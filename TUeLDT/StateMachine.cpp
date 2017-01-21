@@ -1,6 +1,4 @@
 #include "StateMachine.h"
-#include "Camera.h"
-
 using namespace std;
 using namespace cv;
 

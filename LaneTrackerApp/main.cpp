@@ -1,19 +1,11 @@
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "StateMachine.h"
-#include "Camera.h"
 using namespace std;
 using namespace cv;
 
 int main(int argc, char **argv)
 {
-	
-	Camera cam;
-	
-	std::cout<<cam.mProperties.RES_VH <<endl;
-
-	while(1);
-	/*
 	//namedWindow( "Lane Tracker TU/e", WINDOW_AUTOSIZE ); // Create a window for display.
 	vector< cv::String> IMG_filenames;
 	cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
@@ -34,6 +26,6 @@ int main(int argc, char **argv)
 	
 	StateMachine stateMachine(IMG_filenames);
 	return stateMachine.run(sigInit);
-	 * */
+
 }
  

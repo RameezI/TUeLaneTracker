@@ -5,6 +5,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "Lane.h"
 #include "sigInit.h"
+#include "Camera.h"
 using namespace std;
 class StateMachine
 {
@@ -12,8 +13,6 @@ class StateMachine
 	const vector<cv::String> mFileNames;
 	static int mStateCounter;
 	Lane mLane;
-	
-	//class State current;
 	
 	public:
 	StateMachine(const vector<cv::String>&);
