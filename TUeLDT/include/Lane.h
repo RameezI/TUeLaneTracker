@@ -4,7 +4,10 @@
 #include "opencv2/highgui/highgui.hpp"
 #include <Eigen/Dense>
 
+double operator "" _cm( long double );
 using namespace Eigen;
+
+
 class Lane
 {
 	struct Properties
@@ -16,7 +19,7 @@ class Lane
 		const int   CM_STEP;
 		
 		Properties()
-		: AVG_WIDTH(0),STD_WIDTH(0),MIN_WIDTH(0),MAX_WIDTH(0),CM_STEP(0) 
+		: AVG_WIDTH(200.0_cm),STD_WIDTH(0),MIN_WIDTH(0),MAX_WIDTH(0),CM_STEP(0) 
 		{
 			
 		}

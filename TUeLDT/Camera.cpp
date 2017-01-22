@@ -1,4 +1,5 @@
 #include "Camera.h"
+
 Camera::Camera()
 : mCM_TO_PIXEL(CM_TO_PIXEL(mProperties))
 {

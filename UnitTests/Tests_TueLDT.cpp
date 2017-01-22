@@ -1,5 +1,6 @@
 #include "UnitTest++/UnitTest++.h"
 #include  "Camera.h"
+#include  "Lane.h"
 #include <Eigen/Dense>
 using namespace Eigen;
 
@@ -44,6 +45,20 @@ SUITE(TUeLDT_Camera)
 		
 		CHECK_CLOSE(1.5242, cam.mCM_TO_PIXEL, 1.0e-4);
 		
-
     }
+	
+	
+	
+	
+	Lane lane;
+	
+	    TEST(LaneParameters)
+    {
+			
+        CHECK_EQUAL(2, lane.mProperties.AVG_WIDTH);
+
+		
+    }
+	
+	
 }
