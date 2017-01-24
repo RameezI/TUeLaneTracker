@@ -1,10 +1,8 @@
 #ifndef LANE_H
 #define LANE_H
-#include "opencv2/opencv.hpp"
-#include "opencv2/highgui/highgui.hpp"
 #include <Eigen/Dense>
 
-double operator "" _cm( long double );
+//double operator "" _cm( long double );
 using namespace Eigen;
 
 
@@ -16,10 +14,9 @@ class Lane
 		const float STD_WIDTH;
 		const float MIN_WIDTH;
 		const float MAX_WIDTH;
-		const int   CM_STEP;
 		
 		Properties()
-		: AVG_WIDTH(200.0_cm),STD_WIDTH(0),MIN_WIDTH(0),MAX_WIDTH(0),CM_STEP(0) 
+		: AVG_WIDTH(300),STD_WIDTH(50),MIN_WIDTH(250),MAX_WIDTH(500) 
 		{
 			
 		}
@@ -36,15 +33,15 @@ class Lane
 		const Vector2f  DIR;
 		
 		Distributions() //Initialisation of  members through initialisation list
-		:GRAY((Vector2f()<< 0, 0).finished()),
+		:GRAY(Vector2f(25, 0.6)),
 		
-		 YELL((Vector4f()<< 0, 0, 0, 0).finished()),
+		 YELL(Vector4f(100, 0.16-0.05, 100, 0.33+0.05)),
 		 
-		 SAT((Vector2f()<< 0, 0).finished()),
+		 SAT(Vector2f(10, 0.4)),
 		 
-		 MAG((Vector2f()<< 0, 0).finished()),
+		 MAG(Vector2f(50, 0.15)),
 		 
-		 DIR((Vector2f()<< 0, 0).finished())
+		 DIR(Vector2f(-0.25, 15))
 		{
 			//Default Constructor
 		}
