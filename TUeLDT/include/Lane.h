@@ -6,16 +6,14 @@
 using namespace Eigen;
 
 
-class Lane
-{
-	struct Properties
+	struct LaneProperties
 	{
 		const float AVG_WIDTH;
 		const float STD_WIDTH;
 		const float MIN_WIDTH;
 		const float MAX_WIDTH;
 		
-		Properties()
+		LaneProperties()
 		: AVG_WIDTH(300),STD_WIDTH(50),MIN_WIDTH(250),MAX_WIDTH(500) 
 		{
 			
@@ -23,7 +21,7 @@ class Lane
 		
 	};
 	
-	struct Distributions 
+		struct LaneDistributions 
 	{
 		
 		const Vector2f GRAY;
@@ -32,7 +30,7 @@ class Lane
 		const Vector2f  MAG;
 		const Vector2f  DIR;
 		
-		Distributions() //Initialisation of  members through initialisation list
+		LaneDistributions() //Initialisation of  members through initialisation list
 		:GRAY(Vector2f(25, 0.6)),
 		
 		 YELL(Vector4f(100, 0.16-0.05, 100, 0.33+0.05)),
@@ -46,10 +44,13 @@ class Lane
 			//Default Constructor
 		}
 	};
-	
+
+class Lane
+{
+
 public:
-	Properties 		mProperties;
-	Distributions		mDists;
+	const LaneProperties 		mPROPERTIES;
+	const LaneDistributions		mDISTS;
 	Lane();
 	~Lane();
 

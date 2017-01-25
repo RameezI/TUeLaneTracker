@@ -2,9 +2,11 @@
 #include  "Camera.h"
 #include  "Lane.h"
 #include  "LaneFilter.h"
+#include  "VanishingPtFilter.h"
 #include <fstream>
 #include <stdlib.h>
 #include <Eigen/Dense>
+#include <Eigen/Core>
 
 
 
@@ -107,30 +109,84 @@ class Tests
 
 class TEST_LaneFilter:Tests
 {
-
-	
 public:
 	  MatrixXd exp_FilterMatrix;
 	  MatrixXd exp_LanePrior;
-	  VectorXd exp_BINS;
+	  VectorXd exp_BINS_HISTOGRAM;
 	  MatrixXd exp_LaneTransition;
-	  shared_ptr<Camera> camera= make_shared<Camera>();
-	  shared_ptr<Lane>   lane = make_shared<Lane>();
+	  
+	  Camera camera;
+	  Lane   lane;
 	  
 	   LaneFilter laneFilter;
 		TEST_LaneFilter()
-		: laneFilter (LaneFilter(lane, camera))
+		: laneFilter (LaneFilter(lane.mPROPERTIES, camera.mCM_TO_PIXEL))
+	
 		{
-			exp_BINS = readCSV("LANE_BINS_H.csv",  floor((2*laneFilter.PX_MAX)/laneFilter.STEP_PX) +1 );
-			exp_LanePrior = readCSV("LANE_PRIOR.csv",  floor(laneFilter.PX_MAX/laneFilter.STEP_PX) +1 , floor(laneFilter.PX_MAX/laneFilter.STEP_PX) +1);
+
+			exp_BINS_HISTOGRAM = readCSV("LANE_BINS_H.csv",  floor((2*laneFilter.mPX_MAX)/laneFilter.mSTEP_PX) +1 );
+			exp_LanePrior = readCSV("LANE_PRIOR.csv",  floor(laneFilter.mPX_MAX/laneFilter.mSTEP_PX) +1 , floor(laneFilter.mPX_MAX/laneFilter.mSTEP_PX) +1);
 			exp_LaneTransition = readCSV("LANE_TRANSITION.csv", 7, 7);
 		}
 		~TEST_LaneFilter()
 		{
 			
 		}
+		
+		template <typename Derived>
+		void VFilter(const EigenBase<Derived>& ,  const CameraProperties& )
+		{
+			
+		}
+		
+		template <typename Derived>
+		void print_sizee(const MatrixBase<Derived>& b)
+		{
 
+		}
+		
 };
+
+
+
+class TEST_VPFilter:Tests
+{
+public:
+	  MatrixXd exp_Filter;
+	  MatrixXd exp_Prior;
+	  MatrixXd exp_Transition;
+	  VectorXd exp_VpBINS_V;
+	  VectorXd exp_VpBINS_H;
+	  VectorXd exp_BINS_HISTOGRAM;
+	  
+	  
+	  Camera camera;
+	  Lane   lane;
+	  
+	   
+	   LaneFilter laneFilter;
+	   VanishingPtFilter* vpFilter;
+	   
+	  TEST_VPFilter()
+		:laneFilter (LaneFilter(lane.mPROPERTIES, camera.mCM_TO_PIXEL))   //^TODO: Passing EigenMatrix to the constructor in initialisation list doesnot work.  
+		{
+			vpFilter = new VanishingPtFilter(laneFilter.mBINS_HISTOGRAM, camera.mPROPERTIES);
+			exp_VpBINS_V 		= readCSV("VP_BINS_V.csv",  6);
+			exp_VpBINS_H 		= readCSV("VP_BINS_H.csv",  61);
+			exp_BINS_HISTOGRAM 	= readCSV("VP_BINS_HST.csv",153);
+			
+			exp_Filter 			= readCSV("VP_FILTER.csv", 6, 61 );
+			exp_Prior 			= readCSV("VP_PRIOR.csv", 6, 61);
+			exp_Transition   	= readCSV("VP_TRANSITION.csv" , 3, 3 );
+		}
+		
+		~TEST_VPFilter()
+		{
+			
+		}
+};
+
+
 
 
 
@@ -139,14 +195,14 @@ SUITE(TUeLDT_Camera)
 	
 	Camera cam;
 	
-	float 	H_FOV_V     = cam.mProperties.FOV[0]/2;
-	int 	H_RES_V     = cam.mProperties.RES_VH[0]/2;  
-    float 	H_FOV_H     = cam.mProperties.FOV[1]/2;    
-    int 	H_RES_H     = cam.mProperties.RES_VH[1]/2;  
-	double  PX_SIZE     	 = tan(H_FOV_V * M_PI /180.0)*cam.mProperties.FOCAL_LENGTH/H_RES_V;
-	const 	VectorXd vRows 	 = VectorXd::LinSpaced(cam.mProperties.RES_VH[0],1,cam.mProperties.RES_VH[0]);
-    const   VectorXd PX_ANG  = atan( PX_SIZE * (vRows.array()/cam.mProperties.FOCAL_LENGTH) ) * 180.0 /M_PI ;	
-	const	VectorXd DEPTH_P = cam.mProperties.HEIGHT * tan( (90 - PX_ANG.array()) * M_PI/180.0 );
+	float 	H_FOV_V     = cam.mPROPERTIES.FOV[0]/2;
+	int 	H_RES_V     = cam.mPROPERTIES.RES_VH[0]/2;  
+    float 	H_FOV_H     = cam.mPROPERTIES.FOV[1]/2;    
+    int 	H_RES_H     = cam.mPROPERTIES.RES_VH[1]/2;  
+	double  PX_SIZE     	 = tan(H_FOV_V * M_PI /180.0)*cam.mPROPERTIES.FOCAL_LENGTH/H_RES_V;
+	const 	VectorXd vRows 	 = VectorXd::LinSpaced(cam.mPROPERTIES.RES_VH[0],1,cam.mPROPERTIES.RES_VH[0]);
+    const   VectorXd PX_ANG  = atan( PX_SIZE * (vRows.array()/cam.mPROPERTIES.FOCAL_LENGTH) ) * 180.0 /M_PI ;	
+	const	VectorXd DEPTH_P = cam.mPROPERTIES.HEIGHT * tan( (90 - PX_ANG.array()) * M_PI/180.0 );
 	double a = 	H_RES_H/(100*tan(H_FOV_H * M_PI /180.0)*DEPTH_P(H_RES_V-2)); //The horizontal pixel to cm ratio at the bottom line of the image
 
 
@@ -157,9 +213,9 @@ SUITE(TUeLDT_Camera)
 		
 
 		
-        CHECK_EQUAL(240, 	cam.mProperties.FRAME_CENTER(0,0));
-		CHECK_EQUAL(320, 	cam.mProperties.FRAME_CENTER(1,0));
-		CHECK_EQUAL(0.0060, cam.mProperties.FOCAL_LENGTH);
+        CHECK_EQUAL(240, 	cam.mPROPERTIES.FRAME_CENTER(0,0));
+		CHECK_EQUAL(320, 	cam.mPROPERTIES.FRAME_CENTER(1,0));
+		CHECK_EQUAL(0.0060, cam.mPROPERTIES.FOCAL_LENGTH);
 		CHECK_CLOSE(1.0355e-05, PX_SIZE,1.0e-9);
 		CHECK_EQUAL(vRows[5], 6);
 		CHECK_CLOSE(0.098886105737275, PX_ANG[0],1.0e-9);
@@ -184,7 +240,7 @@ SUITE(TUeLDT_Camera)
 	
 	    TEST(LaneParameters)
     {
-        CHECK_EQUAL(300, lane.mProperties.AVG_WIDTH);
+        CHECK_EQUAL(300, lane.mPROPERTIES.AVG_WIDTH);
     }
 	
 	
@@ -196,17 +252,14 @@ SUITE(TUeLDT_Camera)
 		
 		
 		
-		 CHECK_EQUAL(cam.mCM_TO_PIXEL, testLaneFilter.laneFilter.mCamera->mCM_TO_PIXEL);
-		 CHECK_EQUAL(5, testLaneFilter.laneFilter.STEP_CM) ;
-		 CHECK_EQUAL(10, testLaneFilter.laneFilter.STEP_PX) ;
-		 CHECK_EQUAL(760, testLaneFilter.laneFilter.PX_MAX) ;
-		 CHECK_EQUAL(-240, testLaneFilter.laneFilter.FILTER_OFFSET) ;
-		 CHECK_EQUAL(2, testLaneFilter.laneFilter.CONF_THRESH) ;
-		 CHECK_EQUAL(153, floor(2*testLaneFilter.laneFilter.PX_MAX/testLaneFilter.laneFilter.STEP_PX) +1) ;
-		 CHECK_EQUAL(77, floor(testLaneFilter.laneFilter.PX_MAX/testLaneFilter.laneFilter.STEP_PX) +1 ) ;
+		 CHECK_EQUAL(5, testLaneFilter.laneFilter.mSTEP_CM) ;
+		 CHECK_EQUAL(10, testLaneFilter.laneFilter.mSTEP_PX) ;
+		 CHECK_EQUAL(760, testLaneFilter.laneFilter.mPX_MAX) ;
+		 CHECK_EQUAL(2, testLaneFilter.laneFilter.mCONF_THRESH) ;
+		 CHECK_EQUAL(153, floor(2*testLaneFilter.laneFilter.mPX_MAX/testLaneFilter.laneFilter.mSTEP_PX) +1) ;
+		 CHECK_EQUAL(77, floor(testLaneFilter.laneFilter.mPX_MAX/testLaneFilter.laneFilter.mSTEP_PX) +1 ) ;
 		 
-		 CHECK_EQUAL(153, testLaneFilter.laneFilter.mBins.size() );
-		 CHECK_EQUAL(153, testLaneFilter.exp_BINS.size());
+		 CHECK_EQUAL(153, testLaneFilter.laneFilter.mBINS_HISTOGRAM.size() );
 		 
 		 CHECK_EQUAL(77, testLaneFilter.laneFilter.mPrior.rows());
 		 CHECK_EQUAL(77, testLaneFilter.laneFilter.mPrior.cols());
@@ -218,11 +271,32 @@ SUITE(TUeLDT_Camera)
 		 MatrixXd exp_LaneTransition = testLaneFilter.exp_LaneTransition;
 		 MatrixXd act_LaneTransition = testLaneFilter.laneFilter.mTransition;
 		 
-		 CHECK_ARRAY_CLOSE(testLaneFilter.exp_BINS.data(), testLaneFilter.laneFilter.mBins.data(), testLaneFilter.exp_BINS.size(), 1.0e-4);
+		 CHECK_ARRAY_CLOSE(testLaneFilter.exp_BINS_HISTOGRAM.data(), testLaneFilter.laneFilter.mBINS_HISTOGRAM.data(), testLaneFilter.exp_BINS_HISTOGRAM.size(), 1.0e-4);
 		 CHECK_ARRAY_CLOSE(exp_LanePrior.data(), act_LanePrior.data(), 77*77, 1.0e-6);
 		 CHECK_ARRAY_CLOSE(exp_LaneTransition.data(), act_LaneTransition.data(), 7*7, 1.0e-6);
+    }
+	
+	
+	
+	TEST_VPFilter testVpFilter;
+	
+	TEST(VanishPointFilter)
+    {
+		 CHECK_EQUAL(25,  testVpFilter.vpFilter->mRANGE_V) ;
+		 CHECK_EQUAL(300, testVpFilter.vpFilter->mRANGE_H) ;
+		 CHECK_EQUAL(10,  testVpFilter.vpFilter->mSTEP) ;
+		 CHECK_EQUAL(6,   testVpFilter.vpFilter->mNb_BINS_V) ;
 		 
-		 
+		CHECK_ARRAY_CLOSE(testVpFilter.exp_VpBINS_V.data(), testVpFilter.vpFilter->mBINS_V.data(), 6, 1.0e-6) ;
+		CHECK_EQUAL(61, testVpFilter.vpFilter->mNb_BINS_H) ;
+		CHECK_ARRAY_CLOSE(testVpFilter.exp_VpBINS_H.data(), testVpFilter.vpFilter->mBINS_H.data(), 61, 1.0e-6) ;
+		CHECK_EQUAL(153, testVpFilter.vpFilter->mBINS_HISTOGRAM.size()) ;
+		CHECK_ARRAY_CLOSE(testVpFilter.exp_BINS_HISTOGRAM.data(),testVpFilter.vpFilter->mBINS_HISTOGRAM.data(), 153, 1.0e-6) ;
+		
+		
+		CHECK_ARRAY_CLOSE(testVpFilter.exp_Prior.data(),testVpFilter.vpFilter->mPrior.data(), 6*61, 1.0e-6) ;
+		CHECK_ARRAY_CLOSE(testVpFilter.exp_Filter.data(),testVpFilter.vpFilter->mFilter.data(), 6*61, 1.0e-6) ;
+		CHECK_ARRAY_CLOSE(testVpFilter.exp_Transition.data(),testVpFilter.vpFilter->mTransition.data(), 3*3, 1.0e-6) ;
 
     }
 	

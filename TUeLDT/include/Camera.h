@@ -4,23 +4,21 @@
 
 using namespace Eigen;
 
-class Camera
-{
-	struct Properties
+struct CameraProperties
 	{ 		
 		public:
-		const Vector2f	RES_VH; 	    	// resolution of camera
-		const Vector2f  FRAME_CENTER;		// frame center in image coordinate system
+		const Vector2i	RES_VH; 	    	// resolution of camera
+		const Vector2i  FRAME_CENTER;		// frame center in image coordinate system
 		const Vector2f  FOV;				// field of view of camera
 		const float  	HEIGHT;				// camera height in meters
 		const double 	FOCAL_LENGTH;    	// camera focal length in meters
 
 		
-		Properties() //Initialisation of  members through initialisation list
+		CameraProperties() //Initialisation of  members through initialisation list
 		:
-		RES_VH(Vector2f(480, 640)),
+		RES_VH(Vector2i(480, 640)),
 		
-		FRAME_CENTER(Vector2f(480/2, 640/2)),
+		 FRAME_CENTER(Vector2i(480/2, 640/2)),
 		 
 		 FOV(Vector2f(45 , 60)),
 		 
@@ -32,15 +30,25 @@ class Camera
 		}
 		 
 	};
+
+
+
+class Camera
+{
 	
-	double CM_TO_PIXEL(Properties);
+private:
+	double CM_TO_PIXEL();
 	
 public:
-     Properties mProperties;
+     const CameraProperties mPROPERTIES;
 	 const double mCM_TO_PIXEL;			// CM_TO_PIXCEL RATIO
 	 Camera();
 	~Camera();
 
 };
+
+
+
+
 
 #endif // CAMERA_H

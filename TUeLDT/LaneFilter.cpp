@@ -3,36 +3,79 @@ This class provides LaneFilter expressed in Vanishing point coordinate system.
 */
 #include "LaneFilter.h"
 
-LaneFilter::LaneFilter(const shared_ptr<const Lane> lane, const shared_ptr<const Camera> camera)
+LaneFilter::LaneFilter(const LaneProperties& LANE,  const double& CM_TO_PIXEL)
 
 : 
-  mLane(lane),
-  mCamera(camera),
-  STEP_CM(5),
-  STEP_PX(ceil((STEP_CM* mCamera->mCM_TO_PIXEL)/10)*10),
-  mBins(VectorXd::LinSpaced(floor((2*PX_MAX)/STEP_PX) +1 ,-PX_MAX, PX_MAX)),
-  PX_MAX(round((mLane->mProperties.MAX_WIDTH*mCamera->mCM_TO_PIXEL)/STEP_PX)*STEP_PX ),
-  FILTER_OFFSET(-240),
-  CONF_THRESH(2)
+  mLANE(LANE),
+  mCM_TO_PX(CM_TO_PIXEL),
+  mSTEP_CM(5),
+  mSTEP_PX(ceil((mSTEP_CM*mCM_TO_PX)/10)*10),
+  mNb_BINS(floor((2*mPX_MAX)/mSTEP_PX) +1),
+  mNb_OFFSETS(floor((mNb_BINS-1)/2) +1),
+  mBINS_HISTOGRAM(VectorXi::LinSpaced(mNb_BINS,-mPX_MAX, mPX_MAX)),
+  mBINS_FILTER(mBINS_HISTOGRAM.tail(mNb_OFFSETS)),
+  mPX_MAX(round((mLANE.MAX_WIDTH*mCM_TO_PX)/mSTEP_PX)*mSTEP_PX ),
+  mCONF_THRESH(2)
 {
 	
-	createLanePrior();
+	createPrior();
 	mFilter = mPrior;
 	 
 }
 
-void LaneFilter::createLanePrior()
+
+void LaneFilter::createHistograms()
+{
+	
+	
+	//^TODO: Sparce Representation could be used here
+	
+	//^TODO: Temporary Delay the Implementation, Consult with Gijs
+	
+	
+	/*
+	
+	VectorXd bins=mBins.tail(mNbins_oneside);
+	
+	double ObsLeftLane, ObsRightLane, ObsNoLane;
+	float width;
+	
+	double leftOffset, rightOffset;
+	
+	for(int left =1; left < mNbins_oneside; left++)
+	{	
+		for(int right =1; right< mNbins_oneside; right++)
+		{
+		
+			
+			//Allowed states
+			  width = bins(left) + bins(right) * (1/mCamera->mCM_TO_PIXEL);
+			  if (mLane->mProperties.MIN_WIDTH <= width && width <= mLane->mProperties.MAX_WIDTH)
+			  {
+				  leftOffset 	= - bins(left);
+				  rightOffset	=   bins(right) 
+				 
+				  
+			  }
+		}		
+	}	*/
+
+
+
+}
+
+void LaneFilter::createPrior()
 {
 	
 	/*Fill the histogram */
     
 	
-	mPrior  = MatrixXd((int)(PX_MAX/STEP_PX) +1, (int)(PX_MAX/STEP_PX) +1);
+	mPrior  = MatrixXd((int)(mPX_MAX/mSTEP_PX) +1, (int)(mPX_MAX/mSTEP_PX) +1);
 	
-	VectorXd bins_cm = mBins.tail((int)(PX_MAX/STEP_PX) +1)* (1/mCamera->mCM_TO_PIXEL);
+	VectorXf bins_cm = mBINS_FILTER.cast<float>()*(1/mCM_TO_PX);
 	
-    float 	 hmean = mLane->mProperties.AVG_WIDTH/2;
-    float    sigmaL = mLane->mProperties.STD_WIDTH;
+    float 	 hmean = mLANE.AVG_WIDTH/2;
+    float    sigmaL = mLANE.STD_WIDTH;
     double pL, pR, width;
 
 	
@@ -46,7 +89,7 @@ void LaneFilter::createLanePrior()
             
             //prior on lane width
             width = bins_cm(x)+bins_cm(y);
-            if (mLane->mProperties.MIN_WIDTH <= width && width <= mLane->mProperties.MAX_WIDTH)
+            if (mLANE.MIN_WIDTH <= width && width <= mLANE.MAX_WIDTH)
                 mPrior(x,y) = pL*pR;
 		    else
                 mPrior(x,y) = 0;                

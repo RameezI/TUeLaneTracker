@@ -13,13 +13,21 @@ using namespace Eigen;
 class LaneObservation
 {
 private:	
-       const shared_ptr<const LaneFilter> mLaneFilter;
+       const shared_ptr<const Lane> 	mLane;
+	   const shared_ptr<const Camera> 	mCamera;
 	
 public:
-
-	LaneObservation(const shared_ptr<const LaneFilter>);
+	MatrixXd     mLeftLane;
+	MatrixXd 	 mRightLane;
+	MatrixXd     mNotLane;
+	
+	
+	
+	LaneObservation(const shared_ptr<const Lane>, const shared_ptr<const Camera>);
 	~LaneObservation();
-	void createLaneObservationModel();
+	
+	template <typename Derived>
+	void createLaneObservationModel(const MatrixBase<Derived>& a);
 
 };
 
