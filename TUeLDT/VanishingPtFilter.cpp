@@ -1,6 +1,5 @@
 #include "VanishingPtFilter.h"
 
-
 VanishingPtFilter::VanishingPtFilter(const Ref<const VectorXi>& BINS_LANE_HISTOGRAM, const CameraProperties& CAMERA)
 : mRANGE_V(25), 
   mRANGE_H(300),

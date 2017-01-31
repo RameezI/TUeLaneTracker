@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=rameez
-Date                   :=25/01/17
+Date                   :=31/01/17
 CodeLitePath           :="/home/rameez/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -35,13 +35,13 @@ PreprocessOnlySwitch   :=-E
 ObjectsFileList        :="UnitTests.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
-LinkOptions            :=  
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch)$(UNIT_TEST_PP_SRC_DIR)/src $(IncludeSwitch)../TUeLDT/include $(IncludeSwitch)/usr/local/include/UnitTest++ $(IncludeSwitch)/usr/local/include/eigen3 
+LinkOptions            :=  -fopenmp
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch)$(UNIT_TEST_PP_SRC_DIR)/src $(IncludeSwitch)../TUeLDT/include $(IncludeSwitch)/usr/local/include/UnitTest++ $(IncludeSwitch)/usr/local/include/eigen3 $(IncludeSwitch)../InitState/ 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)UnitTest++ $(LibrarySwitch)TUeLDT 
-ArLibs                 :=  "libUnitTest++.a" "libTUeLDT.a" 
-LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)$(UNIT_TEST_PP_SRC_DIR)/Debug $(LibraryPathSwitch)../TUeLDT/Debug 
+Libs                   := $(LibrarySwitch)UnitTest++ $(LibrarySwitch)TUeLDT $(LibrarySwitch)InitStateLDT 
+ArLibs                 :=  "libUnitTest++.a" "libTUeLDT.a" "libInitStateLDT.a" 
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)$(UNIT_TEST_PP_SRC_DIR)/Debug $(LibraryPathSwitch)../TUeLDT/Debug $(LibraryPathSwitch)../InitState/Debug/ 
 
 ##
 ## Common variables

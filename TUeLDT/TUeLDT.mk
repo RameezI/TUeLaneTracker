@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=rameez
-Date                   :=25/01/17
+Date                   :=31/01/17
 CodeLitePath           :="/home/rameez/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -36,7 +36,7 @@ ObjectsFileList        :="TUeLDT.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
 LinkOptions            :=  
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)./include $(IncludeSwitch)/usr/local/include/eigen3 
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)./include $(IncludeSwitch)/usr/local/include/eigen3 $(IncludeSwitch)../InitState/ 
 IncludePCH             := 
 RcIncludePath          := 
 Libs                   := 
@@ -60,8 +60,8 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/Camera.cpp$(ObjectSuffix) $(IntermediateDirectory)/Car.cpp$(ObjectSuffix) $(IntermediateDirectory)/DetectingEgoLane.cpp$(ObjectSuffix) $(IntermediateDirectory)/FillingBuffer.cpp$(ObjectSuffix) $(IntermediateDirectory)/Init_State.cpp$(ObjectSuffix) $(IntermediateDirectory)/Lane.cpp$(ObjectSuffix) $(IntermediateDirectory)/ResetState.cpp$(ObjectSuffix) $(IntermediateDirectory)/sigInit.cpp$(ObjectSuffix) $(IntermediateDirectory)/State.cpp$(ObjectSuffix) $(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/LaneFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/VanishingPtFilter.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/Camera.cpp$(ObjectSuffix) $(IntermediateDirectory)/Car.cpp$(ObjectSuffix) $(IntermediateDirectory)/Lane.cpp$(ObjectSuffix) $(IntermediateDirectory)/sigInit.cpp$(ObjectSuffix) $(IntermediateDirectory)/State.cpp$(ObjectSuffix) $(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/VanishingPtFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/InitState.cpp$(ObjectSuffix) $(IntermediateDirectory)/include_BufferingState.cpp$(ObjectSuffix) \
+	
 
 
 
@@ -110,30 +110,6 @@ $(IntermediateDirectory)/Car.cpp$(DependSuffix): Car.cpp
 $(IntermediateDirectory)/Car.cpp$(PreprocessSuffix): Car.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Car.cpp$(PreprocessSuffix) "Car.cpp"
 
-$(IntermediateDirectory)/DetectingEgoLane.cpp$(ObjectSuffix): DetectingEgoLane.cpp $(IntermediateDirectory)/DetectingEgoLane.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/DetectingEgoLane.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/DetectingEgoLane.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/DetectingEgoLane.cpp$(DependSuffix): DetectingEgoLane.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/DetectingEgoLane.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/DetectingEgoLane.cpp$(DependSuffix) -MM "DetectingEgoLane.cpp"
-
-$(IntermediateDirectory)/DetectingEgoLane.cpp$(PreprocessSuffix): DetectingEgoLane.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/DetectingEgoLane.cpp$(PreprocessSuffix) "DetectingEgoLane.cpp"
-
-$(IntermediateDirectory)/FillingBuffer.cpp$(ObjectSuffix): FillingBuffer.cpp $(IntermediateDirectory)/FillingBuffer.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/FillingBuffer.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/FillingBuffer.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/FillingBuffer.cpp$(DependSuffix): FillingBuffer.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/FillingBuffer.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/FillingBuffer.cpp$(DependSuffix) -MM "FillingBuffer.cpp"
-
-$(IntermediateDirectory)/FillingBuffer.cpp$(PreprocessSuffix): FillingBuffer.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/FillingBuffer.cpp$(PreprocessSuffix) "FillingBuffer.cpp"
-
-$(IntermediateDirectory)/Init_State.cpp$(ObjectSuffix): Init_State.cpp $(IntermediateDirectory)/Init_State.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/Init_State.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/Init_State.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/Init_State.cpp$(DependSuffix): Init_State.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/Init_State.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/Init_State.cpp$(DependSuffix) -MM "Init_State.cpp"
-
-$(IntermediateDirectory)/Init_State.cpp$(PreprocessSuffix): Init_State.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Init_State.cpp$(PreprocessSuffix) "Init_State.cpp"
-
 $(IntermediateDirectory)/Lane.cpp$(ObjectSuffix): Lane.cpp $(IntermediateDirectory)/Lane.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/Lane.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/Lane.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/Lane.cpp$(DependSuffix): Lane.cpp
@@ -141,14 +117,6 @@ $(IntermediateDirectory)/Lane.cpp$(DependSuffix): Lane.cpp
 
 $(IntermediateDirectory)/Lane.cpp$(PreprocessSuffix): Lane.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Lane.cpp$(PreprocessSuffix) "Lane.cpp"
-
-$(IntermediateDirectory)/ResetState.cpp$(ObjectSuffix): ResetState.cpp $(IntermediateDirectory)/ResetState.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/ResetState.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/ResetState.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/ResetState.cpp$(DependSuffix): ResetState.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/ResetState.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/ResetState.cpp$(DependSuffix) -MM "ResetState.cpp"
-
-$(IntermediateDirectory)/ResetState.cpp$(PreprocessSuffix): ResetState.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/ResetState.cpp$(PreprocessSuffix) "ResetState.cpp"
 
 $(IntermediateDirectory)/sigInit.cpp$(ObjectSuffix): sigInit.cpp $(IntermediateDirectory)/sigInit.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/sigInit.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/sigInit.cpp$(ObjectSuffix) $(IncludePath)
@@ -189,6 +157,22 @@ $(IntermediateDirectory)/VanishingPtFilter.cpp$(DependSuffix): VanishingPtFilter
 
 $(IntermediateDirectory)/VanishingPtFilter.cpp$(PreprocessSuffix): VanishingPtFilter.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/VanishingPtFilter.cpp$(PreprocessSuffix) "VanishingPtFilter.cpp"
+
+$(IntermediateDirectory)/InitState.cpp$(ObjectSuffix): InitState.cpp $(IntermediateDirectory)/InitState.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/InitState.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/InitState.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/InitState.cpp$(DependSuffix): InitState.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/InitState.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/InitState.cpp$(DependSuffix) -MM "InitState.cpp"
+
+$(IntermediateDirectory)/InitState.cpp$(PreprocessSuffix): InitState.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/InitState.cpp$(PreprocessSuffix) "InitState.cpp"
+
+$(IntermediateDirectory)/include_BufferingState.cpp$(ObjectSuffix): include/BufferingState.cpp $(IntermediateDirectory)/include_BufferingState.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/include/BufferingState.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/include_BufferingState.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/include_BufferingState.cpp$(DependSuffix): include/BufferingState.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/include_BufferingState.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/include_BufferingState.cpp$(DependSuffix) -MM "include/BufferingState.cpp"
+
+$(IntermediateDirectory)/include_BufferingState.cpp$(PreprocessSuffix): include/BufferingState.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/include_BufferingState.cpp$(PreprocessSuffix) "include/BufferingState.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

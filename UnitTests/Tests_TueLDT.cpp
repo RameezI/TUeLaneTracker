@@ -3,6 +3,7 @@
 #include  "Lane.h"
 #include  "LaneFilter.h"
 #include  "VanishingPtFilter.h"
+#include  "InitState.h"
 #include <fstream>
 #include <stdlib.h>
 #include <Eigen/Dense>
@@ -22,7 +23,7 @@ class Tests
 		
 	public:
 	Tests()
-	: Path("/home/rameez/TUE_Lane_Tracker/")
+	: Path("/home/rameez/TUE_Lane_Tracker_v4.0/")
 	{
 		
 	}
@@ -165,7 +166,7 @@ public:
 	  
 	   
 	   LaneFilter laneFilter;
-	   VanishingPtFilter* vpFilter;
+	   VanishingPtFilter* vpFilter;   
 	   
 	  TEST_VPFilter()
 		:laneFilter (LaneFilter(lane.mPROPERTIES, camera.mCM_TO_PIXEL))   //^TODO: Passing EigenMatrix to the constructor in initialisation list doesnot work.  
@@ -185,6 +186,52 @@ public:
 			
 		}
 };
+
+
+
+class TEST_InitState:Tests
+{
+
+public:
+
+	  Camera camera;
+	  Lane   lane;
+	  shared_ptr<LaneFilter> laneFilter;
+	  shared_ptr<VanishingPtFilter> vpFilter;
+	  
+
+
+/* Testing Private Members of InitState   */
+	  MatrixXd exp_vpFilter;
+	  MatrixXd exp_vpPrior;
+/*  Comment this portion after private member testing*/
+	  
+	  
+	  MatrixXd exp_SEGMENT;
+	  
+	  shared_ptr<InitState> initState;
+	  
+	  TEST_InitState()
+		
+		{ 
+			laneFilter	=	make_shared<LaneFilter>(lane.mPROPERTIES, camera.mCM_TO_PIXEL);
+			vpFilter 	= 	make_shared<VanishingPtFilter>(laneFilter->mBINS_HISTOGRAM, camera.mPROPERTIES);
+			initState   =   make_shared<InitState>(camera.mPROPERTIES, laneFilter, vpFilter, 3);
+			
+			
+			exp_SEGMENT = readCSV("SEGMENT.csv", 480, 640);
+			
+			
+		}
+		
+		~TEST_InitState()
+		{
+			
+		}
+};
+
+
+
 
 
 
@@ -302,6 +349,38 @@ SUITE(TUeLDT_Camera)
 	
 	
 	
+	TEST_InitState testInitState;
 	
+	TEST(InitStateTests)
+	{
+		CHECK_EQUAL(480,  testInitState.initState->mRES_VH[0]) ;
+		/* ^TODO: THe following tests, if two object point to the same data */            
+		/* ^TODO: Make these tests to check all shared Pointers behaviour, in a new file */
+		CHECK_EQUAL(testInitState.vpFilter->mFilter.data(),  testInitState.initState->mVanishPtFilter->mFilter.data()) ;
+		CHECK_ARRAY_CLOSE(testVpFilter.vpFilter->mFilter.data(),  testInitState.initState->mVanishPtFilter->mFilter.data(), 6*61, 1.0e-6) ;
+		
+		//Both points to same data.
+	     CHECK_EQUAL(testInitState.initState->mVanishPtFilter->mFilter.data(),
+					 testInitState.initState->Matlab_vpFilter.mFilter->data);
+					 
+		CHECK_ARRAY_CLOSE(testInitState.initState->mVanishPtFilter->mFilter.data(),
+						  testInitState.initState->Matlab_vpFilter.mFilter->data
+						  , 6*61, 1.0e-6) ;
+						  
+						  
+						  
+		//Both points to same data.
+	     CHECK_EQUAL(testInitState.initState->mLaneFilter->mFilter.data(),
+					 testInitState.initState->Matlab_LaneFilter.mFilter->data) ;
+					 
+		 CHECK_ARRAY_CLOSE(testInitState.initState->mLaneFilter->mFilter.data(),
+						  testInitState.initState->Matlab_LaneFilter.mFilter->data
+						  , 77*77, 1.0e-6) ;				  
+		
+		
+		CHECK_ARRAY_CLOSE(testInitState.exp_SEGMENT.data(), testInitState.initState->Matlab_Templates.SEGMENT->data, 480*640, 1.0e-6) ;			
+					 
+					 
+	}
 	
 }
