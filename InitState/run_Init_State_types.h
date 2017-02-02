@@ -5,7 +5,7 @@
 // File: run_Init_State_types.h
 //
 // MATLAB Coder version            : 3.2
-// C/C++ source code generated on  : 28-Jan-2017 01:24:11
+// C/C++ source code generated on  : 01-Feb-2017 19:25:15
 //
 #ifndef RUN_INIT_STATE_TYPES_H
 #define RUN_INIT_STATE_TYPES_H
@@ -17,7 +17,6 @@
 #ifndef struct_emxArray_real_T
 #define struct_emxArray_real_T
 
-class emxArray_real_T;
 struct emxArray_real_T
 {
   double *data;
@@ -30,26 +29,42 @@ struct emxArray_real_T
 #endif                                 //struct_emxArray_real_T
 
 typedef struct {
-  emxArray_real_T *mFilter;
-  emxArray_real_T *mPrior;
+  emxArray_real_T *FOCUS;
+} MatlabStruct_focusMask;
+
+#ifndef struct_emxArray_real32_T
+#define struct_emxArray_real32_T
+
+struct emxArray_real32_T
+{
+  float *data;
+  int *size;
+  int allocatedSize;
+  int numDimensions;
+  boolean_T canFreeData;
+};
+
+#endif                                 //struct_emxArray_real32_T
+
+typedef struct {
+  emxArray_real32_T *mFilter;
+  emxArray_real32_T *mPrior;
 } MatlabStruct_laneFilter;
 
 typedef struct {
-  emxArray_real_T *TOT_P_ALL;
-  emxArray_real_T *DIR_ALL;
-  emxArray_real_T *MASK_FOC_TOT_P;
-  emxArray_real_T *TOT_P;
-  emxArray_real_T *FOC_TOT_P;
-  emxArray_real_T *AVG_DIR_TOT_P;
-  emxArray_real_T *TOT_P_ALL_BACK_UP;
-  emxArray_real_T *DIR_ALL_BACK_UP;
+  emxArray_real_T *TOT_ALL;
+  emxArray_real_T *TOT_MAX;
+  emxArray_real_T *GRADIENT_DIR_ALL;
+  emxArray_real_T *GRADIENT_DIR_AVG;
+  emxArray_real_T *TOT_ALL_BACK_UP;
+  emxArray_real_T *GRADIENT_DIR_ALL_BACK_UP;
+  emxArray_real_T *TOT_FOCUSED;
 } MatlabStruct_likelihoods;
 
 typedef struct {
-  emxArray_real_T *ROOT_DIR_TEMPLATE;
-  emxArray_real_T *ROOT_PROB_TEMPLATE;
-  emxArray_real_T *ROOT_DEPTH_TEMPLATE;
-  emxArray_real_T *SEGMENT;
+  emxArray_real_T *GRADIENT_DIR_ROOT;
+  emxArray_real_T *PROB_ROOT;
+  emxArray_real_T *DEPTH_ROOT;
 } MatlabStruct_templates;
 
 typedef struct {
@@ -60,8 +75,8 @@ typedef struct {
 } MatlabStruct_vanishingPt;
 
 typedef struct {
-  emxArray_real_T *mFilter;
-  emxArray_real_T *mPrior;
+  emxArray_real32_T *mFilter;
+  emxArray_real32_T *mPrior;
 } MatlabStruct_vpFilter;
 
 #ifndef struct_emxArray__common
@@ -105,20 +120,6 @@ struct emxArray_int32_T
 };
 
 #endif                                 //struct_emxArray_int32_T
-
-#ifndef struct_emxArray_real32_T
-#define struct_emxArray_real32_T
-
-struct emxArray_real32_T
-{
-  float *data;
-  int *size;
-  int allocatedSize;
-  int numDimensions;
-  boolean_T canFreeData;
-};
-
-#endif                                 //struct_emxArray_real32_T
 #endif
 
 //

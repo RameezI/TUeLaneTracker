@@ -1,7 +1,8 @@
 #include "States.h"
 
 
-int State::mStateCounter =0;
+int State::sStateCounter =0;
+
 
 
 State::State()

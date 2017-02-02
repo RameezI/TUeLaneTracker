@@ -4,15 +4,13 @@ using namespace std;
 using namespace cv;
 
 
-
-/* Initialise all static variables */
-const int StateMachine::sNbBuffer =3;
+States StateMachine::sCurrentState = States::BOOTING;
 
 
 /*Constructor*/
+#ifdef DIRECTORY_INPUT    // ^TODO: Define Seprate Constructor for camera input which takes SDI object.
 StateMachine::StateMachine(const vector<cv::String>& filenames) 
-: mFileNames(filenames),
-  mSource(Source::DIRECTORY),
+: mFiles(filenames),
   mStateStrings({ "BOOTING", "BUFFERING", "DETECTING_LANES", "RESETING" })
 
 
@@ -29,54 +27,84 @@ StateMachine::StateMachine(const vector<cv::String>& filenames)
 
 	
 }
-
+#endif
 
  int StateMachine::run(shared_ptr<SigInit> sigInit)
 {
 		//Creates States
-		InitState 			booting(mCamera.mPROPERTIES, mLaneFilter, mVanishingPtFilter, sNbBuffer);
-		BufferingState		buffering();
+		InitState 			booting(mCamera.mPROPERTIES, mLaneFilter, mVanishingPtFilter);
+		BufferingState		buffering;
+		
+		//return 0;
 	
-	
-		mCurrentState= States::BOOTING;
-	
-	
-	while (sigInit->sStatus==SigStatus::STOP)
+	while (sigInit->sStatus!=SigStatus::STOP)
 	{
 		
-		switch (mCurrentState)
+	
+		
+/**************************************************************************************************/
+										// INITIALISING //
+		
+		switch (sCurrentState)
 		{
 		
 		case  States::BOOTING : { 
-									 if (booting.mStateStatus == StateStatus::INACTIVE) {
+									 if (booting.mStateStatus == StateStatus::ACTIVE) {
 											booting.run(); 
-											booting.mStateCounter ++; 
+											booting.sStateCounter ++; 
 										}
 											
-	/*Transition*/				else if (booting.mStateStatus == StateStatus::DONE) {  
+/*Transition*/					else if (booting.mStateStatus == StateStatus::DONE) {  
 											
 											//^TODO: get all allocated memory Maps
-											booting.mStateCounter=0; 
-											mCurrentState =	States::BUFFERING;
+											booting.conclude();
+											sCurrentState =	States::BUFFERING;
 										}
 										
 									else {
 										
-	/*Transition*/							 mCurrentState = States::DISPOSING;
+/*Transition*/							   sCurrentState = States::DISPOSING;
 										
 										 }
 		
 								  }
 		break;
 		
+		
+/***************************************************************************************************/
+											// BUFFERING //
+		
 		case States::BUFFERING : {
 			
 			
-			
-			
+									 if (buffering.mStateStatus == StateStatus::INACTIVE) {
+										 #ifdef DIRECTORY_INPUT 
+											buffering.setSource(mFiles);
+										 #endif
+										}
+											
+							  else  if (buffering.mStateStatus  == StateStatus::ACTIVE) {  
+											
+											buffering.run();
+										}
+										
+/*Transition*/				 else	if(buffering.mStateStatus  == StateStatus::DONE )  {
+	
+	
+										    buffering.conclude();										
+										    sCurrentState = States::DETECTING_LANES;
+										 
+										 }
+								
+/*Transition*/						else {
+									
+											sCurrentState = States::DISPOSING;
+		
+										 }
+
 		 						 }
 		break;
-		  
+/***********************************************************************************************************/		  
 		}
 		
 	}

@@ -5,7 +5,7 @@
 // File: main.cpp
 //
 // MATLAB Coder version            : 3.2
-// C/C++ source code generated on  : 28-Jan-2017 01:24:11
+// C/C++ source code generated on  : 01-Feb-2017 19:25:15
 //
 
 //***********************************************************************
@@ -41,21 +41,21 @@
 #include "run_Init_State_initialize.h"
 
 // Function Declarations
-static void argInit_1x2_real32_T(float result[2]);
+static void argInit_1x2_int32_T(int result[2]);
 static MatlabStruct_laneFilter argInit_MatlabStruct_laneFilter();
 static MatlabStruct_vpFilter argInit_MatlabStruct_vpFilter();
+static int argInit_int32_T();
 static float argInit_real32_T();
-static double argInit_real_T();
-static emxArray_real_T *c_argInit_UnboundedxUnbounded_r();
+static emxArray_real32_T *c_argInit_UnboundedxUnbounded_r();
 static void main_run_Init_State();
 
 // Function Definitions
 
 //
-// Arguments    : float result[2]
+// Arguments    : int result[2]
 // Return Type  : void
 //
-static void argInit_1x2_real32_T(float result[2])
+static void argInit_1x2_int32_T(int result[2])
 {
   int idx1;
 
@@ -63,7 +63,7 @@ static void argInit_1x2_real32_T(float result[2])
   for (idx1 = 0; idx1 < 2; idx1++) {
     // Set the value of the array element.
     // Change this value to the value that the application requires.
-    result[idx1] = argInit_real32_T();
+    result[idx1] = argInit_int32_T();
   }
 }
 
@@ -99,6 +99,15 @@ static MatlabStruct_vpFilter argInit_MatlabStruct_vpFilter()
 
 //
 // Arguments    : void
+// Return Type  : int
+//
+static int argInit_int32_T()
+{
+  return 0;
+}
+
+//
+// Arguments    : void
 // Return Type  : float
 //
 static float argInit_real32_T()
@@ -108,20 +117,11 @@ static float argInit_real32_T()
 
 //
 // Arguments    : void
-// Return Type  : double
+// Return Type  : emxArray_real32_T *
 //
-static double argInit_real_T()
+static emxArray_real32_T *c_argInit_UnboundedxUnbounded_r()
 {
-  return 0.0;
-}
-
-//
-// Arguments    : void
-// Return Type  : emxArray_real_T *
-//
-static emxArray_real_T *c_argInit_UnboundedxUnbounded_r()
-{
-  emxArray_real_T *result;
+  emxArray_real32_T *result;
   static int iv0[2] = { 2, 2 };
 
   int idx0;
@@ -129,14 +129,14 @@ static emxArray_real_T *c_argInit_UnboundedxUnbounded_r()
 
   // Set the size of the array.
   // Change this size to the value that the application requires.
-  result = emxCreateND_real_T(2, *(int (*)[2])&iv0[0]);
+  result = emxCreateND_real32_T(2, *(int (*)[2])&iv0[0]);
 
   // Loop over the array to initialize each element.
   for (idx0 = 0; idx0 < result->size[0U]; idx0++) {
     for (idx1 = 0; idx1 < result->size[1U]; idx1++) {
       // Set the value of the array element.
       // Change this value to the value that the application requires.
-      result->data[idx0 + result->size[0] * idx1] = argInit_real_T();
+      result->data[idx0 + result->size[0] * idx1] = argInit_real32_T();
     }
   }
 
@@ -151,19 +151,20 @@ static void main_run_Init_State()
 {
   MatlabStruct_likelihoods likelihoods;
   MatlabStruct_templates templates;
-  float RES_VH[2];
-  float NBUFFER;
+  MatlabStruct_focusMask masks;
+  int RES_VH[2];
+  int NBUFFER;
   MatlabStruct_laneFilter laneFilter;
   MatlabStruct_vpFilter vpFilter;
-  double msg;
   MatlabStruct_vanishingPt vanishingPt;
   emxInit_MatlabStruct_likelihoods(&likelihoods);
   emxInit_MatlabStruct_templates(&templates);
+  emxInit_MatlabStruct_focusMask(&masks);
 
   // Initialize function 'run_Init_State' input arguments.
   // Initialize function input argument 'RES_VH'.
-  argInit_1x2_real32_T(RES_VH);
-  NBUFFER = argInit_real32_T();
+  argInit_1x2_int32_T(RES_VH);
+  NBUFFER = argInit_int32_T();
 
   // Initialize function input argument 'laneFilter'.
   laneFilter = argInit_MatlabStruct_laneFilter();
@@ -172,8 +173,9 @@ static void main_run_Init_State()
   vpFilter = argInit_MatlabStruct_vpFilter();
 
   // Call the entry-point 'run_Init_State'.
-  run_Init_State(RES_VH, NBUFFER, &laneFilter, &vpFilter, &msg, &likelihoods,
-                 &templates, &vanishingPt);
+  run_Init_State(RES_VH, NBUFFER, &laneFilter, &vpFilter, &likelihoods,
+                 &templates, &vanishingPt, &masks);
+  emxDestroy_MatlabStruct_focusMask(masks);
   emxDestroy_MatlabStruct_templates(templates);
   emxDestroy_MatlabStruct_likelihoods(likelihoods);
   emxDestroy_MatlabStruct_vpFilter(vpFilter);

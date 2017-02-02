@@ -5,7 +5,7 @@
  * File: _coder_run_Init_State_api.h
  *
  * MATLAB Coder version            : 3.2
- * C/C++ source code generated on  : 28-Jan-2017 01:24:11
+ * C/C++ source code generated on  : 01-Feb-2017 19:25:15
  */
 
 #ifndef _CODER_RUN_INIT_STATE_API_H
@@ -41,12 +41,42 @@ typedef struct emxArray_real_T emxArray_real_T;
 
 #endif                                 /*typedef_emxArray_real_T*/
 
+#ifndef typedef_MatlabStruct_focusMask
+#define typedef_MatlabStruct_focusMask
+
+typedef struct {
+  emxArray_real_T *FOCUS;
+} MatlabStruct_focusMask;
+
+#endif                                 /*typedef_MatlabStruct_focusMask*/
+
+#ifndef struct_emxArray_real32_T
+#define struct_emxArray_real32_T
+
+struct emxArray_real32_T
+{
+  real32_T *data;
+  int32_T *size;
+  int32_T allocatedSize;
+  int32_T numDimensions;
+  boolean_T canFreeData;
+};
+
+#endif                                 /*struct_emxArray_real32_T*/
+
+#ifndef typedef_emxArray_real32_T
+#define typedef_emxArray_real32_T
+
+typedef struct emxArray_real32_T emxArray_real32_T;
+
+#endif                                 /*typedef_emxArray_real32_T*/
+
 #ifndef typedef_MatlabStruct_laneFilter
 #define typedef_MatlabStruct_laneFilter
 
 typedef struct {
-  emxArray_real_T *mFilter;
-  emxArray_real_T *mPrior;
+  emxArray_real32_T *mFilter;
+  emxArray_real32_T *mPrior;
 } MatlabStruct_laneFilter;
 
 #endif                                 /*typedef_MatlabStruct_laneFilter*/
@@ -55,14 +85,13 @@ typedef struct {
 #define typedef_MatlabStruct_likelihoods
 
 typedef struct {
-  emxArray_real_T *TOT_P_ALL;
-  emxArray_real_T *DIR_ALL;
-  emxArray_real_T *MASK_FOC_TOT_P;
-  emxArray_real_T *TOT_P;
-  emxArray_real_T *FOC_TOT_P;
-  emxArray_real_T *AVG_DIR_TOT_P;
-  emxArray_real_T *TOT_P_ALL_BACK_UP;
-  emxArray_real_T *DIR_ALL_BACK_UP;
+  emxArray_real_T *TOT_ALL;
+  emxArray_real_T *TOT_MAX;
+  emxArray_real_T *GRADIENT_DIR_ALL;
+  emxArray_real_T *GRADIENT_DIR_AVG;
+  emxArray_real_T *TOT_ALL_BACK_UP;
+  emxArray_real_T *GRADIENT_DIR_ALL_BACK_UP;
+  emxArray_real_T *TOT_FOCUSED;
 } MatlabStruct_likelihoods;
 
 #endif                                 /*typedef_MatlabStruct_likelihoods*/
@@ -71,10 +100,9 @@ typedef struct {
 #define typedef_MatlabStruct_templates
 
 typedef struct {
-  emxArray_real_T *ROOT_DIR_TEMPLATE;
-  emxArray_real_T *ROOT_PROB_TEMPLATE;
-  emxArray_real_T *ROOT_DEPTH_TEMPLATE;
-  emxArray_real_T *SEGMENT;
+  emxArray_real_T *GRADIENT_DIR_ROOT;
+  emxArray_real_T *PROB_ROOT;
+  emxArray_real_T *DEPTH_ROOT;
 } MatlabStruct_templates;
 
 #endif                                 /*typedef_MatlabStruct_templates*/
@@ -95,8 +123,8 @@ typedef struct {
 #define typedef_MatlabStruct_vpFilter
 
 typedef struct {
-  emxArray_real_T *mFilter;
-  emxArray_real_T *mPrior;
+  emxArray_real32_T *mFilter;
+  emxArray_real32_T *mPrior;
 } MatlabStruct_vpFilter;
 
 #endif                                 /*typedef_MatlabStruct_vpFilter*/
@@ -106,10 +134,10 @@ extern emlrtCTX emlrtRootTLSGlobal;
 extern emlrtContext emlrtContextGlobal;
 
 /* Function Declarations */
-extern void run_Init_State(real32_T RES_VH[2], real32_T NBUFFER,
-  MatlabStruct_laneFilter *laneFilter, MatlabStruct_vpFilter *vpFilter, real_T
-  *msg, MatlabStruct_likelihoods *likelihoods, MatlabStruct_templates *templates,
-  MatlabStruct_vanishingPt *vanishingPt);
+extern void run_Init_State(int32_T RES_VH[2], int32_T NBUFFER,
+  MatlabStruct_laneFilter *laneFilter, MatlabStruct_vpFilter *vpFilter,
+  MatlabStruct_likelihoods *likelihoods, MatlabStruct_templates *templates,
+  MatlabStruct_vanishingPt *vanishingPt, MatlabStruct_focusMask *masks);
 extern void run_Init_State_api(const mxArray *prhs[4], const mxArray *plhs[4]);
 extern void run_Init_State_atexit(void);
 extern void run_Init_State_initialize(void);

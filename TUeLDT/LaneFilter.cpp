@@ -70,7 +70,7 @@ void LaneFilter::createPrior()
 	/*Fill the histogram */
     
 	
-	mPrior  = MatrixXd((int)(mPX_MAX/mSTEP_PX) +1, (int)(mPX_MAX/mSTEP_PX) +1);
+	mPrior  = MatrixXf((int)(mPX_MAX/mSTEP_PX) +1, (int)(mPX_MAX/mSTEP_PX) +1);
 	
 	VectorXf bins_cm = mBINS_FILTER.cast<float>()*(1/mCM_TO_PX);
 	
@@ -100,7 +100,7 @@ void LaneFilter::createPrior()
     mPrior = (mPrior/mPrior.sum()).eval();
     
     // Transition Matrix 
-     mTransition = Matrix7d::Constant(7,7,1);
+     mTransition = Matrix7f::Constant(7,7,1);
      mTransition = (mTransition/ mTransition.sum()).eval(); 
 	  
 }

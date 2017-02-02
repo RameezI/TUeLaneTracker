@@ -165,7 +165,7 @@ public:
 	  Lane   lane;
 	  
 	   
-	   LaneFilter laneFilter;
+	   LaneFilter 	laneFilter;
 	   VanishingPtFilter* vpFilter;   
 	   
 	  TEST_VPFilter()
@@ -205,6 +205,8 @@ public:
 	  MatrixXd exp_vpFilter;
 	  MatrixXd exp_vpPrior;
 /*  Comment this portion after private member testing*/
+
+	 MatrixXd	exp_TOT_P;
 	  
 	  
 	  MatrixXd exp_SEGMENT;
@@ -216,11 +218,10 @@ public:
 		{ 
 			laneFilter	=	make_shared<LaneFilter>(lane.mPROPERTIES, camera.mCM_TO_PIXEL);
 			vpFilter 	= 	make_shared<VanishingPtFilter>(laneFilter->mBINS_HISTOGRAM, camera.mPROPERTIES);
-			initState   =   make_shared<InitState>(camera.mPROPERTIES, laneFilter, vpFilter, 3);
-			
-			
+			initState   =   make_shared<InitState>(camera.mPROPERTIES, laneFilter, vpFilter);
+
 			exp_SEGMENT = readCSV("SEGMENT.csv", 480, 640);
-			
+			exp_TOT_P	= readCSV("TOT_P_ALL_1.csv", 480, 640);
 			
 		}
 		
@@ -314,9 +315,9 @@ SUITE(TUeLDT_Camera)
 		 
 		 
 		 MatrixXd exp_LanePrior = testLaneFilter.exp_LanePrior;
-		 MatrixXd act_LanePrior = testLaneFilter.laneFilter.mPrior;
+		 MatrixXf act_LanePrior = testLaneFilter.laneFilter.mPrior;
 		 MatrixXd exp_LaneTransition = testLaneFilter.exp_LaneTransition;
-		 MatrixXd act_LaneTransition = testLaneFilter.laneFilter.mTransition;
+		 MatrixXf act_LaneTransition = testLaneFilter.laneFilter.mTransition;
 		 
 		 CHECK_ARRAY_CLOSE(testLaneFilter.exp_BINS_HISTOGRAM.data(), testLaneFilter.laneFilter.mBINS_HISTOGRAM.data(), testLaneFilter.exp_BINS_HISTOGRAM.size(), 1.0e-4);
 		 CHECK_ARRAY_CLOSE(exp_LanePrior.data(), act_LanePrior.data(), 77*77, 1.0e-6);
@@ -349,7 +350,7 @@ SUITE(TUeLDT_Camera)
 	
 	
 	
-	TEST_InitState testInitState;
+	 TEST_InitState testInitState;
 	
 	TEST(InitStateTests)
 	{
@@ -360,7 +361,7 @@ SUITE(TUeLDT_Camera)
 		CHECK_ARRAY_CLOSE(testVpFilter.vpFilter->mFilter.data(),  testInitState.initState->mVanishPtFilter->mFilter.data(), 6*61, 1.0e-6) ;
 		
 		//Both points to same data.
-	     CHECK_EQUAL(testInitState.initState->mVanishPtFilter->mFilter.data(),
+		CHECK_EQUAL(testInitState.initState->mVanishPtFilter->mFilter.data(),
 					 testInitState.initState->Matlab_vpFilter.mFilter->data);
 					 
 		CHECK_ARRAY_CLOSE(testInitState.initState->mVanishPtFilter->mFilter.data(),
@@ -377,8 +378,7 @@ SUITE(TUeLDT_Camera)
 						  testInitState.initState->Matlab_LaneFilter.mFilter->data
 						  , 77*77, 1.0e-6) ;				  
 		
-		
-		CHECK_ARRAY_CLOSE(testInitState.exp_SEGMENT.data(), testInitState.initState->Matlab_Templates.SEGMENT->data, 480*640, 1.0e-6) ;			
+		CHECK_ARRAY_CLOSE(testInitState.exp_TOT_P.data(), testInitState.initState->mLikelihoods->TOT_ALL[0].data(), 480*640, 1.0e-6) ;	
 					 
 					 
 	}

@@ -5,7 +5,7 @@
 // File: morphopAlgo.cpp
 //
 // MATLAB Coder version            : 3.2
-// C/C++ source code generated on  : 28-Jan-2017 01:24:11
+// C/C++ source code generated on  : 01-Feb-2017 19:25:15
 //
 
 // Include Files
@@ -477,8 +477,7 @@ void morphopAlgo(const emxArray_real_T *A, emxArray_real_T *B)
           }
 
           ak = pind - r;
-          switch (firstIndRange[0]) {
-           case 0:
+          if (firstIndRange[0] == 0) {
             if (ak == 0) {
               i = 0;
             } else if (ak < 0) {
@@ -486,17 +485,11 @@ void morphopAlgo(const emxArray_real_T *A, emxArray_real_T *B)
             } else {
               i = MAX_int32_T;
             }
-            break;
-
-           case 1:
+          } else if (firstIndRange[0] == 1) {
             i = ak;
-            break;
-
-           case -1:
+          } else if (firstIndRange[0] == -1) {
             i = -ak;
-            break;
-
-           default:
+          } else {
             if (ak >= 0) {
               indx = ak;
             } else if (ak == MIN_int32_T) {
@@ -513,7 +506,7 @@ void morphopAlgo(const emxArray_real_T *A, emxArray_real_T *B)
               ck = -firstIndRange[0];
             }
 
-            i = div_s32(indx, ck);
+            i = indx / ck;
             indx -= i * ck;
             if ((indx > 0) && (indx >= (ck >> 1) + (ck & 1))) {
               i++;
@@ -522,7 +515,6 @@ void morphopAlgo(const emxArray_real_T *A, emxArray_real_T *B)
             if ((ak < 0) != (firstIndRange[0] < 0)) {
               i = -i;
             }
-            break;
           }
 
           pixelSub[1] = i + 1;
@@ -784,8 +776,7 @@ void morphopAlgo(const emxArray_real_T *A, emxArray_real_T *B)
           }
 
           ak = pind - r;
-          switch (firstIndRange[0]) {
-           case 0:
+          if (firstIndRange[0] == 0) {
             if (ak == 0) {
               i = 0;
             } else if (ak < 0) {
@@ -793,17 +784,11 @@ void morphopAlgo(const emxArray_real_T *A, emxArray_real_T *B)
             } else {
               i = MAX_int32_T;
             }
-            break;
-
-           case 1:
+          } else if (firstIndRange[0] == 1) {
             i = ak;
-            break;
-
-           case -1:
+          } else if (firstIndRange[0] == -1) {
             i = -ak;
-            break;
-
-           default:
+          } else {
             if (ak >= 0) {
               indx = ak;
             } else if (ak == MIN_int32_T) {
@@ -820,7 +805,7 @@ void morphopAlgo(const emxArray_real_T *A, emxArray_real_T *B)
               ck = -firstIndRange[0];
             }
 
-            i = div_s32(indx, ck);
+            i = indx / ck;
             indx -= i * ck;
             if ((indx > 0) && (indx >= (ck >> 1) + (ck & 1))) {
               i++;
@@ -829,7 +814,6 @@ void morphopAlgo(const emxArray_real_T *A, emxArray_real_T *B)
             if ((ak < 0) != (firstIndRange[0] < 0)) {
               i = -i;
             }
-            break;
           }
 
           b_pixelSub[1] = i + 1;
@@ -1087,8 +1071,7 @@ void morphopAlgo(const emxArray_real_T *A, emxArray_real_T *B)
           }
 
           ak = pind - r;
-          switch (firstIndRange[0]) {
-           case 0:
+          if (firstIndRange[0] == 0) {
             if (ak == 0) {
               i = 0;
             } else if (ak < 0) {
@@ -1096,17 +1079,11 @@ void morphopAlgo(const emxArray_real_T *A, emxArray_real_T *B)
             } else {
               i = MAX_int32_T;
             }
-            break;
-
-           case 1:
+          } else if (firstIndRange[0] == 1) {
             i = ak;
-            break;
-
-           case -1:
+          } else if (firstIndRange[0] == -1) {
             i = -ak;
-            break;
-
-           default:
+          } else {
             if (ak >= 0) {
               indx = ak;
             } else if (ak == MIN_int32_T) {
@@ -1123,7 +1100,7 @@ void morphopAlgo(const emxArray_real_T *A, emxArray_real_T *B)
               ck = -firstIndRange[0];
             }
 
-            i = div_s32(indx, ck);
+            i = indx / ck;
             indx -= i * ck;
             if ((indx > 0) && (indx >= (ck >> 1) + (ck & 1))) {
               i++;
@@ -1132,7 +1109,6 @@ void morphopAlgo(const emxArray_real_T *A, emxArray_real_T *B)
             if ((ak < 0) != (firstIndRange[0] < 0)) {
               i = -i;
             }
-            break;
           }
 
           c_pixelSub[1] = i + 1;
@@ -1394,8 +1370,7 @@ void morphopAlgo(const emxArray_real_T *A, emxArray_real_T *B)
           }
 
           ak = pind - r;
-          switch (firstIndRange[0]) {
-           case 0:
+          if (firstIndRange[0] == 0) {
             if (ak == 0) {
               i = 0;
             } else if (ak < 0) {
@@ -1403,17 +1378,11 @@ void morphopAlgo(const emxArray_real_T *A, emxArray_real_T *B)
             } else {
               i = MAX_int32_T;
             }
-            break;
-
-           case 1:
+          } else if (firstIndRange[0] == 1) {
             i = ak;
-            break;
-
-           case -1:
+          } else if (firstIndRange[0] == -1) {
             i = -ak;
-            break;
-
-           default:
+          } else {
             if (ak >= 0) {
               indx = ak;
             } else if (ak == MIN_int32_T) {
@@ -1430,7 +1399,7 @@ void morphopAlgo(const emxArray_real_T *A, emxArray_real_T *B)
               ck = -firstIndRange[0];
             }
 
-            i = div_s32(indx, ck);
+            i = indx / ck;
             indx -= i * ck;
             if ((indx > 0) && (indx >= (ck >> 1) + (ck & 1))) {
               i++;
@@ -1439,7 +1408,6 @@ void morphopAlgo(const emxArray_real_T *A, emxArray_real_T *B)
             if ((ak < 0) != (firstIndRange[0] < 0)) {
               i = -i;
             }
-            break;
           }
 
           d_pixelSub[1] = i + 1;

@@ -2,7 +2,7 @@
 ## Makefile generated for MATLAB file/project 'run_Init_State'. 
 ## 
 ## Makefile     : run_Init_State_rtw.mk
-## Generated on : Fri Jan 27 22:22:04 2017
+## Generated on : Wed Feb 01 19:15:31 2017
 ## MATLAB Coder version: 3.2 (R2016b)
 ## 
 ## Build Info:
@@ -28,11 +28,11 @@ MATLAB_ROOT               = /usr/local/MATLAB/R2016b
 MATLAB_BIN                = /usr/local/MATLAB/R2016b/bin
 MATLAB_ARCH_BIN           = /usr/local/MATLAB/R2016b/bin/glnxa64
 MASTER_ANCHOR_DIR         = 
-START_DIR                 = /home/rameez/TUE_Lane_Tracker
+START_DIR                 = /home/rameez/TUE_Lane_Tracker_v4.0
 ARCH                      = glnxa64
 RELATIVE_PATH_TO_ANCHOR   = .
-ANSI_OPTS                 = -std=gnu99 -pedantic -fwrapv
-CPP_ANSI_OPTS             =  -fwrapv
+ANSI_OPTS                 = -ansi -pedantic -Wno-long-long -fwrapv
+CPP_ANSI_OPTS             = -std=c++98 -pedantic -Wno-long-long -fwrapv
 
 ###########################################################################
 ## TOOLCHAIN SPECIFICATIONS

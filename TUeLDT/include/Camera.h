@@ -16,7 +16,7 @@ struct CameraProperties
 		
 		CameraProperties() //Initialisation of  members through initialisation list
 		:
-		RES_VH(Vector2i(480, 640)),
+		 RES_VH(Vector2i(480, 640)),
 		
 		 FRAME_CENTER(Vector2i(480/2, 640/2)),
 		 

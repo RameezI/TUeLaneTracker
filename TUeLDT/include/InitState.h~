@@ -13,13 +13,46 @@
 #include "run_Init_State_initialize.h"
 		
 
+
+
+struct Likelihoods
+{
+		MatrixXd  TOT_P_ALL;
+		MatrixXd  DIR_ALL;
+		MatrixXd  MASK_FOC_TOT_P;
+		MatrixXd  TOT_P;
+		MatrixXd  FOC_TOT_P;
+		MatrixXd  AVG_DIR_TOT_P;
+		MatrixXd  TOT_P_ALL_BACK_UP;
+		MatrixXd  DIR_ALL_BACK_UP;
+};
+
+struct Templates
+{
+  MatrixXd ROOT_DIR_TEMPLATE;
+  MatrixXd ROOT_PROB_TEMPLATE;
+  MatrixXd ROOT_DEPTH_TEMPLATE;
+  MatrixXd SEGMENT;
+}; 
+
+struct VanishingPt
+{
+  int  V;
+  int  H;
+  int  V_prev;
+  int  H_prev;
+  VanishingPt()
+  : V(0),H(0),V_prev(0),H_prev(0){}
+};
+
+
 class InitState: public State
 {	
 
 // For testing purposes, make private when testing completed for private members.
 public :
 
-		//const int mNbBuffer; 
+		const int mNbBuffer; 
 		
 	    shared_ptr<LaneFilter>		  mLaneFilter;
 		shared_ptr<VanishingPtFilter> mVanishPtFilter;
@@ -28,10 +61,8 @@ public :
 		MatlabStruct_likelihoods Matlab_Likelihoods;
 		MatlabStruct_templates   Matlab_Templates;
 		MatlabStruct_laneFilter  Matlab_LaneFilter;
-		MatlabStruct_focusMask   Matlab_Masks;
-		
 		MatlabStruct_vpFilter    Matlab_vpFilter;
-		MatlabStruct_vanishingPt Matlab_VanishingPt;
+		MatlabStruct_vanishingPt Matlab_vanishingPt;
 		
 		
 		shared_ptr<VanishingPt> mVanishingPt;
@@ -41,8 +72,7 @@ public :
 
 public:
 		void run();
-		void conclude();
-		InitState(const CameraProperties& , shared_ptr<LaneFilter> , shared_ptr<VanishingPtFilter>);
+		InitState(const CameraProperties& , shared_ptr<LaneFilter> , shared_ptr<VanishingPtFilter>, const int);
 		~InitState();
 
 	};

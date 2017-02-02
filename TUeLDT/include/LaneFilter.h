@@ -7,7 +7,7 @@
 
 using namespace std;
 using namespace Eigen;
-typedef Matrix<double, 7, 7> Matrix7d;
+typedef Matrix<float, 7, 7> Matrix7f;
 
 	
 	class LaneFilter
@@ -30,9 +30,9 @@ typedef Matrix<double, 7, 7> Matrix7d;
 		const int   	mNb_OFFSETS;    		// number of bins in the mFilter.
 		const VectorXi  mBINS_HISTOGRAM;     // -PX_MAX:STEP: PX_MAX
 		const VectorXi  mBINS_FILTER;        //  0 : STEP : PX_MAX
-		MatrixXd     	mPrior;
-		MatrixXd 	 	mFilter;           //^TODO: Rename it as mStatesFilter or something more intutive --> probabilities of states
-		Matrix7d	 	mTransition;  
+		MatrixXf     	mPrior;
+		MatrixXf 	 	mFilter;           //^TODO: Rename it as mStatesFilter or something more intutive --> probabilities of states
+		Matrix7f	 	mTransition;  
 		
 
 		//const Ref<const MatrixXd>& getFilter();

@@ -5,7 +5,7 @@
  * File: _coder_run_Init_State_api.c
  *
  * MATLAB Coder version            : 3.2
- * C/C++ source code generated on  : 28-Jan-2017 01:24:11
+ * C/C++ source code generated on  : 01-Feb-2017 19:25:15
  */
 
 /* Include Files */
@@ -49,16 +49,19 @@ emlrtContext emlrtContextGlobal = { true,/* bFirstTime */
 };
 
 /* Function Declarations */
-static real32_T (*b_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u,
+static int32_T (*b_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u,
   const emlrtMsgIdentifier *parentId))[2];
-static const mxArray *b_emlrt_marshallOut(const MatlabStruct_likelihoods u);
-static real32_T c_emlrt_marshallIn(const emlrtStack *sp, const mxArray *NBUFFER,
+static const mxArray *b_emlrt_marshallOut(const emxArray_real_T *u);
+static int32_T c_emlrt_marshallIn(const emlrtStack *sp, const mxArray *NBUFFER,
   const char_T *identifier);
 static const mxArray *c_emlrt_marshallOut(const emxArray_real_T *u);
+static void c_emxFreeStruct_MatlabStruct_fo(MatlabStruct_focusMask *pStruct);
 static void c_emxFreeStruct_MatlabStruct_la(MatlabStruct_laneFilter *pStruct);
 static void c_emxFreeStruct_MatlabStruct_li(MatlabStruct_likelihoods *pStruct);
 static void c_emxFreeStruct_MatlabStruct_te(MatlabStruct_templates *pStruct);
 static void c_emxFreeStruct_MatlabStruct_vp(MatlabStruct_vpFilter *pStruct);
+static void c_emxInitStruct_MatlabStruct_fo(const emlrtStack *sp,
+  MatlabStruct_focusMask *pStruct, boolean_T doPush);
 static void c_emxInitStruct_MatlabStruct_la(const emlrtStack *sp,
   MatlabStruct_laneFilter *pStruct, boolean_T doPush);
 static void c_emxInitStruct_MatlabStruct_li(const emlrtStack *sp,
@@ -67,37 +70,40 @@ static void c_emxInitStruct_MatlabStruct_te(const emlrtStack *sp,
   MatlabStruct_templates *pStruct, boolean_T doPush);
 static void c_emxInitStruct_MatlabStruct_vp(const emlrtStack *sp,
   MatlabStruct_vpFilter *pStruct, boolean_T doPush);
-static real32_T d_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u, const
+static int32_T d_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u, const
   emlrtMsgIdentifier *parentId);
-static const mxArray *d_emlrt_marshallOut(const emxArray_real_T *u);
+static const mxArray *d_emlrt_marshallOut(const MatlabStruct_templates u);
 static void e_emlrt_marshallIn(const emlrtStack *sp, const mxArray *laneFilter,
   const char_T *identifier, MatlabStruct_laneFilter *y);
-static const mxArray *e_emlrt_marshallOut(const MatlabStruct_templates u);
-static real32_T (*emlrt_marshallIn(const emlrtStack *sp, const mxArray *RES_VH,
+static const mxArray *e_emlrt_marshallOut(const MatlabStruct_vanishingPt u);
+static int32_T (*emlrt_marshallIn(const emlrtStack *sp, const mxArray *RES_VH,
   const char_T *identifier))[2];
-static const mxArray *emlrt_marshallOut(const real_T u);
+static const mxArray *emlrt_marshallOut(const MatlabStruct_likelihoods u);
 static void emxEnsureCapacity(emxArray__common *emxArray, int32_T oldNumel,
   int32_T elementSize);
+static void emxFree_real32_T(emxArray_real32_T **pEmxArray);
 static void emxFree_real_T(emxArray_real_T **pEmxArray);
+static void emxInit_real32_T(const emlrtStack *sp, emxArray_real32_T **pEmxArray,
+  int32_T numDimensions, boolean_T doPush);
 static void emxInit_real_T(const emlrtStack *sp, emxArray_real_T **pEmxArray,
   int32_T numDimensions, boolean_T doPush);
 static void emxInit_real_T1(const emlrtStack *sp, emxArray_real_T **pEmxArray,
   int32_T numDimensions, boolean_T doPush);
 static void f_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u, const
   emlrtMsgIdentifier *parentId, MatlabStruct_laneFilter *y);
-static const mxArray *f_emlrt_marshallOut(const MatlabStruct_vanishingPt u);
+static const mxArray *f_emlrt_marshallOut(const MatlabStruct_focusMask u);
 static void g_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u, const
-  emlrtMsgIdentifier *parentId, emxArray_real_T *y);
+  emlrtMsgIdentifier *parentId, emxArray_real32_T *y);
 static void h_emlrt_marshallIn(const emlrtStack *sp, const mxArray *vpFilter,
   const char_T *identifier, MatlabStruct_vpFilter *y);
 static void i_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u, const
   emlrtMsgIdentifier *parentId, MatlabStruct_vpFilter *y);
-static real32_T (*j_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
+static int32_T (*j_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
   const emlrtMsgIdentifier *msgId))[2];
-static real32_T k_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
+static int32_T k_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
   const emlrtMsgIdentifier *msgId);
 static void l_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src, const
-  emlrtMsgIdentifier *msgId, emxArray_real_T *ret);
+  emlrtMsgIdentifier *msgId, emxArray_real32_T *ret);
 
 /* Function Definitions */
 
@@ -105,42 +111,45 @@ static void l_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src, const
  * Arguments    : const emlrtStack *sp
  *                const mxArray *u
  *                const emlrtMsgIdentifier *parentId
- * Return Type  : real32_T (*)[2]
+ * Return Type  : int32_T (*)[2]
  */
-static real32_T (*b_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u,
+static int32_T (*b_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u,
   const emlrtMsgIdentifier *parentId))[2]
 {
-  real32_T (*y)[2];
+  int32_T (*y)[2];
   y = j_emlrt_marshallIn(sp, emlrtAlias(u), parentId);
   emlrtDestroyArray(&u);
   return y;
 }
 /*
- * Arguments    : const MatlabStruct_likelihoods u
+ * Arguments    : const emxArray_real_T *u
  * Return Type  : const mxArray *
  */
-  static const mxArray *b_emlrt_marshallOut(const MatlabStruct_likelihoods u)
+  static const mxArray *b_emlrt_marshallOut(const emxArray_real_T *u)
 {
   const mxArray *y;
-  const mxArray *b_y;
-  const mxArray *m1;
-  static const int32_T iv0[2] = { 0, 0 };
-
+  const mxArray *m0;
+  real_T *pData;
+  int32_T i0;
+  int32_T i;
+  int32_T b_i;
+  int32_T c_i;
   y = NULL;
-  emlrtAssign(&y, emlrtCreateStructMatrix(1, 1, 0, NULL));
-  emlrtAddField(y, c_emlrt_marshallOut(u.TOT_P_ALL), "TOT_P_ALL", 0);
-  emlrtAddField(y, c_emlrt_marshallOut(u.DIR_ALL), "DIR_ALL", 0);
-  emlrtAddField(y, d_emlrt_marshallOut(u.MASK_FOC_TOT_P), "MASK_FOC_TOT_P", 0);
-  emlrtAddField(y, d_emlrt_marshallOut(u.TOT_P), "TOT_P", 0);
-  emlrtAddField(y, d_emlrt_marshallOut(u.FOC_TOT_P), "FOC_TOT_P", 0);
-  emlrtAddField(y, d_emlrt_marshallOut(u.AVG_DIR_TOT_P), "AVG_DIR_TOT_P", 0);
-  emlrtAddField(y, c_emlrt_marshallOut(u.TOT_P_ALL_BACK_UP), "TOT_P_ALL_BACK_UP",
-                0);
-  emlrtAddField(y, c_emlrt_marshallOut(u.DIR_ALL_BACK_UP), "DIR_ALL_BACK_UP", 0);
-  b_y = NULL;
-  m1 = emlrtCreateNumericArray(2, iv0, mxDOUBLE_CLASS, mxREAL);
-  emlrtAssign(&b_y, m1);
-  emlrtAddField(y, b_y, "IDX_LANE_PIX", 0);
+  m0 = emlrtCreateNumericArray(3, *(int32_T (*)[3])u->size, mxDOUBLE_CLASS,
+    mxREAL);
+  pData = (real_T *)mxGetPr(m0);
+  i0 = 0;
+  for (i = 0; i < u->size[2]; i++) {
+    for (b_i = 0; b_i < u->size[1]; b_i++) {
+      for (c_i = 0; c_i < u->size[0]; c_i++) {
+        pData[i0] = u->data[(c_i + u->size[0] * b_i) + u->size[0] * u->size[1] *
+          i];
+        i0++;
+      }
+    }
+  }
+
+  emlrtAssign(&y, m0);
   return y;
 }
 
@@ -148,12 +157,12 @@ static real32_T (*b_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u,
  * Arguments    : const emlrtStack *sp
  *                const mxArray *NBUFFER
  *                const char_T *identifier
- * Return Type  : real32_T
+ * Return Type  : int32_T
  */
-static real32_T c_emlrt_marshallIn(const emlrtStack *sp, const mxArray *NBUFFER,
+static int32_T c_emlrt_marshallIn(const emlrtStack *sp, const mxArray *NBUFFER,
   const char_T *identifier)
 {
-  real32_T y;
+  int32_T y;
   emlrtMsgIdentifier thisId;
   thisId.fIdentifier = identifier;
   thisId.fParent = NULL;
@@ -170,29 +179,34 @@ static real32_T c_emlrt_marshallIn(const emlrtStack *sp, const mxArray *NBUFFER,
 static const mxArray *c_emlrt_marshallOut(const emxArray_real_T *u)
 {
   const mxArray *y;
-  const mxArray *m2;
+  const mxArray *m1;
   real_T *pData;
-  int32_T i0;
+  int32_T i1;
   int32_T i;
   int32_T b_i;
-  int32_T c_i;
   y = NULL;
-  m2 = emlrtCreateNumericArray(3, *(int32_T (*)[3])u->size, mxDOUBLE_CLASS,
+  m1 = emlrtCreateNumericArray(2, *(int32_T (*)[3])u->size, mxDOUBLE_CLASS,
     mxREAL);
-  pData = (real_T *)mxGetPr(m2);
-  i0 = 0;
-  for (i = 0; i < u->size[2]; i++) {
-    for (b_i = 0; b_i < u->size[1]; b_i++) {
-      for (c_i = 0; c_i < u->size[0]; c_i++) {
-        pData[i0] = u->data[(c_i + u->size[0] * b_i) + u->size[0] * u->size[1] *
-          i];
-        i0++;
-      }
+  pData = (real_T *)mxGetPr(m1);
+  i1 = 0;
+  for (i = 0; i < u->size[1]; i++) {
+    for (b_i = 0; b_i < u->size[0]; b_i++) {
+      pData[i1] = u->data[b_i + u->size[0] * i];
+      i1++;
     }
   }
 
-  emlrtAssign(&y, m2);
+  emlrtAssign(&y, m1);
   return y;
+}
+
+/*
+ * Arguments    : MatlabStruct_focusMask *pStruct
+ * Return Type  : void
+ */
+static void c_emxFreeStruct_MatlabStruct_fo(MatlabStruct_focusMask *pStruct)
+{
+  emxFree_real_T(&pStruct->FOCUS);
 }
 
 /*
@@ -201,8 +215,8 @@ static const mxArray *c_emlrt_marshallOut(const emxArray_real_T *u)
  */
 static void c_emxFreeStruct_MatlabStruct_la(MatlabStruct_laneFilter *pStruct)
 {
-  emxFree_real_T(&pStruct->mFilter);
-  emxFree_real_T(&pStruct->mPrior);
+  emxFree_real32_T(&pStruct->mFilter);
+  emxFree_real32_T(&pStruct->mPrior);
 }
 
 /*
@@ -211,14 +225,13 @@ static void c_emxFreeStruct_MatlabStruct_la(MatlabStruct_laneFilter *pStruct)
  */
 static void c_emxFreeStruct_MatlabStruct_li(MatlabStruct_likelihoods *pStruct)
 {
-  emxFree_real_T(&pStruct->TOT_P_ALL);
-  emxFree_real_T(&pStruct->DIR_ALL);
-  emxFree_real_T(&pStruct->MASK_FOC_TOT_P);
-  emxFree_real_T(&pStruct->TOT_P);
-  emxFree_real_T(&pStruct->FOC_TOT_P);
-  emxFree_real_T(&pStruct->AVG_DIR_TOT_P);
-  emxFree_real_T(&pStruct->TOT_P_ALL_BACK_UP);
-  emxFree_real_T(&pStruct->DIR_ALL_BACK_UP);
+  emxFree_real_T(&pStruct->TOT_ALL);
+  emxFree_real_T(&pStruct->TOT_MAX);
+  emxFree_real_T(&pStruct->GRADIENT_DIR_ALL);
+  emxFree_real_T(&pStruct->GRADIENT_DIR_AVG);
+  emxFree_real_T(&pStruct->TOT_ALL_BACK_UP);
+  emxFree_real_T(&pStruct->GRADIENT_DIR_ALL_BACK_UP);
+  emxFree_real_T(&pStruct->TOT_FOCUSED);
 }
 
 /*
@@ -227,10 +240,9 @@ static void c_emxFreeStruct_MatlabStruct_li(MatlabStruct_likelihoods *pStruct)
  */
 static void c_emxFreeStruct_MatlabStruct_te(MatlabStruct_templates *pStruct)
 {
-  emxFree_real_T(&pStruct->ROOT_DIR_TEMPLATE);
-  emxFree_real_T(&pStruct->ROOT_PROB_TEMPLATE);
-  emxFree_real_T(&pStruct->ROOT_DEPTH_TEMPLATE);
-  emxFree_real_T(&pStruct->SEGMENT);
+  emxFree_real_T(&pStruct->GRADIENT_DIR_ROOT);
+  emxFree_real_T(&pStruct->PROB_ROOT);
+  emxFree_real_T(&pStruct->DEPTH_ROOT);
 }
 
 /*
@@ -239,8 +251,20 @@ static void c_emxFreeStruct_MatlabStruct_te(MatlabStruct_templates *pStruct)
  */
 static void c_emxFreeStruct_MatlabStruct_vp(MatlabStruct_vpFilter *pStruct)
 {
-  emxFree_real_T(&pStruct->mFilter);
-  emxFree_real_T(&pStruct->mPrior);
+  emxFree_real32_T(&pStruct->mFilter);
+  emxFree_real32_T(&pStruct->mPrior);
+}
+
+/*
+ * Arguments    : const emlrtStack *sp
+ *                MatlabStruct_focusMask *pStruct
+ *                boolean_T doPush
+ * Return Type  : void
+ */
+static void c_emxInitStruct_MatlabStruct_fo(const emlrtStack *sp,
+  MatlabStruct_focusMask *pStruct, boolean_T doPush)
+{
+  emxInit_real_T1(sp, &pStruct->FOCUS, 2, doPush);
 }
 
 /*
@@ -252,8 +276,8 @@ static void c_emxFreeStruct_MatlabStruct_vp(MatlabStruct_vpFilter *pStruct)
 static void c_emxInitStruct_MatlabStruct_la(const emlrtStack *sp,
   MatlabStruct_laneFilter *pStruct, boolean_T doPush)
 {
-  emxInit_real_T(sp, &pStruct->mFilter, 2, doPush);
-  emxInit_real_T(sp, &pStruct->mPrior, 2, doPush);
+  emxInit_real32_T(sp, &pStruct->mFilter, 2, doPush);
+  emxInit_real32_T(sp, &pStruct->mPrior, 2, doPush);
 }
 
 /*
@@ -265,14 +289,13 @@ static void c_emxInitStruct_MatlabStruct_la(const emlrtStack *sp,
 static void c_emxInitStruct_MatlabStruct_li(const emlrtStack *sp,
   MatlabStruct_likelihoods *pStruct, boolean_T doPush)
 {
-  emxInit_real_T1(sp, &pStruct->TOT_P_ALL, 3, doPush);
-  emxInit_real_T1(sp, &pStruct->DIR_ALL, 3, doPush);
-  emxInit_real_T(sp, &pStruct->MASK_FOC_TOT_P, 2, doPush);
-  emxInit_real_T(sp, &pStruct->TOT_P, 2, doPush);
-  emxInit_real_T(sp, &pStruct->FOC_TOT_P, 2, doPush);
-  emxInit_real_T(sp, &pStruct->AVG_DIR_TOT_P, 2, doPush);
-  emxInit_real_T1(sp, &pStruct->TOT_P_ALL_BACK_UP, 3, doPush);
-  emxInit_real_T1(sp, &pStruct->DIR_ALL_BACK_UP, 3, doPush);
+  emxInit_real_T(sp, &pStruct->TOT_ALL, 3, doPush);
+  emxInit_real_T1(sp, &pStruct->TOT_MAX, 2, doPush);
+  emxInit_real_T(sp, &pStruct->GRADIENT_DIR_ALL, 3, doPush);
+  emxInit_real_T1(sp, &pStruct->GRADIENT_DIR_AVG, 2, doPush);
+  emxInit_real_T(sp, &pStruct->TOT_ALL_BACK_UP, 3, doPush);
+  emxInit_real_T(sp, &pStruct->GRADIENT_DIR_ALL_BACK_UP, 3, doPush);
+  emxInit_real_T1(sp, &pStruct->TOT_FOCUSED, 2, doPush);
 }
 
 /*
@@ -284,10 +307,9 @@ static void c_emxInitStruct_MatlabStruct_li(const emlrtStack *sp,
 static void c_emxInitStruct_MatlabStruct_te(const emlrtStack *sp,
   MatlabStruct_templates *pStruct, boolean_T doPush)
 {
-  emxInit_real_T(sp, &pStruct->ROOT_DIR_TEMPLATE, 2, doPush);
-  emxInit_real_T(sp, &pStruct->ROOT_PROB_TEMPLATE, 2, doPush);
-  emxInit_real_T(sp, &pStruct->ROOT_DEPTH_TEMPLATE, 2, doPush);
-  emxInit_real_T(sp, &pStruct->SEGMENT, 2, doPush);
+  emxInit_real_T1(sp, &pStruct->GRADIENT_DIR_ROOT, 2, doPush);
+  emxInit_real_T1(sp, &pStruct->PROB_ROOT, 2, doPush);
+  emxInit_real_T1(sp, &pStruct->DEPTH_ROOT, 2, doPush);
 }
 
 /*
@@ -299,50 +321,38 @@ static void c_emxInitStruct_MatlabStruct_te(const emlrtStack *sp,
 static void c_emxInitStruct_MatlabStruct_vp(const emlrtStack *sp,
   MatlabStruct_vpFilter *pStruct, boolean_T doPush)
 {
-  emxInit_real_T(sp, &pStruct->mFilter, 2, doPush);
-  emxInit_real_T(sp, &pStruct->mPrior, 2, doPush);
+  emxInit_real32_T(sp, &pStruct->mFilter, 2, doPush);
+  emxInit_real32_T(sp, &pStruct->mPrior, 2, doPush);
 }
 
 /*
  * Arguments    : const emlrtStack *sp
  *                const mxArray *u
  *                const emlrtMsgIdentifier *parentId
- * Return Type  : real32_T
+ * Return Type  : int32_T
  */
-static real32_T d_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u, const
+static int32_T d_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u, const
   emlrtMsgIdentifier *parentId)
 {
-  real32_T y;
+  int32_T y;
   y = k_emlrt_marshallIn(sp, emlrtAlias(u), parentId);
   emlrtDestroyArray(&u);
   return y;
 }
 
 /*
- * Arguments    : const emxArray_real_T *u
+ * Arguments    : const MatlabStruct_templates u
  * Return Type  : const mxArray *
  */
-static const mxArray *d_emlrt_marshallOut(const emxArray_real_T *u)
+static const mxArray *d_emlrt_marshallOut(const MatlabStruct_templates u)
 {
   const mxArray *y;
-  const mxArray *m3;
-  real_T *pData;
-  int32_T i1;
-  int32_T i;
-  int32_T b_i;
   y = NULL;
-  m3 = emlrtCreateNumericArray(2, *(int32_T (*)[3])u->size, mxDOUBLE_CLASS,
-    mxREAL);
-  pData = (real_T *)mxGetPr(m3);
-  i1 = 0;
-  for (i = 0; i < u->size[1]; i++) {
-    for (b_i = 0; b_i < u->size[0]; b_i++) {
-      pData[i1] = u->data[b_i + u->size[0] * i];
-      i1++;
-    }
-  }
-
-  emlrtAssign(&y, m3);
+  emlrtAssign(&y, emlrtCreateStructMatrix(1, 1, 0, NULL));
+  emlrtAddField(y, c_emlrt_marshallOut(u.GRADIENT_DIR_ROOT), "GRADIENT_DIR_ROOT",
+                0);
+  emlrtAddField(y, c_emlrt_marshallOut(u.PROB_ROOT), "PROB_ROOT", 0);
+  emlrtAddField(y, c_emlrt_marshallOut(u.DEPTH_ROOT), "DEPTH_ROOT", 0);
   return y;
 }
 
@@ -365,21 +375,35 @@ static void e_emlrt_marshallIn(const emlrtStack *sp, const mxArray *laneFilter,
 }
 
 /*
- * Arguments    : const MatlabStruct_templates u
+ * Arguments    : const MatlabStruct_vanishingPt u
  * Return Type  : const mxArray *
  */
-static const mxArray *e_emlrt_marshallOut(const MatlabStruct_templates u)
+static const mxArray *e_emlrt_marshallOut(const MatlabStruct_vanishingPt u)
 {
   const mxArray *y;
+  const mxArray *b_y;
+  const mxArray *m2;
+  const mxArray *c_y;
+  const mxArray *d_y;
+  const mxArray *e_y;
   y = NULL;
   emlrtAssign(&y, emlrtCreateStructMatrix(1, 1, 0, NULL));
-  emlrtAddField(y, d_emlrt_marshallOut(u.ROOT_DIR_TEMPLATE), "ROOT_DIR_TEMPLATE",
-                0);
-  emlrtAddField(y, d_emlrt_marshallOut(u.ROOT_PROB_TEMPLATE),
-                "ROOT_PROB_TEMPLATE", 0);
-  emlrtAddField(y, d_emlrt_marshallOut(u.ROOT_DEPTH_TEMPLATE),
-                "ROOT_DEPTH_TEMPLATE", 0);
-  emlrtAddField(y, d_emlrt_marshallOut(u.SEGMENT), "SEGMENT", 0);
+  b_y = NULL;
+  m2 = emlrtCreateDoubleScalar(u.V);
+  emlrtAssign(&b_y, m2);
+  emlrtAddField(y, b_y, "V", 0);
+  c_y = NULL;
+  m2 = emlrtCreateDoubleScalar(u.H);
+  emlrtAssign(&c_y, m2);
+  emlrtAddField(y, c_y, "H", 0);
+  d_y = NULL;
+  m2 = emlrtCreateDoubleScalar(u.V_prev);
+  emlrtAssign(&d_y, m2);
+  emlrtAddField(y, d_y, "V_prev", 0);
+  e_y = NULL;
+  m2 = emlrtCreateDoubleScalar(u.H_prev);
+  emlrtAssign(&e_y, m2);
+  emlrtAddField(y, e_y, "H_prev", 0);
   return y;
 }
 
@@ -387,12 +411,12 @@ static const mxArray *e_emlrt_marshallOut(const MatlabStruct_templates u)
  * Arguments    : const emlrtStack *sp
  *                const mxArray *RES_VH
  *                const char_T *identifier
- * Return Type  : real32_T (*)[2]
+ * Return Type  : int32_T (*)[2]
  */
-static real32_T (*emlrt_marshallIn(const emlrtStack *sp, const mxArray *RES_VH,
+static int32_T (*emlrt_marshallIn(const emlrtStack *sp, const mxArray *RES_VH,
   const char_T *identifier))[2]
 {
-  real32_T (*y)[2];
+  int32_T (*y)[2];
   emlrtMsgIdentifier thisId;
   thisId.fIdentifier = identifier;
   thisId.fParent = NULL;
@@ -402,16 +426,24 @@ static real32_T (*emlrt_marshallIn(const emlrtStack *sp, const mxArray *RES_VH,
   return y;
 }
 /*
- * Arguments    : const real_T u
+ * Arguments    : const MatlabStruct_likelihoods u
  * Return Type  : const mxArray *
  */
-  static const mxArray *emlrt_marshallOut(const real_T u)
+  static const mxArray *emlrt_marshallOut(const MatlabStruct_likelihoods u)
 {
   const mxArray *y;
-  const mxArray *m0;
   y = NULL;
-  m0 = emlrtCreateDoubleScalar(u);
-  emlrtAssign(&y, m0);
+  emlrtAssign(&y, emlrtCreateStructMatrix(1, 1, 0, NULL));
+  emlrtAddField(y, b_emlrt_marshallOut(u.TOT_ALL), "TOT_ALL", 0);
+  emlrtAddField(y, c_emlrt_marshallOut(u.TOT_MAX), "TOT_MAX", 0);
+  emlrtAddField(y, b_emlrt_marshallOut(u.GRADIENT_DIR_ALL), "GRADIENT_DIR_ALL",
+                0);
+  emlrtAddField(y, c_emlrt_marshallOut(u.GRADIENT_DIR_AVG), "GRADIENT_DIR_AVG",
+                0);
+  emlrtAddField(y, b_emlrt_marshallOut(u.TOT_ALL_BACK_UP), "TOT_ALL_BACK_UP", 0);
+  emlrtAddField(y, b_emlrt_marshallOut(u.GRADIENT_DIR_ALL_BACK_UP),
+                "GRADIENT_DIR_ALL_BACK_UP", 0);
+  emlrtAddField(y, c_emlrt_marshallOut(u.TOT_FOCUSED), "TOT_FOCUSED", 0);
   return y;
 }
 
@@ -465,6 +497,23 @@ static void emxEnsureCapacity(emxArray__common *emxArray, int32_T oldNumel,
 }
 
 /*
+ * Arguments    : emxArray_real32_T **pEmxArray
+ * Return Type  : void
+ */
+static void emxFree_real32_T(emxArray_real32_T **pEmxArray)
+{
+  if (*pEmxArray != (emxArray_real32_T *)NULL) {
+    if (((*pEmxArray)->data != (real32_T *)NULL) && (*pEmxArray)->canFreeData) {
+      emlrtFreeMex((void *)(*pEmxArray)->data);
+    }
+
+    emlrtFreeMex((void *)(*pEmxArray)->size);
+    emlrtFreeMex((void *)*pEmxArray);
+    *pEmxArray = (emxArray_real32_T *)NULL;
+  }
+}
+
+/*
  * Arguments    : emxArray_real_T **pEmxArray
  * Return Type  : void
  */
@@ -478,6 +527,36 @@ static void emxFree_real_T(emxArray_real_T **pEmxArray)
     emlrtFreeMex((void *)(*pEmxArray)->size);
     emlrtFreeMex((void *)*pEmxArray);
     *pEmxArray = (emxArray_real_T *)NULL;
+  }
+}
+
+/*
+ * Arguments    : const emlrtStack *sp
+ *                emxArray_real32_T **pEmxArray
+ *                int32_T numDimensions
+ *                boolean_T doPush
+ * Return Type  : void
+ */
+static void emxInit_real32_T(const emlrtStack *sp, emxArray_real32_T **pEmxArray,
+  int32_T numDimensions, boolean_T doPush)
+{
+  emxArray_real32_T *emxArray;
+  int32_T i;
+  *pEmxArray = (emxArray_real32_T *)emlrtMallocMex(sizeof(emxArray_real32_T));
+  if (doPush) {
+    emlrtPushHeapReferenceStackR2012b(sp, (void *)pEmxArray, (void (*)(void *))
+      emxFree_real32_T);
+  }
+
+  emxArray = *pEmxArray;
+  emxArray->data = (real32_T *)NULL;
+  emxArray->numDimensions = numDimensions;
+  emxArray->size = (int32_T *)emlrtMallocMex((uint32_T)(sizeof(int32_T)
+    * numDimensions));
+  emxArray->allocatedSize = 0;
+  emxArray->canFreeData = true;
+  for (i = 0; i < numDimensions; i++) {
+    emxArray->size[i] = 0;
   }
 }
 
@@ -568,18 +647,15 @@ static void f_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u, const
 }
 
 /*
- * Arguments    : const MatlabStruct_vanishingPt u
+ * Arguments    : const MatlabStruct_focusMask u
  * Return Type  : const mxArray *
  */
-static const mxArray *f_emlrt_marshallOut(const MatlabStruct_vanishingPt u)
+static const mxArray *f_emlrt_marshallOut(const MatlabStruct_focusMask u)
 {
   const mxArray *y;
   y = NULL;
   emlrtAssign(&y, emlrtCreateStructMatrix(1, 1, 0, NULL));
-  emlrtAddField(y, emlrt_marshallOut(u.V), "V", 0);
-  emlrtAddField(y, emlrt_marshallOut(u.H), "H", 0);
-  emlrtAddField(y, emlrt_marshallOut(u.V_prev), "V_prev", 0);
-  emlrtAddField(y, emlrt_marshallOut(u.H_prev), "H_prev", 0);
+  emlrtAddField(y, c_emlrt_marshallOut(u.FOCUS), "FOCUS", 0);
   return y;
 }
 
@@ -587,11 +663,11 @@ static const mxArray *f_emlrt_marshallOut(const MatlabStruct_vanishingPt u)
  * Arguments    : const emlrtStack *sp
  *                const mxArray *u
  *                const emlrtMsgIdentifier *parentId
- *                emxArray_real_T *y
+ *                emxArray_real32_T *y
  * Return Type  : void
  */
 static void g_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u, const
-  emlrtMsgIdentifier *parentId, emxArray_real_T *y)
+  emlrtMsgIdentifier *parentId, emxArray_real32_T *y)
 {
   l_emlrt_marshallIn(sp, emlrtAlias(u), parentId, y);
   emlrtDestroyArray(&u);
@@ -645,16 +721,16 @@ static void i_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u, const
  * Arguments    : const emlrtStack *sp
  *                const mxArray *src
  *                const emlrtMsgIdentifier *msgId
- * Return Type  : real32_T (*)[2]
+ * Return Type  : int32_T (*)[2]
  */
-static real32_T (*j_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
+static int32_T (*j_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
   const emlrtMsgIdentifier *msgId))[2]
 {
-  real32_T (*ret)[2];
+  int32_T (*ret)[2];
   static const int32_T dims[2] = { 1, 2 };
 
-  emlrtCheckBuiltInR2012b(sp, msgId, src, "single", false, 2U, dims);
-  ret = (real32_T (*)[2])mxGetData(src);
+  emlrtCheckBuiltInR2012b(sp, msgId, src, "int32", false, 2U, dims);
+  ret = (int32_T (*)[2])mxGetData(src);
   emlrtDestroyArray(&src);
   return ret;
 }
@@ -662,15 +738,15 @@ static real32_T (*j_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
  * Arguments    : const emlrtStack *sp
  *                const mxArray *src
  *                const emlrtMsgIdentifier *msgId
- * Return Type  : real32_T
+ * Return Type  : int32_T
  */
-  static real32_T k_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
+  static int32_T k_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
   const emlrtMsgIdentifier *msgId)
 {
-  real32_T ret;
+  int32_T ret;
   static const int32_T dims = 0;
-  emlrtCheckBuiltInR2012b(sp, msgId, src, "single", false, 0U, &dims);
-  ret = *(real32_T *)mxGetData(src);
+  emlrtCheckBuiltInR2012b(sp, msgId, src, "int32", false, 0U, &dims);
+  ret = *(int32_T *)mxGetData(src);
   emlrtDestroyArray(&src);
   return ret;
 }
@@ -679,25 +755,25 @@ static real32_T (*j_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
  * Arguments    : const emlrtStack *sp
  *                const mxArray *src
  *                const emlrtMsgIdentifier *msgId
- *                emxArray_real_T *ret
+ *                emxArray_real32_T *ret
  * Return Type  : void
  */
 static void l_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src, const
-  emlrtMsgIdentifier *msgId, emxArray_real_T *ret)
+  emlrtMsgIdentifier *msgId, emxArray_real32_T *ret)
 {
   static const int32_T dims[2] = { -1, -1 };
 
   boolean_T bv0[2] = { true, true };
 
-  int32_T iv1[2];
+  int32_T iv0[2];
   int32_T i2;
-  emlrtCheckVsBuiltInR2012b(sp, msgId, src, "double", false, 2U, dims, &bv0[0],
-    iv1);
+  emlrtCheckVsBuiltInR2012b(sp, msgId, src, "single", false, 2U, dims, &bv0[0],
+    iv0);
   i2 = ret->size[0] * ret->size[1];
-  ret->size[0] = iv1[0];
-  ret->size[1] = iv1[1];
-  emxEnsureCapacity((emxArray__common *)ret, i2, (int32_T)sizeof(real_T));
-  emlrtImportArrayR2015b(sp, src, ret->data, 8, false);
+  ret->size[0] = iv0[0];
+  ret->size[1] = iv0[1];
+  emxEnsureCapacity((emxArray__common *)ret, i2, (int32_T)sizeof(real32_T));
+  emlrtImportArrayR2015b(sp, src, ret->data, 4, false);
   emlrtDestroyArray(&src);
 }
 
@@ -712,9 +788,9 @@ void run_Init_State_api(const mxArray *prhs[4], const mxArray *plhs[4])
   MatlabStruct_vpFilter vpFilter;
   MatlabStruct_likelihoods likelihoods;
   MatlabStruct_templates templates;
-  real32_T (*RES_VH)[2];
-  real32_T NBUFFER;
-  real_T msg;
+  MatlabStruct_focusMask masks;
+  int32_T (*RES_VH)[2];
+  int32_T NBUFFER;
   MatlabStruct_vanishingPt vanishingPt;
   emlrtStack st = { NULL,              /* site */
     NULL,                              /* tls */
@@ -727,6 +803,7 @@ void run_Init_State_api(const mxArray *prhs[4], const mxArray *plhs[4])
   c_emxInitStruct_MatlabStruct_vp(&st, &vpFilter, true);
   c_emxInitStruct_MatlabStruct_li(&st, &likelihoods, true);
   c_emxInitStruct_MatlabStruct_te(&st, &templates, true);
+  c_emxInitStruct_MatlabStruct_fo(&st, &masks, true);
   prhs[0] = emlrtProtectR2012b(prhs[0], 0, false, -1);
 
   /* Marshall function inputs */
@@ -736,14 +813,15 @@ void run_Init_State_api(const mxArray *prhs[4], const mxArray *plhs[4])
   h_emlrt_marshallIn(&st, emlrtAliasP(prhs[3]), "vpFilter", &vpFilter);
 
   /* Invoke the target function */
-  run_Init_State(*RES_VH, NBUFFER, &laneFilter, &vpFilter, &msg, &likelihoods,
-                 &templates, &vanishingPt);
+  run_Init_State(*RES_VH, NBUFFER, &laneFilter, &vpFilter, &likelihoods,
+                 &templates, &vanishingPt, &masks);
 
   /* Marshall function outputs */
-  plhs[0] = emlrt_marshallOut(msg);
-  plhs[1] = b_emlrt_marshallOut(likelihoods);
-  plhs[2] = e_emlrt_marshallOut(templates);
-  plhs[3] = f_emlrt_marshallOut(vanishingPt);
+  plhs[0] = emlrt_marshallOut(likelihoods);
+  plhs[1] = d_emlrt_marshallOut(templates);
+  plhs[2] = e_emlrt_marshallOut(vanishingPt);
+  plhs[3] = f_emlrt_marshallOut(masks);
+  c_emxFreeStruct_MatlabStruct_fo(&masks);
   c_emxFreeStruct_MatlabStruct_te(&templates);
   c_emxFreeStruct_MatlabStruct_li(&likelihoods);
   c_emxFreeStruct_MatlabStruct_vp(&vpFilter);

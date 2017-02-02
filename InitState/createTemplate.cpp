@@ -5,7 +5,7 @@
 // File: createTemplate.cpp
 //
 // MATLAB Coder version            : 3.2
-// C/C++ source code generated on  : 28-Jan-2017 01:24:11
+// C/C++ source code generated on  : 01-Feb-2017 19:25:15
 //
 
 // Include Files
@@ -36,8 +36,8 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
   double apnd;
   double cdiff;
   double absa;
-  emxArray_real32_T *pix;
   double absb;
+  emxArray_real32_T *pix;
   int n;
   int h;
   emxArray_real32_T *pixrot;
@@ -50,11 +50,11 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
   emxArray_real32_T *c_pixrot;
   emxArray_real32_T *d_pixrot;
   float cs;
-  emxArray_real32_T *e_pixrot;
   float sn;
+  float rot[4];
+  emxArray_real32_T *e_pixrot;
   emxArray_real32_T *f_pixrot;
   emxArray_real32_T *g_pixrot;
-  float rot[4];
   unsigned int unnamed_idx_1;
   int ar;
   emxArray_real32_T *h_pixrot;
@@ -75,7 +75,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
   //
   //
   //
-  // 'createTemplate:11' TEMPLATE = -180 * ones( 2*H+1, 2*W+1 );
   y = 2.0F * H;
   an = 2.0F * W;
   i2 = TEMPLATE->size[0] * TEMPLATE->size[1];
@@ -87,28 +86,15 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
     TEMPLATE->data[i2] = -180.0;
   }
 
-  // 'createTemplate:12' pix      = [-2*W:2*W;zeros(1,4*W+1)];
   y = -2.0F * W;
   an = 2.0F * W;
   emxInit_real32_T(&b_y, 2);
-  if (rtIsNaNF(y) || rtIsNaNF(an)) {
-    i2 = b_y->size[0] * b_y->size[1];
-    b_y->size[0] = 1;
-    b_y->size[1] = 1;
-    emxEnsureCapacity((emxArray__common *)b_y, i2, (int)sizeof(float));
-    b_y->data[0] = ((real32_T)rtNaN);
-  } else if (an < y) {
+  if (an < y) {
     i2 = b_y->size[0] * b_y->size[1];
     b_y->size[0] = 1;
     b_y->size[1] = 0;
     emxEnsureCapacity((emxArray__common *)b_y, i2, (int)sizeof(float));
-  } else if ((rtIsInfF(y) || rtIsInfF(an)) && (y == an)) {
-    i2 = b_y->size[0] * b_y->size[1];
-    b_y->size[0] = 1;
-    b_y->size[1] = 1;
-    emxEnsureCapacity((emxArray__common *)b_y, i2, (int)sizeof(float));
-    b_y->data[0] = ((real32_T)rtNaN);
-  } else if (std::floor(y) == y) {
+  } else if (y == y) {
     i2 = b_y->size[0] * b_y->size[1];
     b_y->size[0] = 1;
     b_y->size[1] = (int)std::floor(an - y) + 1;
@@ -182,7 +168,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
   }
 
   //     %% left border
-  // 'createTemplate:15' for h = H+1:2*H+1
   i2 = (int)((2.0F * H + 1.0F) + (1.0F - (H + 1.0F)));
   h = 0;
   emxInit_real32_T(&pixrot, 2);
@@ -195,23 +180,15 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
   emxInit_real32_T(&d_pixrot, 2);
   while (h <= i2 - 1) {
     //         %% angle
-    // 'createTemplate:19' an = atan((h-(H+1)) / W );
     an = std::atan((((H + 1.0F) + (float)h) - (H + 1.0F)) / W);
 
     //         %% draw in template
-    // 'createTemplate:22' cs     = cos(-an);
     cs = std::cos(-an);
-
-    // 'createTemplate:23' sn     = sin(-an);
     sn = std::sin(-an);
-
-    // 'createTemplate:24' rot    = [cs -sn; sn cs];
     rot[0] = cs;
     rot[2] = -sn;
     rot[1] = sn;
     rot[3] = cs;
-
-    // 'createTemplate:25' pixrot = rot*pix;
     unnamed_idx_1 = (unsigned int)pix->size[1];
     ar = pixrot->size[0] * pixrot->size[1];
     pixrot->size[0] = 2;
@@ -252,7 +229,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
       }
     }
 
-    // 'createTemplate:26' pixrot(1,:) = pixrot(1,:) + W+1;
     nm1d2 = pixrot->size[1];
     ar = b_pixrot->size[0] * b_pixrot->size[1];
     b_pixrot->size[0] = 1;
@@ -268,7 +244,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
       pixrot->data[pixrot->size[0] * ar] = b_pixrot->data[b_pixrot->size[0] * ar];
     }
 
-    // 'createTemplate:27' pixrot(2,:) = pixrot(2,:) + H+1;
     nm1d2 = pixrot->size[1];
     ar = c_pixrot->size[0] * c_pixrot->size[1];
     c_pixrot->size[0] = 1;
@@ -285,7 +260,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
         ar];
     }
 
-    // 'createTemplate:28' pixrot      = pixrot(:, (1 <= pixrot(1,:)) & (pixrot(1,:) <= 2*W+1) & (1 <= pixrot(2,:)) & (pixrot(2,:) <= 2*H+1) ); 
     y = 2.0F * W;
     br = pixrot->size[1];
     ar = r0->size[0] * r0->size[1];
@@ -353,11 +327,9 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
       }
     }
 
-    // 'createTemplate:29' pixrot      = round(pixrot);
     b_round(pixrot);
 
     //         %% get indices of the vanashing line
-    // 'createTemplate:32' index = sub2ind([2*H+1, 2*W+1], pixrot(2,:), pixrot(1,:) ); 
     br = pixrot->size[1];
     ar = b_y->size[0] * b_y->size[1];
     b_y->size[0] = 1;
@@ -380,7 +352,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
     nm1d2 = (int)(2.0F * H + 1.0F);
 
     //         %% draw
-    // 'createTemplate:35' TEMPLATE(index) = rad2deg(an);
     ar = r2->size[0] * r2->size[1];
     r2->size[0] = 1;
     r2->size[1] = b_y->size[1];
@@ -404,7 +375,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
   emxFree_real32_T(&b_pixrot);
 
   //     %% bottom border left part
-  // 'createTemplate:39' for w = W:-1:0
   i2 = (int)((-1.0F - W) / -1.0F);
   h = 0;
   emxInit_real32_T(&e_pixrot, 2);
@@ -412,24 +382,16 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
   emxInit_real32_T(&g_pixrot, 2);
   while (h <= i2 - 1) {
     //         %% angle
-    // 'createTemplate:42' an = pi/2-atan( w / H );
     y = (W + -(float)h) / H;
     an = 1.57079637F - std::atan(y);
 
     //         %% draw in template
-    // 'createTemplate:45' cs     = cos(-an);
     cs = std::cos(-an);
-
-    // 'createTemplate:46' sn     = sin(-an);
     sn = std::sin(-an);
-
-    // 'createTemplate:47' rot    = [cs -sn; sn cs];
     rot[0] = cs;
     rot[2] = -sn;
     rot[1] = sn;
     rot[3] = cs;
-
-    // 'createTemplate:48' pixrot = rot*pix;
     unnamed_idx_1 = (unsigned int)pix->size[1];
     ar = pixrot->size[0] * pixrot->size[1];
     pixrot->size[0] = 2;
@@ -470,7 +432,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
       }
     }
 
-    // 'createTemplate:49' pixrot(1,:) = pixrot(1,:) + W+1;
     nm1d2 = pixrot->size[1];
     ar = e_pixrot->size[0] * e_pixrot->size[1];
     e_pixrot->size[0] = 1;
@@ -486,7 +447,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
       pixrot->data[pixrot->size[0] * ar] = e_pixrot->data[e_pixrot->size[0] * ar];
     }
 
-    // 'createTemplate:50' pixrot(2,:) = pixrot(2,:) + H+1;
     nm1d2 = pixrot->size[1];
     ar = f_pixrot->size[0] * f_pixrot->size[1];
     f_pixrot->size[0] = 1;
@@ -503,7 +463,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
         ar];
     }
 
-    // 'createTemplate:51' pixrot      = pixrot(:, (1 <= pixrot(1,:)) & (pixrot(1,:) <= 2*W+1) & (1 <= pixrot(2,:)) & (pixrot(2,:) <= 2*H+1) ); 
     an = 2.0F * W;
     br = pixrot->size[1];
     ar = r0->size[0] * r0->size[1];
@@ -571,11 +530,9 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
       }
     }
 
-    // 'createTemplate:52' pixrot      = round(pixrot);
     b_round(pixrot);
 
     //         %% get indices of the vanashing line
-    // 'createTemplate:55' index = sub2ind([2*H+1, 2*W+1], pixrot(2,:), pixrot(1,:) ); 
     br = pixrot->size[1];
     ar = b_y->size[0] * b_y->size[1];
     b_y->size[0] = 1;
@@ -598,7 +555,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
     nm1d2 = (int)(2.0F * H + 1.0F);
 
     //         %% draw
-    // 'createTemplate:58' TEMPLATE(index) = rad2deg(an);
     ar = r2->size[0] * r2->size[1];
     r2->size[0] = 1;
     r2->size[1] = b_y->size[1];
@@ -622,7 +578,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
   emxFree_real32_T(&e_pixrot);
 
   //     %% bottom border rithg part
-  // 'createTemplate:62' for w = W:-1:0
   i2 = (int)((-1.0F - W) / -1.0F);
   h = 0;
   emxInit_real32_T(&h_pixrot, 2);
@@ -630,24 +585,16 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
   emxInit_real32_T(&j_pixrot, 2);
   while (h <= i2 - 1) {
     //         %% angle
-    // 'createTemplate:65' an = pi/2+atan( w / H );
     y = (W + -(float)h) / H;
     an = 1.57079637F + std::atan(y);
 
     //         %% draw in template
-    // 'createTemplate:68' cs     = cos(-an);
     cs = std::cos(-an);
-
-    // 'createTemplate:69' sn     = sin(-an);
     sn = std::sin(-an);
-
-    // 'createTemplate:70' rot    = [cs -sn; sn cs];
     rot[0] = cs;
     rot[2] = -sn;
     rot[1] = sn;
     rot[3] = cs;
-
-    // 'createTemplate:71' pixrot = rot*pix;
     unnamed_idx_1 = (unsigned int)pix->size[1];
     ar = pixrot->size[0] * pixrot->size[1];
     pixrot->size[0] = 2;
@@ -688,7 +635,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
       }
     }
 
-    // 'createTemplate:72' pixrot(1,:) = pixrot(1,:) + W+1;
     nm1d2 = pixrot->size[1];
     ar = h_pixrot->size[0] * h_pixrot->size[1];
     h_pixrot->size[0] = 1;
@@ -704,7 +650,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
       pixrot->data[pixrot->size[0] * ar] = h_pixrot->data[h_pixrot->size[0] * ar];
     }
 
-    // 'createTemplate:73' pixrot(2,:) = pixrot(2,:) + H+1;
     nm1d2 = pixrot->size[1];
     ar = i_pixrot->size[0] * i_pixrot->size[1];
     i_pixrot->size[0] = 1;
@@ -721,7 +666,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
         ar];
     }
 
-    // 'createTemplate:74' pixrot      = pixrot(:, (1 <= pixrot(1,:)) & (pixrot(1,:) <= 2*W+1) & (1 <= pixrot(2,:)) & (pixrot(2,:) <= 2*H+1) ); 
     an = 2.0F * W;
     br = pixrot->size[1];
     ar = r0->size[0] * r0->size[1];
@@ -789,11 +733,9 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
       }
     }
 
-    // 'createTemplate:75' pixrot      = round(pixrot);
     b_round(pixrot);
 
     //         %% get indices of the vanashing line
-    // 'createTemplate:78' index = sub2ind([2*H+1, 2*W+1], pixrot(2,:), pixrot(1,:) ); 
     br = pixrot->size[1];
     ar = b_y->size[0] * b_y->size[1];
     b_y->size[0] = 1;
@@ -816,7 +758,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
     nm1d2 = (int)(2.0F * H + 1.0F);
 
     //         %% draw
-    // 'createTemplate:81' TEMPLATE(index) = rad2deg(an);
     ar = r2->size[0] * r2->size[1];
     r2->size[0] = 1;
     r2->size[1] = b_y->size[1];
@@ -840,27 +781,14 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
   emxFree_real32_T(&h_pixrot);
 
   //     %% right border
-  // 'createTemplate:85' pix = [-2*W:2*W;zeros(1,4*W+1)];
   y = -2.0F * W;
   an = 2.0F * W;
-  if (rtIsNaNF(y) || rtIsNaNF(an)) {
-    i2 = b_y->size[0] * b_y->size[1];
-    b_y->size[0] = 1;
-    b_y->size[1] = 1;
-    emxEnsureCapacity((emxArray__common *)b_y, i2, (int)sizeof(float));
-    b_y->data[0] = ((real32_T)rtNaN);
-  } else if (an < y) {
+  if (an < y) {
     i2 = b_y->size[0] * b_y->size[1];
     b_y->size[0] = 1;
     b_y->size[1] = 0;
     emxEnsureCapacity((emxArray__common *)b_y, i2, (int)sizeof(float));
-  } else if ((rtIsInfF(y) || rtIsInfF(an)) && (y == an)) {
-    i2 = b_y->size[0] * b_y->size[1];
-    b_y->size[0] = 1;
-    b_y->size[1] = 1;
-    emxEnsureCapacity((emxArray__common *)b_y, i2, (int)sizeof(float));
-    b_y->data[0] = ((real32_T)rtNaN);
-  } else if (std::floor(y) == y) {
+  } else if (y == y) {
     i2 = b_y->size[0] * b_y->size[1];
     b_y->size[0] = 1;
     b_y->size[1] = (int)std::floor(an - y) + 1;
@@ -932,7 +860,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
     pix->data[1 + pix->size[0] * i2] = 0.0F;
   }
 
-  // 'createTemplate:86' for h = H+1:2*H+1
   i2 = (int)((2.0F * H + 1.0F) + (1.0F - (H + 1.0F)));
   h = 0;
   emxInit_real32_T(&k_pixrot, 2);
@@ -940,24 +867,16 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
   emxInit_real32_T(&m_pixrot, 2);
   while (h <= i2 - 1) {
     //         %% angle
-    // 'createTemplate:89' an = pi-atan( (h-(H+1)) / W );
     y = (((H + 1.0F) + (float)h) - (H + 1.0F)) / W;
     an = 3.14159274F - std::atan(y);
 
     //         %% draw in template
-    // 'createTemplate:92' cs     = cos(-an);
     cs = std::cos(-an);
-
-    // 'createTemplate:93' sn     = sin(-an);
     sn = std::sin(-an);
-
-    // 'createTemplate:94' rot    = [cs -sn; sn cs];
     rot[0] = cs;
     rot[2] = -sn;
     rot[1] = sn;
     rot[3] = cs;
-
-    // 'createTemplate:95' pixrot = rot*pix;
     unnamed_idx_1 = (unsigned int)pix->size[1];
     ar = pixrot->size[0] * pixrot->size[1];
     pixrot->size[0] = 2;
@@ -998,7 +917,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
       }
     }
 
-    // 'createTemplate:96' pixrot(1,:) = pixrot(1,:) + W+1;
     nm1d2 = pixrot->size[1];
     ar = k_pixrot->size[0] * k_pixrot->size[1];
     k_pixrot->size[0] = 1;
@@ -1014,7 +932,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
       pixrot->data[pixrot->size[0] * ar] = k_pixrot->data[k_pixrot->size[0] * ar];
     }
 
-    // 'createTemplate:97' pixrot(2,:) = pixrot(2,:) + H+1;
     nm1d2 = pixrot->size[1];
     ar = l_pixrot->size[0] * l_pixrot->size[1];
     l_pixrot->size[0] = 1;
@@ -1031,7 +948,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
         ar];
     }
 
-    // 'createTemplate:98' pixrot      = pixrot(:, (1 <= pixrot(1,:)) & (pixrot(1,:) <= 2*W+1) & (1 <= pixrot(2,:)) & (pixrot(2,:) <= 2*H+1) ); 
     an = 2.0F * W;
     br = pixrot->size[1];
     ar = r0->size[0] * r0->size[1];
@@ -1099,11 +1015,9 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
       }
     }
 
-    // 'createTemplate:99' pixrot      = round(pixrot);
     b_round(pixrot);
 
     //         %% get indices of the vanashing line
-    // 'createTemplate:102' index = sub2ind([2*H+1, 2*W+1], pixrot(2,:), pixrot(1,:) ); 
     br = pixrot->size[1];
     ar = b_y->size[0] * b_y->size[1];
     b_y->size[0] = 1;
@@ -1126,7 +1040,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
     nm1d2 = (int)(2.0F * H + 1.0F);
 
     //         %% draw
-    // 'createTemplate:105' TEMPLATE(index) = rad2deg(an);
     ar = r2->size[0] * r2->size[1];
     r2->size[0] = 1;
     r2->size[1] = b_y->size[1];
@@ -1158,7 +1071,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
   emxInit_real_T(&B, 2);
 
   //     %% fill in holes
-  // 'createTemplate:109' TEMPLATE = imdilate( TEMPLATE, ones(3,3) );
   for (i2 = 0; i2 < 2; i2++) {
     ar = B->size[0] * B->size[1];
     B->size[i2] = TEMPLATE->size[i2];
@@ -1175,7 +1087,6 @@ void createTemplate(float H, float W, emxArray_real_T *TEMPLATE)
     TEMPLATE->data[i2] = B->data[i2];
   }
 
-  // 'createTemplate:110' TEMPLATE(1:H+2,:) = -180;
   br = B->size[1];
   if (1.0F > H + 2.0F) {
     nm1d2 = 0;

@@ -5,7 +5,7 @@
 // File: run_Init_State.h
 //
 // MATLAB Coder version            : 3.2
-// C/C++ source code generated on  : 28-Jan-2017 01:24:11
+// C/C++ source code generated on  : 01-Feb-2017 19:25:15
 //
 #ifndef RUN_INIT_STATE_H
 #define RUN_INIT_STATE_H
@@ -22,10 +22,10 @@
 #include "run_Init_State_types.h"
 
 // Function Declarations
-extern void run_Init_State(const float RES_VH[2], float NBUFFER, const
+extern void run_Init_State(const int RES_VH[2], int NBUFFER, const
   MatlabStruct_laneFilter *laneFilter, const MatlabStruct_vpFilter *vpFilter,
-  double *msg, MatlabStruct_likelihoods *likelihoods, MatlabStruct_templates
-  *templates, MatlabStruct_vanishingPt *vanishingPt);
+  MatlabStruct_likelihoods *likelihoods, MatlabStruct_templates *templates,
+  MatlabStruct_vanishingPt *vanishingPt, MatlabStruct_focusMask *masks);
 
 #endif
 

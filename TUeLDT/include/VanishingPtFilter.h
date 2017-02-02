@@ -40,8 +40,8 @@ using namespace Eigen;
 		const VectorXi 	mBINS_V;	    //Histogram Bins in Pixels.
 		const VectorXi mBINS_HISTOGRAM;	    //Histogram Bins in Pixels.
 		
-		MatrixXd     mPrior;
-		MatrixXd     mFilter;
+		MatrixXf     mPrior;
+		MatrixXf     mFilter;
 		Matrix3d	 mTransition;  
 		
 

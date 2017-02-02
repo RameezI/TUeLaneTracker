@@ -94,9 +94,9 @@
     <File Name="isrow.cpp"/>
     <File Name="morphopAlgo.cpp"/>
     <File Name="round.cpp"/>
+    <File Name="rt_nonfinite.cpp"/>
     <File Name="rtGetInf.cpp"/>
     <File Name="rtGetNaN.cpp"/>
-    <File Name="rt_nonfinite.cpp"/>
     <File Name="run_Init_State.cpp"/>
     <File Name="run_Init_State_data.cpp"/>
     <File Name="run_Init_State_emxAPI.cpp"/>
@@ -110,9 +110,9 @@
     <File Name="isrow.h"/>
     <File Name="morphopAlgo.h"/>
     <File Name="round.h"/>
-    <File Name="rt_nonfinite.h"/>
     <File Name="rtGetInf.h"/>
     <File Name="rtGetNaN.h"/>
+    <File Name="rt_nonfinite.h"/>
     <File Name="rtwtypes.h"/>
     <File Name="run_Init_State.h"/>
     <File Name="run_Init_State_data.h"/>
@@ -123,4 +123,8 @@
     <File Name="run_Init_State_terminate.h"/>
     <File Name="run_Init_State_types.h"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug">
+    <Project Name="TUeLDT"/>
+  </Dependencies>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>

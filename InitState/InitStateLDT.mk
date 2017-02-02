@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=rameez
-Date                   :=31/01/17
+Date                   :=02/02/17
 CodeLitePath           :="/home/rameez/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -60,7 +60,7 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/createTemplate.cpp$(ObjectSuffix) $(IntermediateDirectory)/isrow.cpp$(ObjectSuffix) $(IntermediateDirectory)/morphopAlgo.cpp$(ObjectSuffix) $(IntermediateDirectory)/round.cpp$(ObjectSuffix) $(IntermediateDirectory)/rtGetInf.cpp$(ObjectSuffix) $(IntermediateDirectory)/rtGetNaN.cpp$(ObjectSuffix) $(IntermediateDirectory)/rt_nonfinite.cpp$(ObjectSuffix) $(IntermediateDirectory)/run_Init_State.cpp$(ObjectSuffix) $(IntermediateDirectory)/run_Init_State_data.cpp$(ObjectSuffix) $(IntermediateDirectory)/run_Init_State_emxAPI.cpp$(ObjectSuffix) \
+Objects0=$(IntermediateDirectory)/createTemplate.cpp$(ObjectSuffix) $(IntermediateDirectory)/isrow.cpp$(ObjectSuffix) $(IntermediateDirectory)/morphopAlgo.cpp$(ObjectSuffix) $(IntermediateDirectory)/round.cpp$(ObjectSuffix) $(IntermediateDirectory)/rt_nonfinite.cpp$(ObjectSuffix) $(IntermediateDirectory)/rtGetInf.cpp$(ObjectSuffix) $(IntermediateDirectory)/rtGetNaN.cpp$(ObjectSuffix) $(IntermediateDirectory)/run_Init_State.cpp$(ObjectSuffix) $(IntermediateDirectory)/run_Init_State_data.cpp$(ObjectSuffix) $(IntermediateDirectory)/run_Init_State_emxAPI.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/run_Init_State_emxutil.cpp$(ObjectSuffix) $(IntermediateDirectory)/run_Init_State_initialize.cpp$(ObjectSuffix) $(IntermediateDirectory)/run_Init_State_rtwutil.cpp$(ObjectSuffix) $(IntermediateDirectory)/run_Init_State_terminate.cpp$(ObjectSuffix) 
 
 
@@ -126,6 +126,14 @@ $(IntermediateDirectory)/round.cpp$(DependSuffix): round.cpp
 $(IntermediateDirectory)/round.cpp$(PreprocessSuffix): round.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/round.cpp$(PreprocessSuffix) "round.cpp"
 
+$(IntermediateDirectory)/rt_nonfinite.cpp$(ObjectSuffix): rt_nonfinite.cpp $(IntermediateDirectory)/rt_nonfinite.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/InitState/rt_nonfinite.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/rt_nonfinite.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/rt_nonfinite.cpp$(DependSuffix): rt_nonfinite.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/rt_nonfinite.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/rt_nonfinite.cpp$(DependSuffix) -MM "rt_nonfinite.cpp"
+
+$(IntermediateDirectory)/rt_nonfinite.cpp$(PreprocessSuffix): rt_nonfinite.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/rt_nonfinite.cpp$(PreprocessSuffix) "rt_nonfinite.cpp"
+
 $(IntermediateDirectory)/rtGetInf.cpp$(ObjectSuffix): rtGetInf.cpp $(IntermediateDirectory)/rtGetInf.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/InitState/rtGetInf.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/rtGetInf.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/rtGetInf.cpp$(DependSuffix): rtGetInf.cpp
@@ -141,14 +149,6 @@ $(IntermediateDirectory)/rtGetNaN.cpp$(DependSuffix): rtGetNaN.cpp
 
 $(IntermediateDirectory)/rtGetNaN.cpp$(PreprocessSuffix): rtGetNaN.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/rtGetNaN.cpp$(PreprocessSuffix) "rtGetNaN.cpp"
-
-$(IntermediateDirectory)/rt_nonfinite.cpp$(ObjectSuffix): rt_nonfinite.cpp $(IntermediateDirectory)/rt_nonfinite.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/InitState/rt_nonfinite.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/rt_nonfinite.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/rt_nonfinite.cpp$(DependSuffix): rt_nonfinite.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/rt_nonfinite.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/rt_nonfinite.cpp$(DependSuffix) -MM "rt_nonfinite.cpp"
-
-$(IntermediateDirectory)/rt_nonfinite.cpp$(PreprocessSuffix): rt_nonfinite.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/rt_nonfinite.cpp$(PreprocessSuffix) "rt_nonfinite.cpp"
 
 $(IntermediateDirectory)/run_Init_State.cpp$(ObjectSuffix): run_Init_State.cpp $(IntermediateDirectory)/run_Init_State.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/InitState/run_Init_State.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/run_Init_State.cpp$(ObjectSuffix) $(IncludePath)

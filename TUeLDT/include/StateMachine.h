@@ -1,8 +1,7 @@
 #ifndef STATEMACHINE_H
 #define STATEMACHINE_H
+#include "compileConfig.h"
 #include <memory>
-#include "opencv2/opencv.hpp"
-#include "opencv2/highgui/highgui.hpp"
 #include "sigInit.h"
 #include "Car.h"
 #include "Camera.h"
@@ -12,20 +11,20 @@
 #include "States.h"
 #include "InitState.h"
 #include "BufferingState.h"
-using namespace std;
 
-enum Source{CAMERA, DIRECTORY};
+
+using namespace std;
 enum States{BOOTING, BUFFERING, DETECTING_LANES, RESETING, DISPOSING }; //^TODO: Add PAUSED state as well
 
 class StateMachine
 {
 	private:
-	const Source 	mSource;
-	static States   mCurrentState;
+	static States   sCurrentState;
 	const string 	mStateStrings[4];
 	
-	const vector<cv::String> mFileNames;
-	const static int sNbBuffer;
+	const vector<cv::String>& mFiles;
+	
+
 	const Camera mCamera;
 	const Lane   mLane;
 	const Car    mCar;
@@ -41,14 +40,14 @@ class StateMachine
 	shared_ptr<Templates>   		mTemplates;
 	
 	
-	
 
 public:	
 	// STATE MACHINE METHODS
+#ifdef DIRECTORY_INPUT
 	StateMachine(const vector<cv::String>&);
+#endif
 	int run(shared_ptr<SigInit>);	
 	void PrintMachineInfo();
-	
 	//STAE MACHINE 
 
 	

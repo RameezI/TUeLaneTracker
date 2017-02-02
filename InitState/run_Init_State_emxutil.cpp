@@ -5,7 +5,7 @@
 // File: run_Init_State_emxutil.cpp
 //
 // MATLAB Coder version            : 3.2
-// C/C++ source code generated on  : 28-Jan-2017 01:24:11
+// C/C++ source code generated on  : 01-Feb-2017 19:25:15
 //
 
 // Include Files
@@ -13,30 +13,15 @@
 #include "run_Init_State.h"
 #include "run_Init_State_emxutil.h"
 
-// Function Declarations
-static void emxInit_real_T1(emxArray_real_T **pEmxArray, int numDimensions);
-
 // Function Definitions
 
 //
-// Arguments    : emxArray_real_T **pEmxArray
-//                int numDimensions
+// Arguments    : MatlabStruct_focusMask *pStruct
 // Return Type  : void
 //
-static void emxInit_real_T1(emxArray_real_T **pEmxArray, int numDimensions)
+void c_emxFreeStruct_MatlabStruct_fo(MatlabStruct_focusMask *pStruct)
 {
-  emxArray_real_T *emxArray;
-  int i;
-  *pEmxArray = (emxArray_real_T *)malloc(sizeof(emxArray_real_T));
-  emxArray = *pEmxArray;
-  emxArray->data = (double *)NULL;
-  emxArray->numDimensions = numDimensions;
-  emxArray->size = (int *)malloc((unsigned int)(sizeof(int) * numDimensions));
-  emxArray->allocatedSize = 0;
-  emxArray->canFreeData = true;
-  for (i = 0; i < numDimensions; i++) {
-    emxArray->size[i] = 0;
-  }
+  emxFree_real_T(&pStruct->FOCUS);
 }
 
 //
@@ -45,8 +30,8 @@ static void emxInit_real_T1(emxArray_real_T **pEmxArray, int numDimensions)
 //
 void c_emxFreeStruct_MatlabStruct_la(MatlabStruct_laneFilter *pStruct)
 {
-  emxFree_real_T(&pStruct->mFilter);
-  emxFree_real_T(&pStruct->mPrior);
+  emxFree_real32_T(&pStruct->mFilter);
+  emxFree_real32_T(&pStruct->mPrior);
 }
 
 //
@@ -55,14 +40,13 @@ void c_emxFreeStruct_MatlabStruct_la(MatlabStruct_laneFilter *pStruct)
 //
 void c_emxFreeStruct_MatlabStruct_li(MatlabStruct_likelihoods *pStruct)
 {
-  emxFree_real_T(&pStruct->TOT_P_ALL);
-  emxFree_real_T(&pStruct->DIR_ALL);
-  emxFree_real_T(&pStruct->MASK_FOC_TOT_P);
-  emxFree_real_T(&pStruct->TOT_P);
-  emxFree_real_T(&pStruct->FOC_TOT_P);
-  emxFree_real_T(&pStruct->AVG_DIR_TOT_P);
-  emxFree_real_T(&pStruct->TOT_P_ALL_BACK_UP);
-  emxFree_real_T(&pStruct->DIR_ALL_BACK_UP);
+  emxFree_real_T(&pStruct->TOT_ALL);
+  emxFree_real_T(&pStruct->TOT_MAX);
+  emxFree_real_T(&pStruct->GRADIENT_DIR_ALL);
+  emxFree_real_T(&pStruct->GRADIENT_DIR_AVG);
+  emxFree_real_T(&pStruct->TOT_ALL_BACK_UP);
+  emxFree_real_T(&pStruct->GRADIENT_DIR_ALL_BACK_UP);
+  emxFree_real_T(&pStruct->TOT_FOCUSED);
 }
 
 //
@@ -71,10 +55,9 @@ void c_emxFreeStruct_MatlabStruct_li(MatlabStruct_likelihoods *pStruct)
 //
 void c_emxFreeStruct_MatlabStruct_te(MatlabStruct_templates *pStruct)
 {
-  emxFree_real_T(&pStruct->ROOT_DIR_TEMPLATE);
-  emxFree_real_T(&pStruct->ROOT_PROB_TEMPLATE);
-  emxFree_real_T(&pStruct->ROOT_DEPTH_TEMPLATE);
-  emxFree_real_T(&pStruct->SEGMENT);
+  emxFree_real_T(&pStruct->GRADIENT_DIR_ROOT);
+  emxFree_real_T(&pStruct->PROB_ROOT);
+  emxFree_real_T(&pStruct->DEPTH_ROOT);
 }
 
 //
@@ -83,8 +66,17 @@ void c_emxFreeStruct_MatlabStruct_te(MatlabStruct_templates *pStruct)
 //
 void c_emxFreeStruct_MatlabStruct_vp(MatlabStruct_vpFilter *pStruct)
 {
-  emxFree_real_T(&pStruct->mFilter);
-  emxFree_real_T(&pStruct->mPrior);
+  emxFree_real32_T(&pStruct->mFilter);
+  emxFree_real32_T(&pStruct->mPrior);
+}
+
+//
+// Arguments    : MatlabStruct_focusMask *pStruct
+// Return Type  : void
+//
+void c_emxInitStruct_MatlabStruct_fo(MatlabStruct_focusMask *pStruct)
+{
+  emxInit_real_T(&pStruct->FOCUS, 2);
 }
 
 //
@@ -93,8 +85,8 @@ void c_emxFreeStruct_MatlabStruct_vp(MatlabStruct_vpFilter *pStruct)
 //
 void c_emxInitStruct_MatlabStruct_la(MatlabStruct_laneFilter *pStruct)
 {
-  emxInit_real_T(&pStruct->mFilter, 2);
-  emxInit_real_T(&pStruct->mPrior, 2);
+  emxInit_real32_T(&pStruct->mFilter, 2);
+  emxInit_real32_T(&pStruct->mPrior, 2);
 }
 
 //
@@ -103,14 +95,13 @@ void c_emxInitStruct_MatlabStruct_la(MatlabStruct_laneFilter *pStruct)
 //
 void c_emxInitStruct_MatlabStruct_li(MatlabStruct_likelihoods *pStruct)
 {
-  emxInit_real_T1(&pStruct->TOT_P_ALL, 3);
-  emxInit_real_T1(&pStruct->DIR_ALL, 3);
-  emxInit_real_T(&pStruct->MASK_FOC_TOT_P, 2);
-  emxInit_real_T(&pStruct->TOT_P, 2);
-  emxInit_real_T(&pStruct->FOC_TOT_P, 2);
-  emxInit_real_T(&pStruct->AVG_DIR_TOT_P, 2);
-  emxInit_real_T1(&pStruct->TOT_P_ALL_BACK_UP, 3);
-  emxInit_real_T1(&pStruct->DIR_ALL_BACK_UP, 3);
+  emxInit_real_T1(&pStruct->TOT_ALL, 3);
+  emxInit_real_T(&pStruct->TOT_MAX, 2);
+  emxInit_real_T1(&pStruct->GRADIENT_DIR_ALL, 3);
+  emxInit_real_T(&pStruct->GRADIENT_DIR_AVG, 2);
+  emxInit_real_T1(&pStruct->TOT_ALL_BACK_UP, 3);
+  emxInit_real_T1(&pStruct->GRADIENT_DIR_ALL_BACK_UP, 3);
+  emxInit_real_T(&pStruct->TOT_FOCUSED, 2);
 }
 
 //
@@ -119,10 +110,9 @@ void c_emxInitStruct_MatlabStruct_li(MatlabStruct_likelihoods *pStruct)
 //
 void c_emxInitStruct_MatlabStruct_te(MatlabStruct_templates *pStruct)
 {
-  emxInit_real_T(&pStruct->ROOT_DIR_TEMPLATE, 2);
-  emxInit_real_T(&pStruct->ROOT_PROB_TEMPLATE, 2);
-  emxInit_real_T(&pStruct->ROOT_DEPTH_TEMPLATE, 2);
-  emxInit_real_T(&pStruct->SEGMENT, 2);
+  emxInit_real_T(&pStruct->GRADIENT_DIR_ROOT, 2);
+  emxInit_real_T(&pStruct->PROB_ROOT, 2);
+  emxInit_real_T(&pStruct->DEPTH_ROOT, 2);
 }
 
 //
@@ -131,8 +121,8 @@ void c_emxInitStruct_MatlabStruct_te(MatlabStruct_templates *pStruct)
 //
 void c_emxInitStruct_MatlabStruct_vp(MatlabStruct_vpFilter *pStruct)
 {
-  emxInit_real_T(&pStruct->mFilter, 2);
-  emxInit_real_T(&pStruct->mPrior, 2);
+  emxInit_real32_T(&pStruct->mFilter, 2);
+  emxInit_real32_T(&pStruct->mPrior, 2);
 }
 
 //
@@ -321,6 +311,27 @@ void emxInit_real32_T(emxArray_real32_T **pEmxArray, int numDimensions)
 // Return Type  : void
 //
 void emxInit_real_T(emxArray_real_T **pEmxArray, int numDimensions)
+{
+  emxArray_real_T *emxArray;
+  int i;
+  *pEmxArray = (emxArray_real_T *)malloc(sizeof(emxArray_real_T));
+  emxArray = *pEmxArray;
+  emxArray->data = (double *)NULL;
+  emxArray->numDimensions = numDimensions;
+  emxArray->size = (int *)malloc((unsigned int)(sizeof(int) * numDimensions));
+  emxArray->allocatedSize = 0;
+  emxArray->canFreeData = true;
+  for (i = 0; i < numDimensions; i++) {
+    emxArray->size[i] = 0;
+  }
+}
+
+//
+// Arguments    : emxArray_real_T **pEmxArray
+//                int numDimensions
+// Return Type  : void
+//
+void emxInit_real_T1(emxArray_real_T **pEmxArray, int numDimensions)
 {
   emxArray_real_T *emxArray;
   int i;

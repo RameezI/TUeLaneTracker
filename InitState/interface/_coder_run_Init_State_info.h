@@ -5,7 +5,7 @@
  * File: _coder_run_Init_State_info.h 
  *  
  * MATLAB Coder version            : 3.2 
- * C/C++ source code generated on  : 28-Jan-2017 01:24:11 
+ * C/C++ source code generated on  : 01-Feb-2017 19:25:15 
  */
 
 #ifndef _CODER_RUN_INIT_STATE_INFO_H

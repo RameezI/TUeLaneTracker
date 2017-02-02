@@ -18,7 +18,6 @@ VanishingPtFilter::VanishingPtFilter(const Ref<const VectorXi>& BINS_LANE_HISTOG
 	createPrior();
 	mFilter = mPrior;
 
-	
 }
 
 void VanishingPtFilter::createPrior()
@@ -27,7 +26,7 @@ void VanishingPtFilter::createPrior()
 	/*Fill the histogram */
     
 	
-	mPrior  = MatrixXd(mNb_BINS_V, mNb_BINS_H);
+	mPrior  = MatrixXf(mNb_BINS_V, mNb_BINS_H);
     float  sigma = 5.0*mRANGE_V/mSTEP;
     double pv,ph,p;
 
