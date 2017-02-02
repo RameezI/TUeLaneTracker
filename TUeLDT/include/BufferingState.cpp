@@ -1,7 +1,7 @@
 #include "BufferingState.h"
 
 BufferingState::BufferingState()
-: mFrame(make_shared<Mat>()),
+: mFrameRGB(make_shared<Mat>()),
 #ifdef DIRECTORY_INPUT
   mCount(0)
 #endif
@@ -18,9 +18,9 @@ int BufferingState::grabFrame()
 	
 #ifdef DIRECTORY_INPUT
  
-	*mFrame = imread(mFiles[mCount]);		
+	*mFrameRGB = imread(mFiles[mCount]);		
 	
-	if(!mFrame->data)
+	if(!mFrameRGB->data)
 			return -1;
 			
 	else	mCount ++;
@@ -28,6 +28,9 @@ int BufferingState::grabFrame()
 			
 
 #endif
+
+
+
 
 }
 
@@ -49,8 +52,12 @@ void BufferingState::run()
 		
 		if (0==grabFrame())
 			{
+				//example wrapper---> could be used to Map Color tranformation to a a ROS node or Apex Process
+				ColorTransformer RGB2GRAY(*mFrameRGB, *mFrameGRAY, cv::COLOR_BGR2GRAY);
+				//ColorTransformer RGB2HSV (*mFrameRGB, *mFrameHSV,  cv::COLOR_BGR2HSV);
+				//ChannelsSplitter  HSVSPLIT(*mFrameHSV, *mFrameH, *mFrameS, *mFrameV);
 				
-				imshow( "Display window", *mFrame );
+				imshow( "Display window", *mFrameRGB );
 				waitKey(1);
 			}
 		

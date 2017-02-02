@@ -3,7 +3,11 @@
 #include "compileConfig.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
-#include "States.h"
+#include "ColorTransformer.h"
+#include "ChannelsSplitter.h"
+#include "ChannelsMerger.h"
+#include "GradientsExtractor.h"
+#include "State.h"
 
 using namespace cv;
 using namespace Eigen;
@@ -15,10 +19,21 @@ class BufferingState : public State
 	
 	
 private:
+shared_ptr<Mat>         mFrameRGB;
+shared_ptr<Mat> 	    mFrameHSV;
+shared_ptr<Mat>			mFrameH;   //use split
+shared_ptr<Mat>			mFrameS;
+shared_ptr<Mat>			mFrameV;
+shared_ptr<Mat>			mFrameHS; //use merge
+shared_ptr<Mat>			mFrameGRAY;
+
+
+
+
 shared_ptr<VanishingPt> mVanishingPt;
 shared_ptr<Templates>	mTemplates;
 shared_ptr<Likelihoods> mLikelihoods;
-shared_ptr<Mat>         mFrame;          
+         
 	
 public:
 	BufferingState();

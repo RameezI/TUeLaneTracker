@@ -61,7 +61,7 @@ AS       := /usr/bin/as
 ##
 CodeLiteDir:=/usr/share/codelite
 Objects0=$(IntermediateDirectory)/Camera.cpp$(ObjectSuffix) $(IntermediateDirectory)/Car.cpp$(ObjectSuffix) $(IntermediateDirectory)/Lane.cpp$(ObjectSuffix) $(IntermediateDirectory)/sigInit.cpp$(ObjectSuffix) $(IntermediateDirectory)/State.cpp$(ObjectSuffix) $(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/VanishingPtFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/InitState.cpp$(ObjectSuffix) $(IntermediateDirectory)/include_BufferingState.cpp$(ObjectSuffix) \
-	
+	$(IntermediateDirectory)/ColorTransformer.cpp$(ObjectSuffix) $(IntermediateDirectory)/ChannelsMerger.cpp$(ObjectSuffix) $(IntermediateDirectory)/GradientExtractor.cpp$(ObjectSuffix) $(IntermediateDirectory)/TemplateExtractor.cpp$(ObjectSuffix) $(IntermediateDirectory)/ChannelsSplitter.cpp$(ObjectSuffix) $(IntermediateDirectory)/MaxPoolingProcessor.cpp$(ObjectSuffix) 
 
 
 
@@ -173,6 +173,54 @@ $(IntermediateDirectory)/include_BufferingState.cpp$(DependSuffix): include/Buff
 
 $(IntermediateDirectory)/include_BufferingState.cpp$(PreprocessSuffix): include/BufferingState.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/include_BufferingState.cpp$(PreprocessSuffix) "include/BufferingState.cpp"
+
+$(IntermediateDirectory)/ColorTransformer.cpp$(ObjectSuffix): ColorTransformer.cpp $(IntermediateDirectory)/ColorTransformer.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/ColorTransformer.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/ColorTransformer.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/ColorTransformer.cpp$(DependSuffix): ColorTransformer.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/ColorTransformer.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/ColorTransformer.cpp$(DependSuffix) -MM "ColorTransformer.cpp"
+
+$(IntermediateDirectory)/ColorTransformer.cpp$(PreprocessSuffix): ColorTransformer.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/ColorTransformer.cpp$(PreprocessSuffix) "ColorTransformer.cpp"
+
+$(IntermediateDirectory)/ChannelsMerger.cpp$(ObjectSuffix): ChannelsMerger.cpp $(IntermediateDirectory)/ChannelsMerger.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/ChannelsMerger.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/ChannelsMerger.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/ChannelsMerger.cpp$(DependSuffix): ChannelsMerger.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/ChannelsMerger.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/ChannelsMerger.cpp$(DependSuffix) -MM "ChannelsMerger.cpp"
+
+$(IntermediateDirectory)/ChannelsMerger.cpp$(PreprocessSuffix): ChannelsMerger.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/ChannelsMerger.cpp$(PreprocessSuffix) "ChannelsMerger.cpp"
+
+$(IntermediateDirectory)/GradientExtractor.cpp$(ObjectSuffix): GradientExtractor.cpp $(IntermediateDirectory)/GradientExtractor.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/GradientExtractor.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/GradientExtractor.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/GradientExtractor.cpp$(DependSuffix): GradientExtractor.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/GradientExtractor.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/GradientExtractor.cpp$(DependSuffix) -MM "GradientExtractor.cpp"
+
+$(IntermediateDirectory)/GradientExtractor.cpp$(PreprocessSuffix): GradientExtractor.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/GradientExtractor.cpp$(PreprocessSuffix) "GradientExtractor.cpp"
+
+$(IntermediateDirectory)/TemplateExtractor.cpp$(ObjectSuffix): TemplateExtractor.cpp $(IntermediateDirectory)/TemplateExtractor.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/TemplateExtractor.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/TemplateExtractor.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/TemplateExtractor.cpp$(DependSuffix): TemplateExtractor.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/TemplateExtractor.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/TemplateExtractor.cpp$(DependSuffix) -MM "TemplateExtractor.cpp"
+
+$(IntermediateDirectory)/TemplateExtractor.cpp$(PreprocessSuffix): TemplateExtractor.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/TemplateExtractor.cpp$(PreprocessSuffix) "TemplateExtractor.cpp"
+
+$(IntermediateDirectory)/ChannelsSplitter.cpp$(ObjectSuffix): ChannelsSplitter.cpp $(IntermediateDirectory)/ChannelsSplitter.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/ChannelsSplitter.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/ChannelsSplitter.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/ChannelsSplitter.cpp$(DependSuffix): ChannelsSplitter.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/ChannelsSplitter.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/ChannelsSplitter.cpp$(DependSuffix) -MM "ChannelsSplitter.cpp"
+
+$(IntermediateDirectory)/ChannelsSplitter.cpp$(PreprocessSuffix): ChannelsSplitter.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/ChannelsSplitter.cpp$(PreprocessSuffix) "ChannelsSplitter.cpp"
+
+$(IntermediateDirectory)/MaxPoolingProcessor.cpp$(ObjectSuffix): MaxPoolingProcessor.cpp $(IntermediateDirectory)/MaxPoolingProcessor.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/MaxPoolingProcessor.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/MaxPoolingProcessor.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/MaxPoolingProcessor.cpp$(DependSuffix): MaxPoolingProcessor.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/MaxPoolingProcessor.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/MaxPoolingProcessor.cpp$(DependSuffix) -MM "MaxPoolingProcessor.cpp"
+
+$(IntermediateDirectory)/MaxPoolingProcessor.cpp$(PreprocessSuffix): MaxPoolingProcessor.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/MaxPoolingProcessor.cpp$(PreprocessSuffix) "MaxPoolingProcessor.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
