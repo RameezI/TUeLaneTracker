@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=rameez
-Date                   :=02/02/17
+Date                   :=06/02/17
 CodeLitePath           :="/home/rameez/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -72,23 +72,11 @@ Objects=$(Objects0)
 .PHONY: all clean PreBuild PrePreBuild PostBuild MakeIntermediateDirs
 all: $(OutputFile)
 
-$(OutputFile): $(IntermediateDirectory)/.d "../.build-debug/InitStateLDT" "../.build-debug/TUeLDT" $(Objects) 
+$(OutputFile): $(IntermediateDirectory)/.d $(Objects) 
 	@$(MakeDirCommand) $(@D)
 	@echo "" > $(IntermediateDirectory)/.d
 	@echo $(Objects0)  > $(ObjectsFileList)
 	$(LinkerName) $(OutputSwitch)$(OutputFile) $(Objects) $(LibPath) $(Libs) $(LinkOptions)
-
-"../.build-debug/InitStateLDT":
-	@$(MakeDirCommand) "../.build-debug"
-	@echo stam > "../.build-debug/InitStateLDT"
-
-
-"../.build-debug/TUeLDT":
-	@$(MakeDirCommand) "../.build-debug"
-	@echo stam > "../.build-debug/TUeLDT"
-
-
-
 
 MakeIntermediateDirs:
 	@test -d ./Debug || $(MakeDirCommand) ./Debug

@@ -134,17 +134,6 @@ public:
 			
 		}
 		
-		template <typename Derived>
-		void VFilter(const EigenBase<Derived>& ,  const CameraProperties& )
-		{
-			
-		}
-		
-		template <typename Derived>
-		void print_sizee(const MatrixBase<Derived>& b)
-		{
-
-		}
 		
 };
 
