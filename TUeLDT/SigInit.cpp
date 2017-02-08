@@ -1,4 +1,4 @@
-#include "sigInit.h"
+#include "SigInit.h"
 
 
 SigStatus SigInit::sStatus= SigStatus::INIT;

@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=rameez
-Date                   :=06/02/17
+Date                   :=08/02/17
 CodeLitePath           :="/home/rameez/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -60,8 +60,8 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/Camera.cpp$(ObjectSuffix) $(IntermediateDirectory)/Car.cpp$(ObjectSuffix) $(IntermediateDirectory)/Lane.cpp$(ObjectSuffix) $(IntermediateDirectory)/sigInit.cpp$(ObjectSuffix) $(IntermediateDirectory)/State.cpp$(ObjectSuffix) $(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/VanishingPtFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/InitState.cpp$(ObjectSuffix) $(IntermediateDirectory)/ColorTransformer.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/GradientExtractor.cpp$(ObjectSuffix) $(IntermediateDirectory)/TemplateExtractor.cpp$(ObjectSuffix) $(IntermediateDirectory)/ChannelsSplitter.cpp$(ObjectSuffix) $(IntermediateDirectory)/MaxPoolingProcessor.cpp$(ObjectSuffix) $(IntermediateDirectory)/include_BufferingState.cpp$(ObjectSuffix) $(IntermediateDirectory)/include_GaussianPreProcessor.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/Camera.cpp$(ObjectSuffix) $(IntermediateDirectory)/Car.cpp$(ObjectSuffix) $(IntermediateDirectory)/Lane.cpp$(ObjectSuffix) $(IntermediateDirectory)/State.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/VanishingPtFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/InitState.cpp$(ObjectSuffix) $(IntermediateDirectory)/ColorTransformer.cpp$(ObjectSuffix) $(IntermediateDirectory)/GradientExtractor.cpp$(ObjectSuffix) $(IntermediateDirectory)/TemplateExtractor.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/ChannelsSplitter.cpp$(ObjectSuffix) $(IntermediateDirectory)/MaxPoolingProcessor.cpp$(ObjectSuffix) $(IntermediateDirectory)/SigInit.cpp$(ObjectSuffix) $(IntermediateDirectory)/BufferingState.cpp$(ObjectSuffix) $(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix) $(IntermediateDirectory)/GaussianPreProcessor.cpp$(ObjectSuffix) 
 
 
 
@@ -118,14 +118,6 @@ $(IntermediateDirectory)/Lane.cpp$(DependSuffix): Lane.cpp
 $(IntermediateDirectory)/Lane.cpp$(PreprocessSuffix): Lane.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Lane.cpp$(PreprocessSuffix) "Lane.cpp"
 
-$(IntermediateDirectory)/sigInit.cpp$(ObjectSuffix): sigInit.cpp $(IntermediateDirectory)/sigInit.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/sigInit.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/sigInit.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/sigInit.cpp$(DependSuffix): sigInit.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/sigInit.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/sigInit.cpp$(DependSuffix) -MM "sigInit.cpp"
-
-$(IntermediateDirectory)/sigInit.cpp$(PreprocessSuffix): sigInit.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/sigInit.cpp$(PreprocessSuffix) "sigInit.cpp"
-
 $(IntermediateDirectory)/State.cpp$(ObjectSuffix): State.cpp $(IntermediateDirectory)/State.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/State.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/State.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/State.cpp$(DependSuffix): State.cpp
@@ -133,14 +125,6 @@ $(IntermediateDirectory)/State.cpp$(DependSuffix): State.cpp
 
 $(IntermediateDirectory)/State.cpp$(PreprocessSuffix): State.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/State.cpp$(PreprocessSuffix) "State.cpp"
-
-$(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix): StateMachine.cpp $(IntermediateDirectory)/StateMachine.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/StateMachine.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/StateMachine.cpp$(DependSuffix): StateMachine.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/StateMachine.cpp$(DependSuffix) -MM "StateMachine.cpp"
-
-$(IntermediateDirectory)/StateMachine.cpp$(PreprocessSuffix): StateMachine.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/StateMachine.cpp$(PreprocessSuffix) "StateMachine.cpp"
 
 $(IntermediateDirectory)/LaneFilter.cpp$(ObjectSuffix): LaneFilter.cpp $(IntermediateDirectory)/LaneFilter.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/LaneFilter.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/LaneFilter.cpp$(ObjectSuffix) $(IncludePath)
@@ -206,21 +190,37 @@ $(IntermediateDirectory)/MaxPoolingProcessor.cpp$(DependSuffix): MaxPoolingProce
 $(IntermediateDirectory)/MaxPoolingProcessor.cpp$(PreprocessSuffix): MaxPoolingProcessor.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/MaxPoolingProcessor.cpp$(PreprocessSuffix) "MaxPoolingProcessor.cpp"
 
-$(IntermediateDirectory)/include_BufferingState.cpp$(ObjectSuffix): include/BufferingState.cpp $(IntermediateDirectory)/include_BufferingState.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/include/BufferingState.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/include_BufferingState.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/include_BufferingState.cpp$(DependSuffix): include/BufferingState.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/include_BufferingState.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/include_BufferingState.cpp$(DependSuffix) -MM "include/BufferingState.cpp"
+$(IntermediateDirectory)/SigInit.cpp$(ObjectSuffix): SigInit.cpp $(IntermediateDirectory)/SigInit.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/SigInit.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/SigInit.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/SigInit.cpp$(DependSuffix): SigInit.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/SigInit.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/SigInit.cpp$(DependSuffix) -MM "SigInit.cpp"
 
-$(IntermediateDirectory)/include_BufferingState.cpp$(PreprocessSuffix): include/BufferingState.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/include_BufferingState.cpp$(PreprocessSuffix) "include/BufferingState.cpp"
+$(IntermediateDirectory)/SigInit.cpp$(PreprocessSuffix): SigInit.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/SigInit.cpp$(PreprocessSuffix) "SigInit.cpp"
 
-$(IntermediateDirectory)/include_GaussianPreProcessor.cpp$(ObjectSuffix): include/GaussianPreProcessor.cpp $(IntermediateDirectory)/include_GaussianPreProcessor.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/include/GaussianPreProcessor.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/include_GaussianPreProcessor.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/include_GaussianPreProcessor.cpp$(DependSuffix): include/GaussianPreProcessor.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/include_GaussianPreProcessor.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/include_GaussianPreProcessor.cpp$(DependSuffix) -MM "include/GaussianPreProcessor.cpp"
+$(IntermediateDirectory)/BufferingState.cpp$(ObjectSuffix): BufferingState.cpp $(IntermediateDirectory)/BufferingState.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/BufferingState.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/BufferingState.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/BufferingState.cpp$(DependSuffix): BufferingState.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/BufferingState.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/BufferingState.cpp$(DependSuffix) -MM "BufferingState.cpp"
 
-$(IntermediateDirectory)/include_GaussianPreProcessor.cpp$(PreprocessSuffix): include/GaussianPreProcessor.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/include_GaussianPreProcessor.cpp$(PreprocessSuffix) "include/GaussianPreProcessor.cpp"
+$(IntermediateDirectory)/BufferingState.cpp$(PreprocessSuffix): BufferingState.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/BufferingState.cpp$(PreprocessSuffix) "BufferingState.cpp"
+
+$(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix): StateMachine.cpp $(IntermediateDirectory)/StateMachine.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/StateMachine.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/StateMachine.cpp$(DependSuffix): StateMachine.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/StateMachine.cpp$(DependSuffix) -MM "StateMachine.cpp"
+
+$(IntermediateDirectory)/StateMachine.cpp$(PreprocessSuffix): StateMachine.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/StateMachine.cpp$(PreprocessSuffix) "StateMachine.cpp"
+
+$(IntermediateDirectory)/GaussianPreProcessor.cpp$(ObjectSuffix): GaussianPreProcessor.cpp $(IntermediateDirectory)/GaussianPreProcessor.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/GaussianPreProcessor.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/GaussianPreProcessor.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/GaussianPreProcessor.cpp$(DependSuffix): GaussianPreProcessor.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/GaussianPreProcessor.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/GaussianPreProcessor.cpp$(DependSuffix) -MM "GaussianPreProcessor.cpp"
+
+$(IntermediateDirectory)/GaussianPreProcessor.cpp$(PreprocessSuffix): GaussianPreProcessor.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/GaussianPreProcessor.cpp$(PreprocessSuffix) "GaussianPreProcessor.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

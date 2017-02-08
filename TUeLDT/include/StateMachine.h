@@ -2,7 +2,7 @@
 #define STATEMACHINE_H
 #include "compileConfig.h"
 #include <memory>
-#include "sigInit.h"
+#include "SigInit.h"
 #include "Car.h"
 #include "Camera.h"
 #include "Lane.h"
