@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=rameez
-Date                   :=08/02/17
+Date                   :=22/02/17
 CodeLitePath           :="/home/rameez/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -36,12 +36,12 @@ ObjectsFileList        :="LaneTrackerApp.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
 LinkOptions            :=  -fopenmp
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)../TUeLDT/include $(IncludeSwitch)/usr/local/include/eigen3 $(IncludeSwitch)../InitState/ 
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)../TUeLDT/include $(IncludeSwitch)/usr/local/include/eigen3 $(IncludeSwitch)../GeneratedFcns/include $(IncludeSwitch)../include/ 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)TUeLDT $(LibrarySwitch)InitStateLDT $(LibrarySwitch)opencv_shape $(LibrarySwitch)opencv_stitching $(LibrarySwitch)opencv_objdetect $(LibrarySwitch)opencv_superres $(LibrarySwitch)opencv_videostab $(LibrarySwitch)opencv_calib3d $(LibrarySwitch)opencv_features2d $(LibrarySwitch)opencv_highgui $(LibrarySwitch)opencv_videoio $(LibrarySwitch)opencv_imgcodecs $(LibrarySwitch)opencv_video $(LibrarySwitch)opencv_photo $(LibrarySwitch)opencv_ml $(LibrarySwitch)opencv_imgproc $(LibrarySwitch)opencv_flann $(LibrarySwitch)opencv_core 
-ArLibs                 :=  "libTUeLDT.a" "libInitStateLDT.a" "opencv_shape" "opencv_stitching" "opencv_objdetect" "opencv_superres" "opencv_videostab" "opencv_calib3d" "opencv_features2d" "opencv_highgui" "opencv_videoio" "opencv_imgcodecs" "opencv_video" "opencv_photo" "opencv_ml" "opencv_imgproc" "opencv_flann" "opencv_core" 
-LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)../TUeLDT/Debug $(LibraryPathSwitch)../InitState/Debug/ 
+Libs                   := $(LibrarySwitch)TUeLDT $(LibrarySwitch)GeneratedFcns $(LibrarySwitch)opencv_shape $(LibrarySwitch)opencv_stitching $(LibrarySwitch)opencv_objdetect $(LibrarySwitch)opencv_superres $(LibrarySwitch)opencv_videostab $(LibrarySwitch)opencv_calib3d $(LibrarySwitch)opencv_features2d $(LibrarySwitch)opencv_highgui $(LibrarySwitch)opencv_videoio $(LibrarySwitch)opencv_imgcodecs $(LibrarySwitch)opencv_video $(LibrarySwitch)opencv_photo $(LibrarySwitch)opencv_ml $(LibrarySwitch)opencv_imgproc $(LibrarySwitch)opencv_flann $(LibrarySwitch)opencv_core $(LibrarySwitch)ncurses 
+ArLibs                 :=  "libTUeLDT.a" "libGeneratedFcns.a" "opencv_shape" "opencv_stitching" "opencv_objdetect" "opencv_superres" "opencv_videostab" "opencv_calib3d" "opencv_features2d" "opencv_highgui" "opencv_videoio" "opencv_imgcodecs" "opencv_video" "opencv_photo" "opencv_ml" "opencv_imgproc" "opencv_flann" "opencv_core" "ncurses" 
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)../TUeLDT/Debug $(LibraryPathSwitch)../GeneratedFcns/Debug/ 
 
 ##
 ## Common variables
@@ -60,7 +60,7 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/time_measure.cpp$(ObjectSuffix) 
 
 
 
@@ -72,16 +72,11 @@ Objects=$(Objects0)
 .PHONY: all clean PreBuild PrePreBuild PostBuild MakeIntermediateDirs
 all: $(OutputFile)
 
-$(OutputFile): $(IntermediateDirectory)/.d "../.build-debug/InitStateLDT" "../.build-debug/TUeLDT" $(Objects) 
+$(OutputFile): $(IntermediateDirectory)/.d "../.build-debug/TUeLDT" $(Objects) 
 	@$(MakeDirCommand) $(@D)
 	@echo "" > $(IntermediateDirectory)/.d
 	@echo $(Objects0)  > $(ObjectsFileList)
 	$(LinkerName) $(OutputSwitch)$(OutputFile) $(Objects) $(LibPath) $(Libs) $(LinkOptions)
-
-"../.build-debug/InitStateLDT":
-	@$(MakeDirCommand) "../.build-debug"
-	@echo stam > "../.build-debug/InitStateLDT"
-
 
 "../.build-debug/TUeLDT":
 	@$(MakeDirCommand) "../.build-debug"
@@ -110,6 +105,14 @@ $(IntermediateDirectory)/main.cpp$(DependSuffix): main.cpp
 
 $(IntermediateDirectory)/main.cpp$(PreprocessSuffix): main.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/main.cpp$(PreprocessSuffix) "main.cpp"
+
+$(IntermediateDirectory)/time_measure.cpp$(ObjectSuffix): time_measure.cpp $(IntermediateDirectory)/time_measure.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/LaneTrackerApp/time_measure.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/time_measure.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/time_measure.cpp$(DependSuffix): time_measure.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/time_measure.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/time_measure.cpp$(DependSuffix) -MM "time_measure.cpp"
+
+$(IntermediateDirectory)/time_measure.cpp$(PreprocessSuffix): time_measure.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/time_measure.cpp$(PreprocessSuffix) "time_measure.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

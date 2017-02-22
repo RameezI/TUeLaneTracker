@@ -1,94 +1,87 @@
 #include "InitState.h"
  
 
-InitState::InitState(const CameraProperties& CAMERA, shared_ptr<LaneFilter> laneFilter, shared_ptr<VanishingPtFilter> vpFilter)
-: mLaneFilter(laneFilter),
-  mVanishPtFilter(vpFilter),
-  mRES_VH(CAMERA.RES_VH),
-  mLikelihoods(make_shared<Likelihoods>())  // Allocated on heap but as it is smart;) shared pointer no need for deallocation 
-											//^TODO: initiate all pointer ahead.
+InitState::InitState(const CameraProperties& CAMERA)
+
+: mRES_VH(CAMERA.RES_VH),
+  
+  mLikelihoods(make_shared<Likelihoods>( mRES_VH(0), mRES_VH(1) ) ),  // Allocated on heap but as it is smart, no need for deallocation 
+  
+  mTemplates(make_shared<Templates> ( mRES_VH(0), mRES_VH(1) ) ),
+  
+  mMasks(make_shared<Masks>( mRES_VH(0), mRES_VH(1) ) ),
+  
+  mVanishingPt(make_shared<VanishingPt>())  
   
 {
   
-	int size[2];
-	
-	
-/*	Wrap Matlab_vpFilter.mFilter to point to respective member of mVanishPtFilter.  */
-	size[0]= mVanishPtFilter->mFilter.rows();
-	size[1]= mVanishPtFilter->mFilter.cols();
-	Matlab_vpFilter.mFilter= emxCreateWrapperND_real32_T(mVanishPtFilter->mFilter.data(), 2, size);
-	
-
-	
-/*	Wrap Matlab_vpFilter.mPrior  to point to respective member of mVanishPtFilter.  */	
-	size[0]= mVanishPtFilter->mPrior.rows();
-	size[1]= mVanishPtFilter->mPrior.cols();
-	Matlab_vpFilter.mPrior= emxCreateWrapperND_real32_T(mVanishPtFilter->mPrior.data(), 2, size);
-	
-	
-/*	Wrap Matlab_LaneFilter.mFilter to point to respective member of mLaneFilter.  */
-	size[0]= mLaneFilter->mFilter.rows();
-	size[1]= mLaneFilter->mFilter.cols();
-	Matlab_LaneFilter.mFilter= emxCreateWrapperND_real32_T(mLaneFilter->mFilter.data(), 2, size);
-	
-/*	Wrap Matlab_LaneFilter.mPrior to point to respective member of mLaneFilter.  */	
-	size[0]= mLaneFilter->mPrior.rows();
-	size[1]= mLaneFilter->mPrior.cols();
-	Matlab_LaneFilter.mPrior= emxCreateWrapperND_real32_T(mLaneFilter->mPrior.data(), 2, size);
-	
 	mStateStatus = StateStatus::ACTIVE;
-	
-	run();
+
 }
 
 
 void InitState::run()
 {
-	
-// ^TODO: Initialised Memory allocation for outputs... Make sure to clean up in the destructor.	  
-	run_Init_State_initialize();
-	emxInit_MatlabStruct_likelihoods(&Matlab_Likelihoods);
-	emxInit_MatlabStruct_templates(&Matlab_Templates);
-	emxInit_MatlabStruct_focusMask(&Matlab_Masks);
-	
 
-	run_Init_State(	mRES_VH.data(),
-					sNbBuffer, 
-					&Matlab_LaneFilter, 
-					&Matlab_vpFilter, 
-					&Matlab_Likelihoods,
-					&Matlab_Templates, 
-					&Matlab_VanishingPt,
-					&Matlab_Masks);
 	
-	Map<MatrixXd> TOT_MAX((Matlab_Likelihoods.TOT_MAX->data),
-						Matlab_Likelihoods.TOT_MAX->size[0], 
-						Matlab_Likelihoods.TOT_MAX->size[1]);
+//^TODO: Error of 0.12 degrees in the template. Load Template directly from Matlab CSV file.
 	
+#ifdef PROFILER_ENABLED
+mProfiler.start("SingleRun");
+#endif	
+	
+createTemplate_initialize();
+
+#ifdef PROFILER_ENABLED
+mProfiler.start("WrapDirectionTemplate");
+#endif	
+	
+emxArray_real32_T *TEMPLATE;
+TEMPLATE = emxCreateWrapper_real32_T(mTemplates->GRADIENT_DIR_ROOT.data(), 2*mRES_VH(0)+1, 2*mRES_VH(1)+1);
 
 
-  // MatrixXd TOT_P_M =TOT_P; 
-	mLikelihoods->TOT_MAX= TOT_MAX;  //^TODO: Copy Opperation Time it! One Option is to just directly use Map rather Matrix.
+#ifdef PROFILER_ENABLED
+mProfiler.end();
+LOG_INFO_(LDTLog::BOOTING_PROFILE) <<endl
+										  <<"******************************"<<endl
+										  <<  "Wrapping Direction Template." <<endl
+										  <<  "Time: " << mProfiler.getTiming("WrapDirectionTemplate")<<endl
+										  <<"******************************"<<endl<<endl;	
+									   #endif	
 
-	for (int i=0; i<sNbBuffer; i++)
-	 {
-		Map<MatrixXd> TOT_MAX (Matlab_Likelihoods.TOT_ALL->data + i*Matlab_Likelihoods.TOT_MAX->size[0]*Matlab_Likelihoods.TOT_MAX->size[1], 
-							 Matlab_Likelihoods.TOT_MAX->size[0], 
-							 Matlab_Likelihoods.TOT_MAX->size[1]);
-		mLikelihoods->TOT_ALL[i]= TOT_MAX;
-	 } 
-	
-	
-	//mLikelihoods->TOT_P_ALL[]
-	//MatrixXd M = TOT_P;
-	//mLikelihoods.				
-	 				
 
-//^TODO: Assign Likelihoods, Templates and VanishingPoint 		
+#ifdef PROFILER_ENABLED
+mProfiler.start("CreateTemplate");
+#endif	
+
+
+createTemplate((float)mRES_VH(0), (float)mRES_VH(1), TEMPLATE);
+emxDestroyArray_real32_T(TEMPLATE);  
+
+#ifdef PROFILER_ENABLED
+mProfiler.end();
+LOG_INFO_(LDTLog::BOOTING_PROFILE) <<endl
+										  <<"******************************"<<endl
+										  <<  "Creating Gradient Direction Template." <<endl
+										  <<  "Time: " << mProfiler.getTiming("CreateTemplate")<<endl
+										  <<"******************************"<<endl<<endl;	
+									   #endif	
+
+createTemplate_terminate();		
+
+
+
+#ifdef PROFILER_ENABLED
+mProfiler.end();
+LOG_INFO_(LDTLog::BOOTING_PROFILE) <<endl
+										  <<"******************************"<<endl
+										  <<  "Single-RUN of the Booting State." <<endl
+										  <<  "Time: " << mProfiler.getTiming("SingleRun")<<endl
+										  <<"******************************"<<endl<<endl;	
+									   #endif
 
 	sStateCounter++;
-	mStateStatus = StateStatus::DONE;
-
+	mStateStatus = StateStatus::DONE;		
 }
 
 void InitState::conclude()
@@ -99,8 +92,8 @@ void InitState::conclude()
 
 InitState::~InitState()
 {	
-	emxDestroy_MatlabStruct_templates(Matlab_Templates);
-	emxDestroy_MatlabStruct_likelihoods(Matlab_Likelihoods);
-	run_Init_State_terminate();
+	//emxDestroy_MatlabStruct_templates(Matlab_Templates);
+	//emxDestroy_MatlabStruct_likelihoods(Matlab_Likelihoods);
+	//run_Init_State_terminate();
 }
 

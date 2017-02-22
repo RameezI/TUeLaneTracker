@@ -21,28 +21,29 @@ using namespace Eigen;
 
 	private: 
 			//const VectorXi  mBINS_LANE_HISTOGRAM;
-			const int 		mLANE_FILTER_OFFSET_V;   	 //CONSTANT: might be need outside ----> make public
-			const int  	 	mVP_FILTER_OFFSET_V;        //CONSTANT: might be needed outside ---> make public
 			const int    	mFRAME_CENTER_V;
 			const int    	mFRAME_CENTER_H;
+			const int 		mLANE_FILTER_OFFSET_V;   	 //CONSTANT: might be need outside ----> make public
+			const int  	 	mVP_FILTER_OFFSET_V;        //CONSTANT: might be needed outside ---> make public
 			const float     mVP_LANE_RATIO;
 			void  			createPrior();
 		
 
 	public:
 
-		const int 	 	mRANGE_H;
 		const int 	 	mRANGE_V;
+		const int 	 	mRANGE_H;
 		const int    	mSTEP;
-		const int    	mNb_BINS_H;    	// number of bins in the horizental direction.
 		const int    	mNb_BINS_V;    	// number of bins in the  vertical   direction.
-		const VectorXi 	mBINS_H;     	// Histogram Bins in Pixels.
+		const int    	mNb_BINS_H;    	// number of bins in the horizental direction.
 		const VectorXi 	mBINS_V;	    //Histogram Bins in Pixels.
+		const VectorXi 	mBINS_H;     	// Histogram Bins in Pixels.
 		const VectorXi mBINS_HISTOGRAM;	    //Histogram Bins in Pixels.
 		
 		MatrixXf     mPrior;
+		Matrix3d	 mTransition; 
 		MatrixXf     mFilter;
-		Matrix3d	 mTransition;  
+		 
 		
 
 		//const Ref<const MatrixXd>& getFilter();

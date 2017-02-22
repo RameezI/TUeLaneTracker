@@ -1,1 +1,1 @@
-./Debug/main.cpp.o
+./Debug/main.cpp.o ./Debug/time_measure.cpp.o

@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=rameez
-Date                   :=08/02/17
+Date                   :=22/02/17
 CodeLitePath           :="/home/rameez/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -36,7 +36,7 @@ ObjectsFileList        :="TUeLDT.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
 LinkOptions            :=  
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)./include $(IncludeSwitch)/usr/local/include/eigen3 $(IncludeSwitch)../InitState/ 
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)../include $(IncludeSwitch)./include $(IncludeSwitch)../GeneratedFcns/include $(IncludeSwitch)/usr/local/include/eigen3 
 IncludePCH             := 
 RcIncludePath          := 
 Libs                   := 
@@ -60,8 +60,9 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/Camera.cpp$(ObjectSuffix) $(IntermediateDirectory)/Car.cpp$(ObjectSuffix) $(IntermediateDirectory)/Lane.cpp$(ObjectSuffix) $(IntermediateDirectory)/State.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/VanishingPtFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/InitState.cpp$(ObjectSuffix) $(IntermediateDirectory)/ColorTransformer.cpp$(ObjectSuffix) $(IntermediateDirectory)/GradientExtractor.cpp$(ObjectSuffix) $(IntermediateDirectory)/TemplateExtractor.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/ChannelsSplitter.cpp$(ObjectSuffix) $(IntermediateDirectory)/MaxPoolingProcessor.cpp$(ObjectSuffix) $(IntermediateDirectory)/SigInit.cpp$(ObjectSuffix) $(IntermediateDirectory)/BufferingState.cpp$(ObjectSuffix) $(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix) $(IntermediateDirectory)/GaussianPreProcessor.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/Camera.cpp$(ObjectSuffix) $(IntermediateDirectory)/Car.cpp$(ObjectSuffix) $(IntermediateDirectory)/Lane.cpp$(ObjectSuffix) $(IntermediateDirectory)/State.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/VanishingPtFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/InitState.cpp$(ObjectSuffix) $(IntermediateDirectory)/ColorTransformer.cpp$(ObjectSuffix) $(IntermediateDirectory)/GradientExtractor.cpp$(ObjectSuffix) $(IntermediateDirectory)/ChannelsSplitter.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/MaxPoolingProcessor.cpp$(ObjectSuffix) $(IntermediateDirectory)/SigInit.cpp$(ObjectSuffix) $(IntermediateDirectory)/BufferingState.cpp$(ObjectSuffix) $(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix) $(IntermediateDirectory)/GaussianPreProcessor.cpp$(ObjectSuffix) $(IntermediateDirectory)/NcursesTUI.cpp$(ObjectSuffix) $(IntermediateDirectory)/LDT_logger.cpp$(ObjectSuffix) $(IntermediateDirectory)/LDT_profiler.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneMarkerProbabilities.cpp$(ObjectSuffix) $(IntermediateDirectory)/TemplatesExtractor.cpp$(ObjectSuffix) \
+	
 
 
 
@@ -166,14 +167,6 @@ $(IntermediateDirectory)/GradientExtractor.cpp$(DependSuffix): GradientExtractor
 $(IntermediateDirectory)/GradientExtractor.cpp$(PreprocessSuffix): GradientExtractor.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/GradientExtractor.cpp$(PreprocessSuffix) "GradientExtractor.cpp"
 
-$(IntermediateDirectory)/TemplateExtractor.cpp$(ObjectSuffix): TemplateExtractor.cpp $(IntermediateDirectory)/TemplateExtractor.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/TemplateExtractor.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/TemplateExtractor.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/TemplateExtractor.cpp$(DependSuffix): TemplateExtractor.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/TemplateExtractor.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/TemplateExtractor.cpp$(DependSuffix) -MM "TemplateExtractor.cpp"
-
-$(IntermediateDirectory)/TemplateExtractor.cpp$(PreprocessSuffix): TemplateExtractor.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/TemplateExtractor.cpp$(PreprocessSuffix) "TemplateExtractor.cpp"
-
 $(IntermediateDirectory)/ChannelsSplitter.cpp$(ObjectSuffix): ChannelsSplitter.cpp $(IntermediateDirectory)/ChannelsSplitter.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/ChannelsSplitter.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/ChannelsSplitter.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/ChannelsSplitter.cpp$(DependSuffix): ChannelsSplitter.cpp
@@ -221,6 +214,46 @@ $(IntermediateDirectory)/GaussianPreProcessor.cpp$(DependSuffix): GaussianPrePro
 
 $(IntermediateDirectory)/GaussianPreProcessor.cpp$(PreprocessSuffix): GaussianPreProcessor.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/GaussianPreProcessor.cpp$(PreprocessSuffix) "GaussianPreProcessor.cpp"
+
+$(IntermediateDirectory)/NcursesTUI.cpp$(ObjectSuffix): NcursesTUI.cpp $(IntermediateDirectory)/NcursesTUI.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/NcursesTUI.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/NcursesTUI.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/NcursesTUI.cpp$(DependSuffix): NcursesTUI.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/NcursesTUI.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/NcursesTUI.cpp$(DependSuffix) -MM "NcursesTUI.cpp"
+
+$(IntermediateDirectory)/NcursesTUI.cpp$(PreprocessSuffix): NcursesTUI.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/NcursesTUI.cpp$(PreprocessSuffix) "NcursesTUI.cpp"
+
+$(IntermediateDirectory)/LDT_logger.cpp$(ObjectSuffix): LDT_logger.cpp $(IntermediateDirectory)/LDT_logger.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/LDT_logger.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/LDT_logger.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/LDT_logger.cpp$(DependSuffix): LDT_logger.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/LDT_logger.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/LDT_logger.cpp$(DependSuffix) -MM "LDT_logger.cpp"
+
+$(IntermediateDirectory)/LDT_logger.cpp$(PreprocessSuffix): LDT_logger.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/LDT_logger.cpp$(PreprocessSuffix) "LDT_logger.cpp"
+
+$(IntermediateDirectory)/LDT_profiler.cpp$(ObjectSuffix): LDT_profiler.cpp $(IntermediateDirectory)/LDT_profiler.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/LDT_profiler.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/LDT_profiler.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/LDT_profiler.cpp$(DependSuffix): LDT_profiler.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/LDT_profiler.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/LDT_profiler.cpp$(DependSuffix) -MM "LDT_profiler.cpp"
+
+$(IntermediateDirectory)/LDT_profiler.cpp$(PreprocessSuffix): LDT_profiler.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/LDT_profiler.cpp$(PreprocessSuffix) "LDT_profiler.cpp"
+
+$(IntermediateDirectory)/LaneMarkerProbabilities.cpp$(ObjectSuffix): LaneMarkerProbabilities.cpp $(IntermediateDirectory)/LaneMarkerProbabilities.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/LaneMarkerProbabilities.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/LaneMarkerProbabilities.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/LaneMarkerProbabilities.cpp$(DependSuffix): LaneMarkerProbabilities.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/LaneMarkerProbabilities.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/LaneMarkerProbabilities.cpp$(DependSuffix) -MM "LaneMarkerProbabilities.cpp"
+
+$(IntermediateDirectory)/LaneMarkerProbabilities.cpp$(PreprocessSuffix): LaneMarkerProbabilities.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/LaneMarkerProbabilities.cpp$(PreprocessSuffix) "LaneMarkerProbabilities.cpp"
+
+$(IntermediateDirectory)/TemplatesExtractor.cpp$(ObjectSuffix): TemplatesExtractor.cpp $(IntermediateDirectory)/TemplatesExtractor.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/TemplatesExtractor.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/TemplatesExtractor.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/TemplatesExtractor.cpp$(DependSuffix): TemplatesExtractor.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/TemplatesExtractor.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/TemplatesExtractor.cpp$(DependSuffix) -MM "TemplatesExtractor.cpp"
+
+$(IntermediateDirectory)/TemplatesExtractor.cpp$(PreprocessSuffix): TemplatesExtractor.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/TemplatesExtractor.cpp$(PreprocessSuffix) "TemplatesExtractor.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

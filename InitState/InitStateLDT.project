@@ -89,40 +89,8 @@
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="src">
-    <File Name="createTemplate.cpp"/>
-    <File Name="isrow.cpp"/>
-    <File Name="morphopAlgo.cpp"/>
-    <File Name="round.cpp"/>
-    <File Name="rt_nonfinite.cpp"/>
-    <File Name="rtGetInf.cpp"/>
-    <File Name="rtGetNaN.cpp"/>
-    <File Name="run_Init_State.cpp"/>
-    <File Name="run_Init_State_data.cpp"/>
-    <File Name="run_Init_State_emxAPI.cpp"/>
-    <File Name="run_Init_State_emxutil.cpp"/>
-    <File Name="run_Init_State_initialize.cpp"/>
-    <File Name="run_Init_State_rtwutil.cpp"/>
-    <File Name="run_Init_State_terminate.cpp"/>
-  </VirtualDirectory>
-  <VirtualDirectory Name="include">
-    <File Name="createTemplate.h"/>
-    <File Name="isrow.h"/>
-    <File Name="morphopAlgo.h"/>
-    <File Name="round.h"/>
-    <File Name="rtGetInf.h"/>
-    <File Name="rtGetNaN.h"/>
-    <File Name="rt_nonfinite.h"/>
-    <File Name="rtwtypes.h"/>
-    <File Name="run_Init_State.h"/>
-    <File Name="run_Init_State_data.h"/>
-    <File Name="run_Init_State_emxAPI.h"/>
-    <File Name="run_Init_State_emxutil.h"/>
-    <File Name="run_Init_State_initialize.h"/>
-    <File Name="run_Init_State_rtwutil.h"/>
-    <File Name="run_Init_State_terminate.h"/>
-    <File Name="run_Init_State_types.h"/>
-  </VirtualDirectory>
+  <VirtualDirectory Name="src"/>
+  <VirtualDirectory Name="include"/>
   <Dependencies Name="Debug">
     <Project Name="TUeLDT"/>
   </Dependencies>

@@ -185,33 +185,28 @@ public:
 
 	  Camera camera;
 	  Lane   lane;
-	  shared_ptr<LaneFilter> laneFilter;
-	  shared_ptr<VanishingPtFilter> vpFilter;
 	  
+	  MatrixXd exp_FOCUS_ROOT;
+	  MatrixXd exp_DEPTH_ROOT;
+	  MatrixXd exp_GRADIENT_DIR_ROOT;
 
-
-/* Testing Private Members of InitState   */
-	  MatrixXd exp_vpFilter;
-	  MatrixXd exp_vpPrior;
-/*  Comment this portion after private member testing*/
-
-	 MatrixXd	exp_TOT_P;
-	  
-	  
-	  MatrixXd exp_SEGMENT;
 	  
 	  shared_ptr<InitState> initState;
 	  
 	  TEST_InitState()
 		
 		{ 
-			laneFilter	=	make_shared<LaneFilter>(lane.mPROPERTIES, camera.mCM_TO_PIXEL);
-			vpFilter 	= 	make_shared<VanishingPtFilter>(laneFilter->mBINS_HISTOGRAM, camera.mPROPERTIES);
-			initState   =   make_shared<InitState>(camera.mPROPERTIES, laneFilter, vpFilter);
 
-			exp_SEGMENT = readCSV("SEGMENT.csv", 480, 640);
-			exp_TOT_P	= readCSV("TOT_P_ALL_1.csv", 480, 640);
+			initState   			=   make_shared<InitState>(camera.mPROPERTIES);
+			initState->run();
+			exp_FOCUS_ROOT			= readCSV("FOCUS_ROOT.csv", 2*480+1, 640);
+			exp_DEPTH_ROOT			= readCSV("DEPTH_ROOT.csv", 2*480+1, 640);
+			exp_GRADIENT_DIR_ROOT	= readCSV("GRADIENT_DIR_ROOT.csv", 2*480+1, 2*640 +1);
 			
+			ofstream file("DIR_ROOT_Eigen.csv");
+			const static IOFormat CSVFormat(StreamPrecision, DontAlignCols, ", ", "\n");
+			file<<initState->mTemplates->GRADIENT_DIR_ROOT.format(CSVFormat); 
+
 		}
 		
 		~TEST_InitState()
@@ -346,30 +341,17 @@ SUITE(TUeLDT_Camera)
 		CHECK_EQUAL(480,  testInitState.initState->mRES_VH[0]) ;
 		/* ^TODO: THe following tests, if two object point to the same data */            
 		/* ^TODO: Make these tests to check all shared Pointers behaviour, in a new file */
-		CHECK_EQUAL(testInitState.vpFilter->mFilter.data(),  testInitState.initState->mVanishPtFilter->mFilter.data()) ;
-		CHECK_ARRAY_CLOSE(testVpFilter.vpFilter->mFilter.data(),  testInitState.initState->mVanishPtFilter->mFilter.data(), 6*61, 1.0e-6) ;
+		//CHECK_EQUAL(testInitState.vpFilter->mFilter.data(),  testInitState.initState->mVanishPtFilter->mFilter.data()) ;
+		//CHECK_ARRAY_CLOSE(testVpFilter.vpFilter->mFilter.data(),  testInitState.initState->mVanishPtFilter->mFilter.data(), 6*61, 1.0e-6) ;
 		
 		//Both points to same data.
-		CHECK_EQUAL(testInitState.initState->mVanishPtFilter->mFilter.data(),
-					 testInitState.initState->Matlab_vpFilter.mFilter->data);
-					 
-		CHECK_ARRAY_CLOSE(testInitState.initState->mVanishPtFilter->mFilter.data(),
-						  testInitState.initState->Matlab_vpFilter.mFilter->data
-						  , 6*61, 1.0e-6) ;
-						  
-						  
-						  
-		//Both points to same data.
-	     CHECK_EQUAL(testInitState.initState->mLaneFilter->mFilter.data(),
-					 testInitState.initState->Matlab_LaneFilter.mFilter->data) ;
-					 
-		 CHECK_ARRAY_CLOSE(testInitState.initState->mLaneFilter->mFilter.data(),
-						  testInitState.initState->Matlab_LaneFilter.mFilter->data
-						  , 77*77, 1.0e-6) ;				  
-		
-		CHECK_ARRAY_CLOSE(testInitState.exp_TOT_P.data(), testInitState.initState->mLikelihoods->TOT_ALL[0].data(), 480*640, 1.0e-6) ;	
-					 
-					 
+		//CHECK_EQUAL(testInitState.initState->mVanishPtFilter->mFilter.data(),
+		//			 testInitState.initState->Matlab_vpFilter.mFilter->data);
+	
+		CHECK_ARRAY_CLOSE(testInitState.exp_FOCUS_ROOT.data(), testInitState.initState->mTemplates->FOCUS_ROOT.data(), 961*640, 1.0e-5) ;		
+		CHECK_ARRAY_CLOSE(testInitState.exp_DEPTH_ROOT.data(), testInitState.initState->mTemplates->DEPTH_ROOT.data(), 961*640, 1.0e-3) ;
+		CHECK_ARRAY_CLOSE(testInitState.exp_GRADIENT_DIR_ROOT.data(), testInitState.initState->mTemplates->GRADIENT_DIR_ROOT.data(), (2*480+1)*(2*640+1), 0.12);
+	 
 	}
 	
 }

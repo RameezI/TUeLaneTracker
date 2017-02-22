@@ -1,5 +1,6 @@
 #include "UnitTest++/UnitTest++.h"
 #include  "InitState.h"
+#include  "BufferingState.h"
 #include <fstream>
 #include <stdlib.h>
 #include <Eigen/Dense>
@@ -85,7 +86,7 @@ public:
 			
 			BF_STATE.setSource(IMG_filenames);
 			BF_STATE.run();
-			cv::minMaxLoc(*(BF_STATE.mFrameH), &min_H, &max_H);
+//			cv::minMaxLoc(*(BF_STATE.mFrameH), &min_H, &max_H);
 		}
 		~TEST_Images()
 		{
@@ -104,15 +105,15 @@ SUITE(TUeLDT_Images)
     TEST(OPENCV_TYPE_CHECK)
     {
 		CHECK_EQUAL(CV_8UC3, 	testImages.BF_STATE.mFrameRGB->type());
-		CHECK_EQUAL(CV_32FC3, 	testImages.BF_STATE.mFrameRGB_double->type());
-		CHECK_EQUAL(CV_32FC3, 	testImages.BF_STATE.mFrameHSV->type());
+		CHECK_EQUAL(CV_32FC1, 	testImages.BF_STATE.mFrameGRAY_float->type());
+		//CHECK_EQUAL(CV_32FC3, 	testImages.BF_STATE.mFrameHSV->type());
 		
-		CHECK_EQUAL(CV_32FC1, 	testImages.BF_STATE.mFrameH->type());
-		CHECK_EQUAL(CV_32FC1, 	testImages.BF_STATE.mFrameS->type());
-		CHECK_EQUAL(CV_32FC1, 	testImages.BF_STATE.mFrameV->type());
+		//CHECK_EQUAL(CV_32FC1, 	testImages.BF_STATE.mFrameH->type());
+		//CHECK_EQUAL(CV_32FC1, 	testImages.BF_STATE.mFrameS->type());
+		//CHECK_EQUAL(CV_32FC1, 	testImages.BF_STATE.mFrameV->type());
 		
 		
-		CHECK_CLOSE(1, 	testImages.max_H, 0.01);
+		//CHECK_CLOSE(1, 	testImages.max_H, 0.01);
     }
 	
 }

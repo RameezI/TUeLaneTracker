@@ -18,24 +18,27 @@ class BufferingState : public State
 {
 	
 // Make public for testing	
+
 public:
-shared_ptr<Mat>         mFrameRGB_double;
-shared_ptr<Mat>         mFrameRGB;
-shared_ptr<Mat> 	    mFrameHSV;
-shared_ptr<Mat>			mFrameH;   //use split
-shared_ptr<Mat>			mFrameS;
-shared_ptr<Mat>			mFrameV;
-shared_ptr<Mat>			mFrameHS; //use merge
-shared_ptr<Mat>			mFrameGRAY;
+shared_ptr<Mat>        mFrameRGB;
+shared_ptr<Mat>		   mFrameGRAY;
+shared_ptr<Mat>        mFrameGRAY_float;
+//shared_ptr<Mat> 	    	mFrameHSV;
+//shared_ptr<Mat>			mFrameH;   //use split
+//shared_ptr<Mat>			mFrameS;
+//shared_ptr<Mat>			mFrameV;
+//shared_ptr<Mat>			mFrameHS; //use merge
+
 
 shared_ptr<Mat>         mFrameGradMag_Gray;
-shared_ptr<Mat>         mFrameGradMag_HS;
-shared_ptr<Mat> 	    mFrameGradMag_S;
-shared_ptr<Mat>			mFrameGradMag_V;
+//shared_ptr<Mat> 	    mFrameGradMag_S;
+//shared_ptr<Mat>		mFrameGradMag_V;
+//shared_ptr<Mat>       mFrameGradMag_HS;
+
 shared_ptr<Mat>         mFrameGradAng_Gray;
-shared_ptr<Mat>         mFrameGradAng_HS;
-shared_ptr<Mat> 	    mFrameGradAng_S;
-shared_ptr<Mat>			mFrameGradAng_V;
+//shared_ptr<Mat> 	    mFrameGradAng_S;
+//shared_ptr<Mat>			mFrameGradAng_V;
+//shared_ptr<Mat>         mFrameGradAng_HS;
 
 shared_ptr<VanishingPt> mVanishingPt;
 shared_ptr<Templates>	mTemplates;
@@ -43,6 +46,7 @@ shared_ptr<Likelihoods> mLikelihoods;
          
 	
 public:
+	uint mCountFrame;
 	BufferingState();
 	void run();
 	void conclude();
@@ -52,8 +56,13 @@ public:
 	#ifdef DIRECTORY_INPUT
 	void setSource(const vector<cv::String>& files);
 	vector<cv::String> mFiles;
-	int mCount;
+	#else
+	void setSource();
 	#endif
+	
+
+	
+	
 };
 
 #endif // BUFFERINGSTATE_H

@@ -10,12 +10,13 @@ LaneFilter::LaneFilter(const LaneProperties& LANE,  const double& CM_TO_PIXEL)
   mCM_TO_PX(CM_TO_PIXEL),
   mSTEP_CM(5),
   mSTEP_PX(ceil((mSTEP_CM*mCM_TO_PX)/10)*10),
+  mPX_MAX(round((mLANE.MAX_WIDTH*mCM_TO_PX)/mSTEP_PX)*mSTEP_PX ),
+  mCONF_THRESH(2),
   mNb_BINS(floor((2*mPX_MAX)/mSTEP_PX) +1),
   mNb_OFFSETS(floor((mNb_BINS-1)/2) +1),
   mBINS_HISTOGRAM(VectorXi::LinSpaced(mNb_BINS,-mPX_MAX, mPX_MAX)),
-  mBINS_FILTER(mBINS_HISTOGRAM.tail(mNb_OFFSETS)),
-  mPX_MAX(round((mLANE.MAX_WIDTH*mCM_TO_PX)/mSTEP_PX)*mSTEP_PX ),
-  mCONF_THRESH(2)
+  mBINS_FILTER(mBINS_HISTOGRAM.tail(mNb_OFFSETS))
+  
 {
 	
 	createPrior();

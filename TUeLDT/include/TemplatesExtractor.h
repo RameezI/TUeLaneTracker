@@ -1,16 +1,12 @@
-#ifndef TEMPLATEEXTRACTOR_H
-#define TEMPLATEEXTRACTOR_H
-#include <Eigen/Dense>
-#include "State.h"
-
-using namespace Eigen;
+#ifndef TEMPLATESEXTRACTOR_H
+#define TEMPLATESEXTRACTOR_H
 
 class TemplatesExtractor
 {
 public:
-	TemplatesExtractor(const Templates&, Templates&);
+	TemplatesExtractor();
 	~TemplatesExtractor();
 
 };
 
-#endif // TEMPLATEEXTRACTOR_H
+#endif // TEMPLATESEXTRACTOR_H

@@ -5,7 +5,7 @@ LaneObservation::LaneObservation(const shared_ptr<const Lane>  lane, const share
   mCamera(camera)
 {
 	
-	createLaneObservationModel(laneFilter->mBins);
+	//createLaneObservationModel(laneFilter->mBins);
 	
 	
 }
@@ -16,7 +16,7 @@ void LaneObservation::createLaneObservationModel(const MatrixBase<Derived>& Bins
 {
 	float width;
 	
-	VectorXd bins=Bins.tail(mLaneFilter->mNbins_oneside);
+	//VectorXd bins=Bins.tail(mLaneFilter->mNbins_oneside);
 	
 
 		

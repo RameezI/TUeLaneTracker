@@ -30,9 +30,13 @@ typedef Matrix<float, 7, 7> Matrix7f;
 		const int   	mNb_OFFSETS;    		// number of bins in the mFilter.
 		const VectorXi  mBINS_HISTOGRAM;     // -PX_MAX:STEP: PX_MAX
 		const VectorXi  mBINS_FILTER;        //  0 : STEP : PX_MAX
+		
+		
+		
 		MatrixXf     	mPrior;
+		Matrix7f	 	mTransition; 
 		MatrixXf 	 	mFilter;           //^TODO: Rename it as mStatesFilter or something more intutive --> probabilities of states
-		Matrix7f	 	mTransition;  
+		 
 		
 
 		//const Ref<const MatrixXd>& getFilter();

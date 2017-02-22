@@ -1,14 +1,15 @@
 #include "VanishingPtFilter.h"
 
 VanishingPtFilter::VanishingPtFilter(const Ref<const VectorXi>& BINS_LANE_HISTOGRAM, const CameraProperties& CAMERA)
-: mRANGE_V(25), 
-  mRANGE_H(300),
-  mSTEP(10),
+: 
   mFRAME_CENTER_V(CAMERA.FRAME_CENTER(0)),
   mFRAME_CENTER_H(CAMERA.FRAME_CENTER(1)),
   mLANE_FILTER_OFFSET_V(-240),
   mVP_FILTER_OFFSET_V(-120),
   mVP_LANE_RATIO((float)mVP_FILTER_OFFSET_V / mLANE_FILTER_OFFSET_V),
+  mRANGE_V(25), 
+  mRANGE_H(300),
+  mSTEP(10),
   mNb_BINS_V(floor((2*mRANGE_V)/mSTEP) +1),
   mNb_BINS_H(floor((2*mRANGE_H)/mSTEP) +1),
   mBINS_V( VectorXi::LinSpaced(mNb_BINS_V,-mRANGE_V, mRANGE_V).array() + mFRAME_CENTER_V),
