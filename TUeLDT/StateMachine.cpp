@@ -74,7 +74,7 @@ int StateMachine::run(shared_ptr<SigInit> sigInit)
 {
 
 		InitState 			booting(mCamera.mPROPERTIES);
-		BufferingState		buffering;
+		BufferingState		buffering(mCamera.mPROPERTIES, mLane.mMembership);
 		
 		
 		
@@ -119,18 +119,29 @@ int StateMachine::run(shared_ptr<SigInit> sigInit)
 		case States::BUFFERING : {
 			
 			
-									 if (buffering.mStateStatus == StateStatus::INACTIVE) {
-										 #ifdef DIRECTORY_INPUT 
-											buffering.setSource(mFiles);
-										 #endif
-										}
+							if (buffering.mStateStatus == StateStatus::INACTIVE) {
+								  
+								  /*Inject Dependencies */
+								  
+									#ifdef DIRECTORY_INPUT 
+										buffering.setSource(mFiles);
+									#endif
+									
+									
+									buffering.injectDependencies(booting.mVanishingPt,
+																 booting.mTemplates, 
+																 booting.mMasks, 
+																 booting.mLikelihoods
+																 );										
+							 }
+										
 											
-							  else  if (buffering.mStateStatus  == StateStatus::ACTIVE) {  
+							else  if (buffering.mStateStatus  == StateStatus::ACTIVE) {  
 											
 											buffering.run();
 										}
 										
-/*Transition*/				 else	if(buffering.mStateStatus  == StateStatus::DONE )  {
+/*Transition*/				else  if(buffering.mStateStatus  == StateStatus::DONE )  {
 	
 	
 										    buffering.conclude();										

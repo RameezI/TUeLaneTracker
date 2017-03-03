@@ -4,8 +4,7 @@
 #include <Eigen/Dense>
 #include <math.h>
 #include "State.h"
-#include  "LaneFilter.h"
-#include  "VanishingPtFilter.h"
+#include "Camera.h"
 
 //Code Generation Includes
 #include "createTemplate.h"

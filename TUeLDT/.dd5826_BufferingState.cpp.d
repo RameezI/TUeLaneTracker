@@ -247,7 +247,10 @@
  ../../../../libs/io/frame_io/include/video/fsl_dcu_ioctl.h \
  ../../../../libs/io/dcu/include/dcu.h \
  ../../../../libs/io/dcu/include/dcu_typedefs.h \
- ../../../../libs/io/dcu/include/dcu_cfg.h
+ ../../../../libs/io/dcu/include/dcu_cfg.h ../src/TUeLDT/include/Camera.h \
+ ../src/TUeLDT/include/Lane.h \
+ ../../../../3rdparty/ocv/linux-arm64/include/opencv2/core/eigen.hpp \
+ ../../../../3rdparty/ocv/linux-arm64/include/opencv2/core/ocl.hpp
 #### dont care rules
 ../src/TUeLDT/BufferingState.cpp \
  ../src/TUeLDT/include/BufferingState.h \
@@ -498,4 +501,7 @@
  ../../../../libs/io/frame_io/include/video/fsl_dcu_ioctl.h \
  ../../../../libs/io/dcu/include/dcu.h \
  ../../../../libs/io/dcu/include/dcu_typedefs.h \
- ../../../../libs/io/dcu/include/dcu_cfg.h:
+ ../../../../libs/io/dcu/include/dcu_cfg.h ../src/TUeLDT/include/Camera.h \
+ ../src/TUeLDT/include/Lane.h \
+ ../../../../3rdparty/ocv/linux-arm64/include/opencv2/core/eigen.hpp \
+ ../../../../3rdparty/ocv/linux-arm64/include/opencv2/core/ocl.hpp:

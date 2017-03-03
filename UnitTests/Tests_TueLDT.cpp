@@ -4,12 +4,14 @@
 #include  "LaneFilter.h"
 #include  "VanishingPtFilter.h"
 #include  "InitState.h"
+#include  "BufferingState.h"
 #include <fstream>
 #include <stdlib.h>
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
 
+#define UNIT_TESTING
 
 using namespace Eigen;
 using namespace std;
@@ -203,10 +205,9 @@ public:
 			exp_DEPTH_ROOT			= readCSV("DEPTH_ROOT.csv", 2*480+1, 640);
 			exp_GRADIENT_DIR_ROOT	= readCSV("GRADIENT_DIR_ROOT.csv", 2*480+1, 2*640 +1);
 			
-			ofstream file("DIR_ROOT_Eigen.csv");
+			/*ofstream file("DIR_ROOT_Eigen.csv");
 			const static IOFormat CSVFormat(StreamPrecision, DontAlignCols, ", ", "\n");
-			file<<initState->mTemplates->GRADIENT_DIR_ROOT.format(CSVFormat); 
-
+			file<<initState->mTemplates->GRADIENT_DIR_ROOT.format(CSVFormat); */
 		}
 		
 		~TEST_InitState()
@@ -217,7 +218,65 @@ public:
 
 
 
+class TEST_BufferingState:Tests
+{
 
+public:
+
+	 
+	  
+	  MatrixXd exp_FOCUS_ROOT;
+	  MatrixXd exp_DEPTH_ROOT;
+	  MatrixXd exp_GRADIENT_DIR_ROOT;
+	  
+	  MatrixXd exp_FOCUS;
+	  MatrixXd exp_DEPTH;
+	  MatrixXd exp_GRADIENT_DIR;
+	  
+	  shared_ptr<InitState> 	 			 booting;
+	  shared_ptr<BufferingState> 			 buffering;
+	  
+	  TEST_BufferingState()
+		
+		{ 
+			Camera camera;
+			Lane   lane;
+			booting   			=   make_shared<InitState>(camera.mPROPERTIES);
+			buffering   			=   make_shared<BufferingState>(camera.mPROPERTIES, lane.mMembership);
+		    booting->run();
+			
+			
+			vector< cv::String> IMG_filenames;
+			cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
+			glob(folder, IMG_filenames);
+	
+			buffering->setSource(IMG_filenames);
+			buffering->injectDependencies(booting->mVanishingPt, 
+										 booting->mTemplates, 
+										 booting->mMasks, 
+										 booting->mLikelihoods);
+										 
+			buffering->run();
+							 
+			ofstream file("FOCUS_Eigen.csv");
+			const static IOFormat CSVFormat(StreamPrecision, DontAlignCols, ", ", "\n");
+			file<<buffering->mMasks->FOCUS.format(CSVFormat);							 
+										 
+			
+			exp_FOCUS_ROOT			= readCSV("FOCUS_ROOT.csv", 2*480+1, 640);
+			exp_DEPTH_ROOT			= readCSV("DEPTH_ROOT.csv", 2*480+1, 640);
+			exp_GRADIENT_DIR_ROOT	= readCSV("GRADIENT_DIR_ROOT.csv", 2*480+1, 2*640 +1);
+			
+			exp_FOCUS				= readCSV( "FOCUS.csv",			480, 640);
+			exp_DEPTH				= readCSV( "DEPTH.csv", 			480, 640);
+			exp_GRADIENT_DIR		= readCSV( "GRADIENT_DIR.csv", 	480, 640);
+		}
+		
+		~TEST_BufferingState()
+		{
+			
+		}
+};
 
 
 
@@ -353,5 +412,36 @@ SUITE(TUeLDT_Camera)
 		CHECK_ARRAY_CLOSE(testInitState.exp_GRADIENT_DIR_ROOT.data(), testInitState.initState->mTemplates->GRADIENT_DIR_ROOT.data(), (2*480+1)*(2*640+1), 0.12);
 	 
 	}
+	
+	
+	
+	 TEST_BufferingState testbufferState;
+	
+	TEST(BufferingStateTests)
+	{
+		CHECK_EQUAL(480,  testbufferState.booting->mRES_VH[0]) ;
+		/* ^TODO: THe following tests, if two object point to the same data */            
+		/* ^TODO: Make these tests to check all shared Pointers behaviour, in a new file */
+		//CHECK_EQUAL(testInitState.vpFilter->mFilter.data(),  testInitState.initState->mVanishPtFilter->mFilter.data()) ;
+		//CHECK_ARRAY_CLOSE(testVpFilter.vpFilter->mFilter.data(),  testInitState.initState->mVanishPtFilter->mFilter.data(), 6*61, 1.0e-6) ;
+		
+		//Both points to same data.
+		CHECK_EQUAL(testbufferState.booting->mTemplates.get(), testbufferState.buffering->mTemplates.get());
+		CHECK_EQUAL(testbufferState.booting->mVanishingPt.get(), testbufferState.buffering->mVanishingPt.get());
+		CHECK_EQUAL(testbufferState.booting->mMasks.get(), testbufferState.buffering->mMasks.get());
+		CHECK_EQUAL(testbufferState.booting->mLikelihoods.get(), testbufferState.buffering->mLikelihoods.get());		
+		
+		CHECK_ARRAY_CLOSE(testbufferState.exp_FOCUS_ROOT.data(), testbufferState.buffering->mTemplates->FOCUS_ROOT.data(), 961*640, 1.0e-5) ;		
+		CHECK_ARRAY_CLOSE(testbufferState.exp_DEPTH_ROOT.data(), testbufferState.buffering->mTemplates->DEPTH_ROOT.data(), 961*640, 1.0e-3) ;
+		CHECK_ARRAY_CLOSE(testbufferState.exp_GRADIENT_DIR_ROOT.data(), testbufferState.buffering->mTemplates->GRADIENT_DIR_ROOT.data(), (2*480+1)*(2*640+1), 0.12);
+	 
+		CHECK_ARRAY_CLOSE(testbufferState.exp_FOCUS.data(),        testbufferState.buffering->mMasks->FOCUS.data(), 	       480*640, 1.0e-5) ;
+		CHECK_ARRAY_CLOSE(testbufferState.exp_DEPTH.data(),        testbufferState.buffering->mTemplates->DEPTH.data(), 	   480*640, 1.0e-3) ;
+		CHECK_ARRAY_CLOSE(testbufferState.exp_GRADIENT_DIR.data(), testbufferState.buffering->mTemplates->GRADIENT_DIR.data(), 480*640, 0.12) ;
+	
+	}
+	
+	
+	
 	
 }

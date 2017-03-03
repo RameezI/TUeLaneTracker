@@ -197,13 +197,13 @@
  ../src/TUeLDT/include/Camera.h ../src/TUeLDT/include/Lane.h \
  ../src/TUeLDT/include/LaneFilter.h \
  ../src/TUeLDT/include/VanishingPtFilter.h \
- ../src/TUeLDT/include/InitState.h ../src/Matlab/include/rt_nonfinite.h \
- ../src/Matlab/include/rtwtypes.h ../src/Matlab/include/run_Init_State.h \
- ../src/Matlab/include/rt_nonfinite.h \
- ../src/Matlab/include/run_Init_State_types.h \
- ../src/Matlab/include/run_Init_State_terminate.h \
- ../src/Matlab/include/run_Init_State_emxAPI.h \
- ../src/Matlab/include/run_Init_State_initialize.h \
+ ../src/TUeLDT/include/InitState.h ../src/Matlab/include/createTemplate.h \
+ ../src/Matlab/include/rt_nonfinite.h ../src/Matlab/include/rtwtypes.h \
+ ../src/Matlab/include/createTemplate_types.h \
+ ../src/Matlab/include/createTemplate_types.h \
+ ../src/Matlab/include/createTemplate_emxAPI.h \
+ ../src/Matlab/include/createTemplate_initialize.h \
+ ../src/Matlab/include/createTemplate_terminate.h \
  ../src/TUeLDT/include/BufferingState.h \
  ../../../../3rdparty/ocv/linux-arm64/include/opencv2/opencv.hpp \
  ../../../../3rdparty/ocv/linux-arm64/include/opencv2/core.hpp \
@@ -259,7 +259,10 @@
  ../src/TUeLDT/include/GaussianPreProcessor.h \
  ../src/TUeLDT/include/ColorTransformer.h \
  ../src/TUeLDT/include/ChannelsSplitter.h \
- ../src/TUeLDT/include/GradientsExtractor.h ../src/TUeLDT/include/State.h
+ ../src/TUeLDT/include/GradientsExtractor.h \
+ ../../../../3rdparty/ocv/linux-arm64/include/opencv2/core/eigen.hpp \
+ ../../../../3rdparty/ocv/linux-arm64/include/opencv2/core/ocl.hpp \
+ ../src/TUeLDT/include/State.h
 #### dont care rules
 ../src/TUeLDT/StateMachine.cpp \
  ../src/TUeLDT/include/StateMachine.h ../src/TUeLDT/include/State.h \
@@ -460,13 +463,13 @@
  ../src/TUeLDT/include/Camera.h ../src/TUeLDT/include/Lane.h \
  ../src/TUeLDT/include/LaneFilter.h \
  ../src/TUeLDT/include/VanishingPtFilter.h \
- ../src/TUeLDT/include/InitState.h ../src/Matlab/include/rt_nonfinite.h \
- ../src/Matlab/include/rtwtypes.h ../src/Matlab/include/run_Init_State.h \
- ../src/Matlab/include/rt_nonfinite.h \
- ../src/Matlab/include/run_Init_State_types.h \
- ../src/Matlab/include/run_Init_State_terminate.h \
- ../src/Matlab/include/run_Init_State_emxAPI.h \
- ../src/Matlab/include/run_Init_State_initialize.h \
+ ../src/TUeLDT/include/InitState.h ../src/Matlab/include/createTemplate.h \
+ ../src/Matlab/include/rt_nonfinite.h ../src/Matlab/include/rtwtypes.h \
+ ../src/Matlab/include/createTemplate_types.h \
+ ../src/Matlab/include/createTemplate_types.h \
+ ../src/Matlab/include/createTemplate_emxAPI.h \
+ ../src/Matlab/include/createTemplate_initialize.h \
+ ../src/Matlab/include/createTemplate_terminate.h \
  ../src/TUeLDT/include/BufferingState.h \
  ../../../../3rdparty/ocv/linux-arm64/include/opencv2/opencv.hpp \
  ../../../../3rdparty/ocv/linux-arm64/include/opencv2/core.hpp \
@@ -522,4 +525,7 @@
  ../src/TUeLDT/include/GaussianPreProcessor.h \
  ../src/TUeLDT/include/ColorTransformer.h \
  ../src/TUeLDT/include/ChannelsSplitter.h \
- ../src/TUeLDT/include/GradientsExtractor.h ../src/TUeLDT/include/State.h:
+ ../src/TUeLDT/include/GradientsExtractor.h \
+ ../../../../3rdparty/ocv/linux-arm64/include/opencv2/core/eigen.hpp \
+ ../../../../3rdparty/ocv/linux-arm64/include/opencv2/core/ocl.hpp \
+ ../src/TUeLDT/include/State.h:

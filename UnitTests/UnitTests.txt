@@ -1,1 +1,1 @@
-Debug/main.cpp.o Debug/Tests_TueLDT.cpp.o Debug/ImageTests.cpp.o Debug/time_measure.cpp.o
+Debug/main.cpp.o Debug/Tests_TueLDT.cpp.o Debug/time_measure.cpp.o

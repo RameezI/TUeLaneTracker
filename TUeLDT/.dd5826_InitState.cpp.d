@@ -192,16 +192,14 @@
  ../../../../libs/io/frame_io/include/video/fsl_dcu_ioctl.h \
  ../../../../libs/io/dcu/include/dcu.h \
  ../../../../libs/io/dcu/include/dcu_typedefs.h \
- ../../../../libs/io/dcu/include/dcu_cfg.h \
- ../src/TUeLDT/include/LaneFilter.h ../src/TUeLDT/include/Lane.h \
- ../src/TUeLDT/include/Camera.h ../src/TUeLDT/include/VanishingPtFilter.h \
+ ../../../../libs/io/dcu/include/dcu_cfg.h ../src/TUeLDT/include/Camera.h \
+ ../src/Matlab/include/createTemplate.h \
  ../src/Matlab/include/rt_nonfinite.h ../src/Matlab/include/rtwtypes.h \
- ../src/Matlab/include/run_Init_State.h \
- ../src/Matlab/include/rt_nonfinite.h \
- ../src/Matlab/include/run_Init_State_types.h \
- ../src/Matlab/include/run_Init_State_terminate.h \
- ../src/Matlab/include/run_Init_State_emxAPI.h \
- ../src/Matlab/include/run_Init_State_initialize.h
+ ../src/Matlab/include/createTemplate_types.h \
+ ../src/Matlab/include/createTemplate_types.h \
+ ../src/Matlab/include/createTemplate_emxAPI.h \
+ ../src/Matlab/include/createTemplate_initialize.h \
+ ../src/Matlab/include/createTemplate_terminate.h
 #### dont care rules
 ../src/TUeLDT/InitState.cpp \
  ../src/TUeLDT/include/InitState.h ../../../../3rdparty/Eigen/Dense \
@@ -397,13 +395,11 @@
  ../../../../libs/io/frame_io/include/video/fsl_dcu_ioctl.h \
  ../../../../libs/io/dcu/include/dcu.h \
  ../../../../libs/io/dcu/include/dcu_typedefs.h \
- ../../../../libs/io/dcu/include/dcu_cfg.h \
- ../src/TUeLDT/include/LaneFilter.h ../src/TUeLDT/include/Lane.h \
- ../src/TUeLDT/include/Camera.h ../src/TUeLDT/include/VanishingPtFilter.h \
+ ../../../../libs/io/dcu/include/dcu_cfg.h ../src/TUeLDT/include/Camera.h \
+ ../src/Matlab/include/createTemplate.h \
  ../src/Matlab/include/rt_nonfinite.h ../src/Matlab/include/rtwtypes.h \
- ../src/Matlab/include/run_Init_State.h \
- ../src/Matlab/include/rt_nonfinite.h \
- ../src/Matlab/include/run_Init_State_types.h \
- ../src/Matlab/include/run_Init_State_terminate.h \
- ../src/Matlab/include/run_Init_State_emxAPI.h \
- ../src/Matlab/include/run_Init_State_initialize.h:
+ ../src/Matlab/include/createTemplate_types.h \
+ ../src/Matlab/include/createTemplate_types.h \
+ ../src/Matlab/include/createTemplate_emxAPI.h \
+ ../src/Matlab/include/createTemplate_initialize.h \
+ ../src/Matlab/include/createTemplate_terminate.h:

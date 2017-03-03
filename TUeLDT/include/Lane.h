@@ -21,25 +21,21 @@ using namespace Eigen;
 		
 	};
 	
-		struct LaneDistributions 
+		struct LaneMembership 
 	{
+		/* The folllowing vectors define Sigmoid Membership of the Pixels */
 		
-		const Vector2f GRAY;
-		const Vector4f YELL;
-		const Vector2f  SAT;
+		const Vector2f GRAY;  // First element is the decay rate of a sigmoid function wile second represent the shift.
 		const Vector2f  MAG;
 		const Vector2f  DIR;
 		
-		LaneDistributions() //Initialisation of  members through initialisation list
-		:GRAY(Vector2f(25, 0.6)),
-		
-		 YELL(Vector4f(100, 0.16-0.05, 100, 0.33+0.05)),
-		 
-		 SAT(Vector2f(10, 0.4)),
-		 
+		LaneMembership() //Initialisation of  members through initialisation list
+		:GRAY(Vector2f(25, 0.6)),  // The gray value of 0.6 , in range of [0 1] , will have membership 0.5. 
+								   // Membership will grow exponnetialy with an exponential constatnt 25.
 		 MAG(Vector2f(50, 0.15)),
 		 
 		 DIR(Vector2f(-0.25, 15))
+		 
 		{
 			//Default Constructor
 		}
@@ -50,7 +46,7 @@ class Lane
 
 public:
 	const LaneProperties 		mPROPERTIES;
-	const LaneDistributions		mDISTS;
+	const LaneMembership		mMembership;
 	Lane();
 	~Lane();
 

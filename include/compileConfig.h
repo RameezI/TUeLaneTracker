@@ -2,4 +2,5 @@
 #define COMPLIE_CONFIG__H
 #define PROFILER_ENABLED
 #define DIRECTORY_INPUT
+#define UNIT_TESTING
 #endif

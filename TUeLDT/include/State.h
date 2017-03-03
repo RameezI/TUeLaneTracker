@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <Eigen/Dense>
+#include "opencv2/opencv.hpp"
 #include <math.h>
 #include "LDT_profiler.h"
 #include "LDT_logger.h"
@@ -16,6 +17,7 @@
 
 using namespace std;
 using namespace Eigen;
+using namespace cv;
 
 
 enum States{BOOTING, BUFFERING, DETECTING_LANES, RESETING, DISPOSING }; //^TODO: Add PAUSED state as well
@@ -65,7 +67,7 @@ struct Templates
 	Templates(const int RES_V, const int RES_H)
 	{
 	
-		GRADIENT_DIR =  MatrixXf::Zero(RES_V, RES_H);
+		GRADIENT_DIR =  MatrixXf::Zero(RES_V, RES_H); 
 		DEPTH 		 =  MatrixXf::Zero(RES_V, RES_H);
 			
 		/* Create Focus Template */
@@ -147,7 +149,7 @@ struct Likelihoods
 
 struct Masks
 {		
-		MatrixXf  FOCUS;
+		MatrixXf  FOCUS;  //^Todo: Convert to UMat
 		
 		Masks(const int RES_V, const int RES_H)
 		{

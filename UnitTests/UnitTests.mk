@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=rameez
-Date                   :=22/02/17
+Date                   :=03/03/17
 CodeLitePath           :="/home/rameez/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -60,7 +60,7 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/Tests_TueLDT.cpp$(ObjectSuffix) $(IntermediateDirectory)/ImageTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/time_measure.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/Tests_TueLDT.cpp$(ObjectSuffix) $(IntermediateDirectory)/time_measure.cpp$(ObjectSuffix) 
 
 
 
@@ -113,14 +113,6 @@ $(IntermediateDirectory)/Tests_TueLDT.cpp$(DependSuffix): Tests_TueLDT.cpp
 
 $(IntermediateDirectory)/Tests_TueLDT.cpp$(PreprocessSuffix): Tests_TueLDT.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Tests_TueLDT.cpp$(PreprocessSuffix) "Tests_TueLDT.cpp"
-
-$(IntermediateDirectory)/ImageTests.cpp$(ObjectSuffix): ImageTests.cpp $(IntermediateDirectory)/ImageTests.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/UnitTests/ImageTests.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/ImageTests.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/ImageTests.cpp$(DependSuffix): ImageTests.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/ImageTests.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/ImageTests.cpp$(DependSuffix) -MM "ImageTests.cpp"
-
-$(IntermediateDirectory)/ImageTests.cpp$(PreprocessSuffix): ImageTests.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/ImageTests.cpp$(PreprocessSuffix) "ImageTests.cpp"
 
 $(IntermediateDirectory)/time_measure.cpp$(ObjectSuffix): time_measure.cpp $(IntermediateDirectory)/time_measure.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/UnitTests/time_measure.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/time_measure.cpp$(ObjectSuffix) $(IncludePath)

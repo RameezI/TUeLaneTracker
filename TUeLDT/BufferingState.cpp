@@ -1,77 +1,86 @@
 #include "BufferingState.h"
 
-BufferingState::BufferingState()
-: //mFrameRGB_double(make_shared<Mat>()),
+BufferingState::BufferingState(const CameraProperties& CAMERA, const LaneMembership& MEMBERSHIP)
+: mRES_VH(CAMERA.RES_VH),
+
+  mLaneMembership(MEMBERSHIP),
+  
+  mOnes(MatrixXf::Ones(mRES_VH(0),mRES_VH(1))),
+  
+  mFrameProbMap(MatrixXf::Zero(mRES_VH(0),mRES_VH(1))),
+  
+  mKeyFrameProbMap(MatrixXf::Zero(mRES_VH(0),mRES_VH(1))),
+  
+  mKeyFrameGradDir(MatrixXf::Zero(mRES_VH(0),mRES_VH(1))),
+  
+    mProbMap_Gray(MatrixXf::Zero(mRES_VH(0),mRES_VH(1))),
+  
+	mProbMap_GradMag(MatrixXf::Zero(mRES_VH(0),mRES_VH(1))),
+  
+	mProbMap_GradDir(MatrixXf::Zero(mRES_VH(0),mRES_VH(1))),
+
   mFrameRGB(make_shared<Mat>()),
+  
   mFrameGRAY(make_shared<Mat>()),
+  
   mFrameGRAY_float(make_shared<Mat>()),
-  mFrameGradMag_Gray(make_shared<Mat>()),
-  mFrameGradAng_Gray(make_shared<Mat>())
+  
+  mFrameGradMag(make_shared<Mat>()),
+  
+  mFrameGradAng(make_shared<Mat>())
+  
 #ifdef DIRECTORY_INPUT
   , mCountFrame(0)
 #endif
 
 {
+	#ifdef PROFILER_ENABLED
+	getOpenClInfo();
+	#endif
 
 	
 }
 
 
-
-int BufferingState::grabFrame()
-{
-	
 #ifdef DIRECTORY_INPUT
- 
-#ifdef PROFILER_ENABLED
-mProfiler.start("ImageRead");
-#endif 
+void BufferingState::setSource(const vector<cv::String>& files)
+{
+	mFiles = files;
+}
+#else
 
-	*mFrameRGB = imread(mFiles[mCountFrame]);	
- 
- #ifdef PROFILER_ENABLED
- mProfiler.end();
- #endif 
+void BufferingState::setSource()
+{
 
-
-#ifdef PROFILER_ENABLED
-	const std::string str = mFiles[mCountFrame];
-	
-	LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
-										  <<"******************************"<<endl
-										  <<  "Reading frame from directory." <<endl <<str<<endl
-										  <<  "Read time: " << mProfiler.getTiming("ImageRead")<<endl
-										  <<"******************************"<<endl<<endl;	
-										 #endif
 
 	
-
-	if(!mFrameRGB->data)
-			return -1;
-			
-	else	mCountFrame ++;
-			return 0;
-			
-
+}
+	
 #endif
 
-}
 
-
-
-
-void BufferingState::conclude()
+void BufferingState::injectDependencies (shared_ptr<VanishingPt>  vanishingPt,
+										 shared_ptr<Templates>	  templates,	
+										 shared_ptr<Masks>	  	  masks,
+										 shared_ptr<Likelihoods>  likelihoods)
 {
+	mVanishingPt = vanishingPt;
+	mTemplates   = templates;
+    mMasks       = masks;
+	mLikelihoods = likelihoods;
 	
-	
-	
+	mStateStatus= StateStatus::ACTIVE;
 }
-
 
 
 
 void BufferingState::run()
 {
+	
+#ifdef PROFILER_ENABLED
+	mProfiler.start("SingleRun");
+#endif	
+	
 
 #ifdef DIRECTORY_INPUT
 
@@ -92,196 +101,10 @@ void BufferingState::run()
 
 
 
-#ifdef PROFILER_ENABLED
-	mProfiler.start("SingleRun");
-#endif
+
 
 if (0==grabFrame())
-	
-{
-				
-		
-#ifdef PROFILER_ENABLED
-mProfiler.start("ConversionToGRAY");
-#endif				
-				
-				//ColorConversion ^TODO: Port to ISP
-				 ColorTransformer 	 rgb2gray(*mFrameRGB, *mFrameGRAY, cv::COLOR_BGR2GRAY);
-				 
-				 
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
-										  <<"******************************"<<endl
-										  <<  "GRAY Frame Converion." <<endl
-										  <<  "GrayFrame conversion Time: " << mProfiler.getTiming("ConversionToGRAY")<<endl
-										  <<"******************************"<<endl<<endl;	
-									   #endif						 
-
-
-#ifdef PROFILER_ENABLED
-mProfiler.start("ConversionToFloat");
-#endif				 
-				//Converting to float
-				mFrameGRAY->convertTo(*mFrameGRAY_float, CV_32FC1, 1/255.0); // Rescaling image to the range [0 1]
-				
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
-										  <<"******************************"<<endl
-										  <<  "FloatingPoint Converion." <<endl
-										  <<  "FoatingPoint conversion Time: " << mProfiler.getTiming("ConversionToFloat")<<endl
-										  <<"******************************"<<endl<<endl;	
-									   #endif				
-
-
-
-
-#ifdef PROFILER_ENABLED
-mProfiler.start("GaussianFiltering");
-#endif 
-				//GaussianPreProcessor
-				GaussianPreProcessor filterGauss(*mFrameGRAY_float, *mFrameGRAY_float);
-				
- #ifdef PROFILER_ENABLED
- mProfiler.end();
- LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
-										  <<"******************************"<<endl
-										  <<  "Gaussian Filtering." <<endl
-										  <<  "Gaussian(11x11) Filtering Time: " << mProfiler.getTiming("GaussianFiltering")<<endl
-										  <<"******************************"<<endl<<endl;	
-									   #endif				
-			
-				
-#ifdef PROFILER_ENABLED
-mProfiler.start("GradientsComputation");
-#endif 				
-				
-				//Gradients Computation
-				GradientsExtractor   GradientGray(*mFrameGRAY_float, *mFrameGradMag_Gray , *mFrameGradAng_Gray);
-				
-	
- #ifdef PROFILER_ENABLED
- mProfiler.end();
- LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
-										  <<"******************************"<<endl
-										  <<  "Gradients Computation." <<endl
-										  <<  "Gray channel gradient computation time: " << mProfiler.getTiming("GradientsComputation")<<endl
-										  <<"******************************"<<endl<<endl;	
-										 #endif
-										 
-	
-#ifdef PROFILER_ENABLED
-mProfiler.start("ExtractTemplates");
-#endif 				
-		
-									 
-
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
-										  <<"******************************"<<endl
-										  <<  "Extracting from Root Templates." <<endl
-										  <<  "Time: " << mProfiler.getTiming("ExtractTemplates")<<endl
-										  <<"******************************"<<endl<<endl;	
-										 #endif
-										 
-										 
-
-
-
-#ifdef PROFILER_ENABLED
-mProfiler.start("LaneMarker_P");
-#endif 				
-		
-									 
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
-										  <<"******************************"<<endl
-										  <<  "Compute total LaneMarker Proabilities ." <<endl
-										  <<  "Time: " << mProfiler.getTiming("LaneMarker_P")<<endl
-										  <<"******************************"<<endl<<endl;	
-										 #endif
-										 
-
-
-#ifdef PROFILER_ENABLED
-mProfiler.start("Innovation");
-#endif 				
-		
-									 
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
-										  <<"******************************"<<endl
-										  <<  "Compute and Compare Frame Innovation" <<endl
-										  <<  "Time: " << mProfiler.getTiming("Innovation")<<endl
-										  <<"******************************"<<endl<<endl;	
-										 #endif										 
-										 
-
-
-
-#ifdef PROFILER_ENABLED
-mProfiler.start("UpdateLikeLihoods");
-#endif 				
-		
-									 
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
-										  <<"******************************"<<endl
-										  <<  "Update Likelihoods Buffers" <<endl
-										  <<  "Time: " << mProfiler.getTiming("UpdateLikeLihoods")<<endl
-										  <<"******************************"<<endl<<endl;	
-										 #endif		
-
-				
-				
-				#ifndef s32v2xx
-				 //mFrameHS->convertTo(*mFrameHS, CV_32FC1, 360);
-				 mFrameGradMag_Gray->convertTo(*mFrameGradMag_Gray, CV_8UC1, 255); // Rescaling image to the range [0 255]
-				 imshow( "Display window", *mFrameGradMag_Gray);
-				 waitKey(1);
-				
-				#else
-				
-				#ifdef PROFILER_ENABLED
-				 mProfiler.start("Display");
-				#endif
-	
-					//^TODO: How to display single Channel images 
-				    //mFrameGradMag_Gray->convertTo(*mFrameGradMag_Gray, CV_8UC1, 255); // Rescaling image to the range [0 255]
-				/*	io::FrameOutputV234Fb DcuOutput(640, 
-												    480, 
-													io::IO_DATA_DEPTH_08, 
-													io::IO_DATA_CH3);
-												
-					DcuOutput.PutFrame((char *)mFrameRGB->data, false);
-				*/
-				
-					std::cout<<"******************************"<<std::endl;
-					std::cout<<"	Frame Count : " <<mCountFrame <<std::endl;
-					std::cout<<"******************************"<<std::endl<<endl<<endl;							
-												
-												
-				 #ifdef PROFILER_ENABLED
-					mProfiler.end();
-					LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
-										  <<"******************************"<<endl
-										  <<  "Screen Display." <<endl
-										  <<  "Display update time: " << mProfiler.getTiming("Display")<<endl
-										  <<"******************************"<<endl<<endl;	
-										 #endif
-												 
-				
-				
-				
-				#endif
-				
-}
-		
+	executeDAG_buffering();
 else
 	cerr << "Problem loading image!!!" << endl;
 												
@@ -289,30 +112,224 @@ else
  #ifdef PROFILER_ENABLED
  mProfiler.end();
  LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
-										  <<"******************************"<<endl
-										  <<  "Completing a run loop." <<endl
-										  <<  "Single run-loop time: " << mProfiler.getTiming("SingleRun")<<endl
-										  <<"******************************"<<endl<<endl;	
-										 #endif
+						  <<"******************************"<<endl
+						  <<  "Completing a run loop." <<endl
+						  <<  "Single run-loop time: " << mProfiler.getTiming("SingleRun")<<endl
+						  <<"******************************"<<endl<<endl;	
+						 #endif
 }
 
 
 
 
-#ifdef DIRECTORY_INPUT
-void BufferingState::setSource(const vector<cv::String>& files)
+void BufferingState::conclude()
 {
-	mFiles = files;
-	mStateStatus= StateStatus::ACTIVE;
+	
+	
+	
 }
+
+
+/*  Low level Class PRIVATE FUnctions */
+
+#ifdef PROFILER_ENABLED
+void BufferingState::getOpenClInfo()
+{
+	
+	if (!cv::ocl::haveOpenCL())
+	{
+		 LOG_INFO_(LDTLog::BUFFERING_LOG) <<endl
+						  <<"******************************"<<endl
+						  <<  "OpenCL Info:" <<endl
+						  <<  "Sorry, OpenCl is not available. " <<endl
+						  <<"******************************"<<endl<<endl;	
+		//return;
+	}
+
+	cv::ocl::Context context;
+	if (!context.create(cv::ocl::Device::TYPE_GPU))
+	{
+		LOG_INFO_(LDTLog::BUFFERING_LOG) <<endl
+						  <<"******************************"<<endl
+						  <<  "OpenCL Info:" <<endl
+						  <<  "Sorry, Failed creating the Context. " <<endl
+						  <<"******************************"<<endl<<endl;	
+		//return;
+	}
+
+	else
+	{
+	
+	
+		for (int i = 0; i < context.ndevices(); i++)
+		{
+			cv::ocl::Device device = context.device(i);
+
+					std::string name= device.name();
+					std::string OpenCL_C_Version= device.OpenCL_C_Version();
+
+			
+					LOG_INFO_(LDTLog::BUFFERING_LOG) <<endl
+						  <<"******************************"<<endl
+						  <<  "OpenCL Device Detected:" <<endl
+						  <<  "name:  " << name<< endl
+						  <<  "available:  " << device.available()<< endl
+						  <<  "imageSupport:  " << device.imageSupport()<< endl
+						  <<  "globalMemSize:  " << device.globalMemSize()<< endl
+						  <<  "localMemSize:  " << device.localMemSize()<< endl
+						  <<  "maxWorkGroup:  " << device.maxWorkGroupSize()<< endl
+						  <<  "maxWorkItemDim:  " << device.maxWorkItemDims()<< endl
+						  <<  "maxComputeUnits:  " << device.maxComputeUnits()<< endl
+						  <<  "preferredVectorWidthChar:  " << device.preferredVectorWidthChar()<< endl
+						  <<  "preferredVectorWidthDouble:  " << device.preferredVectorWidthDouble()<< endl
+						  <<  "preferredVectorWidthFloat:  " << device.preferredVectorWidthFloat()<< endl
+						  <<  "preferredVectorWidthHalf:  " << device.preferredVectorWidthHalf()<< endl
+						  <<  "preferredVectorWidthLong:  " << device.preferredVectorWidthLong()<< endl
+						  <<  "preferredVectorWidthShort:  " << device.preferredVectorWidthShort()<< endl
+						  <<  "image2DMaxHeight:  " << device.image2DMaxHeight()<< endl
+						  <<  "image2DMaxWidth:  " << device.image2DMaxWidth()<< endl
+						  <<  "OpenCL_C_Version:  " << OpenCL_C_Version<< endl
+						  <<"******************************"<<endl<<endl;
+		}
+	
+	}
+
+}
+#endif
+
+
+
+
+
+int BufferingState::grabFrame()
+{
+	
+#ifdef DIRECTORY_INPUT 
+	#ifdef PROFILER_ENABLED
+	mProfiler.start("ImageRead");
+	#endif 
+
+		*mFrameRGB = imread(mFiles[mCountFrame]);	
+	 
+	#ifdef PROFILER_ENABLED
+	 mProfiler.end();
+		const std::string str = mFiles[mCountFrame];	
+		LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
+											  <<"******************************"<<endl
+											  <<  "Reading frame from directory." <<endl <<str<<endl
+											  <<  "Read time: " << mProfiler.getTiming("ImageRead")<<endl
+											  <<"******************************"<<endl<<endl;
+											  #endif
+		if(!mFrameRGB->data)
+				return -1;
+				
+		else	mCountFrame ++;
+				return 0;
+
 #else
 
-void BufferingState::setSource()
-{
-	mStateStatus= StateStatus::ACTIVE;
-}
 	
+			
 #endif
+
+}
+
+
+void BufferingState::computeProbabilities()
+{
+
+#ifdef PROFILER_ENABLED
+mProfiler.start("MapCVtoEigen");
+#endif 	
+
+	//Mapping OpenCv Data to Eigen Maps
+	Eigen::Map< Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> > 
+	FrameGray_Mapped ((float*) mFrameGRAY_float->data, mRES_VH(0),mRES_VH(1));
+		
+	Eigen::Map< Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> > 
+	mFrameGradMag_Mapped ((float*) mFrameGradMag->data, mRES_VH(0),mRES_VH(1));
+
+	Eigen::Map< Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> > 
+	mFrameGradDir_Mapped ((float*) mFrameGradAng->data, mRES_VH(0),mRES_VH(1));	
+	
+	
+#ifdef PROFILER_ENABLED
+mProfiler.end();
+LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
+										  <<"******************************"<<endl
+										  <<  "Mapping OpenCv Data to Eigen using Eigen Map" <<endl
+										  <<  "Time: " << mProfiler.getTiming("MapCVtoEigen")<<endl
+										  <<"******************************"<<endl<<endl;	
+									 #endif		
+	
+	
+	mProbMap_Gray = mOnes.cast<float>() * 0.1;
+	
+	//mProbMap_GradMag
+	//mProbMap_GradDir
+	
+	
+	//VectorXf bins_cm = mBINS_FILTER.cast<float>()*(1/mCM_TO_PX);
+	
+	
+    //GRAY_P = 1./(1 + exp(-NGRAY(1)*(I-NGRAY(2))));
+    
+    
+    //MAG_P = 1./(1 + exp(-NMAG(1)*(MAG-NMAG(2))));
+     
+     
+    //DIR_P = 1./(1 + exp(-NDIR(1)*(abs(DIR-DIR_TEMPLATE)-NDIR(2))));
+  
+    
+    //PROB         = GRAY_P .* MAG_P .* DIR_P;         %% prob with dir	
+	
+	
+	
+FrameGray_Mapped.block(200,0, 200,200)= MatrixXf::Constant(200,200,0);
+	
+	
+}
+
+
+
+void BufferingState::extractTemplates()
+{
+	
+	/*Block Opertaions Explaination: block(rowIndex, colIndex, NbRows, NbCols)	*/
+
+	int rowIndex= (mRES_VH(0)-mVanishingPt->V) - mRES_VH(0)/2;
+	int colIndex= (mRES_VH(1)-mVanishingPt->H) - mRES_VH(1)/2;
+	 
+	mMasks->FOCUS			 	= mTemplates->FOCUS_ROOT.block(rowIndex, 0 , mRES_VH(0) , mRES_VH(1)); 
+
+	mTemplates->DEPTH 		 	= mTemplates->DEPTH_ROOT.block(rowIndex, 0 , mRES_VH(0) , mRES_VH(1));
+
+	mTemplates->GRADIENT_DIR 	= mTemplates->GRADIENT_DIR_ROOT.block(rowIndex, colIndex, mRES_VH(0) , mRES_VH(1));
+	
+}
+
+
+void BufferingState::applyGaussian()
+{
+
+GaussianBlur( *mFrameGRAY_float, *mFrameGRAY_float, Size( 11, 11 ), 1.5, 1.5, BORDER_REPLICATE);
+	
+}
+
+void BufferingState::computeOrientedGradients()
+{	
+	int scale = 1;
+	int delta = 0;
+	int ddepth = CV_64F;
+	
+	Mat grad_x, grad_y;
+	
+	Sobel( *mFrameGRAY_float, grad_x, ddepth, 1, 0, 3, scale, delta, BORDER_REPLICATE );
+	Sobel( *mFrameGRAY_float, grad_y, ddepth, 0, 1, 3, scale, delta, BORDER_REPLICATE );
+	cv::magnitude(grad_x,grad_y, *mFrameGradMag);
+	cv::phase(grad_x, grad_y, *mFrameGradAng);
+	
+}
 
 BufferingState::~BufferingState()
 {
