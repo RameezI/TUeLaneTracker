@@ -8,7 +8,7 @@ void BufferingState::executeDAG_buffering()
 mProfiler.start("ConversionToGRAY");
 #endif				
 
-	cvtColor(*mFrameRGB, *mFrameGRAY, cv::COLOR_BGR2GRAY);
+	cvtColor(mFrameRGB, mFrameGRAY, cv::COLOR_BGR2GRAY);
 				 
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -21,28 +21,12 @@ LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
 
 
 
-#ifdef PROFILER_ENABLED
-mProfiler.start("ConversionToFloat");
-#endif				 
-	
-	mFrameGRAY->convertTo(*mFrameGRAY_float, CV_32FC1, 1/255.0); // Rescaling image to the range [0 1]
-				
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
-					  <<"******************************"<<endl
-					  <<  "FloatingPoint Converion." <<endl
-					  <<  "FoatingPoint conversion Time: " << mProfiler.getTiming("ConversionToFloat")<<endl
-					  <<"******************************"<<endl<<endl;	
-				   #endif				
-
-
 
 #ifdef PROFILER_ENABLED
 mProfiler.start("GaussianFiltering");
 #endif 
 	
-	applyGaussian();
+	GaussianBlur( mFrameGRAY, mFrameGRAY, Size( 11, 11 ), 1.5, 1.5, BORDER_REPLICATE);
 				
  #ifdef PROFILER_ENABLED
  mProfiler.end();
@@ -131,7 +115,7 @@ mProfiler.start("Display");
 	
 		 //mFrameHS->convertTo(*mFrameHS, CV_32FC1, 360);
 		// mFrameGradMag->convertTo(*mFrameGradMag, CV_8UC1, 255); // Rescaling image to the range [0 255]
-		 imshow( "Display window", *mFrameGRAY_float);
+		 imshow( "Display window", mFrameGRAY);
 		 waitKey(1);
 	
 	#else
@@ -144,12 +128,12 @@ mProfiler.start("Display");
 										io::IO_DATA_CH3);
 									
 		DcuOutput.PutFrame((char *)mFrameRGB->data, false);
-	*/
-	
+	*/	
 		std::cout<<"******************************"<<std::endl;
 		std::cout<<"	Frame Count : " <<mCountFrame <<std::endl;
 		std::cout<<"******************************"<<std::endl<<endl<<endl;							
-									
+	#endif
+
 									
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -158,8 +142,5 @@ LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
 							  <<  "Screen Display." <<endl
 							  <<  "Display update time: " << mProfiler.getTiming("Display")<<endl
 							  <<"******************************"<<endl<<endl;	
-							 #endif
-									 
-#endif
-				
+							 #endif				
 }

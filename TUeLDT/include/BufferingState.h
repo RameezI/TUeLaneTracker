@@ -28,55 +28,49 @@ class BufferingState : public State
 #ifdef UNIT_TESTING
 public:
 #else
-private:
+protected:
 #endif
 
 //Private Variables needed for Computations
 
-Mat                         mGradientDir;
-Mat                         mDepth;
+	const Vector2i			   	mRES_VH;
+	const LaneMembership	   	mLaneMembership;
 
-const Vector2i			   	mRES_VH;
-const LaneMembership	   	mLaneMembership;
-const MatrixXf				mOnes;
-MatrixXf  				   	mFrameProbMap;
-MatrixXf  				   	mKeyFrameProbMap;
-MatrixXf  				   	mKeyFrameGradDir;
-
-MatrixXf					mProbMap_Gray;
-MatrixXf					mProbMap_GradMag;
-MatrixXf					mProbMap_GradDir;
+	//State Dependencies
+	shared_ptr<VanishingPt> 	mVanishingPt;
+	shared_ptr<Templates>		mTemplates;
+	shared_ptr<Masks> 			mMasks;
+	shared_ptr<Likelihoods> 	mLikelihoods;
 
 
-//Image Frames
-shared_ptr<Mat>        		mFrameRGB;
-shared_ptr<Mat>		   		mFrameGRAY;
-shared_ptr<Mat>        		mFrameGRAY_float;
+	//Extracted Templates
+	Mat     mGradientDirTemplate;
+	Mat     mDepthMapTemplate;
 
-//Image Gradients
-shared_ptr<Mat>         	mFrameGradMag;
-shared_ptr<Mat>         	mFrameGradAng;
+	//Image Frames
+	Mat     mFrameRGB;
+	Mat		mFrameGRAY;
 
-//State Dependencies
-shared_ptr<VanishingPt> 	mVanishingPt;
-shared_ptr<Templates>		mTemplates;
-shared_ptr<Masks> 			mMasks;
-shared_ptr<Likelihoods> 	mLikelihoods;
+	//Image Gradients
+	Mat     mFrameGradMag;
+	Mat     mFrameGradAng;
+
+	//Matrices computed on the GPU
+	UMat	mProbMap_Gray;
+	UMat	mProbMap_GradMag;
+	UMat    mProbMap_GradDir;
 
 
 
-
-
-#ifdef DIRECTORY_INPUT
-	uint mCountFrame;
-	vector<cv::String> mFiles;
-#endif
+	#ifdef DIRECTORY_INPUT
+		uint mCountFrame;
+		vector<cv::String> mFiles;
+	#endif
 
 
 
-private:
+protected:
 	void executeDAG_buffering();
-	void applyGaussian();
 	void extractTemplates();
 	void computeProbabilities();
 	void computeOrientedGradients();
