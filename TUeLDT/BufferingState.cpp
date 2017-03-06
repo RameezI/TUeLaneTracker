@@ -286,13 +286,13 @@ void BufferingState::extractTemplates()
 
 	 int rowIndex= (mRES_VH(0)-mVanishingPt->V) - mRES_VH(0)/2;
 	 int colIndex= (mRES_VH(1)-mVanishingPt->H) - mRES_VH(1)/2;
-	
+/*	
 	mMasks->FOCUS			 	= mTemplates->FOCUS_ROOT.block(rowIndex, 0 , mRES_VH(0) , mRES_VH(1)); 
 
 	mTemplates->DEPTH 		 	= mTemplates->DEPTH_ROOT.block(rowIndex, 0 , mRES_VH(0) , mRES_VH(1));
 
 	mTemplates->GRADIENT_DIR 	= mTemplates->GRADIENT_DIR_ROOT.block(rowIndex, colIndex, mRES_VH(0) , mRES_VH(1));
-	
+*/	
 	
 	
 	/* Using OpenCv ROI to achieve the same. ^TODO: Time and keep one that has lower latency /*
@@ -301,28 +301,29 @@ void BufferingState::extractTemplates()
 	 * Note: When transferring Image to GPU complete Image is tranffered not Just ROI
 	 * 
 	*/
-	//Mat GradientDirRoot, FocusMaskRoot, DepthMapRoot;
+	
+	Mat GradientDirRoot, FocusMaskRoot, DepthMapRoot;
   
-	//eigen2cv(mTemplates->GRADIENT_DIR_ROOT, GradientDirRoot); //^TODO: COPYING OPERATION CHANGE TO WRAPPING OR NATIVE OPENCV
-	//eigen2cv(mTemplates->DEPTH_ROOT,        DepthMapRoot);       //^TODO: COPYING OPERATION CHANGE TO WRAPPING OR NATIVE OPENCV
-	//eigen2cv(mTemplates->FOCUS_ROOT,        FocusMaskRoot);   //^TODO: COPYING OPERATION CHANGE TO WRAPPING OR NATIVE OPENCV
+	eigen2cv(mTemplates->GRADIENT_DIR_ROOT, GradientDirRoot); //^TODO: COPYING OPERATION CHANGE TO WRAPPING OR NATIVE OPENCV
+	eigen2cv(mTemplates->DEPTH_ROOT,        DepthMapRoot);       //^TODO: COPYING OPERATION CHANGE TO WRAPPING OR NATIVE OPENCV
+	eigen2cv(mTemplates->FOCUS_ROOT,        FocusMaskRoot);   //^TODO: COPYING OPERATION CHANGE TO WRAPPING OR NATIVE OPENCV
 
 
 /*Rectangle Opertaions Explaination: Rect(x, y, width, height)	*/
 
-	 //Rect ROI = Rect(0, rowIndex, mRES_VH(1) , mRES_VH(0));
-	 //mDepthMapTemplate = DepthMapRoot(ROI);
+	Rect ROI = Rect(0, rowIndex, mRES_VH(1) , mRES_VH(0));
+	mDepthMapTemplate = DepthMapRoot(ROI);
 	
-	//ROI = Rect(colIndex, rowIndex, mRES_VH(1), mRES_VH(0) );	
-    //mGradientDirTemplate = GradientDirRoot(ROI);
+	ROI = Rect(colIndex, rowIndex, mRES_VH(1), mRES_VH(0) );	
+    mGradientDirTemplate = GradientDirRoot(ROI);
 	
-	//ROI = Rect(colIndex, rowIndex, mRES_VH(1), mRES_VH(0) );	
-    //mGradientDirTemplate = GradientDirRoot(ROI);
+	ROI = Rect(colIndex, rowIndex, mRES_VH(1), mRES_VH(0) );	
+    mGradientDirTemplate = GradientDirRoot(ROI);
 
 
-    //UMat a,b;
-   	//a= mGradientDirTemplate.getUMat( ACCESS_READ);
-	//b= mGradientDirTemplate.getUMat( ACCESS_READ);
+    UMat a,b;
+   	a= mGradientDirTemplate.getUMat( ACCESS_READ);
+	b= mGradientDirTemplate.getUMat( ACCESS_READ);
 }
 
 

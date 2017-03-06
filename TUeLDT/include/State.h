@@ -57,16 +57,20 @@ public:
 
 struct Templates
 {
-  MatrixXf GRADIENT_DIR_ROOT;
-  MatrixXf FOCUS_ROOT;
-  MatrixXf DEPTH_ROOT;
-  
-  MatrixXf GRADIENT_DIR;
-  MatrixXf DEPTH;
+	
+	public:
+		UMat GRADIENT_DIR;
+		UMat FOCUS;
+		UMat DEPTH;
+		MatrixXf GRADIENT_DIR_Tmp;
+
   
 	Templates(const int RES_V, const int RES_H)
 	{
 	
+		MatrixXf FOCUS_ROOT;
+		MatrixXf DEPTH_ROOT;
+
 		GRADIENT_DIR =  MatrixXf::Zero(RES_V, RES_H); 
 		DEPTH 		 =  MatrixXf::Zero(RES_V, RES_H);
 			
@@ -96,7 +100,7 @@ struct Templates
 			}			
 			
 			
-	     /* Create Gradient Direction Template */
+	     /* Initialise Gradient Direction Template */
 			GRADIENT_DIR_ROOT  = MatrixXf::Zero(2*RES_V+1,2*RES_H+1);
 		
 	}	
@@ -119,43 +123,32 @@ struct VanishingPt
 
 struct Likelihoods
 {
-		std::array<MatrixXf, State::sNbBuffer> TOT_ALL;
-		std::array<MatrixXf, State::sNbBuffer> GRADIENT_DIR_ALL;
-		std::array<MatrixXf, State::sNbBuffer> TOT_ALL_BACKUP;
-		std::array<MatrixXf, State::sNbBuffer> GRADIENT_DIR_ALL_BACKUP;
+		std::array<UMat, State::sNbBuffer> TOT_ALL;
+		std::array<UMat, State::sNbBuffer> GRADIENT_DIR_ALL;
 		
-		MatrixXf  TOT_MAX;
-		MatrixXf  TOT_MAX_FOCUSED;
-		MatrixXf  GRADIENT_DIR_TOT_MAX;
+		UMat  TOT_MAX;
+		UMat  GRADIENT_DIR_TOT_MAX;
+		UMat  TOT_MAX_FOCUSED;
+		
 		
 		
 		Likelihoods(const int RES_V, const int RES_H)
 		{
 			
-				TOT_MAX =  MatrixXf::Zero(RES_V, RES_H);
-				GRADIENT_DIR_TOT_MAX = MatrixXf::Zero(RES_V, RES_H);
-				TOT_MAX_FOCUSED = MatrixXf::Zero(RES_V, RES_H);
-   
 				for (int i=0; i< State::sNbBuffer; i++)
 				{
-					TOT_ALL[i]= MatrixXf::Zero(RES_V,RES_H);
-					GRADIENT_DIR_ALL[i]= MatrixXf::Zero(RES_V,RES_H);
+					TOT_ALL[i]= UMat::zeros(RES_V,RES_H, CUMat::zeros(RES_V,RES_H, CV_32F)V_32F);
+					GRADIENT_DIR_ALL[i]= UMat::zeros(RES_V,RES_H, CV_32F);
 				}
+				
+				TOT_MAX =  UMat::zeros(RES_V,RES_H, CV_32F);
+				GRADIENT_DIR_TOT_MAX = UMat::zeros(RES_V,RES_H, CV_32F);
+				TOT_MAX_FOCUSED = UMat::zeros(RES_V,RES_H, CV_32F);
 	
-				TOT_ALL_BACKUP = TOT_ALL;
-				GRADIENT_DIR_ALL_BACKUP = GRADIENT_DIR_ALL;		
 		}		
 };
 
-struct Masks
-{		
-		MatrixXf  FOCUS;  //^Todo: Convert to UMat
-		
-		Masks(const int RES_V, const int RES_H)
-		{
-			FOCUS =  MatrixXf::Zero(RES_V, RES_H);
-		}
-};
+
 
 
 #endif // STATE_H
