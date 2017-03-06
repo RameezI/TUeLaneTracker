@@ -101,7 +101,7 @@ else
  LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
 						  <<"******************************"<<endl
 						  <<  "Completing a run loop." <<endl
-						  <<  "Single run-loop time: " << mProfiler.getTiming("SingleRun")<<endl
+						  <<  "Single run-loop time: " << mProfiler.getAvgTime("SingleRun")<<endl
 						  <<"******************************"<<endl<<endl;	
 						 #endif
 }
@@ -175,7 +175,7 @@ void BufferingState::getOpenClInfo()
 						  <<  "preferredVectorWidthShort:  " << device.preferredVectorWidthShort()<< endl
 						  <<  "image2DMaxHeight:  " << device.image2DMaxHeight()<< endl
 						  <<  "image2DMaxWidth:  " << device.image2DMaxWidth()<< endl
-						  <<  "OpenCL_C_Version:  " << OpenCL_C_Version<< endl
+						  <<  "OpenCLVersion:  " << OpenCL_C_Version<< endl
 						  <<"******************************"<<endl<<endl;
 		}
 	
@@ -204,7 +204,7 @@ int BufferingState::grabFrame()
 		LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
 											  <<"******************************"<<endl
 											  <<  "Reading frame from directory." <<endl <<str<<endl
-											  <<  "Read time: " << mProfiler.getTiming("ImageRead")<<endl
+											  <<  "Read time: " << mProfiler.getAvgTime("ImageRead")<<endl
 											  <<"******************************"<<endl<<endl;
 											  #endif
 		if(!mFrameRGB.data)
@@ -225,9 +225,6 @@ int BufferingState::grabFrame()
 void BufferingState::computeProbabilities()
 {
 
-#ifdef PROFILER_ENABLED
-mProfiler.start("MapCVtoEigen");
-#endif 	
 /*
 	//Mapping OpenCv Data to Eigen Maps
 	Eigen::Map< Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> > 
@@ -240,14 +237,7 @@ mProfiler.start("MapCVtoEigen");
 	mFrameGradDir_Mapped ((float*) mFrameGradAng->data, mRES_VH(0),mRES_VH(1));	
 */	
 	
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
-										  <<"******************************"<<endl
-										  <<  "Mapping OpenCv Data to Eigen using Eigen Map" <<endl
-										  <<  "Time: " << mProfiler.getTiming("MapCVtoEigen")<<endl
-										  <<"******************************"<<endl<<endl;	
-									 #endif		
+	
 	
 	
 	//mProbMap_Gray = mOnes.cast<float>() * 0.1;

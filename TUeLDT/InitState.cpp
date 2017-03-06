@@ -45,7 +45,7 @@ mProfiler.end();
 LOG_INFO_(LDTLog::BOOTING_PROFILE) <<endl
 										  <<"******************************"<<endl
 										  <<  "Wrapping Direction Template." <<endl
-										  <<  "Time: " << mProfiler.getTiming("WrapDirectionTemplate")<<endl
+										  <<  "Time: " << mProfiler.getAvgTime("WrapDirectionTemplate")<<endl
 										  <<"******************************"<<endl<<endl;	
 									   #endif	
 
@@ -63,7 +63,7 @@ mProfiler.end();
 LOG_INFO_(LDTLog::BOOTING_PROFILE) <<endl
 										  <<"******************************"<<endl
 										  <<  "Creating Gradient Direction Template." <<endl
-										  <<  "Time: " << mProfiler.getTiming("CreateTemplate")<<endl
+										  <<  "Time: " << mProfiler.getAvgTime("CreateTemplate")<<endl
 										  <<"******************************"<<endl<<endl;	
 									   #endif	
 
@@ -76,7 +76,7 @@ mProfiler.end();
 LOG_INFO_(LDTLog::BOOTING_PROFILE) <<endl
 										  <<"******************************"<<endl
 										  <<  "Single-RUN of the Booting State." <<endl
-										  <<  "Time: " << mProfiler.getTiming("SingleRun")<<endl
+										  <<  "Time: " << mProfiler.getAvgTime("SingleRun")<<endl
 										  <<"******************************"<<endl<<endl;	
 									   #endif
 

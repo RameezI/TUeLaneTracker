@@ -61,7 +61,9 @@ public:
  
 		void 		writeTimings(); 	//write Timings to a file
 
-		double 		getTiming(std::string);  	//get Timings for a specific block
+		double 		getAvgTime(std::string);  	//get Timings for a specific block
+		double 		getMaxTime(std::string);  	//get Timings for a specific block
+		double 		getMinTime(std::string);  	//get Timings for a specific block
 		
 
 	    uint64_t 	getMultiplicity(std::string);

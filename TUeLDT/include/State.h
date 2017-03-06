@@ -64,9 +64,11 @@ struct Templates
   MatrixXf GRADIENT_DIR;
   MatrixXf DEPTH;
   
+  
 	Templates(const int RES_V, const int RES_H)
 	{
 	
+
 		GRADIENT_DIR =  MatrixXf::Zero(RES_V, RES_H); 
 		DEPTH 		 =  MatrixXf::Zero(RES_V, RES_H);
 			
