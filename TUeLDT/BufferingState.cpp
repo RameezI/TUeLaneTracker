@@ -2,6 +2,10 @@
 
 BufferingState::BufferingState(const CameraProperties& CAMERA, const LaneMembership& MEMBERSHIP)
 : mRES_VH(CAMERA.RES_VH),
+  
+  mOientationTemplate(Mat::zeros(mRES_VH(0), mRES_VH(1), CV_16SC1)),
+  
+  mDEPTHTemplate(Mat::zeros(mRES_VH(0), mRES_VH(1), CV_8UC1)),
 
   mLaneMembership(MEMBERSHIP),
   
@@ -48,12 +52,10 @@ void BufferingState::setSource()
 
 void BufferingState::injectDependencies (shared_ptr<VanishingPt>  vanishingPt,
 										 shared_ptr<Templates>	  templates,	
-										 shared_ptr<Masks>	  	  masks,
 										 shared_ptr<Likelihoods>  likelihoods)
 {
 	mVanishingPt = vanishingPt;
 	mTemplates   = templates;
-    mMasks       = masks;
 	mLikelihoods = likelihoods;
 	
 	mStateStatus= StateStatus::ACTIVE;

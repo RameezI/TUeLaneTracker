@@ -25,7 +25,6 @@ public :
 		shared_ptr<VanishingPt> 	  mVanishingPt;
 		shared_ptr<Templates>		  mTemplates;
 		shared_ptr<Likelihoods> 	  mLikelihoods;
-		shared_ptr<Masks> 			  mMasks;
 
 public:
 		void run();

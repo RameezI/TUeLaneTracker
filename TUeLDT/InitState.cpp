@@ -9,8 +9,6 @@ InitState::InitState(const CameraProperties& CAMERA)
   
   mTemplates(make_shared<Templates> ( mRES_VH(0), mRES_VH(1) ) ),
   
-  mMasks(make_shared<Masks>( mRES_VH(0), mRES_VH(1) ) ),
-  
   mVanishingPt(make_shared<VanishingPt>())  
   
 {

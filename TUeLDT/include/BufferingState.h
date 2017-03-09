@@ -35,11 +35,13 @@ protected:
 
 	const Vector2i			   	mRES_VH;
 	const LaneMembership	   	mLaneMembership;
+	
+	Mat mOientationTemplate; 
+	Mat mDEPTHTemplate;
 
 	//State Dependencies
 	shared_ptr<VanishingPt> 	mVanishingPt;
 	shared_ptr<Templates>		mTemplates;
-	shared_ptr<Masks> 			mMasks;
 	shared_ptr<Likelihoods> 	mLikelihoods;
 
 
@@ -86,7 +88,6 @@ public:
 	BufferingState(const CameraProperties& CAMERA, const LaneMembership& MEMBERSHIP);
 	void injectDependencies(shared_ptr<VanishingPt>	,
 							shared_ptr<Templates>	,	
-							shared_ptr<Masks>		,
 							shared_ptr<Likelihoods>);	
 	void run();
 	void conclude();

@@ -59,21 +59,13 @@ struct Templates
 {
 	
 	public:
-		UMat GRADIENT_DIR;
-		UMat FOCUS;
-		UMat DEPTH;
-		MatrixXf GRADIENT_DIR_Tmp;
+		MatrixXf GRADIENT_DIR_ROOT;
+		MatrixXf FOCUS_ROOT;
+		MatrixXf DEPTH_ROOT;
 
   
 	Templates(const int RES_V, const int RES_H)
 	{
-	
-		MatrixXf FOCUS_ROOT;
-		MatrixXf DEPTH_ROOT;
-
-		GRADIENT_DIR =  MatrixXf::Zero(RES_V, RES_H); 
-		DEPTH 		 =  MatrixXf::Zero(RES_V, RES_H);
-			
 		/* Create Focus Template */
 			const int Margin  = 100;
 			FOCUS_ROOT     = MatrixXf::Zero(2*RES_V+1,RES_H);
@@ -123,12 +115,12 @@ struct VanishingPt
 
 struct Likelihoods
 {
-		std::array<UMat, State::sNbBuffer> TOT_ALL;
-		std::array<UMat, State::sNbBuffer> GRADIENT_DIR_ALL;
+		std::array<Mat, State::sNbBuffer> TOT_ALL;
+		std::array<Mat, State::sNbBuffer> GRADIENT_DIR_ALL;
 		
-		UMat  TOT_MAX;
-		UMat  GRADIENT_DIR_TOT_MAX;
-		UMat  TOT_MAX_FOCUSED;
+		Mat  TOT_MAX;
+		Mat  GRADIENT_DIR_TOT_MAX;
+		Mat  TOT_MAX_FOCUSED;
 		
 		
 		
@@ -137,14 +129,13 @@ struct Likelihoods
 			
 				for (int i=0; i< State::sNbBuffer; i++)
 				{
-					TOT_ALL[i]= UMat::zeros(RES_V,RES_H, CUMat::zeros(RES_V,RES_H, CV_32F)V_32F);
-					GRADIENT_DIR_ALL[i]= UMat::zeros(RES_V,RES_H, CV_32F);
+					TOT_ALL[i]= Mat::zeros(RES_V, RES_H,  CV_8UC1);
+					GRADIENT_DIR_ALL[i]= Mat::zeros(RES_V,RES_H, CV_16SC1);
 				}
 				
-				TOT_MAX =  UMat::zeros(RES_V,RES_H, CV_32F);
-				GRADIENT_DIR_TOT_MAX = UMat::zeros(RES_V,RES_H, CV_32F);
-				TOT_MAX_FOCUSED = UMat::zeros(RES_V,RES_H, CV_32F);
-	
+				TOT_MAX =  Mat::zeros(RES_V,RES_H, CV_32F);
+				GRADIENT_DIR_TOT_MAX = Mat::zeros(RES_V,RES_H, CV_16SC1);
+				TOT_MAX_FOCUSED = Mat::zeros(RES_V,RES_H, CV_8UC1);	
 		}		
 };
 

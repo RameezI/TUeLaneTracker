@@ -129,8 +129,7 @@ int StateMachine::run(shared_ptr<SigInit> sigInit)
 									
 									
 									buffering.injectDependencies(booting.mVanishingPt,
-																 booting.mTemplates, 
-																 booting.mMasks, 
+																 booting.mTemplates,  
 																 booting.mLikelihoods
 																 );										
 							 }
