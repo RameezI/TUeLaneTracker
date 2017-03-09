@@ -21,29 +21,40 @@ LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
 
 
 
-Mat  Gray_double_ARM, Result_ARM;
-UMat GRAY_double_GPU, Result_GPU;
+Mat  GRAY_double_ARM, Processing_ARM,  Result_ARM;
+UMat GRAY_double_GPU, Processing_GPU,  Result_GPU;
+Mat  Result_Transferred;
 
 Mat   Ones_ARM = Mat::ones(480,640,CV_32FC1);
-UMat  Ones_GPU ;
+UMat  Ones_GPU = UMat::ones(480, 640, CV_32FC1);
 
-mFrameGRAY.convertTo(Gray_double_ARM, CV_32FC1, 1.0/255);
-Gray_double_ARM.copyTo(GRAY_double_GPU);
-Ones_ARM.copyTo(Ones_GPU);
+Mat   SetPoint_ARM(480,640,CV_32FC1);
+SetPoint_ARM.setTo(-0.1*120);
+
+UMat  SetPoint_GPU(480,640,CV_32FC1);
+SetPoint_GPU.setTo(-0.1*120);
 
 
+mFrameGRAY.convertTo(GRAY_double_ARM, CV_32FC1, -0.1);
+GRAY_double_ARM.copyTo(GRAY_double_GPU);    
 
+
+const float constantT= -0.1*120;
 
 #ifdef PROFILER_ENABLED
 mProfiler.start("TestGPU");
 #endif
 
 ocl::setUseOpenCL(true);
-for (int i=0; i<200; i++)
-{				
-	//cv::exp(GRAY_double_GPU, Result_GPU );
-	//cv::add(GRAY_double_GPU, Ones_GPU, Result_GPU);
-	int a = cv::countNonZero(GRAY_double_GPU);
+for (int i=0; i<3; i++)
+{	
+	
+	GRAY_double_ARM.copyTo(GRAY_double_GPU); 
+	cv::subtract(GRAY_double_GPU, constantT, Processing_GPU);			
+	cv::exp(Processing_GPU, Processing_GPU );
+	cv::add(1, Processing_GPU, Processing_GPU);
+	cv::divide(1, Processing_GPU, Result_GPU);
+	//int a = cv::countNonZero(GRAY_double_GPU);
 } 
 				 
 #ifdef PROFILER_ENABLED
@@ -62,12 +73,12 @@ LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
 mProfiler.start("TestARM");
 #endif
 
-for (int i=0; i<200; i++)
-{	
-  
-  //cv::exp(Gray_double_ARM, Result_ARM);
-  //cv::add(Gray_double_ARM, Ones_ARM, Result_ARM);
-  int a = cv::countNonZero(Gray_double_ARM);
+for (int i=0; i<3; i++)
+{	  
+  	cv::subtract(GRAY_double_ARM, constantT, Processing_ARM);			
+	cv::exp(Processing_ARM, Processing_ARM );
+	cv::add(1, Processing_ARM, Processing_ARM);
+	cv::divide(1, Processing_ARM, Result_ARM);
 }
 
 #ifdef PROFILER_ENABLED
