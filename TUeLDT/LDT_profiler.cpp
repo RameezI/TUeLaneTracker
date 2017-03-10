@@ -43,6 +43,8 @@ void ProfilerLDT::blockTime_ms(uint64_t t_start, uint64_t t_finish)
         
         mBlockMultiplicity[mBlockName.back()]	=	1;
         mBlockAvgTime[mBlockName.back()]		= (mEndTime-mStartTime)*1000;
+		mBlockMinTime[mBlockName.back()]		= (mEndTime-mStartTime)*1000;
+		mBlockMaxTime[mBlockName.back()]		= (mEndTime-mStartTime)*1000;
     
     } else 
 
@@ -51,12 +53,19 @@ void ProfilerLDT::blockTime_ms(uint64_t t_start, uint64_t t_finish)
         if ((mBlockMultiplicity[mBlockName.back()] != 0) & (mBlockMultiplicity[mBlockName.back()] <UINTMAX_MAX))
         {    
         
-	mBlockMultiplicity[mBlockName.back()]	=	mBlockMultiplicity[mBlockName.back()]+1;
+		mBlockMultiplicity[mBlockName.back()]	=	mBlockMultiplicity[mBlockName.back()]+1;
         mBlockAvgTime[mBlockName.back()]		= 	(1- (1.0/mBlockMultiplicity[mBlockName.back()]))*mBlockAvgTime[mBlockName.back()] 
-											+
-							 (1.0/mBlockMultiplicity[mBlockName.back()])*(mEndTime-mStartTime)*1000;
+													+
+													(1.0/mBlockMultiplicity[mBlockName.back()])*(mEndTime-mStartTime)*1000;
+		
+		if (mBlockMinTime[mBlockName.back()] > (mEndTime-mStartTime)*1000)
+		    mBlockMinTime[mBlockName.back()]	= 		(mEndTime-mStartTime)*1000;
+	
+        else			
+        if (mBlockMaxTime[mBlockName.back()] < (mEndTime-mStartTime)*1000)
+		    mBlockMaxTime[mBlockName.back()]	= 		(mEndTime-mStartTime)*1000;							
         
-	}
+		}
    
     }
  
@@ -87,7 +96,7 @@ uint64_t ProfilerLDT::getMultiplicity(std::string block)
 }
 
 
-double ProfilerLDT::getTiming(std::string block)
+double ProfilerLDT::getAvgTime(std::string block)
 {
     if ( mBlockAvgTime.find(block) == mBlockAvgTime.end() ) 
     {// not found
@@ -102,6 +111,36 @@ double ProfilerLDT::getTiming(std::string block)
 					
 }
 
+
+double ProfilerLDT::getMinTime(std::string block)
+{
+    if ( mBlockMinTime.find(block) == mBlockMinTime.end() ) 
+    {// not found
+        
+        return -1;
+    
+    } else 
+    {// found
+    
+        return mBlockMinTime[block];
+    }
+					
+}
+
+double ProfilerLDT::getMaxTime(std::string block)
+{
+    if ( mBlockMaxTime.find(block) == mBlockMaxTime.end() ) 
+    {// not found
+        
+        return -1;
+    
+    } else 
+    {// found
+    
+        return mBlockMaxTime[block];
+    }
+					
+}
 
 void ProfilerLDT::writeTimings()
 {

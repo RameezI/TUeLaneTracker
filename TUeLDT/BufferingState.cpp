@@ -58,11 +58,10 @@ BufferingState::BufferingState()
 		 LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
 								  <<"******************************"<<endl
 								  <<  "Completing Buffering Setup." <<endl
-								  <<  "ROOT Templates copy Time: "  << mProfiler.getTiming("SetRootTemplates")<<endl
+								  <<  "ROOT Templates copy Time: "  << mProfiler.getAvgTime("SetRootTemplates")<<endl
 								  <<"******************************"<<endl<<endl;	
 								 #endif				
 	}
-
 
 
 
@@ -107,7 +106,7 @@ BufferingState::BufferingState()
 		 LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
 								  <<"******************************"<<endl
 								  <<  "Completing a run loop." <<endl
-								  <<  "Single run-loop time: " << mProfiler.getTiming("SingleRun")<<endl
+								  <<  "Single run-loop time: " << mProfiler.getAvgTime("SingleRun")<<endl
 								  <<"******************************"<<endl<<endl;	
 								 #endif
 	}
@@ -162,10 +161,8 @@ BufferingState::BufferingState()
 			for (int i = 0; i < context.ndevices(); i++)
 			{
 				cv::ocl::Device device = context.device(i);
-
-						std::string name= device.name();
-						std::string OpenCL_C_Version= device.OpenCL_C_Version();
-
+				std::string name= device.name();
+				std::string OpenCL_C_Version= device.OpenCL_C_Version();
 				
 						LOG_INFO_(LDTLog::BUFFERING_LOG) <<endl
 							  <<"******************************"<<endl
@@ -201,9 +198,10 @@ BufferingState::BufferingState()
 
 	 /*^TODO: Define Grabing mechanism in case of camera */
 	int BufferingState::grabFrame()
-	{
-		
-		#ifdef DIRECTORY_INPUT 
+	{		
+
+#ifdef DIRECTORY_INPUT
+ 
 			#ifdef PROFILER_ENABLED
 			mProfiler.start("ImageRead");
 			#endif 
@@ -216,7 +214,7 @@ BufferingState::BufferingState()
 				LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
 													  <<"******************************"<<endl
 													  <<  "Reading frame from directory." <<endl <<str<<endl
-													  <<  "Read time: " << mProfiler.getTiming("ImageRead")<<endl
+													  <<  "Read time: " << mProfiler.getAvgTime("ImageRead")<<endl
 													  <<"******************************"<<endl<<endl;
 													  #endif
 				if(!mFrameRGB.data)
@@ -225,11 +223,12 @@ BufferingState::BufferingState()
 				else	mCountFrame ++;
 						return 0;
 
-		#else
+#else
 
 			
 					
-		#endif
+#endif
+
 
 	}
 

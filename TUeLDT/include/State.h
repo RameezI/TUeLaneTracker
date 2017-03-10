@@ -63,8 +63,11 @@ struct Templates
 		MatrixXf DEPTH_ROOT;
 
   
+  
 	Templates(const int RES_V, const int RES_H)
 	{
+
+
 		/* Create Focus Template */
 			const int Margin  = 100;
 			FOCUS_ROOT     = MatrixXf::Zero(2*RES_V+1,RES_H);
