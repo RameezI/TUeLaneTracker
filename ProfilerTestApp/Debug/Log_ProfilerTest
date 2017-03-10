@@ -14042,3 +14042,33 @@ Top Level time: 2006.68
 ******************************
 
 
+2017-03-10 17:52:47.362 INFO  [15596] [main@28] 
+******************************
+Determining Resolution for the chrono::high_resolution_clock.
+Resolution: 1e-09
+-is steady: false
+******************************
+
+
+2017-03-10 17:52:49.368 INFO  [15596] [main@39] 
+******************************
+Completing Toplevel loop.
+Top Level time: 2006.39
+******************************
+
+
+2017-03-10 17:52:59.581 INFO  [15621] [main@28] 
+******************************
+Determining Resolution for the chrono::high_resolution_clock.
+Resolution: 1e-09
+-is steady: false
+******************************
+
+
+2017-03-10 17:53:01.588 INFO  [15621] [main@39] 
+******************************
+Completing Toplevel loop.
+Top Level time: 2006.53
+******************************
+
+

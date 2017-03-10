@@ -40,11 +40,10 @@ protected:
 	
 public:
 
-	static int 			   sStateCounter;     	//Number Of Itterations in a state
 	static const  int      sNbBuffer =3;
-	const string 		   mStatusStrings[4];
+	int 			       StateCounter;     	
+	StateStatus 	       currentStatus;
 	
-	StateStatus 		   mStateStatus;
 	void printStatus();
 	
 	State();

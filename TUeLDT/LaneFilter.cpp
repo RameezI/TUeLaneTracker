@@ -3,29 +3,37 @@ This class provides LaneFilter expressed in Vanishing point coordinate system.
 */
 #include "LaneFilter.h"
 
-LaneFilter::LaneFilter(const LaneProperties& LANE,  const double& CM_TO_PIXEL)
+LaneFilter::LaneFilter(const Lane& LANE,  const Camera& CAMERA)
 
-: 
-  mLANE(LANE),
-  mCM_TO_PX(CM_TO_PIXEL),
+: mLANE(LANE),
+
+  mCAMERA(CAMERA),
+  
   mSTEP_CM(5),
-  mSTEP_PX(ceil((mSTEP_CM*mCM_TO_PX)/10)*10),
-  mPX_MAX(round((mLANE.MAX_WIDTH*mCM_TO_PX)/mSTEP_PX)*mSTEP_PX ),
-  mCONF_THRESH(2),
-  mNb_BINS(floor((2*mPX_MAX)/mSTEP_PX) +1),
+  
+  STEP(ceil((mSTEP_CM*mCAMERA.CM_TO_PIXEL)/10)*10),
+  
+  mPX_MAX(round((mLANE.MAX_WIDTH*mCAMERA.CM_TO_PIXEL)/STEP)*STEP ),
+  
+  mNb_BINS(floor((2*mPX_MAX)/STEP) +1),
+  
   mNb_OFFSETS(floor((mNb_BINS-1)/2) +1),
-  mBINS_HISTOGRAM(VectorXi::LinSpaced(mNb_BINS,-mPX_MAX, mPX_MAX)),
-  mBINS_FILTER(mBINS_HISTOGRAM.tail(mNb_OFFSETS))
+
+  LANE_FILTER_OFFSET_V(-240),
+  
+  HISTOGRAM_BINS(VectorXi::LinSpaced(mNb_BINS,-mPX_MAX, mPX_MAX)),
+  
+  OFFSET_BINS(HISTOGRAM_BINS.tail(mNb_OFFSETS))
   
 {
 	
 	createPrior();
-	mFilter = mPrior;
+	this->Filter = this->Prior;
 	 
 }
 
 
-void LaneFilter::createHistograms()
+void LaneFilter::createExpectedHistogram()
 {
 	
 	
@@ -68,15 +76,15 @@ void LaneFilter::createHistograms()
 void LaneFilter::createPrior()
 {
 	
-	/*Fill the histogram */
+	/*Assign probabilities to States */
     
+	this->Prior  = MatrixXf((int)(mPX_MAX/this->STEP) +1, (int)(mPX_MAX/this->STEP) +1);
 	
-	mPrior  = MatrixXf((int)(mPX_MAX/mSTEP_PX) +1, (int)(mPX_MAX/mSTEP_PX) +1);
+	VectorXf bins_cm = OFFSET_BINS.cast<float>()*(1/mCAMERA.CM_TO_PIXEL);
 	
-	VectorXf bins_cm = mBINS_FILTER.cast<float>()*(1/mCM_TO_PX);
-	
-    float 	 hmean = mLANE.AVG_WIDTH/2;
+    float 	 hmean =  mLANE.AVG_WIDTH/2;
     float    sigmaL = mLANE.STD_WIDTH;
+	
     double pL, pR, width;
 
 	
@@ -91,18 +99,18 @@ void LaneFilter::createPrior()
             //prior on lane width
             width = bins_cm(x)+bins_cm(y);
             if (mLANE.MIN_WIDTH <= width && width <= mLANE.MAX_WIDTH)
-                mPrior(x,y) = pL*pR;
+                this->Prior(x,y) = pL*pR;
 		    else
-                mPrior(x,y) = 0;                
+                this->Prior(x,y) = 0;                
 	   }    
     }
     
     // normalize
-    mPrior = (mPrior/mPrior.sum()).eval();
+    this->Prior = (this->Prior/this->Prior.sum()).eval();
     
     // Transition Matrix 
-     mTransition = Matrix7f::Constant(7,7,1);
-     mTransition = (mTransition/ mTransition.sum()).eval(); 
+     this->Transition = Matrix7f::Constant(7,7,1);
+     this->Transition = (this->Transition/ this->Transition.sum()).eval(); 
 	  
 }
 

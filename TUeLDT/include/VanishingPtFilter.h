@@ -11,49 +11,52 @@ using namespace std;
 using namespace Eigen;
 
 	class VanishingPtFilter
-	{
+{
 
 		
 	public:
 
-		VanishingPtFilter(const Ref<const VectorXi>& BINS_LANE_HISTOGRAM,  const CameraProperties& CAMERA);
+		VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_BINS, 
+						  const int&  LANE_FILTER_OFFSET_V,
+						  const Camera& CAMERA);
+						  
 		~VanishingPtFilter();
 
-	private: 
-			//const VectorXi  mBINS_LANE_HISTOGRAM;
-			const int    	mFRAME_CENTER_V;
-			const int    	mFRAME_CENTER_H;
-			const int 		mLANE_FILTER_OFFSET_V;   	 //CONSTANT: might be need outside ----> make public
-			const int  	 	mVP_FILTER_OFFSET_V;        //CONSTANT: might be needed outside ---> make public
-			const float     mVP_LANE_RATIO;
-			void  			createPrior();
-		
 
-	public:
 
-		const int 	 	mRANGE_V;
-		const int 	 	mRANGE_H;
-		const int    	mSTEP;
-		const int    	mNb_BINS_V;    	// number of bins in the  vertical   direction.
-		const int    	mNb_BINS_H;    	// number of bins in the horizental direction.
-		const VectorXi 	mBINS_V;	    //Histogram Bins in Pixels.
-		const VectorXi 	mBINS_H;     	// Histogram Bins in Pixels.
-		const VectorXi mBINS_HISTOGRAM;	    //Histogram Bins in Pixels.
-		
-		MatrixXf     mPrior;
-		Matrix3d	 mTransition; 
-		MatrixXf     mFilter;
-		 
-		
 
-		//const Ref<const MatrixXd>& getFilter();
-		//shared_ptr<MatrixXd> getPrior();
-		//shared_ptr<MatrixXd> getTransition(); //^TODO: Make it Private Memeber if only used by LaneFilter class.
-		
-		
-		//LaneFilter(const shared_ptr<const Lane>, const shared_ptr<const Camera>);
-		 
+private: //Internal variables
+	        const int       mSTEP;         // Without adjusting for the ratio between Lane Filter and vpFilter
+			const int 	 	mRANGE_V;
+			const int 	 	mRANGE_H;
+						
+			const int    	mNb_BINS_V;    	// number of bins in the  vertical   direction.
+			const int    	mNb_BINS_H;    	// number of bins in the horizental direction.
 
-	};
+			const VectorXi 	mBINS_V;	    //Histogram Bins in Pixels.
+			const VectorXi 	mBINS_H;     	// Histogram Bins in Pixels.
+			
+			
+
+
+public: //The Public Interface
+			
+			const int  	 	VP_FILTER_OFFSET_V;
+			
+private:	const float     mVP_LANE_RATIO;			
+
+public:			
+			
+			const VectorXi  HISTOGRAM_BINS;	    //Histogram Bins in Pixels.
+			const int    	STEP;  				//After adjustment
+			      
+				  MatrixXf  Prior;
+				  MatrixXf  Filter;
+				  Matrix3d	Transition; 
+				  		
+private:		 
+			void  createPrior();
+
+};
 	
 #endif // VANSIHINGPOINFILTER_H

@@ -7,15 +7,14 @@ double operator "" _cm( long double cm)
 }*/
 
 Lane::Lane()
+: AVG_WIDTH(300),STD_WIDTH(50),MIN_WIDTH(250),MAX_WIDTH(500) 
 {
-	
 	
 	
 }
 
 Lane::~Lane()
-{
-	
+{	
 	
 }
 

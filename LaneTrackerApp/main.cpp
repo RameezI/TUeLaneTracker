@@ -42,6 +42,6 @@ int main()
 
 
 
-	return stateMachine.run(sigInit);
+	return stateMachine.spin(sigInit);
 
 }

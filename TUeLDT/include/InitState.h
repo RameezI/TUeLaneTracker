@@ -5,6 +5,8 @@
 #include <math.h>
 #include "State.h"
 #include "Camera.h"
+#include "LaneFilter.h"
+#include "VanishingPtFilter.h"
 
 //Code Generation Includes
 #include "createTemplate.h"
@@ -18,20 +20,22 @@
 class InitState: public State
 {	
 
-// For testing purposes, make private when testing completed for private members.
-public :
+private :
+       
+		const Camera mCamera;
+		const Lane   mLane;
 
-		Vector2i				 	  mRES_VH;	
-		shared_ptr<VanishingPt> 	  mVanishingPt;
-		shared_ptr<Templates>		  mTemplates;
-		shared_ptr<Likelihoods> 	  mLikelihoods;
+public:		
+		unique_ptr<LaneFilter> 			laneFilter;
+		unique_ptr<VanishingPtFilter> 	vanishingPtFilter;
+		unique_ptr<Templates>		  	templates;
 
 public:
 		void run();
 		void conclude();
-		InitState(const CameraProperties&);
-		~InitState();
+		InitState();
+	   ~InitState();
 
-	};
+};
 	
 #endif // INITSTATE_H

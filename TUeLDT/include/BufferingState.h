@@ -1,5 +1,7 @@
 #ifndef BUFFERINGSTATE_H
 #define BUFFERINGSTATE_H
+
+
 #include "compileConfig.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -28,39 +30,40 @@ class BufferingState : public State
 #ifdef UNIT_TESTING
 public:
 #else
-protected:
+private:
 #endif
 
-//Private Variables needed for Computations
-
-	const Vector2i			   	mRES_VH;
+	const Camera mCAMERA;
 	const LaneMembership	   	mLaneMembership;
 	
-	Mat mOientationTemplate; 
-	Mat mDEPTHTemplate;
+	// Needed for internal Computations
+	VanishingPt 	mVanishingPt;	
+	Likelihoods	    mLikelihoods;
+	
+	Mat mGRADIENT_DIR_ROOT;
+    Mat	mFOCUS_MASK_ROOT;
+    Mat	mDEPTH_MAP_ROOT;
+				
+	Mat mGradDirTemplate; 
+	Mat mDepthTemplate;
+	Mat mFocusTemplate;
 
-	//State Dependencies
-	shared_ptr<VanishingPt> 	mVanishingPt;
-	shared_ptr<Templates>		mTemplates;
-	shared_ptr<Likelihoods> 	mLikelihoods;
 
 
-	//Extracted Templates
-	Mat     mGradientDirTemplate;
-	Mat     mDepthMapTemplate;
 
 	//Image Frames
 	Mat     mFrameRGB;
 	Mat		mFrameGRAY;
+	Mat		mFrameGRAY_float;
 
 	//Image Gradients
 	Mat     mFrameGradMag;
 	Mat     mFrameGradAng;
 
-	//Matrices computed on the GPU
-	UMat	mProbMap_Gray;
-	UMat	mProbMap_GradMag;
-	UMat    mProbMap_GradDir;
+	// Temporary Probability Maps
+	Mat	mProbMap_Gray;
+	Mat	mProbMap_GradMag;
+	Mat mProbMap_GradDir;
 
 
 
@@ -68,6 +71,12 @@ protected:
 		uint mCountFrame;
 		vector<cv::String> mFiles;
 	#endif
+	
+	
+protected:
+	// List variable that are required by the derived states
+	Mat mProbabiltyMap_Focussed;
+	
 
 
 
@@ -85,10 +94,8 @@ protected:
 
 public:
 	
-	BufferingState(const CameraProperties& CAMERA, const LaneMembership& MEMBERSHIP);
-	void injectDependencies(shared_ptr<VanishingPt>	,
-							shared_ptr<Templates>	,	
-							shared_ptr<Likelihoods>);	
+	BufferingState();
+	void setTemplates(shared_ptr<Templates>);	
 	void run();
 	void conclude();
 	

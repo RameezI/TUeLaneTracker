@@ -4,28 +4,25 @@
 
 //double operator "" _cm( long double );
 using namespace Eigen;
-
-
-	struct LaneProperties
-	{
-		const float AVG_WIDTH;
-		const float STD_WIDTH;
-		const float MIN_WIDTH;
-		const float MAX_WIDTH;
-		
-		LaneProperties()
-		: AVG_WIDTH(300),STD_WIDTH(50),MIN_WIDTH(250),MAX_WIDTH(500) 
-		{
-			
-		}
-		
-	};
 	
-		struct LaneMembership 
+class Lane
+{
+
+public:
+	const float AVG_WIDTH;
+	const float STD_WIDTH;
+	const float MIN_WIDTH;
+	const float MAX_WIDTH;
+	
+	Lane();
+   ~Lane();
+};
+
+struct LaneMembership 
 	{
 		/* The folllowing vectors define Sigmoid Membership of the Pixels */
 		
-		const Vector2f GRAY;  // First element is the decay rate of a sigmoid function wile second represent the shift.
+		const Vector2f  GRAY;  // First element is the decay rate of a sigmoid function wile second represent the shift.
 		const Vector2f  MAG;
 		const Vector2f  DIR;
 		
@@ -40,16 +37,5 @@ using namespace Eigen;
 			//Default Constructor
 		}
 	};
-
-class Lane
-{
-
-public:
-	const LaneProperties 		mPROPERTIES;
-	const LaneMembership		mMembership;
-	Lane();
-	~Lane();
-
-};
 
 #endif // LANE_H

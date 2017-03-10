@@ -8,11 +8,8 @@
 #include "Car.h"
 #include "Camera.h"
 #include "Lane.h"
-#include "LaneFilter.h"
-#include "VanishingPtFilter.h"
 #include "InitState.h"
 #include "BufferingState.h"
-//#include "NcursesTUI.h"
 
 
 using namespace std;
@@ -20,38 +17,22 @@ using namespace std;
 
 class StateMachine
 {
+	
+	
 private:
     
 #ifdef DIRECTORY_INPUT
 	const vector<cv::String>& mFiles;
 #endif
-	const string 	mStateStrings[4];
+
+
 	static States   sCurrentState;
+	const  Camera mCamera;
+	const  Lane   mLane;
+	const  Car    mCar;
 	
-	
-	const Camera mCamera;
-	const Lane   mLane;
-	const Car    mCar;
-
-	
-	//These Objects are shared between various States
-	shared_ptr<LaneFilter> 			mLaneFilter;
-	shared_ptr<VanishingPtFilter> 	mVanishingPtFilter;
-	shared_ptr<Likelihoods> 		mLikelihoods;
-	shared_ptr<Templates>   		mTemplates;
-
-#ifdef PROFILER_ENABLED 
-	std::thread                     mThreadProfiler;
-	std::atomic<bool>				mDisposed;
-	#ifndef s32v2xx
-//	NcursesTUI* 					mUserInterface; ^TODO: Design a Textual User Interface to display high level Information only.
-	#endif
-#endif	
-	
-	
-	
-	
-	
+	unique_ptr<InitState> 		mBootingState;
+	unique_ptr<BufferingState>  mBufferingState;		
 
 public:	
 	// STATE MACHINE METHODS
@@ -61,7 +42,7 @@ public:
 	StateMachine();
 #endif
 
-	int run(shared_ptr<SigInit>);	
+	int spin(shared_ptr<SigInit>);	
 	void PrintMachineInfo();
 	~StateMachine();
 

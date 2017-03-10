@@ -1,6 +1,8 @@
 #include "BufferingState.h"
 /* DIRECTED ACYCLIC GRAPHS ARE IMPLEMENTED AS MEMBER FUNCTION*/
 /* ^TODO: TO MAKE IT REUSEABLE: Make a Seperate class out of it */
+
+
 void BufferingState::executeDAG_buffering()
 {
 	
@@ -77,8 +79,13 @@ LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
 mProfiler.start("LaneMarker_P");
 #endif 				
 		
+		
+		
 	computeProbabilities();
 		
+
+
+
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
