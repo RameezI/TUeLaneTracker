@@ -28,15 +28,9 @@ class State
 {
 
 protected:
-	
-	
-	
 	#ifdef PROFILER_ENABLED
 	ProfilerLDT mProfiler;
 	#endif
-
-    
-	
 	
 public:
 

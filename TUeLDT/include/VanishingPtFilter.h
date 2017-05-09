@@ -10,6 +10,27 @@
 using namespace std;
 using namespace Eigen;
 
+typedef Matrix<int, 6, 1> Vector6i;
+
+
+
+struct PurviewHistogramModel
+{
+	Vector6i binIDs_Boundary;
+	Vector6i Weights_Boundary;	
+	std::vector<int> binIDs_NegBoundary;
+	
+	PurviewHistogramModel()
+	{
+		binIDs_Boundary    << -1, -1, -1, -1, -1, -1;
+		Weights_Boundary   << 0.25,1,0.25, 0.25,1,0.25 ;
+	}
+	
+};
+
+
+
+
 	class VanishingPtFilter
 {
 
@@ -26,33 +47,29 @@ using namespace Eigen;
 
 
 private: //Internal variables
-	        const int       mSTEP;         // Without adjusting for the ratio between Lane Filter and vpFilter
-			const int 	 	mRANGE_V;
-			const int 	 	mRANGE_H;
+	        const int       mVP_STEP;         // Step for VP Bins 
+			const int 	 	mVP_RANGE_V;
+			const int 	 	mVP_RANGE_H;
 						
-			const int    	mNb_BINS_V;    	// number of bins in the  vertical   direction.
-			const int    	mNb_BINS_H;    	// number of bins in the horizental direction.
+			const int    	mNb_VP_BINS_V;    // number of bins in the  vertical   direction.
+			const int    	mNb_VP_BINS_H;    // number of bins in the horizental direction.
 
-			const VectorXi 	mBINS_V;	    //Histogram Bins in Pixels.
-			const VectorXi 	mBINS_H;     	// Histogram Bins in Pixels.
-			
-			
-
-
-public: //The Public Interface
-			
-			const int  	 	VP_FILTER_OFFSET_V;
+public:
+			const VectorXi 	VP_BINS_V;	    //Histogram Bins in Pixels.
+			const VectorXi 	VP_BINS_H;     	//Histogram Bins in Pixels.
+			const int  	 	OFFSET_V;
 			
 private:	const float     mVP_LANE_RATIO;			
 
+
 public:			
 			
-			const VectorXi  HISTOGRAM_BINS;	    //Histogram Bins in Pixels.
-			const int    	STEP;  				//After adjustment
+			const VectorXi  HISTOGRAM_BINS;	    //Purview Histogram Bins in Pixels.
+			const int    	STEP;  				//Purview Histogram STEP
 			      
-				  MatrixXf  Prior;
-				  MatrixXf  Filter;
-				  Matrix3d	Transition; 
+		    MatrixXf  prior;
+		    MatrixXf  filter;
+		    Matrix3d  transition; 
 				  		
 private:		 
 			void  createPrior();

@@ -235,7 +235,10 @@ BufferingState::BufferingState()
 
 	void BufferingState::computeProbabilities()
 	{
-
+			//cv::subtract(GRAY_double_ARM, constantT, Processing_ARM);			
+			//cv::exp(Processing_ARM, Processing_ARM );
+			//cv::add(1, Processing_ARM, Processing_ARM);
+			//cv::divide(1, Processing_ARM, Result_ARM);
 	
 	}
 

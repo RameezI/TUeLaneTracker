@@ -15,7 +15,7 @@ public:
 		const Vector2i	RES_VH; 	    	// resolution of camera
 		const Vector2i  FRAME_CENTER;		// frame center in image coordinate system
 		const Vector2f  FOV;				// field of view of camera
-		const float  	HEIGHT;		    // camera height in meters
+		const float  	HEIGHT;		    	// camera height in meters
 		const double 	FOCAL_LENGTH;    	// camera focal length in meters
 		const double    CM_TO_PIXEL;		// CM_TO_PIXCEL RATIO
 				

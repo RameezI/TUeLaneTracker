@@ -13,137 +13,113 @@ LaneFilter::LaneFilter(const Lane& LANE,  const Camera& CAMERA)
   
   STEP(ceil((mSTEP_CM*mCAMERA.CM_TO_PIXEL)/10)*10),
   
-  mPX_MAX(round((mLANE.MAX_WIDTH*mCAMERA.CM_TO_PIXEL)/STEP)*STEP ),
+  mBIN_MAX(round((mLANE.MAX_WIDTH*mCAMERA.CM_TO_PIXEL)/STEP)*STEP ),
   
-  mNb_BINS(floor((2*mPX_MAX)/STEP) +1),
+  mNb_HISTOGRAM_BINS(floor((2*mBIN_MAX)/STEP) +1),
   
-  mNb_OFFSETS(floor((mNb_BINS-1)/2) +1),
+  mNb_OFFSET_BINS(floor((mNb_HISTOGRAM_BINS-1)/2) +1),
 
-  LANE_FILTER_OFFSET_V(-240),
+  OFFSET_V(-240),
   
-  HISTOGRAM_BINS(VectorXi::LinSpaced(mNb_BINS,-mPX_MAX, mPX_MAX)),
+  HISTOGRAM_BINS(VectorXi::LinSpaced(mNb_HISTOGRAM_BINS,-mBIN_MAX, mBIN_MAX)),
   
-  OFFSET_BINS(HISTOGRAM_BINS.tail(mNb_OFFSETS))
+  OFFSET_BINS(HISTOGRAM_BINS.tail(mNb_OFFSET_BINS))
   
 {
 	
-	createPrior();
-	this->Filter = this->Prior;
+	createHistogramModels();
+	this->filter = this->prior;
 	 
 }
 
 
-void LaneFilter::createExpectedHistogram()
+
+
+void LaneFilter::createHistogramModels()
 {
-	
-	
-	//^TODO: Sparce Representation could be used here
-	
-	//^TODO: Temporary Delay the Implementation, Consult with Gijs
-	
-	
-	/*
-	
-	VectorXd bins=mBins.tail(mNbins_oneside);
-	
-	double ObsLeftLane, ObsRightLane, ObsNoLane;
-	float width;
-	
-	double leftOffset, rightOffset;
-	
-	for(int left =1; left < mNbins_oneside; left++)
-	{	
-		for(int right =1; right< mNbins_oneside; right++)
-		{
-		
-			
-			//Allowed states
-			  width = bins(left) + bins(right) * (1/mCamera->mCM_TO_PIXEL);
-			  if (mLane->mProperties.MIN_WIDTH <= width && width <= mLane->mProperties.MAX_WIDTH)
-			  {
-				  leftOffset 	= - bins(left);
-				  rightOffset	=   bins(right) 
-				 
-				  
-			  }
-		}		
-	}	*/
-
-
-
-}
-
-void LaneFilter::createPrior()
-{
-	
-	/*Assign probabilities to States */
+	/* Create Histogram Models for the BaseHistogram */
+	/* Assign probabilities to States  */
     
-	this->Prior  = MatrixXf((int)(mPX_MAX/this->STEP) +1, (int)(mPX_MAX/this->STEP) +1);
+	this->prior  = MatrixXf((int)(mBIN_MAX/this->STEP) +1, (int)(mBIN_MAX/this->STEP) +1);
 	
 	VectorXf bins_cm = OFFSET_BINS.cast<float>()*(1/mCAMERA.CM_TO_PIXEL);
+	
+	
+	
 	
     float 	 hmean =  mLANE.AVG_WIDTH/2;
     float    sigmaL = mLANE.STD_WIDTH;
 	
-    double pL, pR, width;
+    float pL, pR, width;
 
 	
-    for (int x = 0; x < bins_cm.size(); x++)
+    for (int left = 0; left < bins_cm.size(); left++)
 	{
-       for (int y = 0; y < bins_cm.size(); y++)
+       for (int right = 0; right < bins_cm.size(); right++)
 	   {  
             // prior on location
-            pL = exp( -pow(hmean-bins_cm(x), 2) / (2*pow(8*sigmaL,2)) ) / ( sqrt(2*M_PI)*8*sigmaL );     
-            pR = exp( -pow(hmean-bins_cm(y), 2) / (2*pow(8*sigmaL,2)) ) / ( sqrt(2*M_PI)*8*sigmaL );     
+            pL = exp( -pow(hmean-bins_cm(left), 2) / (2*pow(8*sigmaL,2)) ) / ( sqrt(2*M_PI)*8*sigmaL );     
+            pR = exp( -pow(hmean-bins_cm(right), 2) / (2*pow(8*sigmaL,2)) ) / ( sqrt(2*M_PI)*8*sigmaL );     
             
             //prior on lane width
-            width = bins_cm(x)+bins_cm(y);
-            if (mLANE.MIN_WIDTH <= width && width <= mLANE.MAX_WIDTH)
-                this->Prior(x,y) = pL*pR;
-		    else
-                this->Prior(x,y) = 0;                
-	   }    
-    }
+            width = bins_cm(left)+bins_cm(right);
+			
+            
+			if (mLANE.MIN_WIDTH <= width && width <= mLANE.MAX_WIDTH)
+                
+			{
+				
+				
+				
+				/* TO Histogram Bins-IDs*/
+				int idxL = (mNb_OFFSET_BINS-1) - left;
+				int idxR = (mNb_OFFSET_BINS-1) + right;
+				
+				int idxM = round((idxL+idxR)/2.0);
+				
+				int nbLeftNonBoundaryBins  = (idxM-3) - (idxL +2);
+				int nbRightNonBoundaryBins = (idxR-2) - (idxM +3);
+ 				
+				
+				if( 0 < idxL && idxR < mNb_HISTOGRAM_BINS-1 )
+				{	
+					baseHistogramModels.push_back( BaseHistogramModel());
+				
+					baseHistogramModels.back().leftOffsetIdx  = left;
+					baseHistogramModels.back().rightOffsetIdx = right; 
+					
+					baseHistogramModels.back().binIDs_leftBoundary  <<  left-1,  left, left+1 ;
+					baseHistogramModels.back().binIDs_rightBoundary <<  right-1,  right, right+1 ;
+					
+					for(int i=0; i<nbLeftNonBoundaryBins; i++)
+						baseHistogramModels.back().binIDs_NegBoundary.push_back(idxL+2 +i);
+					for(int i=0; i< nbRightNonBoundaryBins; i++)
+						baseHistogramModels.back().binIDs_NegBoundary.push_back(idxM+4 +i);
+						
+						
+						vector<int> v;
+						v= baseHistogramModels.back().binIDs_NegBoundary;
+						int a= v.at(3);
+						
+					this->prior(left,right) = pL*pR;
+										
+				}
+				else
+					this->prior(left,right) = 0;                
+			}    
+		}
+	}
     
     // normalize
-    this->Prior = (this->Prior/this->Prior.sum()).eval();
+    this->prior = (this->prior/this->prior.sum()).eval();
     
     // Transition Matrix 
-     this->Transition = Matrix7f::Constant(7,7,1);
-     this->Transition = (this->Transition/ this->Transition.sum()).eval(); 
+     this->transition = Matrix7f::Constant(7,7,1);
+     this->transition = (this->transition/ this->transition.sum()).eval(); 
 	  
 }
-
 
 LaneFilter::~LaneFilter()
 {
 	
 }
-
-
-
-
-/*
-const Ref<const MatrixXd>& LaneFilter::getFilter()
-{	 
-	return mFilter;
-
-}
-*/
-
-
-/*
-	shared_ptr<MatrixXd> LaneFilter::getFilter();
-	{
-		
-	}
-	shared_ptr<MatrixXd> LaneFilter::getPrior();
-	{
-		
-	}
-	
-	shared_ptr<MatrixXd> LaneFilter::getTransition()
-	{
-	
-	}
-	*/

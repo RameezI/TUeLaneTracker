@@ -48,16 +48,19 @@ TEST(LaneFilter)
 				
 		 CHECK_EQUAL(10, testLaneFilter.laneFilter->STEP) ;
 		 
+		 
+		 CHECK_EQUAL(2221, testLaneFilter.laneFilter->baseHistogramModels.size()) ;
+		 
 		 CHECK_ARRAY_CLOSE(testLaneFilter.exp_BINS_HISTOGRAM.data(), 
 						   testLaneFilter.laneFilter->HISTOGRAM_BINS.data(),
 						   testLaneFilter.exp_BINS_HISTOGRAM.size(), 1.0e-4);
 		 
-		 CHECK_ARRAY_CLOSE(testLaneFilter.exp_LanePrior.data(),
-						   testLaneFilter.laneFilter->Prior.data(),
-						   77*77, 1.0e-6);
+	//	 CHECK_ARRAY_CLOSE(testLaneFilter.exp_LanePrior.data(),
+	//					   testLaneFilter.laneFilter->prior.data(),
+	//					   77*77, 1.0e-6);
 		 
 		 CHECK_ARRAY_CLOSE(testLaneFilter.exp_LaneTransition.data(),
-						   testLaneFilter.laneFilter->Transition.data(),
+						   testLaneFilter.laneFilter->transition.data(),
 						   7*7, 1.0e-6);
     }
 

@@ -1,26 +1,17 @@
 #ifndef BUFFERINGSTATE_H
 #define BUFFERINGSTATE_H
-
-
 #include "compileConfig.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
-#include "GaussianPreProcessor.h"
-#include "ColorTransformer.h"
-#include "ChannelsSplitter.h"
-#include "GradientsExtractor.h"
 #include "State.h"
 #include "Camera.h"
 #include "Lane.h"
 #include <opencv2/core/eigen.hpp>
 #include "opencv2/core/ocl.hpp"
 
-
-
 using namespace cv;
 using namespace Eigen;
 using namespace std;
-
 
 class BufferingState : public State
 {
@@ -49,8 +40,6 @@ private:
 	Mat mFocusTemplate;
 
 
-
-
 	//Image Frames
 	Mat     mFrameRGB;
 	Mat		mFrameGRAY;
@@ -64,7 +53,6 @@ private:
 	Mat	mProbMap_Gray;
 	Mat	mProbMap_GradMag;
 	Mat mProbMap_GradDir;
-
 
 
 	#ifdef DIRECTORY_INPUT

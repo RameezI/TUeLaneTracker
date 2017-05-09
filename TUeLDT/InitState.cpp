@@ -6,7 +6,7 @@ InitState::InitState()
 	laneFilter(	unique_ptr<LaneFilter>(new LaneFilter (mLane, mCamera) ) ),
 
 	vanishingPtFilter( unique_ptr<VanishingPtFilter>( new VanishingPtFilter (laneFilter->HISTOGRAM_BINS,
-																			 laneFilter->LANE_FILTER_OFFSET_V,
+																			 laneFilter->OFFSET_V,
 																			  mCamera)) ),
 													  
     templates( unique_ptr<Templates> ( new  Templates (mCamera.RES_VH(0), mCamera.RES_VH(1) ) ))

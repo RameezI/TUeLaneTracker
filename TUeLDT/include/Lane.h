@@ -1,11 +1,9 @@
 #ifndef LANE_H
 #define LANE_H
-#include <Eigen/Dense>
-
-//double operator "" _cm( long double );
-using namespace Eigen;
+#include <stdio.h>
+#include <math.h>
 	
-class Lane
+struct Lane
 {
 
 public:
@@ -14,25 +12,45 @@ public:
 	const float MIN_WIDTH;
 	const float MAX_WIDTH;
 	
-	Lane();
-   ~Lane();
+	Lane() //Lane Widths in cm
+	: AVG_WIDTH(300),STD_WIDTH(50),MIN_WIDTH(250),MAX_WIDTH(500) 
+	{
+		//Default Constructor
+	}
 };
 
 struct LaneMembership 
 	{
-		/* The folllowing vectors define Sigmoid Membership of the Pixels */
 		
-		const Vector2f  GRAY;  // First element is the decay rate of a sigmoid function wile second represent the shift.
-		const Vector2f  MAG;
-		const Vector2f  DIR;
+		public:
+		const int   TIPPING_POINT_GRAY; 
+		const int   TIPPING_POINT_GRAD_Mag;
+		
+		private:
+		const float WIDTH_STD;
+		
+		public:
+		const float WIDTH_DIFF_NORMA;
+		const float WIDTH_DIFF_NOMIN;
+		
+		private:
+		const float NEG_BOUNDARY_STD;
+		
+		public:
+		const float NEG_BOUNDARY_NORMA;
+		const float NEG_BOUNDARY_NOMIN;
 		
 		LaneMembership() //Initialisation of  members through initialisation list
-		:GRAY(Vector2f(25, 0.6)),  // The gray value of 0.6 , in range of [0 1] , will have membership 0.5. 
-								   // Membership will grow exponnetialy with an exponential constatnt 25.
-		 MAG(Vector2f(50, 0.15)),
+		:TIPPING_POINT_GRAY(100),
+		 TIPPING_POINT_GRAD_Mag(40),
 		 
-		 DIR(Vector2f(-0.25, 15))
+		 WIDTH_STD(15),
+		 WIDTH_DIFF_NORMA( 1/sqrt( 2*M_PI*pow(WIDTH_STD,2) ) ),
+		 WIDTH_DIFF_NOMIN( 2*pow(WIDTH_STD,2) ),
 		 
+		 NEG_BOUNDARY_STD(0.2),
+		 NEG_BOUNDARY_NORMA(2/sqrt(2*M_PI*pow(NEG_BOUNDARY_STD,2))),
+		 NEG_BOUNDARY_NOMIN(2*pow(NEG_BOUNDARY_STD,2))	 
 		{
 			//Default Constructor
 		}

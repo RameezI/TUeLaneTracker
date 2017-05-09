@@ -27,7 +27,7 @@ public:
 			Lane       lane;
 			LaneFilter laneFilter(lane, camera);
 			
-			vpFilter.reset(new VanishingPtFilter(laneFilter.HISTOGRAM_BINS, laneFilter.LANE_FILTER_OFFSET_V, camera));
+			vpFilter.reset(new VanishingPtFilter(laneFilter.HISTOGRAM_BINS, laneFilter.OFFSET_V, camera));
 			
 			exp_BINS_HISTOGRAM 	= readCSV("VP_BINS_HST.csv",153);
 			exp_Filter 			= readCSV("VP_FILTER.csv", 6, 61 );
@@ -52,12 +52,12 @@ TEST(VanishPointFilter)
 		CHECK_EQUAL(5,  testVpFilter.vpFilter->STEP) ;
 		
 		CHECK_ARRAY_CLOSE(testVpFilter.exp_Prior.data(),
-						  testVpFilter.vpFilter->Prior.data(), 6*61, 1.0e-6) ;
+						  testVpFilter.vpFilter->prior.data(), 6*61, 1.0e-6) ;
 		
 		CHECK_ARRAY_CLOSE(testVpFilter.exp_Filter.data(),
-						  testVpFilter.vpFilter->Filter.data(), 6*61, 1.0e-6) ;
+						  testVpFilter.vpFilter->filter.data(), 6*61, 1.0e-6) ;
 		
 		CHECK_ARRAY_CLOSE(testVpFilter.exp_Transition.data(),
-						  testVpFilter.vpFilter->Transition.data(), 3*3, 1.0e-6) ;
+						  testVpFilter.vpFilter->transition.data(), 3*3, 1.0e-6) ;
 
     }
