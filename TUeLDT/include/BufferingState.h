@@ -14,6 +14,8 @@ using namespace Eigen;
 using namespace std;
 
 class BufferingState : public State
+
+
 {
 	
 // Make public for testing	
@@ -24,12 +26,10 @@ public:
 private:
 #endif
 
-	const Camera mCAMERA;
+	const Camera 				mCAMERA;
 	const LaneMembership	   	mLaneMembership;
+	Likelihoods	    			mLikelihoods;
 	
-	// Needed for internal Computations
-	VanishingPt 	mVanishingPt;	
-	Likelihoods	    mLikelihoods;
 	
 	Mat mGRADIENT_DIR_ROOT;
     Mat	mFOCUS_MASK_ROOT;

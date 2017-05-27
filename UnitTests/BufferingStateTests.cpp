@@ -31,23 +31,23 @@ public:
 	  TEST_BufferingState()
 		
 		{ 
-			InitState bootingState;
-			bufferingState.reset(new BufferingState()); 
+		//	InitState bootingState;
+		//	bufferingState.reset(new BufferingState()); 
 			
-			bootingState.run();
+		//	bootingState.run();
 			
 			
-			vector< cv::String> IMG_filenames;
-			cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
-			glob(folder, IMG_filenames);
+		//	vector< cv::String> IMG_filenames;
+		//	cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
+		//	glob(folder, IMG_filenames);
 			
-			bufferingState->setSource(IMG_filenames);
-			bufferingState->setTemplates(std::move(bootingState.templates));
+		//	bufferingState->setSource(IMG_filenames);
+		//	bufferingState->setTemplates(std::move(bootingState.templates));
 						
 			
-			exp_FOCUS_ROOT			= readCSV("FOCUS_ROOT.csv", 2*480+1, 640);
-			exp_DEPTH_ROOT			= readCSV("DEPTH_ROOT.csv", 2*480+1, 640);
-			exp_GRADIENT_DIR_ROOT	= readCSV("GRADIENT_DIR_ROOT.csv", 2*480+1, 2*640 +1);
+		//	exp_FOCUS_ROOT			= readCSV("FOCUS_ROOT.csv", 2*480+1, 640);
+		//	exp_DEPTH_ROOT			= readCSV("DEPTH_ROOT.csv", 2*480+1, 640);
+		//	exp_GRADIENT_DIR_ROOT	= readCSV("GRADIENT_DIR_ROOT.csv", 2*480+1, 2*640 +1);
 			
 			/*ofstream file("DIR_ROOT_Eigen.csv");
 			const static IOFormat CSVFormat(StreamPrecision, DontAlignCols, ", ", "\n");

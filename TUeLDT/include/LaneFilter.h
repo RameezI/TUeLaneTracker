@@ -4,11 +4,14 @@
 #include <math.h>
 #include "Lane.h"
 #include "Camera.h"
+#include "opencv2/opencv.hpp"
+#include "opencv2/highgui/highgui.hpp"
 
 using namespace std;
 using namespace Eigen;
-typedef Matrix<float, 7, 7> Matrix7f;
+using namespace cv;
 
+const double ScalingFactor = 32768;  // A Scaling Factor of 2^15 is employed
 
 struct BaseHistogramModel
 {
@@ -59,11 +62,9 @@ public:	 //Public Interface of the class
 		const VectorXi  HISTOGRAM_BINS;    	// -PX_MAX:STEP: PX_MAX
 		const VectorXi  OFFSET_BINS;       	//  0 : STEP : PX_MAX
 		
-		
-		
-		MatrixXf     	prior;
-		MatrixXf 	 	filter;
-		Matrix7f	 	transition;
+		Mat prior;
+		Mat filter;
+		Mat transition;
 
 	    std::vector<BaseHistogramModel>  baseHistogramModels; 	
 

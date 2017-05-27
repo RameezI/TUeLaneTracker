@@ -46,13 +46,8 @@ BufferingState::BufferingState()
 			mProfiler.start("SetRootTemplates");
 		#endif
 
-			eigen2cv(templates->GRADIENT_DIR_ROOT, mGRADIENT_DIR_ROOT);   //^TODO: COPYING OPERATION CHANGE TO WRAPPING OR NATIVE OPENCV
-			eigen2cv(templates->DEPTH_ROOT,        mDEPTH_MAP_ROOT);     //^TODO: COPYING OPERATION CHANGE TO WRAPPING OR NATIVE OPENCV
-			eigen2cv(templates->FOCUS_ROOT,        mFOCUS_MASK_ROOT);   //^TODO: COPYING OPERATION CHANGE TO WRAPPING OR NATIVE OPENCV
-			
 			this->currentStatus= StateStatus::ACTIVE;
-			
-			
+						
 		 #ifdef PROFILER_ENABLED
 		 mProfiler.end();
 		 LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
@@ -62,8 +57,6 @@ BufferingState::BufferingState()
 								  <<"******************************"<<endl<<endl;	
 								 #endif				
 	}
-
-
 
 /* Running Directed Acyclic Graph
  * 
@@ -197,8 +190,9 @@ BufferingState::BufferingState()
 
 
 	 /*^TODO: Define Grabing mechanism in case of camera */
-	int BufferingState::grabFrame()
-	{		
+int BufferingState::grabFrame()
+	
+{		
 
 #ifdef DIRECTORY_INPUT
  
@@ -246,6 +240,7 @@ BufferingState::BufferingState()
 
 	void BufferingState::extractTemplates()
 	{
+		/*
 		
 		 int rowIndex= (mCAMERA.RES_VH(0)-mVanishingPt.V) - mCAMERA.RES_VH(0)/2;
 		 int colIndex= (mCAMERA.RES_VH(1)-mVanishingPt.H) - mCAMERA.RES_VH(1)/2;
@@ -261,7 +256,8 @@ BufferingState::BufferingState()
 		
 		ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mCAMERA.RES_VH(0));	
 		mFocusTemplate = mFOCUS_MASK_ROOT(ROI);
-
+		
+		 */
 
 	}
 

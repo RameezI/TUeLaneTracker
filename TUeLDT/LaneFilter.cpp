@@ -23,12 +23,18 @@ LaneFilter::LaneFilter(const Lane& LANE,  const Camera& CAMERA)
   
   HISTOGRAM_BINS(VectorXi::LinSpaced(mNb_HISTOGRAM_BINS,-mBIN_MAX, mBIN_MAX)),
   
-  OFFSET_BINS(HISTOGRAM_BINS.tail(mNb_OFFSET_BINS))
+  OFFSET_BINS(HISTOGRAM_BINS.tail(mNb_OFFSET_BINS)),
+  
+  prior(  Mat::zeros( (int)(mBIN_MAX/this->STEP) +1, (int)(mBIN_MAX/this->STEP) +1 , CV_32SC1) ),
+  
+  filter( Mat::zeros( (int)(mBIN_MAX/this->STEP) +1, (int)(mBIN_MAX/this->STEP) +1 , CV_32SC1) ),
+  
+  transition( Mat::ones( 10, 10 , CV_32SC1) )
   
 {
 	
 	createHistogramModels();
-	this->filter = this->prior;
+	this->filter = this->prior.clone();
 	 
 }
 
@@ -39,18 +45,15 @@ void LaneFilter::createHistogramModels()
 {
 	/* Create Histogram Models for the BaseHistogram */
 	/* Assign probabilities to States  */
-    
-	this->prior  = MatrixXf((int)(mBIN_MAX/this->STEP) +1, (int)(mBIN_MAX/this->STEP) +1);
-	
+		
 	VectorXf bins_cm = OFFSET_BINS.cast<float>()*(1/mCAMERA.CM_TO_PIXEL);
-	
-	
-	
 	
     float 	 hmean =  mLANE.AVG_WIDTH/2;
     float    sigmaL = mLANE.STD_WIDTH;
 	
     float pL, pR, width;
+	
+	//cv::Mat Prior_tmp = Mat::zeros((int)(mBIN_MAX/this->STEP) +1, (int)(mBIN_MAX/this->STEP) +1 , CV_32SC1))
 
 	
     for (int left = 0; left < bins_cm.size(); left++)
@@ -58,10 +61,11 @@ void LaneFilter::createHistogramModels()
        for (int right = 0; right < bins_cm.size(); right++)
 	   {  
             // prior on location
-            pL = exp( -pow(hmean-bins_cm(left), 2) / (2*pow(8*sigmaL,2)) ) / ( sqrt(2*M_PI)*8*sigmaL );     
-            pR = exp( -pow(hmean-bins_cm(right), 2) / (2*pow(8*sigmaL,2)) ) / ( sqrt(2*M_PI)*8*sigmaL );     
+            pL = (exp( -pow(hmean-bins_cm(left), 2) / (2*pow(8*sigmaL,2)) ) / ( sqrt(2*M_PI)*8*sigmaL ) )*ScalingFactor;     
+            pR = (exp( -pow(hmean-bins_cm(right), 2) / (2*pow(8*sigmaL,2)) ) / ( sqrt(2*M_PI)*8*sigmaL ))*ScalingFactor;     
             
-            //prior on lane width
+            
+			//prior on lane width
             width = bins_cm(left)+bins_cm(right);
 			
             
@@ -97,26 +101,20 @@ void LaneFilter::createHistogramModels()
 						baseHistogramModels.back().binIDs_NegBoundary.push_back(idxM+4 +i);
 						
 						
-						vector<int> v;
-						v= baseHistogramModels.back().binIDs_NegBoundary;
-						int a= v.at(3);
-						
-					this->prior(left,right) = pL*pR;
+					this->prior.at<int>(left,right) = (int)(std::round(pL*pR));
 										
-				}
-				else
-					this->prior(left,right) = 0;                
+				}              
 			}    
 		}
 	}
     
-    // normalize
-    this->prior = (this->prior/this->prior.sum()).eval();
-    
-    // Transition Matrix 
-     this->transition = Matrix7f::Constant(7,7,1);
-     this->transition = (this->transition/ this->transition.sum()).eval(); 
-	  
+	
+    // Normalize
+	double SUM = cv::sum(this->prior)[0];
+    this->prior.convertTo(this->prior,CV_32FC1,1/SUM);
+	this->prior.convertTo(this->prior,CV_32SC1,ScalingFactor);
+
+
 }
 
 LaneFilter::~LaneFilter()

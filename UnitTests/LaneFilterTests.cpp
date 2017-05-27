@@ -13,11 +13,18 @@ using namespace std;
 class TEST_LaneFilter:Tests
 {
 public:
-	  MatrixXd exp_FilterMatrix;
-	  MatrixXd exp_LanePrior;
 	  VectorXd exp_BINS_HISTOGRAM;
-	  MatrixXd exp_LaneTransition;
-	  	  
+	  
+	  Mat comparisonPrior;
+	  int testResult_prior;
+      
+	  Mat comparisonFilter;
+	  int testResult_filter;
+	  
+	  Mat comparisonTransition;
+	  int testResult_transition;
+	
+
 	  unique_ptr<LaneFilter> laneFilter;
 	  
 	  TEST_LaneFilter()
@@ -27,12 +34,27 @@ public:
 			Lane   lane;
 			
 			laneFilter.reset(new LaneFilter(lane, camera));
-		 
 			exp_BINS_HISTOGRAM = readCSV("LANE_BINS_H.csv", 153);
-			exp_LanePrior = readCSV("LANE_PRIOR.csv", 77, 77);
-			exp_LaneTransition = readCSV("LANE_TRANSITION.csv", 7, 7);
-			exp_FilterMatrix   = exp_LanePrior;
+			
+			Mat exp_LanePrior = loadCSV("LANE_PRIOR.csv", CV_32SC1);
+			cv::compare(exp_LanePrior, laneFilter->prior, comparisonPrior, cv::CMP_NE);
+			testResult_prior = cv::countNonZero(comparisonPrior);
+			
+			//saveMatToCsv(exp_LanePrior, "LANE_PRIOR.csv");
+			//saveMatToCsv(laneFilter->prior, "LANE_PRIOR2.csv");
+
+			Mat exp_LaneFilter = loadCSV("LANE_FILTER.csv", CV_32SC1);
+			cv::compare(exp_LaneFilter, laneFilter->filter, comparisonFilter, cv::CMP_NE);
+			testResult_filter = cv::countNonZero(comparisonFilter);
+			
+			
+			Mat exp_LaneTransition = loadCSV("LANE_TRANSITION.csv", CV_32SC1);
+			//saveMatToCsv(exp_LaneTransition, "LANE_TRANSITION.csv");
+			cv::compare(exp_LaneTransition, laneFilter->transition, comparisonTransition, cv::CMP_NE);
+			testResult_transition = cv::countNonZero(comparisonTransition);
+		
 		}
+		
 		~TEST_LaneFilter()
 		{
 			
@@ -55,12 +77,11 @@ TEST(LaneFilter)
 						   testLaneFilter.laneFilter->HISTOGRAM_BINS.data(),
 						   testLaneFilter.exp_BINS_HISTOGRAM.size(), 1.0e-4);
 		 
-	//	 CHECK_ARRAY_CLOSE(testLaneFilter.exp_LanePrior.data(),
-	//					   testLaneFilter.laneFilter->prior.data(),
-	//					   77*77, 1.0e-6);
+		 CHECK_EQUAL(0,testLaneFilter.testResult_prior);
 		 
-		 CHECK_ARRAY_CLOSE(testLaneFilter.exp_LaneTransition.data(),
-						   testLaneFilter.laneFilter->transition.data(),
-						   7*7, 1.0e-6);
+		 CHECK_EQUAL(0,testLaneFilter.testResult_filter);
+		 
+		CHECK_EQUAL(0,testLaneFilter.testResult_transition);
+		 
     }
 

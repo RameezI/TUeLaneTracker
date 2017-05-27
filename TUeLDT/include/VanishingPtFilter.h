@@ -13,7 +13,6 @@ using namespace Eigen;
 typedef Matrix<int, 6, 1> Vector6i;
 
 
-
 struct PurviewHistogramModel
 {
 	Vector6i binIDs_Boundary;
@@ -47,10 +46,13 @@ struct PurviewHistogramModel
 
 
 private: //Internal variables
-	        const int       mVP_STEP;         // Step for VP Bins 
-			const int 	 	mVP_RANGE_V;
-			const int 	 	mVP_RANGE_H;
-						
+	        const int       mVP_STEP;         // Step for VP Bins
+
+public: 
+			const int 	 	VP_RANGE_V;
+			const int 	 	VP_RANGE_H;
+
+private:						
 			const int    	mNb_VP_BINS_V;    // number of bins in the  vertical   direction.
 			const int    	mNb_VP_BINS_H;    // number of bins in the horizental direction.
 
@@ -67,9 +69,9 @@ public:
 			const VectorXi  HISTOGRAM_BINS;	    //Purview Histogram Bins in Pixels.
 			const int    	STEP;  				//Purview Histogram STEP
 			      
-		    MatrixXf  prior;
-		    MatrixXf  filter;
-		    Matrix3d  transition; 
+		    Mat  prior;
+		    Mat  filter;
+		    Mat  transition; 
 				  		
 private:		 
 			void  createPrior();

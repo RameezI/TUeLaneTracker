@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=rameez
-Date                   :=09/05/17
+Date                   :=27/05/17
 CodeLitePath           :="/home/rameez/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -60,8 +60,8 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/Camera.cpp$(ObjectSuffix) $(IntermediateDirectory)/Car.cpp$(ObjectSuffix) $(IntermediateDirectory)/State.cpp$(ObjectSuffix) $(IntermediateDirectory)/VanishingPtFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/InitState.cpp$(ObjectSuffix) $(IntermediateDirectory)/SigInit.cpp$(ObjectSuffix) $(IntermediateDirectory)/BufferingState.cpp$(ObjectSuffix) $(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix) $(IntermediateDirectory)/LDT_logger.cpp$(ObjectSuffix) $(IntermediateDirectory)/LDT_profiler.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/BufferingDAG.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneFilter.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/State.cpp$(ObjectSuffix) $(IntermediateDirectory)/VanishingPtFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/InitState.cpp$(ObjectSuffix) $(IntermediateDirectory)/SigInit.cpp$(ObjectSuffix) $(IntermediateDirectory)/BufferingState.cpp$(ObjectSuffix) $(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix) $(IntermediateDirectory)/LDT_logger.cpp$(ObjectSuffix) $(IntermediateDirectory)/LDT_profiler.cpp$(ObjectSuffix) $(IntermediateDirectory)/BufferingDAG.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneFilter.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/TrackingLaneState.cpp$(ObjectSuffix) $(IntermediateDirectory)/BufferingDAG_generic.cpp$(ObjectSuffix) 
 
 
 
@@ -94,22 +94,6 @@ PreBuild:
 ##
 ## Objects
 ##
-$(IntermediateDirectory)/Camera.cpp$(ObjectSuffix): Camera.cpp $(IntermediateDirectory)/Camera.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/Camera.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/Camera.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/Camera.cpp$(DependSuffix): Camera.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/Camera.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/Camera.cpp$(DependSuffix) -MM "Camera.cpp"
-
-$(IntermediateDirectory)/Camera.cpp$(PreprocessSuffix): Camera.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Camera.cpp$(PreprocessSuffix) "Camera.cpp"
-
-$(IntermediateDirectory)/Car.cpp$(ObjectSuffix): Car.cpp $(IntermediateDirectory)/Car.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/Car.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/Car.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/Car.cpp$(DependSuffix): Car.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/Car.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/Car.cpp$(DependSuffix) -MM "Car.cpp"
-
-$(IntermediateDirectory)/Car.cpp$(PreprocessSuffix): Car.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Car.cpp$(PreprocessSuffix) "Car.cpp"
-
 $(IntermediateDirectory)/State.cpp$(ObjectSuffix): State.cpp $(IntermediateDirectory)/State.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/State.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/State.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/State.cpp$(DependSuffix): State.cpp
@@ -189,6 +173,22 @@ $(IntermediateDirectory)/LaneFilter.cpp$(DependSuffix): LaneFilter.cpp
 
 $(IntermediateDirectory)/LaneFilter.cpp$(PreprocessSuffix): LaneFilter.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/LaneFilter.cpp$(PreprocessSuffix) "LaneFilter.cpp"
+
+$(IntermediateDirectory)/TrackingLaneState.cpp$(ObjectSuffix): TrackingLaneState.cpp $(IntermediateDirectory)/TrackingLaneState.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/TrackingLaneState.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/TrackingLaneState.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/TrackingLaneState.cpp$(DependSuffix): TrackingLaneState.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/TrackingLaneState.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/TrackingLaneState.cpp$(DependSuffix) -MM "TrackingLaneState.cpp"
+
+$(IntermediateDirectory)/TrackingLaneState.cpp$(PreprocessSuffix): TrackingLaneState.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/TrackingLaneState.cpp$(PreprocessSuffix) "TrackingLaneState.cpp"
+
+$(IntermediateDirectory)/BufferingDAG_generic.cpp$(ObjectSuffix): BufferingDAG_generic.cpp $(IntermediateDirectory)/BufferingDAG_generic.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/BufferingDAG_generic.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/BufferingDAG_generic.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/BufferingDAG_generic.cpp$(DependSuffix): BufferingDAG_generic.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/BufferingDAG_generic.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/BufferingDAG_generic.cpp$(DependSuffix) -MM "BufferingDAG_generic.cpp"
+
+$(IntermediateDirectory)/BufferingDAG_generic.cpp$(PreprocessSuffix): BufferingDAG_generic.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/BufferingDAG_generic.cpp$(PreprocessSuffix) "BufferingDAG_generic.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

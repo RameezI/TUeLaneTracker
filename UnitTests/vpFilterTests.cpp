@@ -13,10 +13,21 @@ using namespace std;
 class TEST_VPFilter:Tests
 {
 public:
-	  MatrixXd exp_Filter;
-	  MatrixXd exp_Prior;
-	  MatrixXd exp_Transition;
-	  VectorXd exp_BINS_HISTOGRAM;
+	  Mat exp_vpFilter;
+	  Mat exp_vpPrior;
+	  Mat exp_vpTransition;
+	  
+	  MatrixXd exp_BINS_HISTOGRAM;
+	  
+	  Mat comparisonPrior;
+	  int testResult_prior;
+	  
+	  Mat comparisonFilter;
+	  int testResult_filter;
+	  
+	  
+	   Mat comparisonTransition;
+	   int testResult_transition;
 	  
 	  unique_ptr<VanishingPtFilter> 	vpFilter;
 	   
@@ -30,9 +41,24 @@ public:
 			vpFilter.reset(new VanishingPtFilter(laneFilter.HISTOGRAM_BINS, laneFilter.OFFSET_V, camera));
 			
 			exp_BINS_HISTOGRAM 	= readCSV("VP_BINS_HST.csv",153);
-			exp_Filter 			= readCSV("VP_FILTER.csv", 6, 61 );
-			exp_Prior 			= readCSV("VP_PRIOR.csv", 6, 61);
-			exp_Transition      = readCSV("VP_TRANSITION.csv" , 3, 3 );
+			
+			
+			exp_vpPrior 		= loadCSV("VP_PRIOR.csv", CV_32SC1);			
+			cv::compare(exp_vpPrior, vpFilter->prior, comparisonPrior, cv::CMP_NE);
+			testResult_prior = cv::countNonZero(comparisonPrior);
+			//saveMatToCsv(exp_LanePrior, "VP_PRIOR.csv");
+			//saveMatToCsv(vpFilter->prior, "VP_PRIOR2.csv");
+			
+			
+			exp_vpFilter 		= loadCSV("VP_FILTER.csv", CV_32SC1);			
+			cv::compare(exp_vpFilter, vpFilter->filter, comparisonFilter, cv::CMP_NE);
+			testResult_filter = cv::countNonZero(comparisonFilter);
+			
+			
+			exp_vpTransition 		= loadCSV("VP_TRANSITION.csv", CV_32SC1);			
+			cv::compare(exp_vpTransition, vpFilter->transition, comparisonTransition, cv::CMP_NE);
+			testResult_transition = cv::countNonZero(comparisonTransition);
+
 		}
 		
 		~TEST_VPFilter()
@@ -51,13 +77,12 @@ TEST(VanishPointFilter)
 
 		CHECK_EQUAL(5,  testVpFilter.vpFilter->STEP) ;
 		
-		CHECK_ARRAY_CLOSE(testVpFilter.exp_Prior.data(),
-						  testVpFilter.vpFilter->prior.data(), 6*61, 1.0e-6) ;
+		CHECK_EQUAL(0,  testVpFilter.testResult_prior);
 		
-		CHECK_ARRAY_CLOSE(testVpFilter.exp_Filter.data(),
-						  testVpFilter.vpFilter->filter.data(), 6*61, 1.0e-6) ;
+		CHECK_EQUAL(0,  testVpFilter.testResult_filter);
 		
-		CHECK_ARRAY_CLOSE(testVpFilter.exp_Transition.data(),
-						  testVpFilter.vpFilter->transition.data(), 3*3, 1.0e-6) ;
+		CHECK_EQUAL(0,  testVpFilter.testResult_transition);
+		
+
 
     }

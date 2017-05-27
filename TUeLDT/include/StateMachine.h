@@ -27,12 +27,7 @@ private:
 
 
 	static States   sCurrentState;
-	const  Camera mCamera;
-	const  Lane   mLane;
-	const  Car    mCar;
-	
-	unique_ptr<InitState> 		mBootingState;
-	unique_ptr<BufferingState>  mBufferingState;		
+
 
 public:	
 	// STATE MACHINE METHODS
