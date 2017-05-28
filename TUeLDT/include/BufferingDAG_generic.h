@@ -20,7 +20,7 @@ protected:
 	const Camera 				mCAMERA;
 	const LaneMembership	   	mLaneMembership;
 	
-	Likelihoods	    			mLikelihoods;
+	BufferPool	    			mBufferPool;
 	
 	Mat mGRADIENT_TAN_ROOT;
     Mat	mFOCUS_MASK_ROOT;
@@ -54,9 +54,9 @@ protected:
 #endif
 
 private:
+		int 			mCurrentBufferPos;
+		VanishingPt 	mVanishPt;
 		
-
-
 protected:
 	void executeDAG_buffering();
 	void extractTemplates();

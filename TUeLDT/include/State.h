@@ -143,28 +143,19 @@ struct VanishingPt
 
 
 
-struct Likelihoods
+struct BufferPool
 {
-		std::array<Mat, State::sNbBuffer> TOT_ALL;
-		std::array<Mat, State::sNbBuffer> GRADIENT_DIR_ALL;
+		std::array<Mat, State::sNbBuffer> Probability;
+		std::array<Mat, State::sNbBuffer> GradientTangent;
 		
-		Mat  TOT_MAX;		
-		Mat  GRADIENT_DIR_TOT_MAX;
-		Mat  TOT_MAX_FOCUSED;
-		
-		
-		Likelihoods(const int RES_V, const int RES_H)
+		BufferPool(const int RES_V, const int RES_H)
 		{
 			
 				for (int i=0; i< State::sNbBuffer; i++)
 				{
-					TOT_ALL[i]= Mat::zeros(RES_V, RES_H,  CV_8UC1);
-					GRADIENT_DIR_ALL[i]= Mat::zeros(RES_V,RES_H, CV_16SC1);
+					Probability[i]= Mat::zeros(RES_V, RES_H,  CV_8UC1);
+					GradientTangent[i]= Mat::zeros(RES_V,RES_H, CV_16SC1);
 				}
-				
-				TOT_MAX =  Mat::zeros(RES_V,RES_H, CV_32F);
-				GRADIENT_DIR_TOT_MAX = Mat::zeros(RES_V,RES_H, CV_16SC1);
-				TOT_MAX_FOCUSED = Mat::zeros(RES_V,RES_H, CV_8UC1);	
 		}		
 };
 

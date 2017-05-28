@@ -1,7 +1,10 @@
 #include "BufferingDAG_generic.h"
 
 BufferingDAG_generic::BufferingDAG_generic( )
-: mLikelihoods(Likelihoods(mCAMERA.RES_VH(0), mCAMERA.RES_VH(1)))
+
+: mBufferPool(BufferPool(mCAMERA.RES_VH(0), mCAMERA.RES_VH(1))),
+
+  mCurrentBufferPos(0)
 
 #ifdef DIRECTORY_INPUT
 	, mCountFrame(0)
@@ -196,7 +199,6 @@ int BufferingDAG_generic::grabFrame()
 
 #else
 
-			return 0;
 					
 #endif
 

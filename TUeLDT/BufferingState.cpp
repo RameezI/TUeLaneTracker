@@ -93,8 +93,7 @@ BufferingState::BufferingState()
 				this->currentStatus = StateStatus::DONE;
 			
 		#endif
-
-
+		
 		if (0==bufferingGraph->grabFrame())
 			bufferingGraph->executeDAG_buffering();
 		else
