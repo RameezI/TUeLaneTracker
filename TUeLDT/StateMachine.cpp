@@ -99,7 +99,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 								bufferingState->setSource();
 							#endif
 									
-							bufferingState->setTemplates(std::move(templates));																				
+							bufferingState->setTemplates(templates.get());																				
 					}
 					
 					else 

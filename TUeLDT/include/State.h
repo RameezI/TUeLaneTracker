@@ -61,21 +61,28 @@ struct Templates
 {
 	
 	public:
+		const int MARGIN;
+		const int VP_RANGE_V;
+		const int SPAN;
+		
+		
 		Mat GRADIENT_TAN_ROOT;
 		Mat FOCUS_MASK_ROOT;
 		Mat DEPTH_MAP_ROOT;
 
   
   
-	Templates(const int RES_V, const int RES_H, const int VP_RANGE_V)
+	Templates(const int RES_V, const int RES_H, const int VP_RANGE_ROWS)
+	: MARGIN(80), 
+	  VP_RANGE_V(VP_RANGE_ROWS), 
+	  SPAN((RES_V/2)-MARGIN + VP_RANGE_ROWS) 
 	{
 		   
 		/* Create Focus Template */
-			const int Margin  = 80;
-			const int span = (RES_V/2)-Margin + VP_RANGE_V;
+			const int SPAN = (RES_V/2)-MARGIN + VP_RANGE_V;
 			
-			MatrixXi FOCUS_ROOT     = MatrixXi::Zero(span + 2*VP_RANGE_V, RES_H);
-			FOCUS_ROOT.block(2*VP_RANGE_V, 0, span, RES_H) = MatrixXi::Constant(span, RES_H, 1);			
+			MatrixXi FOCUS_ROOT     = MatrixXi::Zero(SPAN + 2*VP_RANGE_V, RES_H);
+			FOCUS_ROOT.block(2*VP_RANGE_V, 0, SPAN, RES_H) = MatrixXi::Constant(SPAN, RES_H, 1);			
 			eigen2cv(FOCUS_ROOT, FOCUS_MASK_ROOT);
 
 			

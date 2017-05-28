@@ -30,7 +30,7 @@ BufferingState::BufferingState()
 
 /* Setting up Root Templates */
   
-	void BufferingState::setTemplates (unique_ptr<Templates> templates)
+	void BufferingState::setTemplates (Templates* templates)
 	{
 			
 		#ifdef PROFILER_ENABLED
@@ -73,8 +73,12 @@ BufferingState::BufferingState()
 		#ifdef DIRECTORY_INPUT
 
 		if (bufferingGraph->mCountFrame < bufferingGraph->mFiles.size())
-			this->StateCounter++;				
-		
+		{	
+			if(this->StateCounter < sNbBuffer)
+				this->StateCounter++;
+			else
+				this->currentStatus = StateStatus::DONE;
+		}
 		else
 		{				
 			this->currentStatus = StateStatus::DONE;	
@@ -82,9 +86,11 @@ BufferingState::BufferingState()
 		} 
 
 		#else 
-			//^TODO: Check for camera errors or signals to finalise this state
-			mStateStatus = StateStatus::DONE;
-			sStateCounter++;
+			//^TODO: Check for camera errors or signals to finalise this state			
+			if(this->StateCounter < sNbBuffer)
+				this->StateCounter++;
+			else
+				this->currentStatus = StateStatus::DONE;
 			
 		#endif
 
@@ -104,15 +110,6 @@ BufferingState::BufferingState()
 								  <<"******************************"<<endl<<endl;	
 								 #endif
 	}
-
-
-	void BufferingState::conclude()
-	{
-		
-		
-		
-	}
-
 
 
 

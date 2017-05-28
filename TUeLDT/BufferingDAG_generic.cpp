@@ -128,28 +128,28 @@ LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
 mProfiler.start("Display");
 #endif
 				
-	#ifndef s32v2xx
+	
 	
 		 //mFrameHS->convertTo(*mFrameHS, CV_32FC1, 360);
 		// mFrameGradMag->convertTo(*mFrameGradMag, CV_8UC1, 255); // Rescaling image to the range [0 255]
 		 imshow( "Display window", mFrameGRAY);
 		 waitKey(1);
 	
-	#else
+/*	s32vxx implementation
 
 		//^TODO: How to display single Channel images 
 		//mFrameGradMag_Gray->convertTo(*mFrameGradMag_Gray, CV_8UC1, 255); // Rescaling image to the range [0 255]
-	/*	io::FrameOutputV234Fb DcuOutput(640, 
+		io::FrameOutputV234Fb DcuOutput(640, 
 										480, 
 										io::IO_DATA_DEPTH_08, 
 										io::IO_DATA_CH3);
 									
 		DcuOutput.PutFrame((char *)mFrameRGB->data, false);
-	*/	
+		
 		std::cout<<"******************************"<<std::endl;
 		std::cout<<"	Frame Count : " <<mCountFrame <<std::endl;
 		std::cout<<"******************************"<<std::endl<<endl<<endl;							
-	#endif
+*/	
 
 									
 #ifdef PROFILER_ENABLED
@@ -196,7 +196,7 @@ int BufferingDAG_generic::grabFrame()
 
 #else
 
-			
+			return 0;
 					
 #endif
 

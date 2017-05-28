@@ -53,6 +53,9 @@ protected:
 	vector<cv::String> mFiles;
 #endif
 
+private:
+		
+
 
 protected:
 	void executeDAG_buffering();

@@ -16,9 +16,8 @@ public:
 		
 	unique_ptr<BufferingDAG_generic> bufferingGraph;
 	
-	void setTemplates(unique_ptr<Templates>);
+	void setTemplates(Templates* templates);
 	void run();
-	void conclude();
 	
 	#ifdef PROFILER_ENABLED
 	void getOpenClInfo();

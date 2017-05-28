@@ -2,7 +2,7 @@
 
 State::State()
 :
-  StateCounter(0),
+  StateCounter(1),
   currentStatus(StateStatus::INACTIVE)
 {
 	
