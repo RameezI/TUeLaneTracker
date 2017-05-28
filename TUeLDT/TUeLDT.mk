@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=rameez
-Date                   :=27/05/17
+Date                   :=28/05/17
 CodeLitePath           :="/home/rameez/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -60,8 +60,8 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/State.cpp$(ObjectSuffix) $(IntermediateDirectory)/VanishingPtFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/InitState.cpp$(ObjectSuffix) $(IntermediateDirectory)/SigInit.cpp$(ObjectSuffix) $(IntermediateDirectory)/BufferingState.cpp$(ObjectSuffix) $(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix) $(IntermediateDirectory)/LDT_logger.cpp$(ObjectSuffix) $(IntermediateDirectory)/LDT_profiler.cpp$(ObjectSuffix) $(IntermediateDirectory)/BufferingDAG.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneFilter.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/TrackingLaneState.cpp$(ObjectSuffix) $(IntermediateDirectory)/BufferingDAG_generic.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/State.cpp$(ObjectSuffix) $(IntermediateDirectory)/VanishingPtFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/InitState.cpp$(ObjectSuffix) $(IntermediateDirectory)/SigInit.cpp$(ObjectSuffix) $(IntermediateDirectory)/BufferingState.cpp$(ObjectSuffix) $(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix) $(IntermediateDirectory)/LDT_logger.cpp$(ObjectSuffix) $(IntermediateDirectory)/LDT_profiler.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/TrackingLaneState.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/BufferingDAG_generic.cpp$(ObjectSuffix) 
 
 
 
@@ -157,14 +157,6 @@ $(IntermediateDirectory)/LDT_profiler.cpp$(DependSuffix): LDT_profiler.cpp
 
 $(IntermediateDirectory)/LDT_profiler.cpp$(PreprocessSuffix): LDT_profiler.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/LDT_profiler.cpp$(PreprocessSuffix) "LDT_profiler.cpp"
-
-$(IntermediateDirectory)/BufferingDAG.cpp$(ObjectSuffix): BufferingDAG.cpp $(IntermediateDirectory)/BufferingDAG.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/BufferingDAG.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/BufferingDAG.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/BufferingDAG.cpp$(DependSuffix): BufferingDAG.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/BufferingDAG.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/BufferingDAG.cpp$(DependSuffix) -MM "BufferingDAG.cpp"
-
-$(IntermediateDirectory)/BufferingDAG.cpp$(PreprocessSuffix): BufferingDAG.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/BufferingDAG.cpp$(PreprocessSuffix) "BufferingDAG.cpp"
 
 $(IntermediateDirectory)/LaneFilter.cpp$(ObjectSuffix): LaneFilter.cpp $(IntermediateDirectory)/LaneFilter.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/LaneFilter.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/LaneFilter.cpp$(ObjectSuffix) $(IncludePath)

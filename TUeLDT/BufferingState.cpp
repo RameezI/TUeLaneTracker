@@ -1,13 +1,7 @@
 #include "BufferingState.h"
 
 BufferingState::BufferingState()
-:   
-  mLikelihoods(Likelihoods(mCAMERA.RES_VH(0), mCAMERA.RES_VH(1)))
-  
-#ifdef DIRECTORY_INPUT
-  , mCountFrame(0)
-#endif
-
+: bufferingGraph(unique_ptr<BufferingDAG_generic>(new BufferingDAG_generic()))
 {
 	#ifdef PROFILER_ENABLED
 	getOpenClInfo();
@@ -16,13 +10,11 @@ BufferingState::BufferingState()
 
 
 
-/* Setting up Input Source
- * 
-*/   
+/* Setting up Input Source*/   
 #ifdef DIRECTORY_INPUT
 	void BufferingState::setSource(const vector<cv::String>& files)
 	{
-		mFiles = files;
+		bufferingGraph->mFiles = files;
 	}
 
 #else
@@ -36,18 +28,25 @@ BufferingState::BufferingState()
 
 
 
-/* Setting up Root Templates
- * 
-*/  
-	void BufferingState::setTemplates (shared_ptr<Templates>	templates)
+/* Setting up Root Templates */
+  
+	void BufferingState::setTemplates (unique_ptr<Templates> templates)
 	{
 			
 		#ifdef PROFILER_ENABLED
 			mProfiler.start("SetRootTemplates");
 		#endif
-
+			
+			//if GRADIENT_TAN_ROOT is defined as UMAT than it should interpoerable
+			// In that case we can assign a opencv::UMat to s32v::UMAT
+			// Only right class has to be instantiated as bufferingGraph
+			
+			bufferingGraph->mGRADIENT_TAN_ROOT = templates->GRADIENT_TAN_ROOT;
+			bufferingGraph->mDEPTH_MAP_ROOT    = templates->DEPTH_MAP_ROOT;
+			bufferingGraph->mFOCUS_MASK_ROOT   = templates->FOCUS_MASK_ROOT;
+			
 			this->currentStatus= StateStatus::ACTIVE;
-						
+					
 		 #ifdef PROFILER_ENABLED
 		 mProfiler.end();
 		 LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
@@ -57,6 +56,8 @@ BufferingState::BufferingState()
 								  <<"******************************"<<endl<<endl;	
 								 #endif				
 	}
+
+
 
 /* Running Directed Acyclic Graph
  * 
@@ -71,14 +72,14 @@ BufferingState::BufferingState()
 
 		#ifdef DIRECTORY_INPUT
 
-			if (mCountFrame < mFiles.size())
-				this->StateCounter++;
-			else
-			{
-				
-				this->currentStatus = StateStatus::DONE;	
-				return;
-			} 
+		if (bufferingGraph->mCountFrame < bufferingGraph->mFiles.size())
+			this->StateCounter++;				
+		
+		else
+		{				
+			this->currentStatus = StateStatus::DONE;	
+			return;
+		} 
 
 		#else 
 			//^TODO: Check for camera errors or signals to finalise this state
@@ -88,8 +89,8 @@ BufferingState::BufferingState()
 		#endif
 
 
-		if (0==grabFrame())
-			executeDAG_buffering();
+		if (0==bufferingGraph->grabFrame())
+			bufferingGraph->executeDAG_buffering();
 		else
 			cerr << "Problem loading image!!!" << endl;
 														
@@ -112,13 +113,12 @@ BufferingState::BufferingState()
 		
 	}
 
+
+
+
 /* ********************************************* /*
-/*  Low level Class PRIVATE FUnctions 
+/*  Low level Class PRIVATE FUnction
  *  getOpenClInfo()
- *  grabFrame()
- *  computeProbabilities()
- *  extractTemplates() 
- *  computeOrientedGradients()
 */
 
 #ifdef PROFILER_ENABLED
@@ -186,96 +186,6 @@ BufferingState::BufferingState()
 	
 #endif
 
-
-
-
-	 /*^TODO: Define Grabing mechanism in case of camera */
-int BufferingState::grabFrame()
-	
-{		
-
-#ifdef DIRECTORY_INPUT
- 
-			#ifdef PROFILER_ENABLED
-			mProfiler.start("ImageRead");
-			#endif 
-
-				mFrameRGB = imread(mFiles[mCountFrame]);	
-			 
-			#ifdef PROFILER_ENABLED
-			 mProfiler.end();
-				const std::string str = mFiles[mCountFrame];	
-				LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
-													  <<"******************************"<<endl
-													  <<  "Reading frame from directory." <<endl <<str<<endl
-													  <<  "Read time: " << mProfiler.getAvgTime("ImageRead")<<endl
-													  <<"******************************"<<endl<<endl;
-													  #endif
-				if(!mFrameRGB.data)
-						return -1;
-						
-				else	mCountFrame ++;
-						return 0;
-
-#else
-
-			
-					
-#endif
-
-
-	}
-
-
-	void BufferingState::computeProbabilities()
-	{
-			//cv::subtract(GRAY_double_ARM, constantT, Processing_ARM);			
-			//cv::exp(Processing_ARM, Processing_ARM );
-			//cv::add(1, Processing_ARM, Processing_ARM);
-			//cv::divide(1, Processing_ARM, Result_ARM);
-	
-	}
-
-
-
-	void BufferingState::extractTemplates()
-	{
-		/*
-		
-		 int rowIndex= (mCAMERA.RES_VH(0)-mVanishingPt.V) - mCAMERA.RES_VH(0)/2;
-		 int colIndex= (mCAMERA.RES_VH(1)-mVanishingPt.H) - mCAMERA.RES_VH(1)/2;
-
-	   Rect ROI;
-
-		ROI = Rect(colIndex, rowIndex, mCAMERA.RES_VH(1), mCAMERA.RES_VH(0) );	
-		mGradDirTemplate = mGRADIENT_DIR_ROOT(ROI);
-
-		ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mCAMERA.RES_VH(0));
-		mDepthTemplate   = mDEPTH_MAP_ROOT(ROI);
-		
-		
-		ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mCAMERA.RES_VH(0));	
-		mFocusTemplate = mFOCUS_MASK_ROOT(ROI);
-		
-		 */
-
-	}
-
-
-	void BufferingState::computeOrientedGradients()
-	{	
-		int scale = 1;
-		int delta = 0;
-		int ddepth = CV_64F;
-		
-		Mat grad_x, grad_y;
-		
-		Sobel( mFrameGRAY, grad_x, ddepth, 1, 0, 3, scale, delta, BORDER_REPLICATE );
-		Sobel( mFrameGRAY, grad_y, ddepth, 0, 1, 3, scale, delta, BORDER_REPLICATE );
-		cv::magnitude(grad_x,grad_y, mFrameGradMag);
-		cv::phase(grad_x, grad_y, mFrameGradAng);
-		
-	}
 
 BufferingState::~BufferingState()
 {

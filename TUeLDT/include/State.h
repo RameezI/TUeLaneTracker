@@ -31,6 +31,7 @@ enum StateStatus {DONE, ACTIVE, INACTIVE, ERROR };
 class State
 {
 
+	
 protected:
 	#ifdef PROFILER_ENABLED
 	ProfilerLDT mProfiler;
@@ -116,7 +117,6 @@ struct Templates
 			FileStorage loadGradientTemplate( templateFile, FileStorage::READ);
 			loadGradientTemplate["ROOT_DIR_TEMPLATE"]>> GRADIENT_TAN_ROOT;
 			GRADIENT_TAN_ROOT.convertTo(GRADIENT_TAN_ROOT,CV_16SC1);
-			cout<<GRADIENT_TAN_ROOT;
 		}		
 	}	
   

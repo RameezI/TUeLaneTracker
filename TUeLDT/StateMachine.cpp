@@ -99,7 +99,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 								bufferingState->setSource();
 							#endif
 									
-						//	bufferingState->setTemplates(std::move(bootingState->templates));																				
+							bufferingState->setTemplates(std::move(templates));																				
 					}
 					
 					else 
@@ -125,7 +125,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 				
 				bufferingState->run();
 			
-				if (sigInit->sStatus!=SigStatus::STOP)
+				if (sigInit->sStatus==SigStatus::STOP)
 				return -1;				
 			}
 			
