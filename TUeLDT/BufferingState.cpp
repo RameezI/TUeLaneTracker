@@ -44,6 +44,9 @@ BufferingState::BufferingState()
 			bufferingGraph->mGRADIENT_TAN_ROOT = templates->GRADIENT_TAN_ROOT;
 			bufferingGraph->mDEPTH_MAP_ROOT    = templates->DEPTH_MAP_ROOT;
 			bufferingGraph->mFOCUS_MASK_ROOT   = templates->FOCUS_MASK_ROOT;
+			bufferingGraph->mVP_Range_V        = templates->VP_RANGE_V;
+			bufferingGraph->mSpan			   = templates->SPAN;
+			bufferingGraph->mMargin			   = templates->MARGIN;
 			
 			this->currentStatus= StateStatus::ACTIVE;
 					
@@ -76,8 +79,8 @@ BufferingState::BufferingState()
 		{	
 			if(this->StateCounter < sNbBuffer)
 				this->StateCounter++;
-			else
-				this->currentStatus = StateStatus::DONE;
+			//else
+				//this->currentStatus = StateStatus::DONE;
 		}
 		else
 		{				

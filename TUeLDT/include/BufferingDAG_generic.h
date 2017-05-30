@@ -17,11 +17,14 @@ friend class BufferingState;
 protected:
 
     ProfilerLDT                 mProfiler;
+	
 	const Camera 				mCAMERA;
 	const LaneMembership	   	mLaneMembership;
 	
-	BufferPool	    			mBufferPool;
-	
+	int mSpan;
+	int mMargin;
+	int mVP_Range_V;
+		
 	Mat mGRADIENT_TAN_ROOT;
     Mat	mFOCUS_MASK_ROOT;
     Mat	mDEPTH_MAP_ROOT;
@@ -30,15 +33,16 @@ protected:
 	Mat mDepthTemplate;
 	Mat mFocusTemplate;
 
-
+	BufferPool	    			mBufferPool;
+	
 	//Image Frames
 	Mat     mFrameRGB;
 	Mat		mFrameGRAY;
-	Mat		mFrameGRAY_float;
+	Mat		mFrameGRAY_ROI;
 
 	//Image Gradients
 	Mat     mFrameGradMag;
-	Mat     mFrameGradAng;
+	Mat     mFrameGradTan;
 
 	// Temporary Probability Maps
 	Mat	mProbMap_Gray;
@@ -47,6 +51,7 @@ protected:
 	
 	Mat mProbabiltyMap_Focussed;
 
+	VanishingPt 	mVanishPt;
 	
 #ifdef DIRECTORY_INPUT
 	uint 			   mCountFrame;
@@ -55,14 +60,13 @@ protected:
 
 private:
 		int 			mCurrentBufferPos;
-		VanishingPt 	mVanishPt;
 		
-protected:
-	void executeDAG_buffering();
-	void extractTemplates();
-	void computeProbabilities();
-	void computeOrientedGradients();
+		
+public:
+
 	int  grabFrame();
+	void executeDAG_buffering();
+	
 	
 
 public:

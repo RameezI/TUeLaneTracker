@@ -24,7 +24,16 @@ mProfiler.start("grabGRAYFrame");
 #endif				
 
 	cvtColor(mFrameRGB, mFrameGRAY, cv::COLOR_BGR2GRAY);
-		
+	
+	//int rowIndex= mVanishPt.V + mVP_Range_V;
+	int rowIndex= mCAMERA.RES_VH(0) - mSpan;
+	
+
+	Rect ROI;
+
+	ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mSpan);	
+	mFrameGRAY_ROI = mFrameGRAY(ROI);
+	
 		 
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -42,7 +51,7 @@ LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
 mProfiler.start("GaussianFiltering");
 #endif 
 	
-	GaussianBlur( mFrameGRAY, mFrameGRAY, Size( 5, 5 ), 1.5, 1.5, BORDER_REPLICATE);
+	GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, Size( 5, 5 ), 1.5, 1.5, BORDER_REPLICATE);
 				
  #ifdef PROFILER_ENABLED
  mProfiler.end();
@@ -59,7 +68,16 @@ mProfiler.start("GaussianFiltering");
 mProfiler.start("GradientsComputation");
 #endif 								
 
-	computeOrientedGradients();
+		int scale = 1;
+		int delta = 0;
+		int ddepth = CV_64F;
+		
+		Mat grad_x, grad_y;
+		
+		Sobel( mFrameGRAY_ROI, grad_x, ddepth, 1, 0, 3, scale, delta, BORDER_REPLICATE );
+		Sobel( mFrameGRAY_ROI, grad_y, ddepth, 0, 1, 3, scale, delta, BORDER_REPLICATE );
+		cv::magnitude(grad_x,grad_y, mFrameGradMag);
+		//cv::phase(grad_x, grad_y, mFrameGradAng);
 				
  #ifdef PROFILER_ENABLED
  mProfiler.end();
@@ -76,7 +94,23 @@ mProfiler.start("GradientsComputation");
 mProfiler.start("ExtractTemplates");
 #endif 				
 
-		extractTemplates();
+		/*
+		int rowIndex= (mCAMERA.RES_VH(0)-mVanishingPt.V) - mCAMERA.RES_VH(0)/2;
+		int colIndex= (mCAMERA.RES_VH(1)-mVanishingPt.H) - mCAMERA.RES_VH(1)/2;
+
+		Rect ROI;
+
+		ROI = Rect(colIndex, rowIndex, mCAMERA.RES_VH(1), mCAMERA.RES_VH(0) );	
+		mGradDirTemplate = mGRADIENT_DIR_ROOT(ROI);
+
+		ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mCAMERA.RES_VH(0));
+		mDepthTemplate   = mDEPTH_MAP_ROOT(ROI);
+		
+		
+		ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mCAMERA.RES_VH(0));	
+		mFocusTemplate = mFOCUS_MASK_ROOT(ROI);
+		
+		*/
 
 
 #ifdef PROFILER_ENABLED
@@ -95,8 +129,10 @@ mProfiler.start("computeProbabilities");
 #endif 				
 		
 		
-		
-	computeProbabilities();
+			//cv::subtract(GRAY_double_ARM, constantT, Processing_ARM);			
+			//cv::exp(Processing_ARM, Processing_ARM );
+			//cv::add(1, Processing_ARM, Processing_ARM);
+			//cv::divide(1, Processing_ARM, Result_ARM);
 		
 		
 #ifdef PROFILER_ENABLED
@@ -130,12 +166,10 @@ LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("Display");
 #endif
-				
-	
 	
 		 //mFrameHS->convertTo(*mFrameHS, CV_32FC1, 360);
 		// mFrameGradMag->convertTo(*mFrameGradMag, CV_8UC1, 255); // Rescaling image to the range [0 255]
-		 imshow( "Display window", mFrameGRAY);
+		 imshow( "Display window", mFrameGRAY_ROI);
 		 waitKey(1);
 	
 /*	s32vxx implementation
@@ -201,59 +235,8 @@ int BufferingDAG_generic::grabFrame()
 
 					
 #endif
-
-
 }
 
-void BufferingDAG_generic::computeProbabilities()
-{
-			//cv::subtract(GRAY_double_ARM, constantT, Processing_ARM);			
-			//cv::exp(Processing_ARM, Processing_ARM );
-			//cv::add(1, Processing_ARM, Processing_ARM);
-			//cv::divide(1, Processing_ARM, Result_ARM);
-	
-}
-
-
-void BufferingDAG_generic::extractTemplates()
-{
-		/*
-		
-		 int rowIndex= (mCAMERA.RES_VH(0)-mVanishingPt.V) - mCAMERA.RES_VH(0)/2;
-		 int colIndex= (mCAMERA.RES_VH(1)-mVanishingPt.H) - mCAMERA.RES_VH(1)/2;
-
-	   Rect ROI;
-
-		ROI = Rect(colIndex, rowIndex, mCAMERA.RES_VH(1), mCAMERA.RES_VH(0) );	
-		mGradDirTemplate = mGRADIENT_DIR_ROOT(ROI);
-
-		ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mCAMERA.RES_VH(0));
-		mDepthTemplate   = mDEPTH_MAP_ROOT(ROI);
-		
-		
-		ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mCAMERA.RES_VH(0));	
-		mFocusTemplate = mFOCUS_MASK_ROOT(ROI);
-		
-		 */
-
-}
-
-	
-	
-void BufferingDAG_generic::computeOrientedGradients()
-{	
-		int scale = 1;
-		int delta = 0;
-		int ddepth = CV_64F;
-		
-		Mat grad_x, grad_y;
-		
-		Sobel( mFrameGRAY, grad_x, ddepth, 1, 0, 3, scale, delta, BORDER_REPLICATE );
-		Sobel( mFrameGRAY, grad_y, ddepth, 0, 1, 3, scale, delta, BORDER_REPLICATE );
-		cv::magnitude(grad_x,grad_y, mFrameGradMag);
-		cv::phase(grad_x, grad_y, mFrameGradAng);
-		
-}
 
 BufferingDAG_generic::~BufferingDAG_generic()
 {
