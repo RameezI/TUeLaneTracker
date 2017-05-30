@@ -1,7 +1,6 @@
 #include "BufferingState.h"
 
 BufferingState::BufferingState()
-: bufferingGraph(unique_ptr<BufferingDAG_generic>(new BufferingDAG_generic()))
 {
 	#ifdef PROFILER_ENABLED
 	getOpenClInfo();
@@ -14,7 +13,7 @@ BufferingState::BufferingState()
 #ifdef DIRECTORY_INPUT
 	void BufferingState::setSource(const vector<cv::String>& files)
 	{
-		bufferingGraph->mFiles = files;
+		bufferingGraph.mFiles = files;
 	}
 
 #else
@@ -41,12 +40,12 @@ BufferingState::BufferingState()
 			// In that case we can assign a opencv::UMat to s32v::UMAT
 			// Only right class has to be instantiated as bufferingGraph
 			
-			bufferingGraph->mGRADIENT_TAN_ROOT = templates->GRADIENT_TAN_ROOT;
-			bufferingGraph->mDEPTH_MAP_ROOT    = templates->DEPTH_MAP_ROOT;
-			bufferingGraph->mFOCUS_MASK_ROOT   = templates->FOCUS_MASK_ROOT;
-			bufferingGraph->mVP_Range_V        = templates->VP_RANGE_V;
-			bufferingGraph->mSpan			   = templates->SPAN;
-			bufferingGraph->mMargin			   = templates->MARGIN;
+			bufferingGraph.mGRADIENT_TAN_ROOT = templates->GRADIENT_TAN_ROOT;
+			bufferingGraph.mDEPTH_MAP_ROOT    = templates->DEPTH_MAP_ROOT;
+			bufferingGraph.mFOCUS_MASK_ROOT   = templates->FOCUS_MASK_ROOT;
+			bufferingGraph.mVP_Range_V        = templates->VP_RANGE_V;
+			bufferingGraph.mSpan			  = templates->SPAN;
+			bufferingGraph.mMargin			  = templates->MARGIN;
 			
 			this->currentStatus= StateStatus::ACTIVE;
 					
@@ -75,7 +74,7 @@ BufferingState::BufferingState()
 
 		#ifdef DIRECTORY_INPUT
 
-		if (bufferingGraph->mCountFrame < bufferingGraph->mFiles.size())
+		if (bufferingGraph.mCountFrame < bufferingGraph.mFiles.size())
 		{	
 			if(this->StateCounter < sNbBuffer)
 				this->StateCounter++;
@@ -97,8 +96,8 @@ BufferingState::BufferingState()
 			
 		#endif
 		
-		if (0==bufferingGraph->grabFrame())
-			bufferingGraph->executeDAG_buffering();
+		if (0==bufferingGraph.grabFrame())
+			bufferingGraph.executeDAG_buffering();
 		else
 			cerr << "Problem loading image!!!" << endl;
 														

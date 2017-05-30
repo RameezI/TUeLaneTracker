@@ -2,7 +2,7 @@
 #define BUFFERINGSTATE_H
 #include "State.h"
 #include "BufferingDAG_generic.h"
-
+#include <thread>
 
 using namespace cv;
 using namespace Eigen;
@@ -11,10 +11,13 @@ using namespace std;
 class BufferingState : public State
 {
 	
+private:
+	std::thread mSideExecutor;
+	
 public:		
 	BufferingState();
 		
-	unique_ptr<BufferingDAG_generic> bufferingGraph;
+	BufferingDAG_generic bufferingGraph;
 	
 	void setTemplates(Templates* templates);
 	void run();

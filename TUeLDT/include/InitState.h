@@ -33,8 +33,6 @@ public	:
 		unique_ptr<LaneFilter> 		  createLaneFilter();
 		unique_ptr<VanishingPtFilter> createVanishingPtFilter();
 		unique_ptr<Templates> 		  createTemplates();
-		
-		void conclude();
 		InitState();
 	   ~InitState();
 
