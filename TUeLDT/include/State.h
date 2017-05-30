@@ -88,11 +88,11 @@ struct Templates
 			
 		/* Create Depth Template */
 
-			MatrixXf DEPTH_ROOT  = MatrixXf::Zero(RES_V,RES_H);			
+			MatrixXf DEPTH_ROOT  = MatrixXf::Zero(2*RES_V +1,RES_H);			
 			const float step 	= 45.0/RES_V;
 			float angle = 90- step;
 			
-			for(int n = 0; n < RES_V ; n++)
+			for(int n = RES_V; n < 2*RES_V +1; n++)
 			{
 			  float x= 1.75 * tan(angle * M_PI/180.0 );
 			   
