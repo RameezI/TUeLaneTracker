@@ -23,8 +23,8 @@ struct LaneMembership
 	{
 		
 		public:
-		const int   TIPPING_POINT_GRAY; 
-		const int   TIPPING_POINT_GRAD_Mag;
+		const uint8_t   TIPPING_POINT_GRAY; 
+		const uint8_t   TIPPING_POINT_GRAD_Mag;
 		
 		private:
 		const float WIDTH_STD;

@@ -11,7 +11,8 @@ using namespace std;
 class BufferingState : public State
 {
 	
-private:
+public:
+
 	std::thread mSideExecutor;
 	
 public:		
@@ -19,7 +20,7 @@ public:
 		
 	BufferingDAG_generic bufferingGraph;
 	
-	void setTemplates(Templates* templates);
+	void setupDAG(const Templates& templates);
 	void run();
 	
 	#ifdef PROFILER_ENABLED

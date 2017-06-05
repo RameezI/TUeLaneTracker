@@ -13,6 +13,7 @@ using namespace std;
 class TEST_LaneFilter:Tests
 {
 public:
+
 	  VectorXd exp_BINS_HISTOGRAM;
 	  
 	  Mat comparisonPrior;

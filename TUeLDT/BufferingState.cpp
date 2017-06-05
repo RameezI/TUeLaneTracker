@@ -9,11 +9,12 @@ BufferingState::BufferingState()
 
 
 
-/* Setting up Input Source*/   
+/* Setup Input Source*/   
 #ifdef DIRECTORY_INPUT
 	void BufferingState::setSource(const vector<cv::String>& files)
 	{
 		bufferingGraph.mFiles = files;
+		bufferingGraph.mCountFrame =0;
 	}
 
 #else
@@ -27,43 +28,47 @@ BufferingState::BufferingState()
 
 
 
-/* Setting up Root Templates */
-  
-	void BufferingState::setTemplates (Templates* templates)
+	/* Setup RootTemplates and BufferPool */  
+	void BufferingState::setupDAG(const Templates& templates)
 	{
-			
+				
 		#ifdef PROFILER_ENABLED
 			mProfiler.start("SetRootTemplates");
 		#endif
 			
-			//if GRADIENT_TAN_ROOT is defined as UMAT than it should interpoerable
-			// In that case we can assign a opencv::UMat to s32v::UMAT
-			// Only right class has to be instantiated as bufferingGraph
-			
-			bufferingGraph.mGRADIENT_TAN_ROOT = templates->GRADIENT_TAN_ROOT;
-			bufferingGraph.mDEPTH_MAP_ROOT    = templates->DEPTH_MAP_ROOT;
-			bufferingGraph.mFOCUS_MASK_ROOT   = templates->FOCUS_MASK_ROOT;
-			bufferingGraph.mVP_Range_V        = templates->VP_RANGE_V;
-			bufferingGraph.mSpan			  = templates->SPAN;
-			bufferingGraph.mMargin			  = templates->MARGIN;
-			
-			this->currentStatus= StateStatus::ACTIVE;
+		//if GRADIENT_TAN_ROOT is defined as UMAT than it should interpoerable
+		// In that case we can assign a opencv::UMat to s32v::UMAT
+		// Only right class has to be instantiated as bufferingGraph
+		
+		
+		bufferingGraph.mVP_Range_V        = templates.VP_RANGE_V;
+		bufferingGraph.mSpan			  = templates.SPAN;
+		bufferingGraph.mMargin			  = templates.MARGIN;
+		
+		bufferingGraph.mGRADIENT_TAN_ROOT = templates.GRADIENT_TAN_ROOT;
+		bufferingGraph.mDEPTH_MAP_ROOT    = templates.DEPTH_MAP_ROOT;
+		bufferingGraph.mFOCUS_MASK_ROOT   = templates.FOCUS_MASK_ROOT;
+		
+		const int RES_V = bufferingGraph.mCAMERA.RES_VH(0);
+		const int RES_H = bufferingGraph.mCAMERA.RES_VH(1);
+		bufferingGraph.mBufferPool.reset(new BufferPool(RES_V, RES_H)); 
+		
+		this->currentStatus= StateStatus::ACTIVE;
 					
 		 #ifdef PROFILER_ENABLED
-		 mProfiler.end();
-		 LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
-								  <<"******************************"<<endl
-								  <<  "Completing Buffering Setup." <<endl
-								  <<  "ROOT Templates copy Time: "  << mProfiler.getAvgTime("SetRootTemplates")<<endl
-								  <<"******************************"<<endl<<endl;	
-								 #endif				
-	}
+			mProfiler.end();
+			LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
+			<<"******************************"<<endl
+			<<  "Completing Buffering Setup." <<endl
+			<<  "ROOT Templates copy Time: "  << mProfiler.getAvgTime("SetRootTemplates")<<endl
+			<<"******************************"<<endl<<endl;	
+		 #endif
+				
+		}
 
 
 
-/* Running Directed Acyclic Graph
- * 
-*/  
+	// Run Directed Acyclic Graph
 	void BufferingState::run()
 	{
 		
@@ -72,44 +77,35 @@ BufferingState::BufferingState()
 		#endif	
 			
 
-		#ifdef DIRECTORY_INPUT
-
-		if (bufferingGraph.mCountFrame < bufferingGraph.mFiles.size())
-		{	
-			if(this->StateCounter < sNbBuffer)
-				this->StateCounter++;
-			//else
-				//this->currentStatus = StateStatus::DONE;
-		}
-		else
-		{				
-			this->currentStatus = StateStatus::DONE;	
-			return;
-		} 
-
-		#else 
-			//^TODO: Check for camera errors or signals to finalise this state			
-			if(this->StateCounter < sNbBuffer)
-				this->StateCounter++;
-			else
-				this->currentStatus = StateStatus::DONE;
-			
-		#endif
+		if(this->StateCounter < sNbBuffer)
+		  this->StateCounter++;
+	   //else
+		//this->currentStatus = StateStatus::DONE;		
+		
+		
+		if (mSideExecutor.joinable())
+			mSideExecutor.join();
+				
+			mSideExecutor =
+			#ifndef s32v2xx
+				std::thread(&BufferingDAG_generic::auxillaryTasks, std::ref(bufferingGraph));
+			#endif
 		
 		if (0==bufferingGraph.grabFrame())
 			bufferingGraph.executeDAG_buffering();
+				
 		else
-			cerr << "Problem loading image!!!" << endl;
+			currentStatus = StateStatus::ERROR;
 														
 
 		 #ifdef PROFILER_ENABLED
-		 mProfiler.end();
-		 LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
-								  <<"******************************"<<endl
-								  <<  "Completing a run loop." <<endl
-								  <<  "Single run-loop time: " << mProfiler.getAvgTime("SingleRun")<<endl
-								  <<"******************************"<<endl<<endl;	
-								 #endif
+			 mProfiler.end();
+			 LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
+			  <<"******************************"<<endl
+			  <<  "Completing a run loop." <<endl
+			  <<  "Single run-loop time: " << mProfiler.getAvgTime("SingleRun")<<endl
+			  <<"******************************"<<endl<<endl;	
+		 #endif
 	}
 
 
@@ -127,10 +123,10 @@ BufferingState::BufferingState()
 		if (!cv::ocl::haveOpenCL())
 		{
 			 LOG_INFO_(LDTLog::BUFFERING_LOG) <<endl
-							  <<"******************************"<<endl
-							  <<  "OpenCL Info:" <<endl
-							  <<  "Sorry, OpenCl is not available. " <<endl
-							  <<"******************************"<<endl<<endl;	
+			  <<"******************************"<<endl
+			  <<  "OpenCL Info:" <<endl
+			  <<  "Sorry, OpenCl is not available. " <<endl
+			  <<"******************************"<<endl<<endl;	
 			//return;
 		}
 
@@ -155,27 +151,27 @@ BufferingState::BufferingState()
 				std::string name= device.name();
 				std::string OpenCL_C_Version= device.OpenCL_C_Version();
 				
-						LOG_INFO_(LDTLog::BUFFERING_LOG) <<endl
-							  <<"******************************"<<endl
-							  <<  "OpenCL Device Detected:" <<endl
-							  <<  "name:  " << name<< endl
-							  <<  "available:  " << device.available()<< endl
-							  <<  "imageSupport:  " << device.imageSupport()<< endl
-							  <<  "globalMemSize:  " << device.globalMemSize()<< endl
-							  <<  "localMemSize:  " << device.localMemSize()<< endl
-							  <<  "maxWorkGroup:  " << device.maxWorkGroupSize()<< endl
-							  <<  "maxWorkItemDim:  " << device.maxWorkItemDims()<< endl
-							  <<  "maxComputeUnits:  " << device.maxComputeUnits()<< endl
-							  <<  "preferredVectorWidthChar:  " << device.preferredVectorWidthChar()<< endl
-							  <<  "preferredVectorWidthDouble:  " << device.preferredVectorWidthDouble()<< endl
-							  <<  "preferredVectorWidthFloat:  " << device.preferredVectorWidthFloat()<< endl
-							  <<  "preferredVectorWidthHalf:  " << device.preferredVectorWidthHalf()<< endl
-							  <<  "preferredVectorWidthLong:  " << device.preferredVectorWidthLong()<< endl
-							  <<  "preferredVectorWidthShort:  " << device.preferredVectorWidthShort()<< endl
-							  <<  "image2DMaxHeight:  " << device.image2DMaxHeight()<< endl
-							  <<  "image2DMaxWidth:  " << device.image2DMaxWidth()<< endl
-							  <<  "OpenCL_C_Version:  " << OpenCL_C_Version<< endl
-							  <<"******************************"<<endl<<endl;
+				LOG_INFO_(LDTLog::BUFFERING_LOG) <<endl
+				  <<"***********************************"<<endl
+				  <<  "OpenCL Device Detected:" <<endl
+				  <<  "name:  							"<< name<< endl
+				  <<  "available:						"<< device.available()<< endl
+				  <<  "imageSupport:					"<< device.imageSupport()<< endl
+				  <<  "globalMemSize:					"<< device.globalMemSize()<< endl
+				  <<  "localMemSize:					"<< device.localMemSize()<< endl
+				  <<  "maxWorkGroup:					"<< device.maxWorkGroupSize()<< endl
+				  <<  "maxWorkItemDim:					"<< device.maxWorkItemDims()<< endl
+				  <<  "maxComputeUnits:					"<< device.maxComputeUnits()<< endl
+				  <<  "preferredVectorWidthChar:		"<< device.preferredVectorWidthChar()<< endl
+				  <<  "preferredVectorWidthDouble:		"<< device.preferredVectorWidthDouble()<< endl
+				  <<  "preferredVectorWidthFloat:		"<< device.preferredVectorWidthFloat()<< endl
+				  <<  "preferredVectorWidthHalf:		"<< device.preferredVectorWidthHalf()<< endl
+				  <<  "preferredVectorWidthLong:		"<< device.preferredVectorWidthLong()<< endl
+				  <<  "preferredVectorWidthShort:		"<< device.preferredVectorWidthShort()<< endl
+				  <<  "image2DMaxHeight:				"<< device.image2DMaxHeight()<< endl
+				  <<  "image2DMaxWidth:					"<< device.image2DMaxWidth()<< endl
+				  <<  "OpenCL_C_Version:				"<< OpenCL_C_Version<< endl
+				  <<"***********************************"<<endl<<endl;
 			}
 		
 		}
@@ -187,7 +183,7 @@ BufferingState::BufferingState()
 
 BufferingState::~BufferingState()
 {
-	
-	
+	if (mSideExecutor.joinable())
+		mSideExecutor.join();	
 }
 

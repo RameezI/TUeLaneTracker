@@ -68,100 +68,89 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	
 	// Life Scope of Buffering Process
 	{
-		unique_ptr<BufferingState>  bufferingState(new BufferingState());
+		BufferingState  bufferingState; 
 			
 	
-			// Life Scope of Booting Process
-			{
+		// Life Scope of Booting Process
+		{
 				
-					unique_ptr<InitState> 		bootingState(new InitState());
+			InitState		bootingState;
 				
-					/*******************************************/
-								// INITIALISING //
+		 /*******************************************/
+					// INITIALISING //
 		
-					laneFilter 			= bootingState->createLaneFilter();
-					vanishingPtFilter	= bootingState->createVanishingPtFilter();
-					templates           = bootingState->createTemplates();
+			laneFilter 			= bootingState.createLaneFilter();
+			vanishingPtFilter	= bootingState.createVanishingPtFilter();
+			templates           = bootingState.createTemplates();
 					
-					/*******************************************/
-								  //TRANSITION//
+		/*******************************************/
+					//TRANSITION//
 			
-					if (bootingState->currentStatus == StateStatus::DONE)
-					{  
-						
-						sCurrentState =	States::BUFFERING;	
-													
-							/*Inject Dependencies for Buffering State */
-								  
-							#ifdef DIRECTORY_INPUT 
-								bufferingState->setSource(mFiles);
-							#else
-								bufferingState->setSource();
-							#endif
-									
-							bufferingState->setTemplates(templates.get());																				
-					}
-					
-					else 
-					{
-						sCurrentState = States::DISPOSING;
-						
-							#ifdef PROFILER_ENABLED
-							LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-										 <<"******************************"<<endl
-										 <<  "Could not Boot Properly, Shutting Down the State-Machine..."   <<endl
-										 <<"******************************"<<endl<<endl;
-							#endif
-					}
+			if (bootingState.currentStatus == StateStatus::DONE)						
+				sCurrentState =	States::BUFFERING;	
+																																				
+			else 
+			{
+				sCurrentState = States::DISPOSING;
+				return -2;				
+				#ifdef PROFILER_ENABLED
+				 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+				 <<"******************************"<<endl
+				 <<  "Could not Boot Properly, Shutting Down the State-Machine..."   <<endl
+				 <<"******************************"<<endl<<endl;
+				#endif
+			}
 					
 
 							
-			} //bootingState is out of scope from here onwards
+		} //bootingState is out of scope from here onwards
+		
 	
+		// The currenState== States::BUFFERING
+		if (bufferingState.currentStatus == StateStatus::INACTIVE)
+		{			
+			/*Inject Dependencies for Buffering State */								  
+				#ifdef DIRECTORY_INPUT 
+					bufferingState.setSource(mFiles);
+				#else
+					bufferingState.setSource();
+				#endif				
+					
+				bufferingState.setupDAG(std::ref(*templates));
+		}
 	
-	
-			while (bufferingState->currentStatus == StateStatus::ACTIVE)
-			{
-				
-				bufferingState->run();
+		while (bufferingState.currentStatus == StateStatus::ACTIVE)
+		{
+			bufferingState.run();
+			if (sigInit->sStatus==SigStatus::STOP)
+				return -1;
+							
+		}
 			
-				if (sigInit->sStatus==SigStatus::STOP)
-				return -1;				
-			}
+		if( bufferingState.currentStatus == StateStatus::DONE)
+		{
+			// ^TODO: Move the complete buffering state as superclass of Lane Tracking State.
+		    // Inherit Buffering State into Lane Tracking State 
+			sCurrentState = States::DETECTING_LANES;				
+		}
 			
-			
-			if( bufferingState->currentStatus == StateStatus::DONE)
-			{
-				// ^TODO: Move the complete buffering state as superclass of Lane Tracking State.
-				// Inherit Buffering State into Lane Tracking State 
-				sCurrentState = States::DETECTING_LANES;				
-			}
-			
-			else
-			{
-				sCurrentState = States::DISPOSING;
-			
-						#ifdef PROFILER_ENABLED
-						LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-							<<"******************************"<<endl
-							<<  "Could not complete Buffering Process, Shutting Down the State-Machine..." <<endl
-							<<"******************************"<<endl<<endl;		
-						#endif
-			}
+		else
+		{
+			sCurrentState = States::DISPOSING;
+		
+			#ifdef PROFILER_ENABLED
+			LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+			<<"******************************"<<endl
+			<<  "Could not complete Buffering Process, Shutting Down the State-Machine..." <<endl
+			<<"******************************"<<endl<<endl;		
+			#endif
+		}
 		   
 
 	} // bufferingState is out of scope from here onwards
 	
-								  
-	
 	return 0;
 }
-
-
-
-
-
-
 
 StateMachine::~StateMachine()
 {

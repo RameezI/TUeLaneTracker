@@ -65,7 +65,6 @@ struct Templates
 		const int VP_RANGE_V;
 		const int SPAN;
 		
-		
 		Mat GRADIENT_TAN_ROOT;
 		Mat FOCUS_MASK_ROOT;
 		Mat DEPTH_MAP_ROOT;
@@ -78,12 +77,11 @@ struct Templates
 	  SPAN((RES_V/2)-MARGIN + VP_RANGE_ROWS) 
 	{
 		   
-		/* Create Focus Template */
-			const int SPAN = (RES_V/2)-MARGIN + VP_RANGE_V;
-			
+		/* Create Focus Template */			
 			MatrixXi FOCUS_ROOT     = MatrixXi::Zero(SPAN + 2*VP_RANGE_V, RES_H);
-			FOCUS_ROOT.block(2*VP_RANGE_V, 0, SPAN, RES_H) = MatrixXi::Constant(SPAN, RES_H, 1);			
+			FOCUS_ROOT.block(2*VP_RANGE_V, 0, SPAN, RES_H) = MatrixXi::Constant(SPAN, RES_H, 255);			
 			eigen2cv(FOCUS_ROOT, FOCUS_MASK_ROOT);
+			FOCUS_MASK_ROOT.convertTo(FOCUS_MASK_ROOT, CV_8U);
 
 			
 		/* Create Depth Template */
@@ -102,7 +100,7 @@ struct Templates
 			}
 			
 			eigen2cv(DEPTH_ROOT, DEPTH_MAP_ROOT);
-			
+			DEPTH_MAP_ROOT.convertTo(DEPTH_MAP_ROOT, CV_8U);
 
 
 
