@@ -29,6 +29,9 @@ public:
 	  int testResult_GradTan3=-1;
 	  int testResult_GradTanFocussed=-1;
 	  
+	  int testResult_BaseBinIdx=-1;
+	  int testResult_PurviewBinIdx=-1;
+	  
 	  
 	 TEST_TrackingState()
 		
@@ -58,6 +61,9 @@ public:
 			
 			Mat exp_GradTan1, exp_GradTan2, exp_GradTan3;
 			Mat GradTan1, 	  GradTan2,     GradTan3;
+			
+			Mat BaseBinIdx,        PurviewBinIdx;
+			Mat exp_BaseBinIdx,    exp_PurviewBinIdx;
 				
 				
 			
@@ -108,6 +114,12 @@ public:
 					MaxProbFocussed = trackingState.mTrackingLanesGraph.mProbMapFocussed;
 					GradTanFocussed = trackingState.mTrackingLanesGraph.mGradTanFocussed;
 					
+					BaseBinIdx = Mat(trackingState.mTrackingLanesGraph.mBaseBinIdx);
+					PurviewBinIdx = Mat(trackingState.mTrackingLanesGraph.mBaseBinIdx);
+					
+
+					
+					
 					
 					exp_Prob1 = loadCSV("Prob_1.csv", CV_8UC1);
 					cv::compare(exp_Prob1, ProbFrame1, comparison, cv::CMP_NE);
@@ -142,6 +154,26 @@ public:
 					exp_GradTanFocussed = loadCSV("GradTan_MAX_PROB.csv", CV_16SC1);
 					cv::compare(exp_GradTanFocussed, GradTanFocussed, comparison, cv::CMP_NE);
 					testResult_GradTanFocussed = cv::countNonZero(comparison);
+					
+					
+					
+					exp_BaseBinIdx = loadCSV("BaseBinIdx.csv", CV_16UC1);
+					cv::compare(exp_BaseBinIdx, BaseBinIdx, comparison, cv::CMP_NE);
+					testResult_BaseBinIdx = cv::countNonZero(comparison);
+					
+					
+					exp_PurviewBinIdx = loadCSV("BaseBinIdx.csv", CV_16UC1);
+					cv::compare(exp_PurviewBinIdx, PurviewBinIdx, comparison, cv::CMP_NE);
+					testResult_PurviewBinIdx = cv::countNonZero(comparison);
+					
+					/*Mat_OCV.open("baseBinsExpected.csv");
+					Mat_OCV<< cv::format(exp_BaseBinIdx, cv::Formatter::FMT_CSV) << std::endl;
+					Mat_OCV.close();
+					
+					Mat_OCV.open("baseBins.csv");
+					Mat_OCV<< cv::format(BaseBinIdx, cv::Formatter::FMT_CSV) << std::endl;
+					Mat_OCV.close();
+					*/
 					
 					
 					//imshow("ActualFrame",     ProbMap_3);

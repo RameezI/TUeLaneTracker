@@ -38,7 +38,7 @@ public:
 						  uint16_t* weightBin
 					  )
 					  
-	//Initialisation List 
+		//Initialisation List 
 		:  mBaseIntrsec(baseIntrsec),
 		   mPurviewIntrsec(purviewIntrsec),
 		   mWeightIntrsec(weightIntrsec),
@@ -52,7 +52,7 @@ public:
 		   mWeightBin(weightBin){}
 
 
-	void operator()( const cv::Range &range ) const 
+	virtual void operator()( const cv::Range &range ) const 
 	{	
 		register int32_t* 	IN_basePTR 	    = mBaseIntrsec.ptr<int32_t>(0)      	+ range.start;
 		register int32_t* 	IN_purviewPTR   = mPurviewIntrsec.ptr<int32_t>(0)   	+ range.start;
@@ -67,10 +67,10 @@ public:
 		
 		for (int i = range.start; i < range.end; i++, IN_basePTR++, IN_purviewPTR++, IN_weightsPTR++, IN_maskPTR++)
 		{
-			if(*IN_maskPTR !=0 )
-			{
-				
-				*OUT_basePTR = 
+		
+			if(!(*IN_maskPTR ==0) )
+			{				
+				*OUT_basePTR=
 				( *IN_basePTR    - mSTART_LANE_HIST + (mSTEP_LANE_HIST/2) ) / mSTEP_LANE_HIST;
 				
 				*OUT_purviewPTR=
@@ -78,10 +78,10 @@ public:
 				
 				*OUT_weights = *IN_weightsPTR;
 				
-				OUT_basePTR ++;
-				OUT_purviewPTR++;
-				OUT_weights++;
-			}
+				//OUT_basePTR++;
+				//OUT_purviewPTR++;
+				//OUT_weights++;
+			}	
 			
 		}
 	}

@@ -15,4 +15,7 @@ TEST(TrackingStateTests)
 	
 	CHECK_EQUAL(0,testTrackingState.testResult_MaxProbFocussed);
 	CHECK_EQUAL(0,testTrackingState.testResult_GradTanFocussed);
+	
+	CHECK_EQUAL(0,testTrackingState.testResult_BaseBinIdx);
+	
 }

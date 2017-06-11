@@ -75,7 +75,7 @@ mProfiler.start("ComputeIntersections");
 	
 	
 	//Build Mask for Valid Intersections
-	bitwise_and(mProbMapFocussed > 0, mGradTanFocussed >0,    mMask);
+	bitwise_and(mProbMapFocussed > 0, mGradTanFocussed !=0,    mMask);
 	bitwise_and(mMask, mIntBase    > LOWER_LIMIT_IntBase,     mMask);
 	bitwise_and(mMask, mIntPurview > LOWER_LIMIT_IntPurview,  mMask);
     bitwise_and(mMask, mIntBase    < UPPER_LIMIT_IntBase,     mMask);
@@ -101,16 +101,14 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 mProfiler.start("ExtractValidBinIds");
 #endif	
 		
-		
-	
-	
 	// Resize vectors to Maximum Limit
 	mBaseBinIdx.resize(mMAX_PIXELS_ROI);
 	mPurviewBinIdx.resize(mMAX_PIXELS_ROI);	
 	mWeightBin.resize(mMAX_PIXELS_ROI);
-	
-	// Fill Vectors With Valid Values using Parallel for Loops
-		
+
+/* Paralle FOR is Disabled
+ * 
+	// Fill Vectors With Valid Values using Parallel for Loops. NOT WORKING
 	{ //^TODO: The Object instantiation can be moved to SetupGraph Routine
 		FillBins_Parallel fillBins(	mIntBase,
 									mIntPurview,
@@ -125,10 +123,39 @@ mProfiler.start("ExtractValidBinIds");
 									mWeightBin.data()
 								  );
 		
-		parallel_for_(cv::Range(0,mMAX_PIXELS_ROI), fillBins);
+		parallel_for_(cv::Range(0, mMAX_PIXELS_ROI), fillBins);
+	} 
+*/
+	
+	register int32_t* 	IN_basePTR 	    	= mIntBase.ptr<int32_t>(0);
+	register int32_t* 	IN_purviewPTR   	= mIntPurview.ptr<int32_t>(0);
+	register uint16_t* 	IN_weightsPTR   	= mIntWeights.ptr<uint16_t>(0);
+	register uint8_t* 	IN_maskPTR   		= mMask.ptr<uint8_t>(0);
+	
+	register uint16_t*   OUT_basePTR		= mBaseBinIdx.data();
+	register uint16_t*   OUT_purviewPTR		= mPurviewBinIdx.data();
+	register uint16_t*   OUT_weights		= mWeightBin.data();
+	
+	
+	for (int i = 0; i < mMAX_PIXELS_ROI; i++, IN_basePTR++, IN_purviewPTR++, IN_weightsPTR++, IN_maskPTR++)
+	{
 		
-	}	
-		
+		if(!(*IN_maskPTR ==0) )
+		{		
+			*OUT_basePTR=
+				(*IN_basePTR    - SCALED_START_LANE_FILTER + (SCALED_STEP_LANE_FILTER/2) ) / SCALED_STEP_LANE_FILTER;
+			
+			*OUT_purviewPTR=
+				(*IN_purviewPTR -  SCALED_START_VP_FILTER   + (SCALED_STEP_VP_FILTER/2)  ) / SCALED_STEP_VP_FILTER ;
+			
+			*OUT_weights = *IN_weightsPTR;
+			
+			OUT_basePTR++;
+			OUT_purviewPTR++;
+			OUT_weights++;
+		}	
+			
+	}
 	
 	mBaseBinIdx.resize(size);
 	mPurviewBinIdx.resize(size);
@@ -150,7 +177,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 mProfiler.start("ComputeHistograms");
 #endif
 
-/*
+
 	 mHistBase 		= Mat::zeros( 1,mLaneFilter->mNb_HISTOGRAM_BINS,CV_32S);
 	 mHistPurview   = Mat::zeros (1,mLaneFilter->mNb_HISTOGRAM_BINS,CV_32S);
 	
@@ -159,11 +186,12 @@ mProfiler.start("ComputeHistograms");
 	
 	for ( int j = 0; j < mBaseBinIdx.size(); ++j)
 	{
-		*(HistBase_pixelPTR 	+ mBaseBinIdx[j] 	-1) += mWeightBin[j];
-		*(HistPurview_pixelPTR  + mPurviewBinIdx[j] -1) += mWeightBin[j]; 						
+		
+		*(HistBase_pixelPTR 	+ mBaseBinIdx[j]) += mWeightBin[j];
+		*(HistPurview_pixelPTR  + mPurviewBinIdx[j]) += mWeightBin[j]; 						
 	}
 	
-*/
+
 
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -214,8 +242,8 @@ mProfiler.start("Display");
 #endif
 	
 	
-		 //imshow( "Display window", mProbMapFocussed);
-		 //waitKey(1);
+		 imshow( "Display window", mProbMapFocussed);
+		 waitKey(1);
 	
 /*	s32vxx implementation
 
