@@ -14,7 +14,7 @@ BufferingState::BufferingState()
 	void BufferingState::setSource(const vector<cv::String>& files)
 	{
 		bufferingGraph.mFiles = files;
-		bufferingGraph.mCountFrame =0;
+		bufferingGraph.mFrameCount =0;
 	}
 
 #else
@@ -49,15 +49,21 @@ BufferingState::BufferingState()
 		bufferingGraph.mDEPTH_MAP_ROOT    = templates.DEPTH_MAP_ROOT;
 		bufferingGraph.mFOCUS_MASK_ROOT   = templates.FOCUS_MASK_ROOT;
 		
+		int ORIGIN_Y_CRS= bufferingGraph.mCAMERA.FRAME_CENTER(0) - templates.SPAN;
+		int ORIGIN_X_CRS = -bufferingGraph.mCAMERA.FRAME_CENTER(1);
+		
+		bufferingGraph.mX_VPRS    =  templates.X_IRS + ORIGIN_X_CRS;
+		bufferingGraph.mY_VPRS	 = -(templates.Y_IRS + ORIGIN_Y_CRS);
+		
 		const int RES_V = bufferingGraph.mCAMERA.RES_VH(0);
 		const int RES_H = bufferingGraph.mCAMERA.RES_VH(1);
-		bufferingGraph.mBufferPool.reset(new BufferPool(RES_V, RES_H)); 
+		bufferingGraph.mBufferPool.reset(new BufferPool(templates.SPAN, RES_H)); 
 		
 		this->currentStatus= StateStatus::ACTIVE;
 					
 		 #ifdef PROFILER_ENABLED
 			mProfiler.end();
-			LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
+			LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 			<<"******************************"<<endl
 			<<  "Completing Buffering Setup." <<endl
 			<<  "ROOT Templates copy Time: "  << mProfiler.getAvgTime("SetRootTemplates")<<endl
@@ -73,45 +79,53 @@ BufferingState::BufferingState()
 	{
 		
 		#ifdef PROFILER_ENABLED
-			mProfiler.start("SingleRun");
+			mProfiler.start("SingleRun_BUFFER");
 		#endif	
 			
 
-		if(this->StateCounter < sNbBuffer)
-		  this->StateCounter++;
-	   //else
-		//this->currentStatus = StateStatus::DONE;		
-		
-		
 		if (mSideExecutor.joinable())
 			mSideExecutor.join();
 				
-			mSideExecutor =
-			#ifndef s32v2xx
-				std::thread(&BufferingDAG_generic::auxillaryTasks, std::ref(bufferingGraph));
-			#endif
+		mSideExecutor =
+		#ifndef s32v2xx
+			std::thread(&BufferingDAG_generic::auxillaryTasks, std::ref(bufferingGraph));
+		#endif
+		
 		
 		if (0==bufferingGraph.grabFrame())
-			bufferingGraph.executeDAG_buffering();
+			bufferingGraph.buffer();
 				
 		else
 			currentStatus = StateStatus::ERROR;
 														
 
+		if(this->StateCounter < sNbBuffer-2)
+			this->StateCounter++;
+		else
+		{
+			this->StateCounter++;
+			this->currentStatus = StateStatus::DONE;
+		}	
+
+
 		 #ifdef PROFILER_ENABLED
 			 mProfiler.end();
-			 LOG_INFO_(LDTLog::BUFFERING_PROFILE) <<endl
+			 LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 			  <<"******************************"<<endl
-			  <<  "Completing a run loop." <<endl
-			  <<  "Single run-loop time: " << mProfiler.getAvgTime("SingleRun")<<endl
+			  <<  "Completing a Buffering run." <<endl
+			  <<  "Single run-loop time: " << mProfiler.getAvgTime("SingleRun_BUFFER")<<endl
 			  <<"******************************"<<endl<<endl;	
 		 #endif
 	}
 
-
+BufferingState::~BufferingState()
+{
+	if (mSideExecutor.joinable())
+		mSideExecutor.join();	
+}
 
 /* ********************************************* /*
-/*  Low level Class PRIVATE FUnction
+/*  Low level Class PRIVATE FUnction for _Profiling/ Logging
  *  getOpenClInfo()
 */
 
@@ -122,7 +136,7 @@ BufferingState::BufferingState()
 		
 		if (!cv::ocl::haveOpenCL())
 		{
-			 LOG_INFO_(LDTLog::BUFFERING_LOG) <<endl
+			 LOG_INFO_(LDTLog::BUFFERING_STATE_LOG) <<endl
 			  <<"******************************"<<endl
 			  <<  "OpenCL Info:" <<endl
 			  <<  "Sorry, OpenCl is not available. " <<endl
@@ -133,7 +147,7 @@ BufferingState::BufferingState()
 		cv::ocl::Context context;
 		if (!context.create(cv::ocl::Device::TYPE_GPU))
 		{
-			LOG_INFO_(LDTLog::BUFFERING_LOG) <<endl
+			LOG_INFO_(LDTLog::BUFFERING_STATE_LOG) <<endl
 							  <<"******************************"<<endl
 							  <<  "OpenCL Info:" <<endl
 							  <<  "Sorry, Failed creating the Context. " <<endl
@@ -151,7 +165,7 @@ BufferingState::BufferingState()
 				std::string name= device.name();
 				std::string OpenCL_C_Version= device.OpenCL_C_Version();
 				
-				LOG_INFO_(LDTLog::BUFFERING_LOG) <<endl
+				LOG_INFO_(LDTLog::BUFFERING_STATE_LOG) <<endl
 				  <<"***********************************"<<endl
 				  <<  "OpenCL Device Detected:" <<endl
 				  <<  "name:  							"<< name<< endl
@@ -181,9 +195,5 @@ BufferingState::BufferingState()
 #endif
 
 
-BufferingState::~BufferingState()
-{
-	if (mSideExecutor.joinable())
-		mSideExecutor.join();	
-}
+
 

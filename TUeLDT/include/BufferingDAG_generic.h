@@ -16,28 +16,21 @@
 
 class BufferingDAG_generic
 {
+	
+friend class BufferingState;
+friend class TEST_BufferingState;
+friend class TEST_TrackingState;
+
+public:
+BufferingDAG_generic ();
+
+
+protected:
 
 using MutexType = std::mutex;
 using WriteLock = std::unique_lock<MutexType>;
 	
-friend class BufferingState;
-friend class TEST_BufferingState;
 
-BufferingDAG_generic ()
-{
-
-}
-
-public:
-//Note: An explicit move constructor of following format might be required
-
-/*  BufferingDAG_generic(BufferingDAG_generic&& graph)
- * : mBufferPool(std::move(graph.mBufferPool))
- * {
- * 
- * 
- * }
- * */
 	
 protected:
 
@@ -46,7 +39,7 @@ protected:
 	bool 				mTemplatesReady= false;
 
 #ifdef PROFILER_ENABLED
-    ProfilerLDT                 mProfiler;
+    ProfilerLDT         mProfiler;
 #endif
 	
 	//Set from outside, before buffering is activated  
@@ -81,6 +74,8 @@ protected:
 	Mat mGradTanTemplate; 
 	Mat mDepthTemplate;
 	Mat mFocusTemplate;
+	Mat mX_VPRS;
+	Mat mY_VPRS;
 
 	// Temporary Probability Maps
 	Mat mTempProbMat;
@@ -88,23 +83,22 @@ protected:
 	Mat	mProbMap_GradMag;
 	Mat mProbMap_GradDir;
 	
+	uint64_t 			mFrameCount;
 	
-#ifdef DIRECTORY_INPUT
-	uint 			   mCountFrame;
-	vector<cv::String> mFiles;
+#ifdef DIRECTORY_INPUT	
+	vector<cv::String>	mFiles;
 #endif
 
-private:
-	void computeGradients();
 	
 public:
 	int  grabFrame(); 		 		// Grab Frame from the Source
 	void auxillaryTasks();  		// Perform tasks from seperate executor
-	void executeDAG_buffering();   //  Perform tasks from main Thread
+	void buffer();   //  Perform tasks from main Thread
 	
 	
 	
-	BufferingDAG_generic (BufferingDAG_generic && bufferingGraph)
+BufferingDAG_generic (BufferingDAG_generic && bufferingGraph)
+
 {
 	
 
@@ -139,6 +133,14 @@ public:
 	mProbMap_Gray		= std::move(bufferingGraph.mProbMap_Gray);
 	mProbMap_GradMag	= std::move(bufferingGraph.mProbMap_GradMag);
 	mProbMap_GradDir	= std::move(bufferingGraph.mProbMap_GradDir);
+	
+	mFrameCount			= std::move(bufferingGraph.mFrameCount);
+	mX_VPRS				= std::move(bufferingGraph.mX_VPRS);
+	mY_VPRS				= std::move(bufferingGraph.mY_VPRS);
+		
+	#ifdef DIRECTORY_INPUT	
+	mFiles				= std::move(bufferingGraph.mFiles);
+	#endif
 	
 	
 	

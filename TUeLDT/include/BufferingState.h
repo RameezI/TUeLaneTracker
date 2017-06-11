@@ -11,15 +11,14 @@ using namespace std;
 class BufferingState : public State
 {
 	
-public:
+friend class TEST_BufferingState;
+	
+private:
 
 	std::thread mSideExecutor;
 	
 public:		
-	BufferingState();
-		
-	BufferingDAG_generic bufferingGraph;
-	
+	BufferingDAG_generic bufferingGraph;	
 	void setupDAG(const Templates& templates);
 	void run();
 	
@@ -32,7 +31,8 @@ public:
 	#else
 	void setSource();
 	#endif
-
+	
+	 BufferingState();
 	~BufferingState();
 
 };

@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=rameez
-Date                   :=05/06/17
+Date                   :=11/06/17
 CodeLitePath           :="/home/rameez/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -61,7 +61,7 @@ AS       := /usr/bin/as
 ##
 CodeLiteDir:=/usr/share/codelite
 Objects0=$(IntermediateDirectory)/State.cpp$(ObjectSuffix) $(IntermediateDirectory)/VanishingPtFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/InitState.cpp$(ObjectSuffix) $(IntermediateDirectory)/SigInit.cpp$(ObjectSuffix) $(IntermediateDirectory)/BufferingState.cpp$(ObjectSuffix) $(IntermediateDirectory)/StateMachine.cpp$(ObjectSuffix) $(IntermediateDirectory)/LDT_logger.cpp$(ObjectSuffix) $(IntermediateDirectory)/LDT_profiler.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneFilter.cpp$(ObjectSuffix) $(IntermediateDirectory)/TrackingLaneState.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/BufferingDAG_generic.cpp$(ObjectSuffix) 
+	$(IntermediateDirectory)/BufferingDAG_generic.cpp$(ObjectSuffix) $(IntermediateDirectory)/TrackingLanesDAG_generic.cpp$(ObjectSuffix) 
 
 
 
@@ -181,6 +181,14 @@ $(IntermediateDirectory)/BufferingDAG_generic.cpp$(DependSuffix): BufferingDAG_g
 
 $(IntermediateDirectory)/BufferingDAG_generic.cpp$(PreprocessSuffix): BufferingDAG_generic.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/BufferingDAG_generic.cpp$(PreprocessSuffix) "BufferingDAG_generic.cpp"
+
+$(IntermediateDirectory)/TrackingLanesDAG_generic.cpp$(ObjectSuffix): TrackingLanesDAG_generic.cpp $(IntermediateDirectory)/TrackingLanesDAG_generic.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/TUeLDT/TrackingLanesDAG_generic.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/TrackingLanesDAG_generic.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/TrackingLanesDAG_generic.cpp$(DependSuffix): TrackingLanesDAG_generic.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/TrackingLanesDAG_generic.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/TrackingLanesDAG_generic.cpp$(DependSuffix) -MM "TrackingLanesDAG_generic.cpp"
+
+$(IntermediateDirectory)/TrackingLanesDAG_generic.cpp$(PreprocessSuffix): TrackingLanesDAG_generic.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/TrackingLanesDAG_generic.cpp$(PreprocessSuffix) "TrackingLanesDAG_generic.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

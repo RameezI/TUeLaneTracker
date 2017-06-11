@@ -10,6 +10,7 @@
 #include "Lane.h"
 #include "InitState.h"
 #include "BufferingState.h"
+#include "TrackingLaneState.h"
 
 
 using namespace std;

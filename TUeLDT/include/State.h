@@ -7,6 +7,7 @@
 #include "opencv2/opencv.hpp"
 #include <opencv2/core/eigen.hpp>
 #include <math.h>
+#include <fstream>
 #include "LDT_profiler.h"
 #include "LDT_logger.h"
 
@@ -40,7 +41,7 @@ protected:
 public:
 
 	static const  int      sNbBuffer =3;
-	int 			       StateCounter;     	
+	int64_t 			   StateCounter;     	
 	StateStatus 	       currentStatus;
 	
 	void printStatus();
@@ -68,6 +69,8 @@ struct Templates
 		Mat GRADIENT_TAN_ROOT;
 		Mat FOCUS_MASK_ROOT;
 		Mat DEPTH_MAP_ROOT;
+		Mat X_IRS;
+		Mat Y_IRS;
 
   
   
@@ -100,29 +103,49 @@ struct Templates
 			}
 			
 			eigen2cv(DEPTH_ROOT, DEPTH_MAP_ROOT);
-			DEPTH_MAP_ROOT.convertTo(DEPTH_MAP_ROOT, CV_8U);
+			DEPTH_MAP_ROOT.convertTo(DEPTH_MAP_ROOT, CV_16U);
 
-
+		/* Create X Template */
+		
+			Mat Row = Mat(1, RES_H, CV_16S);
+			uint16_t* ptr = Row.ptr<uint16_t>(0);
+			for (int i=0; i<RES_H; i++)
+			{
+				ptr[i]= i;			
+			}
+			repeat(Row,SPAN,1 ,X_IRS);
+		
+		
+		/* Create Y Template */
+			Mat Col = Mat(SPAN, 1, CV_16S);
+			
+			ptr = Col.ptr<uint16_t>(0);
+			for (int i=0; i<SPAN; i++)
+			{
+				ptr[i]= i;			
+			}
+			repeat(Col,1, RES_H ,Y_IRS);
+	
 
 	  /* Load Gradient Tangent Template */
-	    std::stringstream formattedString;
-		string templateFile, prefix, format;
-		prefix= "Templates/GradientTangent_";
-		formattedString<<prefix<<std::to_string(RES_H)<<"x"<<std::to_string(RES_V);
-		templateFile = formattedString.str();
-		struct stat buf;
-		int statResult = stat(templateFile.c_str(),&buf);
-		if (statResult || buf.st_ino < 0) 
-		{
-			cout << "File not found: " << templateFile.c_str() << endl;
-			exit(-2);
-		}
-		else
-		{
-			FileStorage loadGradientTemplate( templateFile, FileStorage::READ);
-			loadGradientTemplate["ROOT_DIR_TEMPLATE"]>> GRADIENT_TAN_ROOT;
-			GRADIENT_TAN_ROOT.convertTo(GRADIENT_TAN_ROOT,CV_16SC1);
-		}		
+			std::stringstream formattedString;
+			string templateFile, prefix, format;
+			prefix= "Templates/GradientTangent_";
+			formattedString<<prefix<<std::to_string(RES_H)<<"x"<<std::to_string(RES_V);
+			templateFile = formattedString.str();
+			struct stat buf;
+			int statResult = stat(templateFile.c_str(),&buf);
+			if (statResult || buf.st_ino < 0) 
+			{
+				cout << "File not found: " << templateFile.c_str() << endl;
+				exit(-2);
+			}
+			else
+			{
+				FileStorage loadGradientTemplate( templateFile, FileStorage::READ);
+				loadGradientTemplate["ROOT_DIR_TEMPLATE"]>> GRADIENT_TAN_ROOT;
+				GRADIENT_TAN_ROOT.convertTo(GRADIENT_TAN_ROOT,CV_16SC1);
+			}		
 	}	
   
 }; 

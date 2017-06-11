@@ -11,6 +11,7 @@ TEST(BufferingStateTests)
 	CHECK_EQUAL(0,testBufferingState.testResult_GradY);
 	CHECK_EQUAL(0,testBufferingState.testResult_Mag);
 	CHECK_EQUAL(0,testBufferingState.testResult_GradTan);
+//	CHECK_EQUAL(0,testBufferingState.testResult_ProbFrame);
 	
 	
 /*		

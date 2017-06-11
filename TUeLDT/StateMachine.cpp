@@ -60,11 +60,11 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	Camera	camera;
 	Lane    lane;
 	
-	unique_ptr<LaneFilter>  		laneFilter;
-	unique_ptr<VanishingPtFilter>   vanishingPtFilter;
-	unique_ptr<Templates> 			templates;
+	unique_ptr<LaneFilter>  		pLaneFilter;
+	unique_ptr<VanishingPtFilter>   pVanishingPtFilter;
+	unique_ptr<Templates> 			pTemplates;
 	
-	
+	unique_ptr<TrackingLaneState>  pTrackingState = NULL;
 	
 	// Life Scope of Buffering Process
 	{
@@ -79,9 +79,9 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		 /*******************************************/
 					// INITIALISING //
 		
-			laneFilter 			= bootingState.createLaneFilter();
-			vanishingPtFilter	= bootingState.createVanishingPtFilter();
-			templates           = bootingState.createTemplates();
+			pLaneFilter 			= bootingState.createLaneFilter();
+			pVanishingPtFilter		= bootingState.createVanishingPtFilter();
+			pTemplates           	= bootingState.createTemplates();
 					
 		/*******************************************/
 					//TRANSITION//
@@ -116,7 +116,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 					bufferingState.setSource();
 				#endif				
 					
-				bufferingState.setupDAG(std::ref(*templates));
+				bufferingState.setupDAG(std::ref(*pTemplates));
 		}
 	
 		while (bufferingState.currentStatus == StateStatus::ACTIVE)
@@ -124,14 +124,17 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 			bufferingState.run();
 			if (sigInit->sStatus==SigStatus::STOP)
 				return -1;
-							
 		}
 			
 		if( bufferingState.currentStatus == StateStatus::DONE)
 		{
 			// ^TODO: Move the complete buffering state as superclass of Lane Tracking State.
 		    // Inherit Buffering State into Lane Tracking State 
-			sCurrentState = States::DETECTING_LANES;				
+			sCurrentState = States::DETECTING_LANES;
+			LaneFilter&        laneFilter    		= *pLaneFilter;
+			VanishingPtFilter& vanishingPtFilter	= *pVanishingPtFilter;
+			
+			pTrackingState.reset(new TrackingLaneState( std::move(bufferingState.bufferingGraph) ));				
 		}
 			
 		else
@@ -148,6 +151,25 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		   
 
 	} // bufferingState is out of scope from here onwards
+	
+		TrackingLaneState& trackingState 		= *pTrackingState;
+
+		
+		
+		if (trackingState.currentStatus == StateStatus::INACTIVE)
+		{			
+			/*Inject Dependencies for Lane Tracking Buffering State */
+			trackingState.setupDAG(pLaneFilter.get(), pVanishingPtFilter.get());
+		}
+		
+		while (trackingState.currentStatus == StateStatus::ACTIVE)
+		{
+			trackingState.run();
+			if (sigInit->sStatus==SigStatus::STOP)
+			return -1;
+		}	
+	
+	
 	
 	return 0;
 }

@@ -1,3 +1,6 @@
+#ifndef TESTBUFFERINGSTATE_H
+#define TESTBUFFERINGSTATE_H
+
 #include "UnitTest++/UnitTest++.h"
 #include  "Tests.h"
 #include  "Camera.h"
@@ -29,6 +32,7 @@ public:
 	  int testResult_GradY=-1;
 	  int testResult_Mag=-1;
 	  int testResult_GradTan=-1;
+	  int testResult_ProbFrame=-1;
 
 	 States  mCurrentState;
 	  
@@ -47,92 +51,78 @@ public:
 		unique_ptr<LaneFilter>  		laneFilter;
 		unique_ptr<VanishingPtFilter>   vanishingPtFilter;
 		unique_ptr<Templates> 			templates;
-				
-		BufferingState bufferingState;
+		
+		InitState		bootingState;
+		BufferingState  bufferingState;
 			
+	
+		laneFilter 			= bootingState.createLaneFilter();
+		vanishingPtFilter	= bootingState.createVanishingPtFilter();
+		templates           = bootingState.createTemplates();
+		
+
+		Mat exp_GradientX, exp_GradientY,	exp_MagFrame, exp_GradTan, exp_ProbFrame;
+		
+
+		if (bootingState.currentStatus == StateStatus::DONE)						
 		{
-			InitState		bootingState;
-				
-			/*******************************************/
-						  // INITIALISING //
-
-			laneFilter 			= bootingState.createLaneFilter();
-			vanishingPtFilter	= bootingState.createVanishingPtFilter();
-			templates           = bootingState.createTemplates();
-					
-					
-					
-			/*******************************************/
-							//TRANSITION//
-
-			if (bootingState.currentStatus == StateStatus::DONE)						
-				mCurrentState =	States::BUFFERING;	
-			else 			
-				mCurrentState = States::DISPOSING;
-		}
 			
-			
-				
 			Mat comparison;
 
+			if (bufferingState.currentStatus == StateStatus::INACTIVE)
+			{			
+					bufferingState.setSource(lFiles);				
+					bufferingState.setupDAG(std::ref(*templates));
+			}
 			
-				// The currenState== States::BUFFERING
-		if (bufferingState.currentStatus == StateStatus::INACTIVE)
-		{			
-			/*Inject Dependencies for Buffering State */								  
-				#ifdef DIRECTORY_INPUT 
-					bufferingState.setSource(lFiles);
-				#else
-					bufferingState.setSource();
-				#endif				
+			if (bufferingState.currentStatus == StateStatus::ACTIVE)
+			{
+					bufferingState.run();
+
+					BufferingDAG_generic lBufferingGraph(std::move(bufferingState.bufferingGraph));
+					Span = lBufferingGraph.mSpan;
+							
+							
+										/* Simulated */
+					//-----------------------------------------------------------------------//		
+					exp_GradientX = loadCSV("GradientX.csv", CV_16SC1);
+					cv::compare(exp_GradientX, lBufferingGraph.mGradX, comparison, cv::CMP_NE);
+					testResult_GradX = cv::countNonZero(comparison);
 					
-				bufferingState.setupDAG(std::ref(*templates));
+					exp_GradientY = loadCSV("GradientY.csv", CV_16SC1);
+					cv::compare(exp_GradientY, lBufferingGraph.mGradY, comparison, cv::CMP_NE);
+					testResult_GradY = cv::countNonZero(comparison);
+					
+										/*Actual */
+					//-------------------------------------------------------------------------//		
+					exp_MagFrame = loadCSV("MAG_FRAME.csv", CV_8UC1);
+					cv::compare(exp_MagFrame, lBufferingGraph.mFrameGradMag, comparison, cv::CMP_NE);
+					testResult_Mag = cv::countNonZero(comparison);
+					
+					exp_GradTan = loadCSV("GradTan_FRAME.csv", CV_16SC1);
+					cv::compare(exp_GradTan, lBufferingGraph.mBufferPool->GradientTangent[2], comparison, cv::CMP_NE);
+					testResult_GradTan = cv::countNonZero(comparison);
+					
+					
+					exp_ProbFrame = loadCSV("PROB_FRAME.csv", CV_8UC1);
+					cv::compare(exp_ProbFrame, lBufferingGraph.mBufferPool->Probability[2], comparison, cv::CMP_NE);
+					testResult_ProbFrame = cv::countNonZero(comparison);
+					
+					if (lBufferingGraph.mGradX.type() == CV_16SC1)
+					{
+						testTypes=0;		
+					}
+					
+					
+					// ^TODO ProbFrame is only varified visually
+					//imshow("ExpectedFrame", exp_ProbFrame);
+					//imshow("ActualFrame",   lBufferingGraph.mBufferPool->Probability[2]);
+					//waitKey(0);
+			}
 		}
 	
 
-		bufferingState.run();
-		BufferingDAG_generic lBufferingGraph(std::move(bufferingState.bufferingGraph));
-		Span = lBufferingGraph.mSpan;
-		
-		Mat exp_GradientX = loadCSV("GradientX.csv", CV_16SC1);
-		cv::compare(exp_GradientX, lBufferingGraph.mGradX, comparison, cv::CMP_NE);
-		testResult_GradX = cv::countNonZero(comparison);
-		
-		Mat exp_GradientY = loadCSV("GradientY.csv", CV_16SC1);
-		cv::compare(exp_GradientY, lBufferingGraph.mGradY, comparison, cv::CMP_NE);
-		testResult_GradY = cv::countNonZero(comparison);
-		
-		Mat exp_MagFrame = loadCSV("MAG_FRAME.csv", CV_8UC1);
-		cv::compare(exp_MagFrame, lBufferingGraph.mFrameGradMag, comparison, cv::CMP_NE);
-		testResult_Mag = cv::countNonZero(comparison);
-		
-		Mat exp_GradTan = loadCSV("GradTan_FRAME.csv", CV_16SC1);
-		cv::compare(exp_GradTan, lBufferingGraph.mBufferPool->GradientTangent[2], comparison, cv::CMP_NE);
-		testResult_GradTan = cv::countNonZero(comparison);
-		
-		
-		Mat expFrame = loadCSV("PROB_FRAME.csv", CV_8UC1);
-		imshow("ExpectedFrame", expFrame);
-		imshow("ActualFrame",  lBufferingGraph.mBufferPool->Probability[2]);
-		
-	//	Mat expFrame = loadCSV("MAG_FRAME.csv", CV_8UC1);
-	//	imshow("ExpectedFrame", expFrame);
-	//	imshow("ActualFrame",  lBufferingGraph.mBufferPool->Probability[2]);
-		waitKey(0);
-		
-		if (lBufferingGraph.mGradX.type() == CV_16SC1)
-		{
-			testTypes=0;		
-		}
-		
-		ofstream ProbabilityGray;
-		ProbabilityGray.open("ProbabilityGray.csv");
-        ProbabilityGray<< cv::format(lBufferingGraph.mProbMap_Gray, cv::Formatter::FMT_CSV) << std::endl;
-        ProbabilityGray.close();
-	
-	
-	//lBufferingGraph.mBufferPool->Probability[2]
-		
+
 	  /* ofstream  GrayFrame, GradientX, GradientY;
        GradientX.open("GradientX.csv");
        GradientX<< cv::format(lBufferingGraph.mGradX, cv::Formatter::FMT_CSV) << std::endl;
@@ -152,3 +142,4 @@ public:
 
 
 
+#endif

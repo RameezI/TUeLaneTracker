@@ -38,7 +38,7 @@ struct BaseHistogramModel
 	
 };
 
-	class LaneFilter
+class LaneFilter
 {
 	
 private:	
@@ -47,12 +47,10 @@ private:
 		const int 	 mSTEP_CM; 				// BaseHistogram Step in cm
 
 public:	 //Public Interface 
-		const int 	 STEP;   				// BaseHistogram Step in Pixels
-
-private: 
-		 const int 	 mBIN_MAX; 				// BaseHistogram Max Bin Value
-		 const int   mNb_HISTOGRAM_BINS;    // number of bins in the Base Histogram.
-		 const int   mNb_OFFSET_BINS;       // number of offset bins on one side.
+		const int 	STEP;   				// BaseHistogram Step in Pixels 
+		const int 	mBIN_MAX; 				// BaseHistogram Max Bin Value
+		const int   mNb_HISTOGRAM_BINS;    // number of bins in the Base Histogram.
+		const int   mNb_OFFSET_BINS;       // number of offset bins on one side.
 		
 public:	 //Public Interface of the class	
 
