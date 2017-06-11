@@ -281,7 +281,6 @@ void BufferingDAG_generic::auxillaryTasks()
 			
 		ROI = Rect(0,rowIndex,mCAMERA.RES_VH(1), mSpan);
 		mDEPTH_MAP_ROOT(ROI).copyTo(mDepthTemplate);
-		multiply(mDepthTemplate, mDepthTemplate, mDepthTemplate);
 		
 		rowIndex = mVP_Range_V-mVanishPt.V;
 		ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mSpan);

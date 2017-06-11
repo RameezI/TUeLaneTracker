@@ -31,6 +31,10 @@ public:
 	  
 	  int testResult_BaseBinIdx=-1;
 	  int testResult_PurviewBinIdx=-1;
+	  int testResult_WeightsBin=-1;
+	  
+	  int testResult_HistBase=-1;
+	  int testResult_HistPurview=-1;
 	  
 	  
 	 TEST_TrackingState()
@@ -62,8 +66,8 @@ public:
 			Mat exp_GradTan1, exp_GradTan2, exp_GradTan3;
 			Mat GradTan1, 	  GradTan2,     GradTan3;
 			
-			Mat BaseBinIdx,        PurviewBinIdx;
-			Mat exp_BaseBinIdx,    exp_PurviewBinIdx;
+			Mat BaseBinIdx,     PurviewBinIdx,     WeightsBin,    	HistBase,      HistPurview;
+			Mat exp_BaseBinIdx, exp_PurviewBinIdx, exp_WeightsBin,  exp_HistBase,  exp_HistPurview;
 				
 				
 			
@@ -115,11 +119,14 @@ public:
 					GradTanFocussed = trackingState.mTrackingLanesGraph.mGradTanFocussed;
 					
 					BaseBinIdx = Mat(trackingState.mTrackingLanesGraph.mBaseBinIdx);
-					PurviewBinIdx = Mat(trackingState.mTrackingLanesGraph.mBaseBinIdx);
+					PurviewBinIdx = Mat(trackingState.mTrackingLanesGraph.mPurviewBinIdx);
 					
-
+					WeightsBin = Mat(trackingState.mTrackingLanesGraph.mWeightBin);
 					
+					HistBase 	= trackingState.mTrackingLanesGraph.mHistBase;
+					HistPurview = trackingState.mTrackingLanesGraph.mHistPurview;
 					
+		
 					
 					exp_Prob1 = loadCSV("Prob_1.csv", CV_8UC1);
 					cv::compare(exp_Prob1, ProbFrame1, comparison, cv::CMP_NE);
@@ -162,18 +169,35 @@ public:
 					testResult_BaseBinIdx = cv::countNonZero(comparison);
 					
 					
-					exp_PurviewBinIdx = loadCSV("BaseBinIdx.csv", CV_16UC1);
+					exp_PurviewBinIdx = loadCSV("PurviewBinIdx.csv", CV_16UC1);
 					cv::compare(exp_PurviewBinIdx, PurviewBinIdx, comparison, cv::CMP_NE);
 					testResult_PurviewBinIdx = cv::countNonZero(comparison);
 					
-					/*Mat_OCV.open("baseBinsExpected.csv");
-					Mat_OCV<< cv::format(exp_BaseBinIdx, cv::Formatter::FMT_CSV) << std::endl;
+					exp_WeightsBin = loadCSV("WeightsHistogram.csv", CV_32SC1);
+					cv::compare(exp_WeightsBin, WeightsBin, comparison, cv::CMP_NE);
+					testResult_WeightsBin = cv::countNonZero(comparison);
+					
+					
+					exp_HistBase = loadCSV("HistogramBase.csv", CV_32SC1);
+					cv::compare(exp_HistBase, HistBase, comparison, cv::CMP_NE);
+					testResult_HistBase= cv::countNonZero(comparison);
+					
+					
+					exp_HistPurview= loadCSV("HistogramPurview.csv", CV_32SC1);
+					cv::compare(exp_HistPurview, HistPurview, comparison, cv::CMP_NE);
+					testResult_HistPurview = cv::countNonZero(comparison);
+					
+				
+					
+					Mat_OCV.open("HistogramExpected.csv");
+					Mat_OCV<< cv::format(exp_HistBase, cv::Formatter::FMT_CSV) << std::endl;
 					Mat_OCV.close();
 					
-					Mat_OCV.open("baseBins.csv");
-					Mat_OCV<< cv::format(BaseBinIdx, cv::Formatter::FMT_CSV) << std::endl;
+					Mat_OCV.open("Histogram.csv");
+					Mat_OCV<< cv::format(HistBase, cv::Formatter::FMT_CSV) << std::endl;
 					Mat_OCV.close();
-					*/
+					
+					
 					
 					
 					//imshow("ActualFrame",     ProbMap_3);

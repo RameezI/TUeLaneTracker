@@ -9,7 +9,6 @@ TEST_InitState testBooting;
 		 
 			CHECK_EQUAL(0,testBooting.testResult_transition);
 			
-			
 			CHECK_EQUAL(0,testBooting.testResult_GradTangentRoot);
 		 
 			CHECK_EQUAL(0,testBooting.testResult_DepthRoot);

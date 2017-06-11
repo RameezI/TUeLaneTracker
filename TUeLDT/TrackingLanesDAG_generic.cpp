@@ -70,9 +70,7 @@ mProfiler.start("ComputeIntersections");
 	add(mIntPurview, mX_VPRS_SCALED, mIntPurview);
 	
 	//Weights of Intersections
-	multiply(mDepthTemplate, mProbMapFocussed, mIntWeights, 1, CV_32S);
-	mIntWeights.convertTo(mIntWeights, CV_16U, 1/128.0);
-	
+	multiply(mDepthTemplate, mProbMapFocussed, mIntWeights, 1, CV_32S);	
 	
 	//Build Mask for Valid Intersections
 	bitwise_and(mProbMapFocussed > 0, mGradTanFocussed !=0,    mMask);
@@ -129,12 +127,12 @@ mProfiler.start("ExtractValidBinIds");
 	
 	register int32_t* 	IN_basePTR 	    	= mIntBase.ptr<int32_t>(0);
 	register int32_t* 	IN_purviewPTR   	= mIntPurview.ptr<int32_t>(0);
-	register uint16_t* 	IN_weightsPTR   	= mIntWeights.ptr<uint16_t>(0);
+	register int32_t* 	IN_weightsPTR   	= mIntWeights.ptr<int32_t>(0);
 	register uint8_t* 	IN_maskPTR   		= mMask.ptr<uint8_t>(0);
 	
 	register uint16_t*   OUT_basePTR		= mBaseBinIdx.data();
 	register uint16_t*   OUT_purviewPTR		= mPurviewBinIdx.data();
-	register uint16_t*   OUT_weights		= mWeightBin.data();
+	register int32_t*    OUT_weights		= mWeightBin.data();
 	
 	
 	for (int i = 0; i < mMAX_PIXELS_ROI; i++, IN_basePTR++, IN_purviewPTR++, IN_weightsPTR++, IN_maskPTR++)
@@ -178,17 +176,17 @@ mProfiler.start("ComputeHistograms");
 #endif
 
 
-	 mHistBase 		= Mat::zeros( 1,mLaneFilter->mNb_HISTOGRAM_BINS,CV_32S);
-	 mHistPurview   = Mat::zeros (1,mLaneFilter->mNb_HISTOGRAM_BINS,CV_32S);
+	 mHistBase 		= Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 , CV_32S);
+	 mHistPurview   = Mat::zeros (mLaneFilter->mNb_HISTOGRAM_BINS, 1 , CV_32S);
 	
-	int32_t* HistBase_pixelPTR    =  mHistBase.ptr<int32_t>(0);
-	int32_t* HistPurview_pixelPTR =  mHistPurview.ptr<int32_t>(0);
+	register int32_t* HistBase_pixelPTR    =  mHistBase.ptr<int32_t>(0);
+	register int32_t* HistPurview_pixelPTR =  mHistPurview.ptr<int32_t>(0);
 	
 	for ( int j = 0; j < mBaseBinIdx.size(); ++j)
 	{
 		
-		*(HistBase_pixelPTR 	+ mBaseBinIdx[j]) += mWeightBin[j];
-		*(HistPurview_pixelPTR  + mPurviewBinIdx[j]) += mWeightBin[j]; 						
+		*(HistBase_pixelPTR 	+ mBaseBinIdx[j])  += mWeightBin[j];
+		*(HistPurview_pixelPTR  + mPurviewBinIdx[j]) += mWeightBin[j];
 	}
 	
 
@@ -211,6 +209,11 @@ mProfiler.start("HistogramMatching");
 #endif	
 
 
+
+
+
+
+
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 
@@ -224,19 +227,6 @@ mProfiler.end();
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 #ifdef PROFILER_ENABLED
 mProfiler.start("Display");
 #endif
@@ -245,23 +235,6 @@ mProfiler.start("Display");
 		 imshow( "Display window", mProbMapFocussed);
 		 waitKey(1);
 	
-/*	s32vxx implementation
-
-		//^TODO: How to display single Channel images 
-		//mFrameGradMag_Gray->convertTo(*mFrameGradMag_Gray, CV_8UC1, 255); // Rescaling image to the range [0 255]
-		io::FrameOutputV234Fb DcuOutput(640, 
-										480, 
-										io::IO_DATA_DEPTH_08, 
-										io::IO_DATA_CH3);
-									
-		DcuOutput.PutFrame((char *)mFrameRGB->data, false);
-		
-		std::cout<<"******************************"<<std::endl;
-		std::cout<<"	Frame Count : " <<mCountFrame <<std::endl;
-		std::cout<<"******************************"<<std::endl<<endl<<endl;							
-
-
-*/
 
 									
 #ifdef PROFILER_ENABLED

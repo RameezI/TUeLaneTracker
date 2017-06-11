@@ -41,7 +41,7 @@ private:
 	
 	vector<uint16_t>		mBaseBinIdx; 	  //Only valid list of Intersections IDs
 	vector<uint16_t>		mPurviewBinIdx;  //Only valid list of Intersections IDs
-	vector<uint16_t>	    mWeightBin;     //Only valid list of Weights IDs
+	vector<int32_t>	        mWeightBin;     //Only valid list of Weights IDs
 	
 	Mat						mHistBase;
 	Mat						mHistPurview;

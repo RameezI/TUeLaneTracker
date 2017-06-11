@@ -79,8 +79,8 @@ public:
 			testResult_GradTangentRoot = cv::countNonZero(comparisonGradientTanRoot);
 			
 			
-			Mat exp_DepthRoot = loadCSV("DEPTH_ROOT.csv", CV_8UC1);
-			cv::compare(exp_LaneFilter, laneFilter->filter, comparisonDepthRoot, cv::CMP_NE);
+			Mat exp_DepthRoot = loadCSV("DEPTH_ROOT.csv", CV_16UC1);
+			cv::compare(exp_DepthRoot, templates->DEPTH_MAP_ROOT , comparisonDepthRoot, cv::CMP_NE);
 			testResult_DepthRoot = cv::countNonZero(comparisonDepthRoot);
 			
 			Mat exp_FocusRoot = loadCSV("FOCUS_ROOT.csv", CV_8UC1);
