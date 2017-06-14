@@ -16,24 +16,28 @@ void TrackingLaneState::setupDAG(LaneFilter* laneFilter, VanishingPtFilter* vpFi
  mTrackingLanesGraph.mVpFilter   = vpFilter;
  
  
- mTrackingLanesGraph.LOWER_LIMIT_IntBase 
+ mTrackingLanesGraph.mLOWER_LIMIT_IntBase 
  = SCALE_INTSEC*laneFilter->HISTOGRAM_BINS(0) - (SCALE_INTSEC*laneFilter->STEP)/2;
  
- mTrackingLanesGraph.UPPER_LIMIT_IntBase 
+ mTrackingLanesGraph.mUPPER_LIMIT_IntBase 
  = SCALE_INTSEC*laneFilter->HISTOGRAM_BINS(laneFilter->mNb_HISTOGRAM_BINS-1) +  (SCALE_INTSEC*laneFilter->STEP)/2;
  
-  mTrackingLanesGraph.LOWER_LIMIT_IntPurview 
+  mTrackingLanesGraph.mLOWER_LIMIT_IntPurview 
  = -SCALE_INTSEC*vpFilter->VP_RANGE_H - (SCALE_INTSEC*vpFilter->STEP)/2;
  
- mTrackingLanesGraph.UPPER_LIMIT_IntPurview 
+ mTrackingLanesGraph.mUPPER_LIMIT_IntPurview 
  = SCALE_INTSEC*vpFilter->VP_RANGE_H +  (SCALE_INTSEC*vpFilter->STEP)/2;
 
- mTrackingLanesGraph.SCALED_STEP_LANE_FILTER	 = laneFilter->STEP*SCALE_INTSEC;
- mTrackingLanesGraph.SCALED_STEP_VP_FILTER       = vpFilter->STEP*SCALE_INTSEC;
- mTrackingLanesGraph.SCALED_START_LANE_FILTER    = laneFilter->HISTOGRAM_BINS(0)*SCALE_INTSEC;
- mTrackingLanesGraph.SCALED_START_VP_FILTER	     = vpFilter->HISTOGRAM_BINS(0)*SCALE_INTSEC;
 
+ mTrackingLanesGraph.mSCALED_STEP_LANE_FILTER	 = laneFilter->STEP*SCALE_INTSEC;
+ mTrackingLanesGraph.mSCALED_STEP_VP_FILTER       = vpFilter->STEP*SCALE_INTSEC;
+ mTrackingLanesGraph.mSCALED_START_LANE_FILTER    = laneFilter->HISTOGRAM_BINS(0)*SCALE_INTSEC;
+ mTrackingLanesGraph.mSCALED_START_VP_FILTER	     = vpFilter->HISTOGRAM_BINS(0)*SCALE_INTSEC;
 
+	
+  mTrackingLanesGraph.mHistBase 	 = Mat::zeros(laneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
+  mTrackingLanesGraph.mHistPurview   = Mat::zeros(laneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
+	
  this->currentStatus= StateStatus::ACTIVE;	
 	
 }

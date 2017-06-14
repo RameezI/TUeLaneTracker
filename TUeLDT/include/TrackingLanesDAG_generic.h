@@ -6,9 +6,7 @@
 #include "BufferingDAG_generic.h"
 #include <thread>
 
-const int SCALE_INTSEC= 1024;
-const int SCALE_GRAD_TAN = 128;
-const int SCALE_INTSEC_TAN = 128*1024;
+using namespace Eigen;
 
 class TrackingLanesDAG_generic: public BufferingDAG_generic
 {
@@ -18,18 +16,23 @@ friend class TEST_TrackingState;
 	
 private:
 
+	bool 				    mFiltersReady;
+    bool                    mStartFiltering;
+	
 	const int				mMAX_PIXELS_ROI;
 
-	int  					LOWER_LIMIT_IntBase;
-	int 					UPPER_LIMIT_IntBase;
+	int  					mLOWER_LIMIT_IntBase;
+	int 					mUPPER_LIMIT_IntBase;
 	
-	int  					LOWER_LIMIT_IntPurview;
-	int 					UPPER_LIMIT_IntPurview;
+	int  					mLOWER_LIMIT_IntPurview;
+	int 					mUPPER_LIMIT_IntPurview;
 	
-	int						SCALED_STEP_LANE_FILTER;
-	int 					SCALED_STEP_VP_FILTER;
-	int 					SCALED_START_LANE_FILTER;
-	int 					SCALED_START_VP_FILTER;
+	int						mSCALED_STEP_LANE_FILTER;
+	int 					mSCALED_STEP_VP_FILTER;
+	int 					mSCALED_START_LANE_FILTER;
+	int 					mSCALED_START_VP_FILTER;
+	
+	int                     mPosteriorProb;
 	
 	LaneFilter* 			mLaneFilter;
 	VanishingPtFilter*		mVpFilter;
@@ -49,6 +52,9 @@ private:
 	Mat 					mMask;
 	Mat						mProbMapFocussed;
 	Mat 					mGradTanFocussed;
+	
+	Mat 					mTransitLaneFilter;
+	Mat 					mTransitVpFilter;
 
 	
 	

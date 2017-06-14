@@ -135,15 +135,25 @@ mProfiler.start("GradientsComputation");
 
 
 							
+
 #ifdef PROFILER_ENABLED
-mProfiler.start("computeProbabilities");
+mProfiler.start("TemplatesWait");
 #endif 				
-		
 		
 		//Synchronise Condition Variable
 		WriteLock  wrtLock(_mutex);
 		_sateChange.wait(wrtLock,[this]{return mTemplatesReady;} );		
 		
+				
+ #ifdef PROFILER_ENABLED
+ mProfiler.end();
+ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
+										  <<"******************************"<<endl
+										  <<  "Waiting For Worker thread to finish Templates." <<endl
+										  <<  "Waiting Time: " << mProfiler.getAvgTime("TemplatesWait")<<endl
+										  <<"******************************"<<endl<<endl;	
+										 #endif	
+				
 /*			
 			uint8_t* Gray_pixel;
 			uint8_t* GradMag_pixel;
@@ -212,7 +222,9 @@ mProfiler.start("computeProbabilities");
 				}
 			}			
 */
-	
+#ifdef PROFILER_ENABLED
+mProfiler.start("computeProbabilities");
+#endif 		
 
 			//GrayChannel Probabilities
 			subtract(mFrameGRAY_ROI, mLaneMembership.TIPPING_POINT_GRAY, mTempProbMat, noArray(), CV_32F);

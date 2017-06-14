@@ -4,7 +4,9 @@
 
 TrackingLanesDAG_generic::TrackingLanesDAG_generic(BufferingDAG_generic&& bufferingGraph)
 
-: BufferingDAG_generic(std::move(bufferingGraph)),
+: mStartFiltering(false),
+  mFiltersReady(false),
+  BufferingDAG_generic(std::move(bufferingGraph)),
   mMAX_PIXELS_ROI(mFrameGRAY_ROI.size().height * mFrameGRAY_ROI.size().width),
   mProbMapFocussed(mFrameGRAY_ROI.size(),CV_8U),
   mGradTanFocussed(mFrameGRAY_ROI.size(),CV_16S)
@@ -14,7 +16,6 @@ TrackingLanesDAG_generic::TrackingLanesDAG_generic(BufferingDAG_generic&& buffer
 	mBaseBinIdx.reserve(mMAX_PIXELS_ROI);
 	mPurviewBinIdx.reserve(mMAX_PIXELS_ROI);
 	mWeightBin.reserve(mMAX_PIXELS_ROI);
-	
 }
 
 
@@ -22,8 +23,15 @@ void TrackingLanesDAG_generic::extractLanes()
 {
 
 	
+//Signal mSideExecutor to start Filtering
+WriteLock  wrtLock_StartFilter(_mutex);
+this->mStartFiltering = true;
+wrtLock_StartFilter.unlock();
+_sateChange.notify_one();
+	
+	
 #ifdef PROFILER_ENABLED
-mProfiler.start("FilterFocus");
+mProfiler.start("TemporalFiltering");
 #endif	
 	
 	mBufferPool->Probability[0].copyTo(mProbMapFocussed);
@@ -45,7 +53,7 @@ mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
   <<"******************************"<<endl
   <<  "Filter and Focus Based on Focus Mask." <<endl
-  <<  "Focussing Time: " << mProfiler.getAvgTime("FilterFocus")<<endl
+  <<  "Focussing Time: " << mProfiler.getAvgTime("TemporalFiltering")<<endl
   <<"******************************"<<endl<<endl;	
 #endif
 
@@ -74,10 +82,10 @@ mProfiler.start("ComputeIntersections");
 	
 	//Build Mask for Valid Intersections
 	bitwise_and(mProbMapFocussed > 0, mGradTanFocussed !=0,    mMask);
-	bitwise_and(mMask, mIntBase    > LOWER_LIMIT_IntBase,     mMask);
-	bitwise_and(mMask, mIntPurview > LOWER_LIMIT_IntPurview,  mMask);
-    bitwise_and(mMask, mIntBase    < UPPER_LIMIT_IntBase,     mMask);
-    bitwise_and(mMask, mIntPurview < UPPER_LIMIT_IntPurview,  mMask);
+	bitwise_and(mMask, mIntBase    > mLOWER_LIMIT_IntBase,     mMask);
+	bitwise_and(mMask, mIntPurview > mLOWER_LIMIT_IntPurview,  mMask);
+    bitwise_and(mMask, mIntBase    < mUPPER_LIMIT_IntBase,     mMask);
+    bitwise_and(mMask, mIntPurview < mUPPER_LIMIT_IntPurview,  mMask);
 
 	int size= countNonZero(mMask);
 	
@@ -141,10 +149,10 @@ mProfiler.start("ExtractValidBinIds");
 		if(!(*IN_maskPTR ==0) )
 		{		
 			*OUT_basePTR=
-				(*IN_basePTR    - SCALED_START_LANE_FILTER + (SCALED_STEP_LANE_FILTER/2) ) / SCALED_STEP_LANE_FILTER;
+				(*IN_basePTR    - mSCALED_START_LANE_FILTER + (mSCALED_STEP_LANE_FILTER/2) ) / mSCALED_STEP_LANE_FILTER;
 			
 			*OUT_purviewPTR=
-				(*IN_purviewPTR -  SCALED_START_VP_FILTER   + (SCALED_STEP_VP_FILTER/2)  ) / SCALED_STEP_VP_FILTER ;
+				(*IN_purviewPTR -  mSCALED_START_VP_FILTER   + (mSCALED_STEP_VP_FILTER/2)  ) / mSCALED_STEP_VP_FILTER ;
 			
 			*OUT_weights = *IN_weightsPTR;
 			
@@ -165,7 +173,7 @@ mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
   <<"******************************"<<endl
   <<  "Extract Valid Intersection Bin IDs." <<endl
-  <<  "Paralle-For Compute Time: " << mProfiler.getAvgTime("ExtractValidBinIds")<<endl
+  <<  "Vector Filling Time: " << mProfiler.getAvgTime("ExtractValidBinIds")<<endl
   <<"******************************"<<endl<<endl;	
 #endif
 
@@ -174,22 +182,26 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("ComputeHistograms");
 #endif
-
-
-	 mHistBase 		= Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 , CV_32S);
-	 mHistPurview   = Mat::zeros (mLaneFilter->mNb_HISTOGRAM_BINS, 1 , CV_32S);
 	
+	int64_t SUM;
 	register int32_t* HistBase_pixelPTR    =  mHistBase.ptr<int32_t>(0);
 	register int32_t* HistPurview_pixelPTR =  mHistPurview.ptr<int32_t>(0);
 	
 	for ( int j = 0; j < mBaseBinIdx.size(); ++j)
 	{
-		
 		*(HistBase_pixelPTR 	+ mBaseBinIdx[j])  += mWeightBin[j];
 		*(HistPurview_pixelPTR  + mPurviewBinIdx[j]) += mWeightBin[j];
 	}
 	
-
+	// Normalising Base Histogram
+	 SUM = sum(mHistBase)[0];
+	 mHistBase.convertTo(mHistBase, CV_64F, SCALE_FILTER);
+	 mHistBase.convertTo(mHistBase, CV_32S, 1.0/SUM );
+	 
+	 //Normalising Purview Histogram
+	 SUM = sum(mHistPurview)[0];
+	 mHistPurview.convertTo(mHistPurview, CV_64F, SCALE_FILTER);
+	 mHistPurview.convertTo(mHistPurview, CV_32S, 1.0/SUM );
 
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -200,8 +212,24 @@ mProfiler.end();
 		  <<  "Histogram Computation Time: " << mProfiler.getAvgTime("ComputeHistograms")<<endl
 		  <<"******************************"<<endl<<endl;	
 		#endif
+
+#ifdef PROFILER_ENABLED
+mProfiler.start("FiltersWait");
+#endif 				
 		
-	
+		//Synchronise Condition Variable
+	  WriteLock wrtLock_FilterReady(_mutex);
+	  _sateChange.wait(wrtLock_FilterReady,[this]{return mFiltersReady;} );		
+		
+				
+ #ifdef PROFILER_ENABLED
+ mProfiler.end();
+ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
+										  <<"******************************"<<endl
+										  <<  "Waiting For Worker thread to finish Filters." <<endl
+										  <<  "Waiting Time: " << mProfiler.getAvgTime("FiltersWait")<<endl
+										  <<"******************************"<<endl<<endl;	
+										 #endif	
 
 
 #ifdef PROFILER_ENABLED
@@ -209,11 +237,110 @@ mProfiler.start("HistogramMatching");
 #endif	
 
 
+		
+	int  best  = 0;
+	vector<BaseHistogramModel>& Models= mLaneFilter->baseHistogramModels;
+    
+	
+	int likelihood_leftLaneBoundary, likelihood_rightLaneBoundary, likelihood_NegLaneBoundary;
+	int NegLaneCorrelation;
+	float x;
+	int64_t conditionalProb;
+	
+	Vector3f ObservedHist;
+	VectorXi ObservedNegBoundary;
+	
+	Mat  range;
+	int Sum=0;
+
+	cout<< "Orignal Vector"<<endl<<mHistBase <<endl;
+
+	for(size_t i=0; i< Models.size(); i++)
+    {    
+		
+		int& LeftIdx    	= Models[i].binID_leftBoundary;
+		int& RightIdx		= Models[i].binID_rightBoundary;
+		int& NegLeftIdx		= Models[i].binID_NegBoundaryLeft;
+		int& NegRightIdx    = Models[i].binID_NegBoundaryRight;
+		int& NLeft          = Models[i].nbNonBoundaryBinsLeft;
+		int& Nright		    = Models[i].nbNonBoundaryBinsRight;
+		
+
+		likelihood_leftLaneBoundary =  round( HistBase_pixelPTR[LeftIdx-1]*0.25
+											 +HistBase_pixelPTR[LeftIdx	]
+											 +HistBase_pixelPTR[LeftIdx+1]*0.25 );
+									 
+		likelihood_rightLaneBoundary = round( HistBase_pixelPTR[RightIdx-1]*0.25
+											 +HistBase_pixelPTR[RightIdx  ]
+											 +HistBase_pixelPTR[RightIdx+1]*0.25 );
 
 
+		
+		
+
+		Sum=0;
+		int end =Models[i].binIDs_NegBoundary.size();
+		cout<<"Sum		:"<<Sum<<endl<<endl;
+		
+		range = mHistBase(Range(NegLeftIdx,  NegLeftIdx  +  NLeft),   Range::all());
+		Sum +=sum(range)[0];
+		
+		cout<<"Range Left: "<<NegLeftIdx<<"---"<<NegLeftIdx  +  NLeft<<endl<<endl;
+		cout<<"Sum       :"<<Sum<<endl<<endl;
+		
+		
+		range = mHistBase(Range(NegRightIdx, NegRightIdx + Nright), Range::all());
+		Sum +=sum(range)[0];
+		
+		
+		cout<<"Range Right: "<<NegRightIdx<<"---"<<NegRightIdx  +  Nright<<endl<<endl;
+		cout<<"Sum       :"<<Sum<<endl<<endl<<endl<<endl;
+	
+		
 
 
+		cout<< "Expected Range Left: "<<Models[i].binIDs_NegBoundary[0]
+								 <<"---"
+								 <<Models[i].binIDs_NegBoundary[NLeft-1]
+								 <<endl;
+		
+		
+		cout<< "Expected Range Right: "<<Models[i].binIDs_NegBoundary[end-Nright]
+								 <<"---"
+								 <<Models[i].binIDs_NegBoundary[end-1]
+								 <<endl<<endl;
+		NegLaneCorrelation=0;
+		for (int j=0; j< Models[i].binIDs_NegBoundary.size(); j++)		
+		NegLaneCorrelation += HistBase_pixelPTR[ Models[i].binIDs_NegBoundary[j] ];
+							
+	    cout<<"Sum 	:"<<NegLaneCorrelation<<endl<<endl;
+								 
+		int a;
+		cin>>a;
+	
+		
+		
+		
+/*
+		x= (float)NegLaneCorrelation / SCALE_FILTER ;
+		likelihood_NegLaneBoundary = 
+		round(( mLaneMembership.NEG_BOUNDARY_NORMA * exp ( -pow(x,2) / mLaneMembership.NEG_BOUNDARY_NOMIN  ) )*SCALE_FILTER);
+*/	
+		 conditionalProb  =  likelihood_leftLaneBoundary;
+		//conditionalProb  = (conditionalProb * likelihood_rightLaneBoundary) / SCALE_FILTER;
+        //conditionalProb  = (conditionalProb * likelihood_NegLaneBoundary) / SCALE_FILTER; 
+       // mPosteriorProb =  saturate_cast<int32_t>(conditionalProb * mTransitLaneFilter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffsetIdx));
+		//mLaneFilter->filter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffset)= mPosteriorProb;
 
+
+	
+	}
+
+
+		//Filters Consumed...unlock the Mutex.
+		mFiltersReady = false;
+		wrtLock_FilterReady.unlock();
+		
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 
@@ -255,13 +382,16 @@ void TrackingLanesDAG_generic::extractControllerInputs()
 
 void TrackingLanesDAG_generic::auxillaryTasks()
 {
+
+
+// MODE: A
 		
 	int offset   =  mCAMERA.RES_VH(0)  -mSpan;
-	int rowIndex = mCAMERA.RES_VH(0) - mCAMERA.FRAME_CENTER(0) -mVanishPt.V +offset ;
-	int colIndex = mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
+	int rowIndex =  mCAMERA.RES_VH(0) - mCAMERA.FRAME_CENTER(0) -mVanishPt.V +offset ;
+	int colIndex =  mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
 
 
-	WriteLock  wrtLock(_mutex);
+	WriteLock  wrtLockTemplates(_mutex);
 	
 		Rect ROI = Rect(colIndex, rowIndex, mCAMERA.RES_VH(1), mSpan);
 		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
@@ -274,17 +404,49 @@ void TrackingLanesDAG_generic::auxillaryTasks()
 		mFOCUS_MASK_ROOT(ROI).copyTo(mFocusTemplate);	
 		
 		for ( int i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
-		{
-		
+		{		
 			mBufferPool->Probability[i] 	= mBufferPool->Probability[i+1];		
-			mBufferPool->GradientTangent[i] = mBufferPool->GradientTangent[i+1];
-			
+			mBufferPool->GradientTangent[i] = mBufferPool->GradientTangent[i+1];			
 		}
 	
 		mTemplatesReady = true;
 
-	wrtLock.unlock();
+	wrtLockTemplates.unlock();
 	_sateChange.notify_one();
+	
+//MODE B:
+	WriteLock  wrtLockFilters(_mutex);
+	_sateChange.wait(wrtLockFilters,[this]{return mStartFiltering;} );
+
+	
+	int64_t SUM;
+	
+	//Predict Lane States
+	mLaneFilter->filter.convertTo(mLaneFilter->filter, CV_64F);
+	boxFilter(mLaneFilter->filter, mTransitLaneFilter, -1, Size(11,11), Point(-1,-1), false, BORDER_REPLICATE );
+    mLaneFilter->filter.convertTo(mLaneFilter->filter, CV_32S);
+
+	SUM = sum(mTransitLaneFilter)[0];
+	mTransitLaneFilter= mTransitLaneFilter*SCALE_FILTER;
+	mTransitLaneFilter.convertTo(mTransitLaneFilter, CV_32S, 1.0/SUM);	
+	mTransitLaneFilter = 0.5*mTransitLaneFilter + 0.5*mLaneFilter->prior + 0.5;
+	
+	//Predict VP States
+	mVpFilter->filter.convertTo(mVpFilter->filter, CV_64F);
+	boxFilter(mVpFilter->filter, mTransitVpFilter, -1, Size(3,3), Point(-1,-1), false, BORDER_REPLICATE );
+    mVpFilter->filter.convertTo(mVpFilter->filter, CV_32S);
+	
+	SUM = sum(mTransitVpFilter)[0];
+	mTransitVpFilter= mTransitVpFilter*SCALE_FILTER;
+	mTransitVpFilter.convertTo(mTransitVpFilter, CV_32S, 1.0/SUM);	
+	mTransitVpFilter = 0.5*mTransitVpFilter + 0.5*mVpFilter->prior + 0.5;
+			
+		mFiltersReady   = true;
+		mStartFiltering = false;
+	
+	wrtLockFilters.unlock();
+	_sateChange.notify_one();
+	
 
 }
 

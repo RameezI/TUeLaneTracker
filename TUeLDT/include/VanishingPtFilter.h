@@ -4,6 +4,7 @@
 #include <memory>
 #include <Eigen/Dense>
 #include <math.h>
+#include "ScalingFactors.h"
 #include "Lane.h"
 #include "Camera.h"
 
@@ -71,7 +72,7 @@ public:
 			      
 		    Mat  prior;
 		    Mat  filter;
-		    Mat  transition; 
+
 				  		
 private:		 
 			void  createPrior();

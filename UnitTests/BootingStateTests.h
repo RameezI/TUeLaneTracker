@@ -16,14 +16,9 @@ public:
 	VectorXd exp_BINS_HISTOGRAM;
 	VectorXi act_BINS_HISTOGRAM;
 	  
-	
-	  int testResult_prior;
-	  int testResult_filter;
-	  int testResult_transition;
-	  
-	  int testResult_GradTangentRoot;
-	  int testResult_DepthRoot;
-	  int testResult_FocusRoot;
+	int testResult_GradTangentRoot;
+	int testResult_DepthRoot;
+	int testResult_FocusRoot;
 
 	 States  mCurrentState;
 	  
@@ -55,23 +50,6 @@ public:
 			Mat comparisonGradientTanRoot;
 			Mat comparisonFocusRoot;
 			Mat comparisonDepthRoot;
-			
-			
-			exp_BINS_HISTOGRAM = readCSV("LANE_BINS_H.csv", 153);
-			act_BINS_HISTOGRAM = laneFilter->HISTOGRAM_BINS;
-
-			Mat exp_LanePrior = loadCSV("LANE_PRIOR.csv", CV_32SC1);
-			cv::compare(exp_LanePrior, laneFilter->prior, comparisonPrior, cv::CMP_NE);
-			testResult_prior = cv::countNonZero(comparisonPrior);
-			
-			Mat exp_LaneFilter = loadCSV("LANE_FILTER.csv", CV_32SC1);
-			cv::compare(exp_LaneFilter, laneFilter->filter, comparisonFilter, cv::CMP_NE);
-			testResult_filter = cv::countNonZero(comparisonFilter);
-
-			Mat exp_LaneTransition = loadCSV("LANE_TRANSITION.csv", CV_32SC1);
-			saveMatToCsv(exp_LaneTransition, "LANE_TRANSITION.csv");
-			cv::compare(exp_LaneTransition, laneFilter->transition, comparisonTransition, cv::CMP_NE);
-			testResult_transition = cv::countNonZero(comparisonTransition);
 			
 			
 			Mat exp_GradientTangent = loadCSV("GRADIENT_TANGENT_ROOT.csv", CV_16SC1);

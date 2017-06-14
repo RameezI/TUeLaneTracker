@@ -10,9 +10,6 @@
 #include  "InitState.h"
 #include  "BufferingState.h"
 
-
-
-
 class TEST_BufferingState:Tests
 {
 	
@@ -120,7 +117,7 @@ public:
 					//waitKey(0);
 			}
 		}
-	
+
 
 
 	  /* ofstream  GrayFrame, GradientX, GradientY;

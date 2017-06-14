@@ -29,10 +29,7 @@ VanishingPtFilter::VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_B
   
   prior(  Mat::zeros( mNb_VP_BINS_V, mNb_VP_BINS_H , CV_32SC1) ),
   
-  filter( Mat::zeros( mNb_VP_BINS_H, mNb_VP_BINS_H,  CV_32SC1) ),
-  
-  transition( Mat::ones( 3, 3 , CV_32SC1) )
-  
+  filter( Mat::zeros( mNb_VP_BINS_H, mNb_VP_BINS_H,  CV_32SC1) )
 {
 	createPrior();
 	this->filter = this->prior.clone();
@@ -51,19 +48,19 @@ void VanishingPtFilter::createPrior()
 	{
        for (int h = 1; h <= mNb_VP_BINS_H; h++)
 	   {  
-            pv = exp( -pow(v-mNb_VP_BINS_V/2.0,2)  / pow(sigma,2) ) ;     
-            ph = exp( -pow(h-mNb_VP_BINS_H/2.0,2)  / pow(sigma,2) ) ;  
+            pv = exp( -pow(v-mNb_VP_BINS_V/2.0,2)  / pow(sigma,2) ) *128 ;     
+            ph = exp( -pow(h-mNb_VP_BINS_H/2.0,2)  / pow(sigma,2) ) *128;  
 			
-			this->prior.at<int>(v-1,h-1) = (int)(std::round(pv*ph*ScalingFactor));                
+			this->prior.at<int>(v-1,h-1) = (int)(std::round(pv*ph));                
 	   }    
     }
     
 
 
 	// Normalize
-	double SUM = cv::sum(this->prior)[0];
-    this->prior.convertTo(this->prior,CV_32FC1,1/SUM);
-	this->prior.convertTo(this->prior,CV_32SC1,ScalingFactor);
+	int32_t SUM = cv::sum(this->prior)[0];
+	this->prior.convertTo(this->prior,CV_32SC1,SCALE_FILTER);
+	this->prior = this->prior/(SUM);
 
 
 	  

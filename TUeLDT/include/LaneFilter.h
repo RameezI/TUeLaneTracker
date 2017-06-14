@@ -2,6 +2,7 @@
 #define LANEFILTER_H
 #include <Eigen/Dense>
 #include <math.h>
+#include "ScalingFactors.h"
 #include "Lane.h"
 #include "Camera.h"
 #include "opencv2/opencv.hpp"
@@ -11,28 +12,34 @@ using namespace std;
 using namespace Eigen;
 using namespace cv;
 
-const double ScalingFactor = 32768;  // A Scaling Factor of 2^15 is employed
-
 struct BaseHistogramModel
 {
-	int leftOffsetIdx;
-	int rightOffsetIdx;
+	int   leftOffsetIdx;
+	int   rightOffsetIdx;
+	int   leftOffset;
+	int   rightOffset;
+	float width_cm;
+		
+	int  binID_leftBoundary;
+	int  binID_rightBoundary;
 	
-	Vector3i binIDs_leftBoundary;
-	Vector3i binIDs_rightBoundary;
-	Vector3i Weights_leftBoundary;
-	Vector3i Weights_rightBoundary;
-	
+	int  binID_NegBoundaryLeft;
+	int  nbNonBoundaryBinsLeft;
+	int  binID_NegBoundaryRight;
+	int  nbNonBoundaryBinsRight;
+		
 	std::vector<int> binIDs_NegBoundary;
 	
 	BaseHistogramModel()
 	: leftOffsetIdx(-1),
-	  rightOffsetIdx(-1)
+	  rightOffsetIdx(-1),
+	  leftOffset(-1),
+	  rightOffset(-1),
+	  width_cm(0),
+	  binID_leftBoundary(-1),
+	  binID_rightBoundary(-1)
 	{
-		binIDs_leftBoundary    << -1,-1,-1;
-		binIDs_rightBoundary   << -1,-1,-1;
-		Weights_leftBoundary   << 0.25,1,0.25;
-		Weights_rightBoundary  << 0.25,1,0.25;
+
 
 	}
 	
@@ -60,7 +67,6 @@ public:	 //Public Interface of the class
 		
 		Mat prior;
 		Mat filter;
-		Mat transition;
 
 	    std::vector<BaseHistogramModel>  baseHistogramModels; 	
 
