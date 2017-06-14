@@ -311,16 +311,21 @@ mProfiler.start("HistogramMatching");
 
 				if(mPosteriorProb > bestPosteriorProb)
 				{
-					BestModelIdx =i;
 					bestPosteriorProb=mPosteriorProb;
+					
+					BestModelIdx =i;
+					mLaneModel.confidenceLeft  = likelihood_leftLaneBoundary;
+					mLaneModel.confidenceRight = likelihood_rightLaneBoundary;
 				}
 				
-			} //For	End
+			} 
 				
-			//Models[BestModelIdx].leftOffset;
-			//Models[BestModelIdx].rightOffset;
-				
-			
+			 mLaneModel.leftOffset 		= Models[BestModelIdx].leftOffset;
+			 mLaneModel.rightOffset		= Models[BestModelIdx].rightOffset;
+			 
+			 mLaneModel.confidenceLeft  =  100*  ((float)mLaneModel.confidenceLeft/SCALE_FILTER);
+			 mLaneModel.confidenceRight  = 100* ((float)mLaneModel.confidenceRight/SCALE_FILTER);
+		
 		}//Scope End
 		
 		/*	Filters Consumed */

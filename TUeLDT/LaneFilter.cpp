@@ -3,7 +3,7 @@ This class provides LaneFilter expressed in Vanishing point coordinate system.
 */
 #include "LaneFilter.h"
 
-LaneFilter::LaneFilter(const Lane& LANE,  const Camera& CAMERA)
+LaneFilter::LaneFilter(const LaneParameters& LANE,  const Camera& CAMERA)
 
 : mLANE(LANE),
 

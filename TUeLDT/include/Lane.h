@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 	
-struct Lane
+struct LaneParameters
 {
 
 public:
@@ -12,11 +12,30 @@ public:
 	const float MIN_WIDTH;
 	const float MAX_WIDTH;
 	
-	Lane() //Lane Widths in cm
+	LaneParameters() //Lane Widths in cm
 	: AVG_WIDTH(300),STD_WIDTH(50),MIN_WIDTH(250),MAX_WIDTH(500) 
 	{
 		//Default Constructor
 	}
+};
+
+struct LaneModel
+{
+public:
+	    int 	leftOffset;
+		int 	rightOffset;
+		
+		int 	confidenceLeft;
+		int     confidenceRight;
+		
+		float   laneWidth;
+
+		
+		LaneModel()
+		: leftOffset(0),rightOffset(0),confidenceLeft(0), confidenceRight(0), laneWidth(0)
+		{
+			
+		}
 };
 
 struct LaneMembership 

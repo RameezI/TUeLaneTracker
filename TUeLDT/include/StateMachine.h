@@ -1,13 +1,7 @@
 #ifndef STATEMACHINE_H
 #define STATEMACHINE_H
-#include "State.h"
-#include <memory>
-#include <atomic>
-#include <thread>
 #include "SigInit.h"
-#include "Car.h"
-#include "Camera.h"
-#include "Lane.h"
+#include "State.h"
 #include "InitState.h"
 #include "BufferingState.h"
 #include "TrackingLaneState.h"
@@ -15,18 +9,14 @@
 
 using namespace std;
 
-
 class StateMachine
 {
 	
-	
 private:
-    
+
 #ifdef DIRECTORY_INPUT
 	const vector<cv::String>& mFiles;
 #endif
-
-
 	static States   sCurrentState;
 
 
@@ -39,7 +29,6 @@ public:
 #endif
 
 	int spin(shared_ptr<SigInit>);	
-	void PrintMachineInfo();
 	~StateMachine();
 
 };

@@ -49,9 +49,9 @@ class LaneFilter
 {
 	
 private:	
-		const Lane   mLANE;
-		const Camera mCAMERA;
-		const int 	 mSTEP_CM; 				// BaseHistogram Step in cm
+		const LaneParameters   mLANE;
+		const Camera 		   mCAMERA;
+		const int 	 		   mSTEP_CM;     // BaseHistogram Step in cm
 
 public:	 //Public Interface 
 		const int 	STEP;   				// BaseHistogram Step in Pixels 
@@ -74,7 +74,7 @@ public:	 //Public Interface of the class
 		void  createHistogramModels();	
 
 	public:	
-		LaneFilter(const Lane& LANE,  const Camera& CAMERA);
+		LaneFilter(const LaneParameters& LANE,  const Camera& CAMERA);
 	   ~LaneFilter();
 	};
 	

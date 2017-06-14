@@ -14,6 +14,16 @@ using namespace Eigen;
 typedef Matrix<int, 6, 1> Vector6i;
 
 
+struct VanishingPt
+{
+  int  V;
+  int  H;
+  int  V_prev;
+  int  H_prev;
+  VanishingPt()
+  : V(0),H(0),V_prev(0),H_prev(0){}
+};
+
 struct PurviewHistogramModel
 {
 	Vector6i binIDs_Boundary;

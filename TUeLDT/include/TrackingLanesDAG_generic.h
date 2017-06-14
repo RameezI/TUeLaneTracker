@@ -1,10 +1,8 @@
 #ifndef TRACKINGLANESDAG_GENERIC_H
 #define TRACKINGLANESDAG_GENERIC_H
 #include "State.h"
-#include "LaneFilter.h"
-#include "VanishingPtFilter.h"
 #include "BufferingDAG_generic.h"
-#include <thread>
+
 
 using namespace Eigen;
 
@@ -56,7 +54,7 @@ private:
 	Mat 					mTransitLaneFilter;
 	Mat 					mTransitVpFilter;
 
-	
+	LaneModel               mLaneModel;
 	
 	
 public:

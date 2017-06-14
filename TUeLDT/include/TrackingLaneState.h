@@ -3,7 +3,6 @@
 #include "State.h"
 #include "BufferingDAG_generic.h"
 #include "TrackingLanesDAG_generic.h"
-#include <thread>
 
 
 class TrackingLaneState: public State

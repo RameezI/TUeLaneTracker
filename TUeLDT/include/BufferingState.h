@@ -2,7 +2,7 @@
 #define BUFFERINGSTATE_H
 #include "State.h"
 #include "BufferingDAG_generic.h"
-#include <thread>
+#include "opencv2/core/ocl.hpp"
 
 using namespace cv;
 using namespace Eigen;

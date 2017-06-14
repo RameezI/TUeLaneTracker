@@ -1,16 +1,9 @@
 #ifndef BUFFERINGDAG_GENERIC_H
 #define BUFFERINGDAG_GENERIC_H
 #include "State.h"
-#include "Camera.h"
-#include "Lane.h"
-#include <opencv2/core/eigen.hpp>
-#include "opencv2/core/ocl.hpp"
-#include "opencv2/opencv.hpp"
-#include "opencv2/highgui/highgui.hpp"
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-#include  <fstream>
 
 
 

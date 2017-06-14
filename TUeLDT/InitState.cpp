@@ -17,10 +17,10 @@ InitState::InitState()
 unique_ptr<LaneFilter> InitState::createLaneFilter()
 {
 	
-	Camera camera;
-	Lane   lane;
+	Camera 			 camera;
+	LaneParameters   lane;
 	
-	unique_ptr<LaneFilter> laneFilter( new LaneFilter (lane, camera) );
+	unique_ptr<LaneFilter> 	laneFilter( new LaneFilter (lane, camera) );
 	mLaneFilterCreated = true;
 	
 	if (checkCreationStatus())
@@ -32,9 +32,9 @@ unique_ptr<LaneFilter> InitState::createLaneFilter()
 
 unique_ptr<VanishingPtFilter> InitState::createVanishingPtFilter()
 {
-	Camera camera;
-	Lane   lane;
-	LaneFilter laneFilter(lane, camera);
+	Camera 			 camera;
+	LaneParameters   lane;
+	LaneFilter 		 laneFilter(lane, camera);
 	
 	unique_ptr<VanishingPtFilter> vanishingPtFilter(new VanishingPtFilter (laneFilter.HISTOGRAM_BINS, 
 																	       laneFilter.OFFSET_V,																		   camera) );
@@ -49,8 +49,8 @@ unique_ptr<VanishingPtFilter> InitState::createVanishingPtFilter()
 
 unique_ptr<Templates> InitState::createTemplates()
 {
-	Camera camera;
-	Lane   lane;
+	Camera 			  camera;
+	LaneParameters    lane;
 	LaneFilter 		  laneFilter(lane, camera);
 	VanishingPtFilter vanishingPtFilter(laneFilter.HISTOGRAM_BINS, laneFilter.OFFSET_V, camera);
 	
