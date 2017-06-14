@@ -182,27 +182,31 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("ComputeHistograms");
 #endif
-	
-	int64_t SUM;
-	register int32_t* HistBase_pixelPTR    =  mHistBase.ptr<int32_t>(0);
-	register int32_t* HistPurview_pixelPTR =  mHistPurview.ptr<int32_t>(0);
-	
-	for ( int j = 0; j < mBaseBinIdx.size(); ++j)
+
 	{
-		*(HistBase_pixelPTR 	+ mBaseBinIdx[j])  += mWeightBin[j];
-		*(HistPurview_pixelPTR  + mPurviewBinIdx[j]) += mWeightBin[j];
+		int64_t SUM;
+		register int32_t* HistBase_pixelPTR    =  mHistBase.ptr<int32_t>(0);
+		register int32_t* HistPurview_pixelPTR =  mHistPurview.ptr<int32_t>(0);
+	
+		for ( int j = 0; j < mBaseBinIdx.size(); ++j)
+		{
+			*(HistBase_pixelPTR 	+ mBaseBinIdx[j])  += mWeightBin[j];
+			*(HistPurview_pixelPTR  + mPurviewBinIdx[j]) += mWeightBin[j];
+		}
+	
+	
+	
+		// Normalising Base Histogram
+		 SUM = sum(mHistBase)[0];
+		 mHistBase.convertTo(mHistBase, CV_64F, SCALE_FILTER);
+		 mHistBase.convertTo(mHistBase, CV_32S, 1.0/SUM );
+		 
+		 //Normalising Purview Histogram
+		 SUM = sum(mHistPurview)[0];
+		 mHistPurview.convertTo(mHistPurview, CV_64F, SCALE_FILTER);
+		 mHistPurview.convertTo(mHistPurview, CV_32S, 1.0/SUM );
 	}
 	
-	// Normalising Base Histogram
-	 SUM = sum(mHistBase)[0];
-	 mHistBase.convertTo(mHistBase, CV_64F, SCALE_FILTER);
-	 mHistBase.convertTo(mHistBase, CV_32S, 1.0/SUM );
-	 
-	 //Normalising Purview Histogram
-	 SUM = sum(mHistPurview)[0];
-	 mHistPurview.convertTo(mHistPurview, CV_64F, SCALE_FILTER);
-	 mHistPurview.convertTo(mHistPurview, CV_32S, 1.0/SUM );
-
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 
@@ -212,6 +216,8 @@ mProfiler.end();
 		  <<  "Histogram Computation Time: " << mProfiler.getAvgTime("ComputeHistograms")<<endl
 		  <<"******************************"<<endl<<endl;	
 		#endif
+
+
 
 #ifdef PROFILER_ENABLED
 mProfiler.start("FiltersWait");
@@ -237,107 +243,87 @@ mProfiler.start("HistogramMatching");
 #endif	
 
 
+	{
+		int   bestPosteriorProb  = 0;
+		int   BestModelIdx=-1;
+		int   likelihood_leftLaneBoundary, likelihood_rightLaneBoundary, likelihood_NegLaneBoundary;
+		int   NegLaneCorrelation;
+		float x;
+		int64_t conditionalProb;
 		
-	int  best  = 0;
-	vector<BaseHistogramModel>& Models= mLaneFilter->baseHistogramModels;
-    
+		vector<BaseHistogramModel>& Models= mLaneFilter->baseHistogramModels;
+		
+		Mat    range;
+		register int32_t* HistBasePTR    	=  mHistBase.ptr<int32_t>(0);
+		register int32_t* HistPurviewPTR    =  mHistBase.ptr<int32_t>(0);
+		
+		int Sum=0;
 	
-	int likelihood_leftLaneBoundary, likelihood_rightLaneBoundary, likelihood_NegLaneBoundary;
-	int NegLaneCorrelation;
-	float x;
-	int64_t conditionalProb;
+		//Delete These
+		Vector3f ObservedHist;
+		VectorXi ObservedNegBoundary;
+		
+
+		for(size_t i=0; i< Models.size(); i++)
+		{    
+			
+			int& LeftIdx    	= Models[i].binID_leftBoundary;
+			int& RightIdx		= Models[i].binID_rightBoundary;
+			
+			int& NegLeftIdx		= Models[i].binID_NegBoundaryLeft;
+			int& NegRightIdx    = Models[i].binID_NegBoundaryRight;
+			
+			int& Nleft          = Models[i].nbNonBoundaryBinsLeft;
+			int& Nright		    = Models[i].nbNonBoundaryBinsRight;
+			
+
+			likelihood_leftLaneBoundary =  round( HistBasePTR[LeftIdx-1]*0.25
+												 +HistBasePTR[LeftIdx	]
+												 +HistBasePTR[LeftIdx+1]*0.25);
+										 
+			likelihood_rightLaneBoundary = round( HistBasePTR[RightIdx-1]*0.25
+												 +HistBasePTR[RightIdx  ]
+												 +HistBasePTR[RightIdx+1]*0.25);
 	
-	Vector3f ObservedHist;
-	VectorXi ObservedNegBoundary;
-	
-	Mat  range;
-	int Sum=0;
+			NegLaneCorrelation=0;
+			range = mHistBase(Range(NegLeftIdx,  NegLeftIdx  +  Nleft), Range::all());
+			NegLaneCorrelation +=sum(range)[0];
+			
+		    range = mHistBase(Range(NegRightIdx, NegRightIdx + Nright), Range::all());
+			NegLaneCorrelation +=sum(range)[0];
+		
+			x= (float)NegLaneCorrelation / SCALE_FILTER ;
+			likelihood_NegLaneBoundary = 
+			round(( mLaneMembership.NEG_BOUNDARY_NORMA * exp ( -pow(x,2) / mLaneMembership.NEG_BOUNDARY_NOMIN  ) )*SCALE_FILTER);
 
-	cout<< "Orignal Vector"<<endl<<mHistBase <<endl;
+			 conditionalProb  =  likelihood_leftLaneBoundary;
+			 
+			conditionalProb  = (conditionalProb * likelihood_rightLaneBoundary) / SCALE_FILTER;
+			conditionalProb  = (conditionalProb * likelihood_NegLaneBoundary) / SCALE_FILTER; 
+			
+			
+			mPosteriorProb =
+			saturate_cast<int32_t>(conditionalProb
+								*  mTransitLaneFilter.at<int32_t>
+								   (Models[i].leftOffsetIdx, Models[i].rightOffsetIdx));
+			
+			mLaneFilter->filter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffset)= mPosteriorProb;
 
-	for(size_t i=0; i< Models.size(); i++)
-    {    
+				if(mPosteriorProb > bestPosteriorProb)
+				{
+					BestModelIdx =i;
+					bestPosteriorProb=mPosteriorProb;
+				}
+				
+			} //For	End
+				
+			//Models[BestModelIdx].leftOffset;
+			//Models[BestModelIdx].rightOffset;
+				
+			
+		}//Scope End
 		
-		int& LeftIdx    	= Models[i].binID_leftBoundary;
-		int& RightIdx		= Models[i].binID_rightBoundary;
-		int& NegLeftIdx		= Models[i].binID_NegBoundaryLeft;
-		int& NegRightIdx    = Models[i].binID_NegBoundaryRight;
-		int& NLeft          = Models[i].nbNonBoundaryBinsLeft;
-		int& Nright		    = Models[i].nbNonBoundaryBinsRight;
-		
-
-		likelihood_leftLaneBoundary =  round( HistBase_pixelPTR[LeftIdx-1]*0.25
-											 +HistBase_pixelPTR[LeftIdx	]
-											 +HistBase_pixelPTR[LeftIdx+1]*0.25 );
-									 
-		likelihood_rightLaneBoundary = round( HistBase_pixelPTR[RightIdx-1]*0.25
-											 +HistBase_pixelPTR[RightIdx  ]
-											 +HistBase_pixelPTR[RightIdx+1]*0.25 );
-
-
-		
-		
-
-		Sum=0;
-		int end =Models[i].binIDs_NegBoundary.size();
-		cout<<"Sum		:"<<Sum<<endl<<endl;
-		
-		range = mHistBase(Range(NegLeftIdx,  NegLeftIdx  +  NLeft),   Range::all());
-		Sum +=sum(range)[0];
-		
-		cout<<"Range Left: "<<NegLeftIdx<<"---"<<NegLeftIdx  +  NLeft<<endl<<endl;
-		cout<<"Sum       :"<<Sum<<endl<<endl;
-		
-		
-		range = mHistBase(Range(NegRightIdx, NegRightIdx + Nright), Range::all());
-		Sum +=sum(range)[0];
-		
-		
-		cout<<"Range Right: "<<NegRightIdx<<"---"<<NegRightIdx  +  Nright<<endl<<endl;
-		cout<<"Sum       :"<<Sum<<endl<<endl<<endl<<endl;
-	
-		
-
-
-		cout<< "Expected Range Left: "<<Models[i].binIDs_NegBoundary[0]
-								 <<"---"
-								 <<Models[i].binIDs_NegBoundary[NLeft-1]
-								 <<endl;
-		
-		
-		cout<< "Expected Range Right: "<<Models[i].binIDs_NegBoundary[end-Nright]
-								 <<"---"
-								 <<Models[i].binIDs_NegBoundary[end-1]
-								 <<endl<<endl;
-		NegLaneCorrelation=0;
-		for (int j=0; j< Models[i].binIDs_NegBoundary.size(); j++)		
-		NegLaneCorrelation += HistBase_pixelPTR[ Models[i].binIDs_NegBoundary[j] ];
-							
-	    cout<<"Sum 	:"<<NegLaneCorrelation<<endl<<endl;
-								 
-		int a;
-		cin>>a;
-	
-		
-		
-		
-/*
-		x= (float)NegLaneCorrelation / SCALE_FILTER ;
-		likelihood_NegLaneBoundary = 
-		round(( mLaneMembership.NEG_BOUNDARY_NORMA * exp ( -pow(x,2) / mLaneMembership.NEG_BOUNDARY_NOMIN  ) )*SCALE_FILTER);
-*/	
-		 conditionalProb  =  likelihood_leftLaneBoundary;
-		//conditionalProb  = (conditionalProb * likelihood_rightLaneBoundary) / SCALE_FILTER;
-        //conditionalProb  = (conditionalProb * likelihood_NegLaneBoundary) / SCALE_FILTER; 
-       // mPosteriorProb =  saturate_cast<int32_t>(conditionalProb * mTransitLaneFilter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffsetIdx));
-		//mLaneFilter->filter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffset)= mPosteriorProb;
-
-
-	
-	}
-
-
-		//Filters Consumed...unlock the Mutex.
+		/*	Filters Consumed */
 		mFiltersReady = false;
 		wrtLock_FilterReady.unlock();
 		
@@ -346,12 +332,10 @@ mProfiler.end();
 
 		LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 		  <<"******************************"<<endl
-		  <<  "Histogram Matching leading to MAP Estimate." <<endl
-		  <<  "Histogram Matching Time: " << mProfiler.getAvgTime("HistogramMatching")<<endl
+		  <<  "Histogram Matching MAP Estimate." <<endl
+		  <<  "Filter Update Time: " << mProfiler.getAvgTime("HistogramMatching")<<endl
 		  <<"******************************"<<endl<<endl;	
 		#endif
-
-
 
 
 #ifdef PROFILER_ENABLED

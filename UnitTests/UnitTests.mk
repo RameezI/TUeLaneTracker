@@ -60,7 +60,7 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneFilterTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/vpFilterTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/BootingStateTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/BufferingStateTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneTrackerApp_time_measure.cpp$(ObjectSuffix) $(IntermediateDirectory)/TrackingStateTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/SAMPLE.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/SAMPLE.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneFilterTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/vpFilterTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/BootingStateTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneTrackerApp_time_measure.cpp$(ObjectSuffix) $(IntermediateDirectory)/BufferingStateTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/TrackingStateTests.cpp$(ObjectSuffix) 
 
 
 
@@ -106,6 +106,14 @@ $(IntermediateDirectory)/main.cpp$(DependSuffix): main.cpp
 $(IntermediateDirectory)/main.cpp$(PreprocessSuffix): main.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/main.cpp$(PreprocessSuffix) "main.cpp"
 
+$(IntermediateDirectory)/SAMPLE.cpp$(ObjectSuffix): SAMPLE.cpp $(IntermediateDirectory)/SAMPLE.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/UnitTests/SAMPLE.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/SAMPLE.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/SAMPLE.cpp$(DependSuffix): SAMPLE.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/SAMPLE.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/SAMPLE.cpp$(DependSuffix) -MM "SAMPLE.cpp"
+
+$(IntermediateDirectory)/SAMPLE.cpp$(PreprocessSuffix): SAMPLE.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/SAMPLE.cpp$(PreprocessSuffix) "SAMPLE.cpp"
+
 $(IntermediateDirectory)/LaneFilterTests.cpp$(ObjectSuffix): LaneFilterTests.cpp $(IntermediateDirectory)/LaneFilterTests.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/UnitTests/LaneFilterTests.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/LaneFilterTests.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/LaneFilterTests.cpp$(DependSuffix): LaneFilterTests.cpp
@@ -130,14 +138,6 @@ $(IntermediateDirectory)/BootingStateTests.cpp$(DependSuffix): BootingStateTests
 $(IntermediateDirectory)/BootingStateTests.cpp$(PreprocessSuffix): BootingStateTests.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/BootingStateTests.cpp$(PreprocessSuffix) "BootingStateTests.cpp"
 
-$(IntermediateDirectory)/BufferingStateTests.cpp$(ObjectSuffix): BufferingStateTests.cpp $(IntermediateDirectory)/BufferingStateTests.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/UnitTests/BufferingStateTests.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/BufferingStateTests.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/BufferingStateTests.cpp$(DependSuffix): BufferingStateTests.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/BufferingStateTests.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/BufferingStateTests.cpp$(DependSuffix) -MM "BufferingStateTests.cpp"
-
-$(IntermediateDirectory)/BufferingStateTests.cpp$(PreprocessSuffix): BufferingStateTests.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/BufferingStateTests.cpp$(PreprocessSuffix) "BufferingStateTests.cpp"
-
 $(IntermediateDirectory)/LaneTrackerApp_time_measure.cpp$(ObjectSuffix): ../LaneTrackerApp/time_measure.cpp $(IntermediateDirectory)/LaneTrackerApp_time_measure.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/LaneTrackerApp/time_measure.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/LaneTrackerApp_time_measure.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/LaneTrackerApp_time_measure.cpp$(DependSuffix): ../LaneTrackerApp/time_measure.cpp
@@ -146,6 +146,14 @@ $(IntermediateDirectory)/LaneTrackerApp_time_measure.cpp$(DependSuffix): ../Lane
 $(IntermediateDirectory)/LaneTrackerApp_time_measure.cpp$(PreprocessSuffix): ../LaneTrackerApp/time_measure.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/LaneTrackerApp_time_measure.cpp$(PreprocessSuffix) "../LaneTrackerApp/time_measure.cpp"
 
+$(IntermediateDirectory)/BufferingStateTests.cpp$(ObjectSuffix): BufferingStateTests.cpp $(IntermediateDirectory)/BufferingStateTests.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/UnitTests/BufferingStateTests.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/BufferingStateTests.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/BufferingStateTests.cpp$(DependSuffix): BufferingStateTests.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/BufferingStateTests.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/BufferingStateTests.cpp$(DependSuffix) -MM "BufferingStateTests.cpp"
+
+$(IntermediateDirectory)/BufferingStateTests.cpp$(PreprocessSuffix): BufferingStateTests.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/BufferingStateTests.cpp$(PreprocessSuffix) "BufferingStateTests.cpp"
+
 $(IntermediateDirectory)/TrackingStateTests.cpp$(ObjectSuffix): TrackingStateTests.cpp $(IntermediateDirectory)/TrackingStateTests.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/UnitTests/TrackingStateTests.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/TrackingStateTests.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/TrackingStateTests.cpp$(DependSuffix): TrackingStateTests.cpp
@@ -153,14 +161,6 @@ $(IntermediateDirectory)/TrackingStateTests.cpp$(DependSuffix): TrackingStateTes
 
 $(IntermediateDirectory)/TrackingStateTests.cpp$(PreprocessSuffix): TrackingStateTests.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/TrackingStateTests.cpp$(PreprocessSuffix) "TrackingStateTests.cpp"
-
-$(IntermediateDirectory)/SAMPLE.cpp$(ObjectSuffix): SAMPLE.cpp $(IntermediateDirectory)/SAMPLE.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/UnitTests/SAMPLE.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/SAMPLE.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/SAMPLE.cpp$(DependSuffix): SAMPLE.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/SAMPLE.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/SAMPLE.cpp$(DependSuffix) -MM "SAMPLE.cpp"
-
-$(IntermediateDirectory)/SAMPLE.cpp$(PreprocessSuffix): SAMPLE.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/SAMPLE.cpp$(PreprocessSuffix) "SAMPLE.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

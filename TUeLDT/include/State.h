@@ -105,27 +105,28 @@ struct Templates
 			eigen2cv(DEPTH_ROOT, DEPTH_MAP_ROOT);
 			DEPTH_MAP_ROOT.convertTo(DEPTH_MAP_ROOT, CV_16U);
 
-		/* Create X Template */
-		
+			/* Create X Template */
 			Mat Row = Mat(1, RES_H, CV_16S);
-			uint16_t* ptr = Row.ptr<uint16_t>(0);
+			int16_t* ptr = Row.ptr<int16_t>(0);
 			for (int i=0; i<RES_H; i++)
 			{
 				ptr[i]= i;			
 			}
 			repeat(Row,SPAN,1 ,X_IRS);
+			X_IRS.convertTo(X_IRS, CV_16S);
 		
+
 		
-		/* Create Y Template */
+			/* Create Y Template */
 			Mat Col = Mat(SPAN, 1, CV_16S);
-			
-			ptr = Col.ptr<uint16_t>(0);
+			ptr = Col.ptr<int16_t>(0);
 			for (int i=0; i<SPAN; i++)
 			{
 				ptr[i]= i;			
 			}
 			repeat(Col,1, RES_H ,Y_IRS);
-	
+
+
 
 	  /* Load Gradient Tangent Template */
 			std::stringstream formattedString;

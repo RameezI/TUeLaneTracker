@@ -49,11 +49,13 @@ BufferingState::BufferingState()
 		bufferingGraph.mDEPTH_MAP_ROOT    = templates.DEPTH_MAP_ROOT;
 		bufferingGraph.mFOCUS_MASK_ROOT   = templates.FOCUS_MASK_ROOT;
 		
-		int ORIGIN_Y_CRS= bufferingGraph.mCAMERA.FRAME_CENTER(0) - templates.SPAN;
-		int ORIGIN_X_CRS = -bufferingGraph.mCAMERA.FRAME_CENTER(1);
+		int16_t ORIGIN_Y_CRS	=  bufferingGraph.mCAMERA.FRAME_CENTER(0) - templates.SPAN;
+		int16_t ORIGIN_X_CRS 	= -bufferingGraph.mCAMERA.FRAME_CENTER(1);
 		
-		bufferingGraph.mX_VPRS    =  templates.X_IRS + ORIGIN_X_CRS;
-		bufferingGraph.mY_VPRS	 = -(templates.Y_IRS + ORIGIN_Y_CRS);
+		//Dangerous! Put it in other location this is nonintutive to put this code here
+		bufferingGraph.mY_VPRS	 	=   -(templates.Y_IRS + ORIGIN_Y_CRS);
+		bufferingGraph.mX_VPRS      =    templates.X_IRS  + ORIGIN_X_CRS;
+
 		
 		const int RES_V = bufferingGraph.mCAMERA.RES_VH(0);
 		const int RES_H = bufferingGraph.mCAMERA.RES_VH(1);

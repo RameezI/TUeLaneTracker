@@ -33,18 +33,17 @@ public:
 
 	 States  mCurrentState;
 	  
-	 TEST_BufferingState()
+	TEST_BufferingState()
 		
 	{ 
 		
 		vector< cv::String> lFiles;
-		
 		cv::String folder = "/home/rameez/TestDataBackup";
 		glob(folder, lFiles);
-				
+		
 		Camera	camera;
 		Lane    lane;
-
+		
 		unique_ptr<LaneFilter>  		laneFilter;
 		unique_ptr<VanishingPtFilter>   vanishingPtFilter;
 		unique_ptr<Templates> 			templates;
@@ -74,63 +73,52 @@ public:
 			
 			if (bufferingState.currentStatus == StateStatus::ACTIVE)
 			{
-					bufferingState.run();
+				bufferingState.run();
 
-					BufferingDAG_generic lBufferingGraph(std::move(bufferingState.bufferingGraph));
-					Span = lBufferingGraph.mSpan;
-							
-							
-										/* Simulated */
-					//-----------------------------------------------------------------------//		
-					exp_GradientX = loadCSV("GradientX.csv", CV_16SC1);
-					cv::compare(exp_GradientX, lBufferingGraph.mGradX, comparison, cv::CMP_NE);
-					testResult_GradX = cv::countNonZero(comparison);
-					
-					exp_GradientY = loadCSV("GradientY.csv", CV_16SC1);
-					cv::compare(exp_GradientY, lBufferingGraph.mGradY, comparison, cv::CMP_NE);
-					testResult_GradY = cv::countNonZero(comparison);
-					
-										/*Actual */
-					//-------------------------------------------------------------------------//		
-					exp_MagFrame = loadCSV("MAG_FRAME.csv", CV_8UC1);
-					cv::compare(exp_MagFrame, lBufferingGraph.mFrameGradMag, comparison, cv::CMP_NE);
-					testResult_Mag = cv::countNonZero(comparison);
-					
-					exp_GradTan = loadCSV("GradTan_FRAME.csv", CV_16SC1);
-					cv::compare(exp_GradTan, lBufferingGraph.mBufferPool->GradientTangent[2], comparison, cv::CMP_NE);
-					testResult_GradTan = cv::countNonZero(comparison);
-					
-					
-					exp_ProbFrame = loadCSV("PROB_FRAME.csv", CV_8UC1);
-					cv::compare(exp_ProbFrame, lBufferingGraph.mBufferPool->Probability[2], comparison, cv::CMP_NE);
-					testResult_ProbFrame = cv::countNonZero(comparison);
-					
-					if (lBufferingGraph.mGradX.type() == CV_16SC1)
-					{
-						testTypes=0;		
-					}
-					
-					
-					// ^TODO ProbFrame is only varified visually
-					//imshow("ExpectedFrame", exp_ProbFrame);
-					//imshow("ActualFrame",   lBufferingGraph.mBufferPool->Probability[2]);
-					//waitKey(0);
+				BufferingDAG_generic lBufferingGraph(std::move(bufferingState.bufferingGraph));
+				Span = lBufferingGraph.mSpan;
+						
+						
+									/* Simulated */
+				//-----------------------------------------------------------------------//		
+				exp_GradientX = loadCSV("GradientX.csv", CV_16SC1);
+				cv::compare(exp_GradientX, lBufferingGraph.mGradX, comparison, cv::CMP_NE);
+				testResult_GradX = cv::countNonZero(comparison);
+				
+				exp_GradientY = loadCSV("GradientY.csv", CV_16SC1);
+				cv::compare(exp_GradientY, lBufferingGraph.mGradY, comparison, cv::CMP_NE);
+				testResult_GradY = cv::countNonZero(comparison);
+				
+									/*Actual */
+				//-------------------------------------------------------------------------//		
+				exp_MagFrame = loadCSV("MAG_FRAME.csv", CV_8UC1);
+				cv::compare(exp_MagFrame, lBufferingGraph.mFrameGradMag, comparison, cv::CMP_NE);
+				testResult_Mag = cv::countNonZero(comparison);
+				
+				exp_GradTan = loadCSV("GradTan_FRAME.csv", CV_16SC1);
+				cv::compare(exp_GradTan, lBufferingGraph.mBufferPool->GradientTangent[2], comparison, cv::CMP_NE);
+				testResult_GradTan = cv::countNonZero(comparison);
+				
+				
+				exp_ProbFrame = loadCSV("PROB_FRAME.csv", CV_8UC1);
+				cv::compare(exp_ProbFrame, lBufferingGraph.mBufferPool->Probability[2], comparison, cv::CMP_NE);
+				testResult_ProbFrame = cv::countNonZero(comparison);
+				
+				if (lBufferingGraph.mGradX.type() == CV_16SC1)
+				{
+					testTypes=0;		
+				}
+				
+				
+				// ^TODO ProbFrame is only varified visually
+				//imshow("ExpectedFrame", exp_ProbFrame);
+				//imshow("ActualFrame",   lBufferingGraph.mBufferPool->Probability[2]);
+				//waitKey(0);
 			}
 		}
 
 
 
-	  /* ofstream  GrayFrame, GradientX, GradientY;
-       GradientX.open("GradientX.csv");
-       GradientX<< cv::format(lBufferingGraph.mGradX, cv::Formatter::FMT_CSV) << std::endl;
-       GradientX.close();
-	   GradientY.open("GradientY.csv");
-       GradientY<< cv::format(lBufferingGraph.mGradY, cv::Formatter::FMT_CSV) << std::endl;
-       GradientY.close();
-	   GrayFrame.open("GrayFrame.csv");
-       GrayFrame<< cv::format(lBufferingGraph.mFrameGRAY_ROI, cv::Formatter::FMT_CSV) << std::endl;
-       GrayFrame.close();
-	*/
 	
 	}
 		

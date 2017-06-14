@@ -48,9 +48,7 @@ mProfiler.start("GaussianFiltering");
 										  <<  "Gaussian(11x11) Filtering Time: " << mProfiler.getAvgTime("GaussianFiltering")<<endl
 										  <<"******************************"<<endl<<endl;	
 									   #endif				
-			
 
-				
 #ifdef PROFILER_ENABLED
 mProfiler.start("GradientsComputation");
 #endif 								

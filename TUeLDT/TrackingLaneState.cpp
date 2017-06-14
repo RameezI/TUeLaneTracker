@@ -30,13 +30,13 @@ void TrackingLaneState::setupDAG(LaneFilter* laneFilter, VanishingPtFilter* vpFi
 
 
  mTrackingLanesGraph.mSCALED_STEP_LANE_FILTER	 = laneFilter->STEP*SCALE_INTSEC;
- mTrackingLanesGraph.mSCALED_STEP_VP_FILTER       = vpFilter->STEP*SCALE_INTSEC;
- mTrackingLanesGraph.mSCALED_START_LANE_FILTER    = laneFilter->HISTOGRAM_BINS(0)*SCALE_INTSEC;
- mTrackingLanesGraph.mSCALED_START_VP_FILTER	     = vpFilter->HISTOGRAM_BINS(0)*SCALE_INTSEC;
+ mTrackingLanesGraph.mSCALED_STEP_VP_FILTER      = vpFilter->STEP*SCALE_INTSEC;
+ mTrackingLanesGraph.mSCALED_START_LANE_FILTER   = laneFilter->HISTOGRAM_BINS(0)*SCALE_INTSEC;
+ mTrackingLanesGraph.mSCALED_START_VP_FILTER	 = vpFilter->HISTOGRAM_BINS(0)*SCALE_INTSEC;
 
 	
-  mTrackingLanesGraph.mHistBase 	 = Mat::zeros(laneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
-  mTrackingLanesGraph.mHistPurview   = Mat::zeros(laneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
+ mTrackingLanesGraph.mHistBase 	    = Mat::zeros(laneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
+ mTrackingLanesGraph.mHistPurview   = Mat::zeros(laneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
 	
  this->currentStatus= StateStatus::ACTIVE;	
 	

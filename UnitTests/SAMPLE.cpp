@@ -3,6 +3,5 @@
 
 TEST(YourTestName)
 {
-	 
-	 CHECK_EQUAL(10, 9) ;
+	 CHECK_EQUAL(10, 10) ;
 }
