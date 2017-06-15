@@ -26,9 +26,9 @@ public:
 	Mat comparison;
 	Mat exp_vpFilter, exp_vpPrior;
 			
-		Camera 	   camera;
-		Lane       lane;
-		LaneFilter laneFilter(lane, camera);
+		Camera 	   			camera;
+		LaneParameters      lane;
+		LaneFilter 			laneFilter(lane, camera);
 	
 		
 		VanishingPtFilter vpFilter(laneFilter.HISTOGRAM_BINS, laneFilter.OFFSET_V, camera);

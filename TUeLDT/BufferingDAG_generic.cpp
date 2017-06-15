@@ -128,29 +128,7 @@ mProfiler.start("GradientsComputation");
 										  <<  "Gray channel gradient computation Time: " << mProfiler.getAvgTime("GradientsComputation")<<endl
 										  <<"******************************"<<endl<<endl;	
 										 #endif
-										 
 
-
-
-							
-
-#ifdef PROFILER_ENABLED
-mProfiler.start("TemplatesWait");
-#endif 				
-		
-		//Synchronise Condition Variable
-		WriteLock  wrtLock(_mutex);
-		_sateChange.wait(wrtLock,[this]{return mTemplatesReady;} );		
-		
-				
- #ifdef PROFILER_ENABLED
- mProfiler.end();
- LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
-										  <<"******************************"<<endl
-										  <<  "Waiting For Worker thread to finish Templates." <<endl
-										  <<  "Waiting Time: " << mProfiler.getAvgTime("TemplatesWait")<<endl
-										  <<"******************************"<<endl<<endl;	
-										 #endif	
 				
 /*			
 			uint8_t* Gray_pixel;
@@ -237,6 +215,26 @@ mProfiler.start("computeProbabilities");
 			mTempProbMat= abs(mTempProbMat) + 10;
 			divide(mProbMap_GradMag, mTempProbMat, mProbMap_GradMag, 255, -1);
 
+
+				
+			#ifdef PROFILER_ENABLED
+			mProfiler.start("TemplatesWait");
+			#endif 				
+					
+			//Synchronise Condition Variable
+			WriteLock  wrtLock(_mutex);
+			_sateChange.wait(wrtLock,[this]{return mBufferReady;} );		
+					
+							
+			 #ifdef PROFILER_ENABLED
+			 mProfiler.end();
+			 LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
+				  <<"******************************"<<endl
+				  <<  "Waiting For Worker thread to finish Templates." <<endl
+				  <<  "Waiting Time: " << mProfiler.getAvgTime("TemplatesWait")<<endl
+				  <<"******************************"<<endl<<endl;	
+				 #endif	
+
 			// Intermediate Probability Map
 			mBufferPool->Probability[bufferPos] = mProbMap_GradMag + mProbMap_Gray;
 			threshold(mBufferPool->Probability[bufferPos], mBufferPool->Probability[bufferPos], 0, 255, THRESH_TOZERO );
@@ -252,16 +250,14 @@ mProfiler.start("computeProbabilities");
 			
 			subtract(255, mProbMap_GradDir, mProbMap_GradDir, noArray(), -1);
 			mProbMap_GradDir.convertTo(mProbMap_GradDir, CV_16U);
-			
-			
+					
+	
 			//Final Probability Map
 			multiply(mBufferPool->Probability[bufferPos], mProbMap_GradDir, mBufferPool->Probability[bufferPos]);
 		    mBufferPool->Probability[bufferPos].convertTo(mBufferPool->Probability[bufferPos], CV_8U, 1.0/255, 0);
 			
-
-
-		mTemplatesReady= false;
-		wrtLock.unlock();
+			mBufferReady= false;
+			wrtLock.unlock();
 		
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -303,7 +299,7 @@ void BufferingDAG_generic::auxillaryTasks()
 			mBufferPool->GradientTangent[i] = mBufferPool->GradientTangent[i+1];
 		}	
 		
-	mTemplatesReady = true;
+	mBufferReady = true;
 	//cout<< "Templates Ready"<<endl;
 	wrtLock.unlock();
 	_sateChange.notify_one();

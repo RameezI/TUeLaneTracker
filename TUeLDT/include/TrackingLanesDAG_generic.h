@@ -30,6 +30,9 @@ private:
 	int 					mSCALED_START_LANE_FILTER;
 	int 					mSCALED_START_VP_FILTER;
 	
+	int   					mLikelihoodLeftBoundary;
+	int 					mLikelihoodRightBoundary;
+	int                     mLikelihoodNegBoundary;
 	int                     mPosteriorProb;
 	
 	LaneFilter* 			mLaneFilter;

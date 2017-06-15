@@ -31,8 +31,8 @@ public:
 	TEST_LaneFilter()
 	{
 
-		Camera camera;
-		Lane   lane;
+		Camera 			 camera;
+		LaneParameters   lane;
 			
 		LaneFilter laneFilter(lane, camera);
 		

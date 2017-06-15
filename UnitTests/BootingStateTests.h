@@ -26,8 +26,8 @@ public:
 	
 	{ 
 		
-		Camera	camera;
-		Lane    lane;
+		Camera			  camera;
+		LaneParameters    lane;
 
 		unique_ptr<LaneFilter>  		laneFilter;
 		unique_ptr<VanishingPtFilter>   vanishingPtFilter;
