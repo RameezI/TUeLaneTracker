@@ -255,12 +255,6 @@ mProfiler.start("FiltersWait");
 										 #endif	
 
 
-
-
-
-
-
-
 #ifdef PROFILER_ENABLED
 mProfiler.start("HistogramMatching");
 #endif
@@ -271,7 +265,7 @@ mProfiler.start("HistogramMatching");
 		int   NegLaneCorrelation;
 		float x;
 		float bestPosteriorProb  = 0;
-		float conditionalProb;
+		double conditionalProb;
 		
 		vector<BaseHistogramModel>& Models= mLaneFilter->baseHistogramModels;
 		
@@ -322,6 +316,8 @@ mProfiler.start("HistogramMatching");
 //Put on the  side thread. syynchronise mLikelihoodNegBoundary (end)
 			
 			conditionalProb  = (conditionalProb * mLikelihoodNegBoundary) / SCALE_FILTER; 
+		
+		    int a = mTransitLaneFilter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffsetIdx);
 		
 			mPosteriorProb = conditionalProb*
 			mTransitLaneFilter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffsetIdx);
@@ -571,7 +567,7 @@ void TrackingLanesDAG_generic::auxillaryTasks()
 	SUM = sum(mTransitLaneFilter)[0];
 	mTransitLaneFilter= mTransitLaneFilter*SCALE_FILTER;
 	mTransitLaneFilter.convertTo(mTransitLaneFilter, CV_32S, 1.0/SUM);	
-	mTransitLaneFilter = 0.5*mTransitLaneFilter + 0.5*mLaneFilter->prior + 0.5;
+	mTransitLaneFilter = 0.5*mTransitLaneFilter + 0.5*mLaneFilter->prior;
 	
 	//Predict VP States
 	mVpFilter->filter.convertTo(mVpFilter->filter, CV_64F);

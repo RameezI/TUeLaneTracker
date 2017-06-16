@@ -181,10 +181,13 @@ public:
 			
 			// Preccision Error! scaled additions of integer matrices
 			exp_TransitionedFilterLane= loadCSV("TransitionedLane.csv", CV_32SC1);
-			Mat exp_Diff = Mat::ones(exp_TransitionedFilterLane.size(),CV_32SC1);
+			
+			/*Mat exp_Diff = Mat::ones(exp_TransitionedFilterLane.size(),CV_32SC1);
 			Mat Diff= exp_TransitionedFilterLane - TransitionedFilterLane;
-			Diff = abs(Diff);
-			cv::compare(Diff, exp_Diff, comparison, cv::CMP_GT);
+			Diff = abs(Diff); 
+			cv::compare(Diff, exp_Diff, comparison, cv::CMP_GT);*/
+			
+			cv::compare(exp_TransitionedFilterLane, TransitionedFilterLane, comparison, cv::CMP_NE);
 			testResult_TransitionedFilterLane = cv::countNonZero(comparison);
 	
 	
