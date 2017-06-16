@@ -117,7 +117,7 @@ public:
 			HistPurview 	= trackingState.mTrackingLanesGraph.mHistPurview;
 			
 			TransitionedFilterLane = trackingState.mTrackingLanesGraph.mTransitLaneFilter;
-			
+			UpdatedFilterLane      = trackingState.mTrackingLanesGraph.mLaneFilter->filter;
 			
 			exp_Prob1 = loadCSV("Prob_1.csv", CV_8UC1);
 			cv::compare(exp_Prob1, ProbFrame1, comparison, cv::CMP_NE);
@@ -179,17 +179,21 @@ public:
 			cv::compare(exp_HistPurview, HistPurview, comparison, cv::CMP_NE);
 			testResult_HistPurview = cv::countNonZero(comparison);
 			
-			// Preccision Error! scaled additions of integer matrices
+
 			exp_TransitionedFilterLane= loadCSV("TransitionedLane.csv", CV_32SC1);
-			
-			/*Mat exp_Diff = Mat::ones(exp_TransitionedFilterLane.size(),CV_32SC1);
-			Mat Diff= exp_TransitionedFilterLane - TransitionedFilterLane;
-			Diff = abs(Diff); 
-			cv::compare(Diff, exp_Diff, comparison, cv::CMP_GT);*/
-			
 			cv::compare(exp_TransitionedFilterLane, TransitionedFilterLane, comparison, cv::CMP_NE);
 			testResult_TransitionedFilterLane = cv::countNonZero(comparison);
-	
+			
+			exp_UpdatedFilterLane= loadCSV("UpdatedLaneFilter.csv", CV_32SC1);
+			cv::compare(exp_UpdatedFilterLane, UpdatedFilterLane, comparison, cv::CMP_NE);
+			testResult_TransitionedFilterLane = cv::countNonZero(comparison);
+			
+			saveMatToCsv(UpdatedFilterLane, "UpdatedFilter.csv");
+			
+		/*	exp_TransitionedFilterVP= loadCSV("TransitionedVP.csv", CV_32SC1);
+			cv::compare(testResult_TransitionedFilterVP, TransitionedFilterVP, comparison, cv::CMP_NE);
+			testResult_TransitionedFilterVP = cv::countNonZero(comparison);
+		*/
 	
 			//imshow("ActualFrame",     ProbMap_3);
 			//imshow("ActualFrame -1",  ProbMap_2);

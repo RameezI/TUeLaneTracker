@@ -322,7 +322,8 @@ mProfiler.start("HistogramMatching");
 			mPosteriorProb = conditionalProb*
 			mTransitLaneFilter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffsetIdx);
 			
-			mLaneFilter->filter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffset)= round(mPosteriorProb);
+			mLaneFilter->filter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffsetIdx)
+			= round(mPosteriorProb);
 
 			if(mPosteriorProb > bestPosteriorProb)
 			{
@@ -566,8 +567,11 @@ void TrackingLanesDAG_generic::auxillaryTasks()
 
 	SUM = sum(mTransitLaneFilter)[0];
 	mTransitLaneFilter= mTransitLaneFilter*SCALE_FILTER;
-	mTransitLaneFilter.convertTo(mTransitLaneFilter, CV_32S, 1.0/SUM);	
-	mTransitLaneFilter = 0.5*mTransitLaneFilter + 0.5*mLaneFilter->prior;
+	mTransitLaneFilter.convertTo(mTransitLaneFilter, CV_32S, 1.0/SUM);
+	mTransitLaneFilter = 	mTransitLaneFilter + mLaneFilter->prior;
+
+
+	
 	
 	//Predict VP States
 	mVpFilter->filter.convertTo(mVpFilter->filter, CV_64F);
@@ -577,7 +581,7 @@ void TrackingLanesDAG_generic::auxillaryTasks()
 	SUM = sum(mTransitVpFilter)[0];
 	mTransitVpFilter= mTransitVpFilter*SCALE_FILTER;
 	mTransitVpFilter.convertTo(mTransitVpFilter, CV_32S, 1.0/SUM);	
-	mTransitVpFilter = 0.5*mTransitVpFilter + 0.5*mVpFilter->prior + 0.5;
+	mTransitVpFilter = mTransitVpFilter + mVpFilter->prior;
 			
 		mFiltersReady   = true;
 		mStartFiltering = false;
