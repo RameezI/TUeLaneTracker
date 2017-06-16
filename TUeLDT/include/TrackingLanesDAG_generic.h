@@ -32,8 +32,8 @@ private:
 	
 	int   					mLikelihoodLeftBoundary;
 	int 					mLikelihoodRightBoundary;
-	int                     mLikelihoodNegBoundary;
-	int                     mPosteriorProb;
+	float                   mLikelihoodNegBoundary;
+	float                   mPosteriorProb;
 	
 	LaneFilter* 			mLaneFilter;
 	VanishingPtFilter*		mVpFilter;
