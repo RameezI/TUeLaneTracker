@@ -26,14 +26,20 @@ struct VanishingPt
 
 struct PurviewHistogramModel
 {
-	Vector6i binIDs_Boundary;
-	Vector6i Weights_Boundary;	
-	std::vector<int> binIDs_NegBoundary;
+	int  binID_leftBoundary;
+	int  binID_rightBoundary;
+	
+	int  binID_NegBoundaryLeft;
+	int  binID_NegBoundaryRight;
+	int  nbNonBoundaryBinsLeft;
+	int  nbNonBoundaryBinsRight;
 	
 	PurviewHistogramModel()
+	: binID_leftBoundary(-1),binID_rightBoundary(-1),
+	 binID_NegBoundaryLeft(-1),binID_NegBoundaryRight(-1),
+	 nbNonBoundaryBinsLeft(0), nbNonBoundaryBinsRight(0)
 	{
-		binIDs_Boundary    << -1, -1, -1, -1, -1, -1;
-		Weights_Boundary   << 0.25,1,0.25, 0.25,1,0.25 ;
+
 	}
 	
 };
@@ -62,17 +68,15 @@ private: //Internal variables
 public: 
 			const int 	 	VP_RANGE_V;
 			const int 	 	VP_RANGE_H;
-
-private:						
+						
 			const int    	mNb_VP_BINS_V;    // number of bins in the  vertical   direction.
 			const int    	mNb_VP_BINS_H;    // number of bins in the horizental direction.
 
-public:
-			const VectorXi 	VP_BINS_V;	    //Histogram Bins in Pixels.
-			const VectorXi 	VP_BINS_H;     	//Histogram Bins in Pixels.
+			const VectorXi 	VP_BINS_V;	    	//Histogram Bins in Pixels.
+			const VectorXi 	VP_BINS_H;     		//Histogram Bins in Pixels.
 			const int  	 	OFFSET_V;
 			
-private:	const float     mVP_LANE_RATIO;			
+			const float     mVP_LANE_RATIO;			
 
 
 public:			

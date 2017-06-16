@@ -29,7 +29,6 @@ public:
 	  int testResult_GradY=-1;
 	  int testResult_Mag=-1;
 	  int testResult_GradTan=-1;
-	  int testResult_ProbFrame=-1;
 
 	 States  mCurrentState;
 	  
@@ -38,7 +37,7 @@ public:
 	{ 
 		
 		vector< cv::String> lFiles;
-		cv::String folder = "/home/rameez/TestDataBackup";
+		cv::String folder = "../TestData/TestImages";
 		glob(folder, lFiles);
 		
 		Camera			  camera;
@@ -99,16 +98,10 @@ public:
 				cv::compare(exp_GradTan, lBufferingGraph.mBufferPool->GradientTangent[2], comparison, cv::CMP_NE);
 				testResult_GradTan = cv::countNonZero(comparison);
 				
-				
-				exp_ProbFrame = loadCSV("PROB_FRAME.csv", CV_8UC1);
-				cv::compare(exp_ProbFrame, lBufferingGraph.mBufferPool->Probability[2], comparison, cv::CMP_NE);
-				testResult_ProbFrame = cv::countNonZero(comparison);
-				
 				if (lBufferingGraph.mGradX.type() == CV_16SC1)
 				{
 					testTypes=0;		
 				}
-				
 				
 				// ^TODO ProbFrame is only varified visually
 				//imshow("ExpectedFrame", exp_ProbFrame);

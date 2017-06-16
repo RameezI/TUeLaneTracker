@@ -13,14 +13,10 @@ class TEST_InitState:Tests
 	
 public:	
 	
-	VectorXd exp_BINS_HISTOGRAM;
-	VectorXi act_BINS_HISTOGRAM;
-	  
 	int testResult_GradTangentRoot;
 	int testResult_DepthRoot;
 	int testResult_FocusRoot;
 
-	 States  mCurrentState;
 	  
 	TEST_InitState()
 	
@@ -42,7 +38,7 @@ public:
 		Mat comparison;
 		
 		Mat exp_GradientTangent, exp_DepthRoot, exp_FocusRoot;
-		Mat GradientTangent, DepthRoot, FocusRoot;
+		Mat GradientTangent, 	 DepthRoot, 	 FocusRoot;
 		
 		GradientTangent = templates->GRADIENT_TAN_ROOT;
 		DepthRoot		= templates->DEPTH_MAP_ROOT;

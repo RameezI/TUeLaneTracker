@@ -15,9 +15,9 @@ VanishingPtFilter::VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_B
   
   mNb_VP_BINS_H(floor((2*VP_RANGE_H)/mVP_STEP) +1),
   
-  VP_BINS_V( VectorXi::LinSpaced(mNb_VP_BINS_V,-VP_RANGE_V, VP_RANGE_V).array() + CAMERA.FRAME_CENTER(0)),
+  VP_BINS_V( VectorXi::LinSpaced(mNb_VP_BINS_V,-VP_RANGE_V, VP_RANGE_V).array()),
   
-  VP_BINS_H( VectorXi::LinSpaced(mNb_VP_BINS_H,-VP_RANGE_H, VP_RANGE_H).array() + CAMERA.FRAME_CENTER(1) ),
+  VP_BINS_H( VectorXi::LinSpaced(mNb_VP_BINS_H,-VP_RANGE_H, VP_RANGE_H).array()),
   
   OFFSET_V(-120),
   
@@ -33,7 +33,6 @@ VanishingPtFilter::VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_B
 {
 	createPrior();
 	this->filter = this->prior.clone();
-
 }
 
 void VanishingPtFilter::createPrior()

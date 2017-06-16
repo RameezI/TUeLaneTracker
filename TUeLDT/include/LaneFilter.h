@@ -28,7 +28,6 @@ struct BaseHistogramModel
 	int  binID_NegBoundaryRight;
 	int  nbNonBoundaryBinsRight;
 		
-	std::vector<int> binIDs_NegBoundary;
 	
 	BaseHistogramModel()
 	: leftOffsetIdx(-1),

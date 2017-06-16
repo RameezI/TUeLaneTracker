@@ -57,7 +57,7 @@ public:
 	
 	// Setup Files
 	vector< cv::String> lFiles;
-	cv::String folder = "/home/rameez/TestDataBackup";
+	cv::String folder = "../TestData/TestImages";
 	glob(folder, lFiles);
 
 	// Filters and Templates	
@@ -157,12 +157,14 @@ public:
 			exp_BaseBinIdx = loadCSV("BaseBinIdx.csv", CV_16UC1);
 			cv::compare(exp_BaseBinIdx, BaseBinIdx, comparison, cv::CMP_NE);
 			testResult_BaseBinIdx = cv::countNonZero(comparison);
-		
+			
 			
 			exp_PurviewBinIdx = loadCSV("PurviewBinIdx.csv", CV_16UC1);
 			cv::compare(exp_PurviewBinIdx, PurviewBinIdx, comparison, cv::CMP_NE);
 			testResult_PurviewBinIdx = cv::countNonZero(comparison);
-			
+		
+	
+
 			exp_WeightsBin = loadCSV("WeightsHistogram.csv", CV_32SC1);
 			cv::compare(exp_WeightsBin, WeightsBin, comparison, cv::CMP_NE);
 			testResult_WeightsBin = cv::countNonZero(comparison);
@@ -184,8 +186,6 @@ public:
 			Diff = abs(Diff);
 			cv::compare(Diff, exp_Diff, comparison, cv::CMP_GT);
 			testResult_TransitionedFilterLane = cv::countNonZero(comparison);
-
-			saveMatToCsv(trackingState.mTrackingLanesGraph.mHistBase,"HistBase.csv");
 	
 	
 			//imshow("ActualFrame",     ProbMap_3);
