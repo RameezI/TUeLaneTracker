@@ -264,8 +264,8 @@ mProfiler.start("HistogramMatching");
 		int   BestModelIdx=-1;
 		int   NegLaneCorrelation;
 		float x;
-		float bestPosteriorProb  = 0;
-		double conditionalProb;
+		int   bestPosteriorProb  = 0;
+		float conditionalProb;
 		
 		vector<BaseHistogramModel>& Models= mLaneFilter->baseHistogramModels;
 		
@@ -289,7 +289,7 @@ mProfiler.start("HistogramMatching");
 	
 		
 
-			mLikelihoodLeftBoundary =  round( HistBasePTR[LeftIdx-1]*0.25
+			mLikelihoodLeftBoundary =  round(HistBasePTR[LeftIdx-1]*0.25
 											+HistBasePTR[LeftIdx]
 											+HistBasePTR[LeftIdx+1]*0.25);
 										 
@@ -297,8 +297,7 @@ mProfiler.start("HistogramMatching");
 											+HistBasePTR[RightIdx]
 											+HistBasePTR[RightIdx+1]*0.25);
 	
-			conditionalProb  =  mLikelihoodLeftBoundary;
-			conditionalProb  =  (conditionalProb * mLikelihoodRightBoundary) / SCALE_FILTER ;
+			conditionalProb  =  (mLikelihoodLeftBoundary*mLikelihoodRightBoundary)/(float)SCALE_FILTER;
 
 //TODO:	Put on the side thread.(start)
 			NegLaneCorrelation=0;
@@ -317,13 +316,12 @@ mProfiler.start("HistogramMatching");
 			
 			conditionalProb  = (conditionalProb * mLikelihoodNegBoundary) / SCALE_FILTER; 
 		
-		    int a = mTransitLaneFilter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffsetIdx);
-		
-			mPosteriorProb = conditionalProb*
-			mTransitLaneFilter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffsetIdx);
+		    
+			mPosteriorProb = round(conditionalProb*
+			mTransitLaneFilter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffsetIdx) );
 			
 			mLaneFilter->filter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffsetIdx)
-			= round(mPosteriorProb);
+			= mPosteriorProb;
 
 			if(mPosteriorProb > bestPosteriorProb)
 			{
@@ -340,8 +338,8 @@ mProfiler.start("HistogramMatching");
 		mLaneModel.leftOffset 		= Models[BestModelIdx].leftOffset;
 		mLaneModel.rightOffset		= Models[BestModelIdx].rightOffset;
 		 
-		mLaneModel.confidenceLeft  =  100*  ((float)mLaneModel.confidenceLeft/SCALE_FILTER);
-		mLaneModel.confidenceRight  = 100* ((float)mLaneModel.confidenceRight/SCALE_FILTER);
+		mLaneModel.confidenceLeft  =  (100* mLaneModel.confidenceLeft)/(float)SCALE_FILTER;
+		mLaneModel.confidenceRight  = (100*mLaneModel.confidenceRight)/(float)SCALE_FILTER;
 		
 	}//Scope End
 		

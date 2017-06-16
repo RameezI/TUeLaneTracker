@@ -20,6 +20,7 @@ TEST(TrackingStateTests)
 	CHECK_EQUAL(0,testTrackingState.testResult_HistBase);
 	CHECK_EQUAL(0,testTrackingState.testResult_HistPurview);
 
-	CHECK_EQUAL(0,testTrackingState.testResult_TransitionedFilterLane);	
+	CHECK_EQUAL(0,testTrackingState.testResult_TransitionedFilterLane);
+	CHECK_EQUAL(0,testTrackingState.testResult_UpdatedFilterLane);		
 	
 }

@@ -32,7 +32,6 @@ private:
 	
 	int   					mLikelihoodLeftBoundary;
 	int 					mLikelihoodRightBoundary;
-	
 	float                   mLikelihoodNegBoundary;
 	float                   mPosteriorProb;
 	

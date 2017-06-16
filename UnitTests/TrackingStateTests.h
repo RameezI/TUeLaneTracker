@@ -186,7 +186,7 @@ public:
 			
 			exp_UpdatedFilterLane= loadCSV("UpdatedLaneFilter.csv", CV_32SC1);
 			cv::compare(exp_UpdatedFilterLane, UpdatedFilterLane, comparison, cv::CMP_NE);
-			testResult_TransitionedFilterLane = cv::countNonZero(comparison);
+			testResult_UpdatedFilterLane = cv::countNonZero(comparison);
 			
 			saveMatToCsv(UpdatedFilterLane, "UpdatedFilter.csv");
 			
