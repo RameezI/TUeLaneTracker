@@ -15,6 +15,7 @@
 
 #include "Camera.h"
 #include "Lane.h"
+#include  "Car.h"
 #include "LaneFilter.h"
 #include "VanishingPtFilter.h"
 #include "VanishingPtFilter.h"

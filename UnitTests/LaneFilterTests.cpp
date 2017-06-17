@@ -50,8 +50,6 @@ public:
 		cv::compare(exp_LaneFilter, laneFilter.filter, comparison, cv::CMP_NE);
 		testResult_filter = cv::countNonZero(comparison);
 		
-	
-		
 		}
 		
 		~TEST_LaneFilter()

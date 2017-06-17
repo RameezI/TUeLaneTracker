@@ -30,13 +30,27 @@ private:
 	int 					mSCALED_START_LANE_FILTER;
 	int 					mSCALED_START_VP_FILTER;
 	
+	
 	int   					mLikelihoodLeftBoundary;
 	int 					mLikelihoodRightBoundary;
 	float                   mLikelihoodNegBoundary;
-	float                   mPosteriorProb;
+	int                     mPosteriorProbBase;
+	
+	
+	int   					mLikelihoodVP_LBoundary;
+	int   					mLikelihoodVP_RBoundary;
+	float                   mLikelihoodVP_NegBoundary;
+    float					mLikelihoodVP_Width;
+	int                     mPosteriorProbVP;
+	
+	//Caclutaions of Weighted Center Lane
+	//int 					mCarWidth_pixels;
+	//float					mCenterOffset;
+	
 	
 	LaneFilter* 			mLaneFilter;
 	VanishingPtFilter*		mVpFilter;
+	
 	
 	Mat 					mX_VPRS_SCALED;	
 	Mat 					mIntBase;           

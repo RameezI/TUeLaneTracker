@@ -26,14 +26,18 @@ public:
 	    int 	leftOffset;
 		int 	rightOffset;
 		
+		int     centerLane;
+		
 		int 	confidenceLeft;
 		int     confidenceRight;
 		
-		float   laneWidth;
+
+		
+		float   laneWidth_cm;
 
 		
 		LaneModel()
-		: leftOffset(0),rightOffset(0),confidenceLeft(0), confidenceRight(0), laneWidth(0)
+		: leftOffset(0),rightOffset(0),confidenceLeft(0), confidenceRight(0), laneWidth_cm(0)
 		{
 			
 		}
@@ -65,11 +69,11 @@ struct LaneMembership
 		 TIPPING_POINT_GRAD_Mag(40),
 		 
 		 WIDTH_STD(15),
-		 WIDTH_DIFF_NORMA( (1/sqrt( 2*M_PI*pow(WIDTH_STD,2) ))*SCALE_FILTER ),
+		 WIDTH_DIFF_NORMA( (1/sqrt( 2*M_PI*pow(WIDTH_STD,2) )) ),
 		 WIDTH_DIFF_NOMIN( 2*pow(WIDTH_STD,2) ),
 		 
 		 NEG_BOUNDARY_STD(0.2),
-		 NEG_BOUNDARY_NORMA( (2/sqrt(2*M_PI*pow(NEG_BOUNDARY_STD,2)))*SCALE_FILTER  ),
+		 NEG_BOUNDARY_NORMA( (2/sqrt(2*M_PI*pow(NEG_BOUNDARY_STD,2)))),
 		 NEG_BOUNDARY_NOMIN(2*pow(NEG_BOUNDARY_STD,2))	 
 		{
 			//Default Constructor

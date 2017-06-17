@@ -10,7 +10,6 @@ TrackingLanesDAG_generic::TrackingLanesDAG_generic(BufferingDAG_generic&& buffer
   mMAX_PIXELS_ROI(mFrameGRAY_ROI.size().height * mFrameGRAY_ROI.size().width),
   mProbMapFocussed(mFrameGRAY_ROI.size(),CV_8U),
   mGradTanFocussed(mFrameGRAY_ROI.size(),CV_16S)
-  
 {	
 	mX_VPRS.convertTo(mX_VPRS_SCALED, CV_32S, SCALE_INTSEC );
 	mBaseBinIdx.reserve(mMAX_PIXELS_ROI);
@@ -267,14 +266,10 @@ mProfiler.start("HistogramMatching");
 		int   bestPosteriorProb  = 0;
 		float conditionalProb;
 		
-		vector<BaseHistogramModel>& Models= mLaneFilter->baseHistogramModels;
-		
-		Mat    range;
 		register int32_t* HistBasePTR    	=  mHistBase.ptr<int32_t>(0);
-		
-		int Sum=0;
-
-
+		vector<BaseHistogramModel>& Models= mLaneFilter->baseHistogramModels;
+		Mat    range;
+	
 		for(size_t i=0; i< Models.size(); i++)
 		{    
 			
@@ -299,6 +294,7 @@ mProfiler.start("HistogramMatching");
 	
 			conditionalProb  =  (mLikelihoodLeftBoundary*mLikelihoodRightBoundary)/(float)SCALE_FILTER;
 
+
 //TODO:	Put on the side thread.(start)
 			NegLaneCorrelation=0;
 			range = mHistBase(Range(NegLeftIdx,  NegLeftIdx  +  Nleft), Range::all());
@@ -314,18 +310,18 @@ mProfiler.start("HistogramMatching");
 
 //Put on the  side thread. syynchronise mLikelihoodNegBoundary (end)
 			
-			conditionalProb  = (conditionalProb * mLikelihoodNegBoundary) / SCALE_FILTER; 
+			conditionalProb  = (conditionalProb * mLikelihoodNegBoundary); 
 		
 		    
-			mPosteriorProb = round(conditionalProb*
+			mPosteriorProbBase = round(conditionalProb*
 			mTransitLaneFilter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffsetIdx) );
 			
 			mLaneFilter->filter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffsetIdx)
-			= mPosteriorProb;
+			= mPosteriorProbBase;
 
-			if(mPosteriorProb > bestPosteriorProb)
+			if(mPosteriorProbBase > bestPosteriorProb)
 			{
-				bestPosteriorProb=mPosteriorProb;
+				bestPosteriorProb=mPosteriorProbBase;
 				
 				BestModelIdx =i;
 				mLaneModel.confidenceLeft  = mLikelihoodLeftBoundary;
@@ -334,9 +330,14 @@ mProfiler.start("HistogramMatching");
 				
 		} 
 		
-		
+		if (bestPosteriorProb == 0)
+		return;
+		  
 		mLaneModel.leftOffset 		= Models[BestModelIdx].leftOffset;
 		mLaneModel.rightOffset		= Models[BestModelIdx].rightOffset;
+		mLaneModel.centerLane       = round((mLaneModel.leftOffset + mLaneModel.rightOffset)/2.0);
+		
+		mLaneModel.laneWidth_cm     = Models[BestModelIdx].width_cm;
 		 
 		mLaneModel.confidenceLeft  =  (100* mLaneModel.confidenceLeft)/(float)SCALE_FILTER;
 		mLaneModel.confidenceRight  = (100*mLaneModel.confidenceRight)/(float)SCALE_FILTER;
@@ -359,13 +360,13 @@ mProfiler.end();
 #ifdef PROFILER_ENABLED
 mProfiler.start("VP_HistogramMatching");
 #endif
+
+	const float delta= mLaneFilter->STEP/2.0;
+	
 	{	
 		int   	bestPosteriorProb  = 0;
-		register int32_t* HistPurviewPTR    =  mHistBase.ptr<int32_t>(0);
-		int Sum = 0;
-		
-		
-		float delta= mLaneFilter->STEP/2.0;
+		register int32_t* HistPurviewPTR    =  mHistPurview.ptr<int32_t>(0);
+
 		
 		const float left_VP  = ((-mLaneModel.leftOffset  - delta)
 							   +(-mLaneModel.leftOffset + delta))
@@ -375,26 +376,32 @@ mProfiler.start("VP_HistogramMatching");
 								+(mLaneModel.rightOffset  + delta))
 								/2.0;
 								
-		const int   FRAME_CENTER_V		= mCAMERA.FRAME_CENTER(0); 
- 		const float PIXEL_TO_CM     	= 1.0/mCAMERA.CM_TO_PIXEL;
+		const int    FRAME_CENTER_V		= mCAMERA.FRAME_CENTER(0); 
+ 		const float  PIXEL_TO_CM     	= 1.0/mCAMERA.CM_TO_PIXEL;
 		
 		const int    VP_FILTER_OFFSET  	= mVpFilter->OFFSET_V;
-		const int    VP_STEP_HIST		= mVpFilter->STEP;
+		const int    VP_HIST_STEP		= mVpFilter->STEP;
 		const int    VP_HIST_START		= mVpFilter->HISTOGRAM_BINS(0);
 		const int    VP_HIST_SIZE		= mVpFilter->HISTOGRAM_BINS.size();
 		const int    VP_HIST_END		= mVpFilter->HISTOGRAM_BINS(VP_HIST_SIZE-1);
 		const float  VP_HIST_RATIO      = mVpFilter->mVP_LANE_RATIO;
-		const float  WIDTH_FACTOR       = PIXEL_TO_CM* VP_HIST_RATIO;
+		const float  WIDTH_FACTOR       = PIXEL_TO_CM* 1.0/VP_HIST_RATIO;
 			
 	
 		float  IntSecLeft, IntSecRight; 
 		int    LeftIdx, MidIdx, RightIdx;
-        int    NbNegLaneLeft, NbNegLaneRight;  
+        
+		int   NegLeftIdx, NegRightIdx;
+		int   NbNegLaneLeft, NbNegLaneRight, NegLaneCorrelation;
+		float x, conditionalProb;
 		
-		float  width, widthProb, boundaryProb;
+		Mat   range;
 		
-		PurviewHistogramModel Model;
-
+		float  width_cm, widthProb;
+		
+		/* Store Previous values of VP */
+		mVanishPt.V_prev = mVanishPt.V;
+		mVanishPt.H_prev = mVanishPt.H;
 		
 		for(int v=0; v < mVpFilter->mNb_VP_BINS_V;v++)
 		{	for(int h=0; h < mVpFilter->mNb_VP_BINS_H; h++)
@@ -406,77 +413,90 @@ mProfiler.start("VP_HistogramMatching");
 				
 				IntSecLeft = ((binH - left_VP)/(float)(binV+FRAME_CENTER_V))
 							 *(VP_FILTER_OFFSET - binV) +binH;
-				IntSecLeft = VP_STEP_HIST * round(IntSecLeft/VP_STEP_HIST);
-				LeftIdx= (IntSecLeft - VP_HIST_START)/VP_HIST_START;
+				IntSecLeft = VP_HIST_STEP * round(IntSecLeft/VP_HIST_STEP);
+				LeftIdx= (IntSecLeft - VP_HIST_START)/VP_HIST_STEP;
 				
 				
-				IntSecRight = ((binH - right_VP)/(float)(binV+FRAME_CENTER_V))
-							 *(VP_FILTER_OFFSET - binV) +binH;
-				IntSecRight = VP_STEP_HIST * round(IntSecRight/VP_STEP_HIST);
-				RightIdx = (VP_HIST_SIZE-1) - (VP_HIST_END - IntSecRight)/VP_STEP_HIST;
-			
-			
-			
+				IntSecRight 	= ((binH - right_VP)/(float)(binV+FRAME_CENTER_V))
+								*(VP_FILTER_OFFSET - binV) +binH;
+				IntSecRight 	= VP_HIST_STEP * round(IntSecRight/VP_HIST_STEP);
+				RightIdx 		= (VP_HIST_SIZE-1) - (VP_HIST_END - IntSecRight)/VP_HIST_STEP;
+				
+				MidIdx  		= round( ( LeftIdx+ RightIdx ) /2.0);
+				
+				NegLeftIdx  	= LeftIdx+2;
+				NegRightIdx     = MidIdx+4;
+				
+				NbNegLaneLeft   = (MidIdx-3) - (LeftIdx+ 2) ;        
+				NbNegLaneRight  = (RightIdx-2) - (MidIdx+3);
+				
+				width_cm= (IntSecRight -IntSecLeft) * WIDTH_FACTOR;
 					   
 				if (LeftIdx > 0 && RightIdx < VP_HIST_SIZE-2)
 				{	
 					
-					MidIdx  		= round( ( LeftIdx+ RightIdx ) /2.0);
-					NbNegLaneLeft   =  (MidIdx-3) - (LeftIdx+ 2) ;        
-					NbNegLaneRight  = (RightIdx-2) - (MidIdx+3);
+					/* VP Probability over Lane Width at Offseted-VP */	
+					mLikelihoodVP_Width = mLaneMembership.WIDTH_DIFF_NORMA 
+							  * exp( - pow(mLaneModel.laneWidth_cm - width_cm, 2) / mLaneMembership.WIDTH_DIFF_NOMIN );
 				
 				
-					width= (IntSecRight -IntSecLeft) * WIDTH_FACTOR;
-				
-					widthProb = mLaneMembership.WIDTH_DIFF_NORMA 
-							  * exp( - pow(mLaneModel.laneWidth - width, 2) / mLaneMembership.WIDTH_DIFF_NOMIN );
-				
-				
-					boundaryProb =  round(HistPurviewPTR[LeftIdx-1]*0.25
-										 +HistPurviewPTR[LeftIdx]
-										 +HistPurviewPTR[LeftIdx+1]*0.25);
-									 
-					boundaryProb += round(HistPurviewPTR[RightIdx-1]*0.25
-										 +HistPurviewPTR[RightIdx]
-										 +HistPurviewPTR[RightIdx+1]*0.25);
-										 
-										 
-//TODO:	Put on the side thread.(start)
-		/*			NegLaneCorrelation=0;
-					range = mHistBase(Range(NegLeftIdx,  NegLeftIdx  +  Nleft), Range::all());
+					/* VP Probability over Left LaneBoundary */
+					mLikelihoodVP_LBoundary =  round(HistPurviewPTR[LeftIdx-1]*0.25
+												  + HistPurviewPTR[LeftIdx]
+											      + HistPurviewPTR[LeftIdx+1]*0.25);
+												  
+					/* VP Probability over Right LaneBoundary */				 
+					mLikelihoodVP_RBoundary = round(HistPurviewPTR[RightIdx-1]*0.25
+												  + HistPurviewPTR[RightIdx]
+												  + HistPurviewPTR[RightIdx+1]*0.25);
+					
+					conditionalProb  =  (mLikelihoodVP_LBoundary*mLikelihoodVP_RBoundary)
+										/(float)SCALE_FILTER;	
+		
+					/* VP Probability over Negative(NO) Boundary Region*/												
+					NegLaneCorrelation=0;
+					range = mHistPurview(Range(NegLeftIdx,  NegLeftIdx  +  NbNegLaneLeft), Range::all());
 					NegLaneCorrelation +=sum(range)[0];
 			
-					range = mHistBase(Range(NegRightIdx, NegRightIdx + Nright), Range::all());
+					range = mHistPurview(Range(NegRightIdx, NegRightIdx + NbNegLaneRight), Range::all());
 					NegLaneCorrelation +=sum(range)[0];
 		
 					x= (float)NegLaneCorrelation / SCALE_FILTER ;
-					mLikelihoodNegBoundary =  round(( mLaneMembership.NEG_BOUNDARY_NORMA 
-											* exp ( -pow(x,2) / mLaneMembership.NEG_BOUNDARY_NOMIN  ) )
-											* SCALE_FILTER);
-											* 
-					 IdxLeft + 2;
-					 IdxMid +4;
-		*/
-
-//Put on the side thread. syynchronise mLikelihoodNegBoundary (end)					 
+					mLikelihoodVP_NegBoundary = mLaneMembership.NEG_BOUNDARY_NORMA 
+					*exp (-pow(x,2)/mLaneMembership.NEG_BOUNDARY_NOMIN);
+											 				 
 										 
-										 
-										 
-										 
-										 
-										 
-												
+					conditionalProb  = 	  conditionalProb
+										* mLikelihoodVP_NegBoundary
+										* mLikelihoodVP_Width;
+					
+					mPosteriorProbVP = round(conditionalProb * mTransitVpFilter.at<int32_t>(v ,h));
+			
+					mVpFilter->filter.at<int32_t>(v, h) = mPosteriorProbVP;
+					
 				
+
+					if(mPosteriorProbVP > bestPosteriorProb)
+					{
+						bestPosteriorProb=mPosteriorProbVP;
+						mVanishPt.V = -binV;
+						mVanishPt.H =  binH;
+					}
+
 				}
-							
-											
+					
 			}			
 		}
 		
-	}
+		if (bestPosteriorProb == 0)
+		{
+			mVanishPt.V = mVanishPt.V_prev;
+			mVanishPt.H = mVanishPt.H_prev;
+			return;
+		}
 		
+	} // Scope Ends
 		
-
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 
@@ -486,7 +506,6 @@ mProfiler.end();
 		  <<  "Filter Update Time: " << mProfiler.getAvgTime("VP_HistogramMatching")<<endl
 		  <<"******************************"<<endl<<endl;	
 		#endif
-
 
 
 

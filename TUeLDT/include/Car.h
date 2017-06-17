@@ -1,12 +1,14 @@
 #ifndef CAR_H
 #define CAR_H
 
-class Car
+struct Car
 {
 public:
-	Car();
-	~Car();
-
+	int  CarWidth_cm;
+	
+	Car(): CarWidth_cm(170)
+	{
+	}
 };
 
 #endif // CAR_H

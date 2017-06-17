@@ -100,6 +100,8 @@ void LaneFilter::createHistogramModels()
 					
 					baseHistogramModels.back().binID_NegBoundaryRight  = idxM+4;
 					baseHistogramModels.back().nbNonBoundaryBinsRight = nbRightNonBoundaryBins;
+					
+					baseHistogramModels.back().width_cm				  = width;
 											
 					this->prior.at<int>(left,right) = (int)(std::round(pL*pR));
 										
