@@ -361,7 +361,7 @@ mProfiler.end();
 mProfiler.start("VP_HistogramMatching");
 #endif
 
-	const float delta= mLaneFilter->STEP/2.0;
+	const int delta= round(mLaneFilter->STEP/2.0);
 	
 	{	
 		int   	bestPosteriorProb  = 0;
@@ -512,9 +512,60 @@ mProfiler.end();
 #ifdef PROFILER_ENABLED
 mProfiler.start("Display");
 #endif
+	{
+		/*  Transform VP to Image Coordianate System */
+		int VP_V =  mVanishPt.V + mCAMERA.FRAME_CENTER(0);
+		int VP_H =  mVanishPt.H + mCAMERA.FRAME_CENTER(1);	
 
-		 imshow( "Display window", mProbMapFocussed);
-		 waitKey(1);
+		/* Lane Bundaries */
+		Point  Start_leftLaneInner( mCAMERA.FRAME_CENTER(1) -mLaneModel.leftOffset  + delta,  mCAMERA.RES_VH(0) );
+		
+		//Point  Start_leftLaneOuter(mCAMERA.FRAME_CENTER(1) -mLaneModel.leftOffset  - delta, mCAMERA.RES_VH(0) );
+		
+		
+		Point  Start_rightLaneInner( mCAMERA.FRAME_CENTER(1) + mLaneModel.rightOffset - delta,  mCAMERA.RES_VH(0) );
+		
+		//Point  Start_rightLaneOuter(mCAMERA.FRAME_CENTER(1) + mLaneModel.rightOffset  + delta, mCAMERA.RES_VH(0) );
+	 
+		float slopeLeft =  (float)( VP_V-mCAMERA.RES_VH(0) ) / (VP_H- Start_leftLaneInner.x);
+		float slopeRight = (float)( VP_V-mCAMERA.RES_VH(0) ) / (VP_H- Start_rightLaneInner.x);
+		
+		
+		/*Point End_leftLaneOuter = Start_leftLaneOuter;
+		End_leftLaneOuter.x += - round((mCAMERA.RES_VH(0)*0.35) / slopeLeft);
+		End_leftLaneOuter.y += - round(mCAMERA.RES_VH(0)*0.35);
+		*/
+		
+		Point End_leftLaneInner = Start_leftLaneInner;
+		End_leftLaneInner.x += -round(
+								(mCAMERA.RES_VH(0)*0.35) / slopeLeft);
+		End_leftLaneInner.y += -round( (mCAMERA.RES_VH(0)*0.35));
+		
+		
+		
+		Point End_rightLaneInner = Start_rightLaneInner;
+		End_rightLaneInner.x += -round ((mCAMERA.RES_VH(0)*0.35) / slopeRight);
+		End_rightLaneInner.y += -round ((mCAMERA.RES_VH(0)*0.35));
+
+		line(mFrameRGB,
+			 Start_leftLaneInner,
+			 End_leftLaneInner,
+			 CvScalar(0,255,0),
+			 3
+		);
+		
+		line(mFrameRGB,
+			 Start_rightLaneInner,
+			 End_rightLaneInner,
+			 CvScalar(0,255,0),
+			 3
+		);
+		
+		
+		 imshow( "Display window", mFrameRGB);
+		 waitKey(10);
+	}
+		
 										
 #ifdef PROFILER_ENABLED
 mProfiler.end();
