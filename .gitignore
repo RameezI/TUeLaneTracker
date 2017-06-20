@@ -1,6 +1,6 @@
 # TUeLDT
 .clang/
-./*
+.build-debug/
 .codelite/
 TUeLaneTracker.workspace
 
