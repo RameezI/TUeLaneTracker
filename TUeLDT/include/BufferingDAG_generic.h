@@ -56,6 +56,10 @@ protected:
 	Mat		mFrameGRAY;
 	Mat		mFrameGRAY_ROI;
 	
+	//Binary Mask 
+	Mat 	mMask;
+	
+	
 	//Image Gradients
 	Mat     mGradX;
 	Mat     mGradY;

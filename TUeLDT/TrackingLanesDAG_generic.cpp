@@ -36,8 +36,8 @@ void TrackingLanesDAG_generic::extractLanes()
 mProfiler.start("TemporalFiltering");
 #endif	
 
-	mBufferPool->Probability[0].copyTo(mProbMapFocussed);
-	mBufferPool->GradientTangent[0].copyTo(mGradTanFocussed);
+	mProbMapFocussed = mBufferPool->Probability[0];
+	mGradTanFocussed = mBufferPool->GradientTangent[0];
 	
 	for ( int i=1; i< mBufferPool->Probability.size(); i++ )
 	{	
@@ -114,26 +114,7 @@ mProfiler.start("ExtractValidBinIds");
 	mPurviewBinIdx.resize(mMAX_PIXELS_ROI);	
 	mWeightBin.resize(mMAX_PIXELS_ROI);
 
-/* Paralle FOR is Disabled
- * 
-	// Fill Vectors With Valid Values using Parallel for Loops. NOT WORKING
-	{ //^TODO: The Object instantiation can be moved to SetupGraph Routine
-		FillBins_Parallel fillBins(	mIntBase,
-									mIntPurview,
-									mIntWeights,
-									mMask,
-									SCALED_STEP_LANE_FILTER,
-									SCALED_STEP_VP_FILTER,
-									SCALED_START_LANE_FILTER,
-									SCALED_START_VP_FILTER,
-									mBaseBinIdx.data(),
-									mPurviewBinIdx.data(),
-									mWeightBin.data()
-								  );
-		
-		parallel_for_(cv::Range(0, mMAX_PIXELS_ROI), fillBins);
-	} 
-*/	{
+	{
 		register int32_t* 	IN_basePTR 	    	= mIntBase.ptr<int32_t>(0);
 		register int32_t* 	IN_purviewPTR   	= mIntPurview.ptr<int32_t>(0);
 		register int32_t* 	IN_weightsPTR   	= mIntWeights.ptr<int32_t>(0);
@@ -339,8 +320,8 @@ mProfiler.start("HistogramMatching");
 		
 		mLaneModel.laneWidth_cm     = Models[BestModelIdx].width_cm;
 		 
-		mLaneModel.confidenceLeft  =  (100* mLaneModel.confidenceLeft)/(float)SCALE_FILTER;
-		mLaneModel.confidenceRight  = (100*mLaneModel.confidenceRight)/(float)SCALE_FILTER;
+		mLaneModel.confidenceLeft  =  round(100* mLaneModel.confidenceLeft/(float)SCALE_FILTER);
+		mLaneModel.confidenceRight  = round(100* mLaneModel.confidenceRight/(float)SCALE_FILTER);
 		
 	}//Scope End
 		
@@ -610,9 +591,9 @@ void TrackingLanesDAG_generic::auxillaryTasks()
 
 	wrtLock.lock();
 		for ( int i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
-		{		
-			mBufferPool->Probability[i] 	= mBufferPool->Probability[i+1];		
-			mBufferPool->GradientTangent[i] = mBufferPool->GradientTangent[i+1];			
+		{
+			mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
+			mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);		
 		}
 		
 		mBufferReady = true;
@@ -625,7 +606,6 @@ void TrackingLanesDAG_generic::auxillaryTasks()
 	wrtLock.lock();
 	_sateChange.wait(wrtLock,[this]{return mStartFiltering;} );
 
-	
 	int64_t SUM;
 	
 	//Predict Lane States

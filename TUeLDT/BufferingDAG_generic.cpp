@@ -39,6 +39,12 @@ mProfiler.start("GaussianFiltering");
 #endif 
 	
 	GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, Size( 5, 5 ), 1.5, 1.5, BORDER_REPLICATE);
+	
+	/*std::stringstream formattedString;
+	string prefix= "/media/rameez/Linux-Extended/DataSet/eindhoven/GRAY_OPENCV/";
+	formattedString<<prefix<<std::setw(6)<<std::to_string(mFrameCount)<<".png";
+	imwrite( formattedString.str(), mFrameGRAY_ROI );
+    */	
 				
  #ifdef PROFILER_ENABLED
  mProfiler.end();
@@ -47,12 +53,11 @@ mProfiler.start("GaussianFiltering");
 										  <<  "Gaussian Filtering." <<endl
 										  <<  "Gaussian(11x11) Filtering Time: " << mProfiler.getAvgTime("GaussianFiltering")<<endl
 										  <<"******************************"<<endl<<endl;	
-									   #endif				
+									#endif				
 
 #ifdef PROFILER_ENABLED
 mProfiler.start("GradientsComputation");
 #endif 								
-
 
 		int scale = 1;
 		int delta = 0;
@@ -61,65 +66,32 @@ mProfiler.start("GradientsComputation");
 		Sobel( mFrameGRAY_ROI, mGradX, ddepth, 1, 0, 3, scale, delta, BORDER_REPLICATE );
 		Sobel( mFrameGRAY_ROI, mGradY, ddepth, 0, 1, 3, scale, delta, BORDER_REPLICATE );
 
+		mMask = mGradX> 255;
+		mGradX.setTo(255, mMask);
+		mMask = mGradX <-255;
+		mGradX.setTo(-255, mMask);
 
+		mMask = mGradY> 255;
+		mGradY.setTo(255, mMask);
+		mMask = mGradY <-255;
+		mGradY.setTo(-255, mMask);
+		mMask = mGradY ==0;
+		mGradY.setTo(1, mMask);
 
-		// get Gradient Tanget. Dx*2^7/Dy
-			int nRows = mFrameGRAY_ROI.rows;
-			int nCols = mFrameGRAY_ROI.cols;;
-			int16_t* GradX_pixel;
-			int16_t* GradY_pixel;
-
-			if (mGradX.isContinuous() && mGradY.isContinuous())
-			{
-				nCols *= nRows;
-				nRows = 1;
-			}
-
-			for(int i = 0; i < nRows; ++i)
-			{
-				GradX_pixel = mGradX.ptr<int16_t>(i);
-				GradY_pixel = mGradY.ptr<int16_t>(i);
-				
-				for ( int j = 0; j < nCols; ++j)
-				{
-					if (GradX_pixel[j] < -255)
-						GradX_pixel[j] = -255;
-					if (GradX_pixel[j] > 255)
-						GradX_pixel[j] = 255;
-						
-						
-					if (GradY_pixel[j] < -255)
-						GradY_pixel[j] = -255;
-					if (GradY_pixel[j] > 255)
-						GradY_pixel[j] = 255;
-				
-					if (GradY_pixel[j]==0)
-						GradY_pixel[j]=1;
-						
-				}
-			}			
-		
 		// Compute Dx/Dy			
-			int bufferPos = mBufferPool->GradientTangent.size()-1;
-			cv::divide(mGradX, mGradY, mBufferPool->GradientTangent[bufferPos], 128, -1);
+		int bufferPos = mBufferPool->GradientTangent.size()-1;
+		cv::divide(mGradX, mGradY, mBufferPool->GradientTangent[bufferPos], 128, -1);
 								
 		//convert to absolute scale and add weighted absolute gradients 
-			mGradX_abs = abs(mGradX);
-			mGradY_abs = abs(mGradY );
+		mGradX_abs = abs(mGradX);
+		mGradY_abs = abs(mGradY );
+		
+		//addWeighted( mGradX_abs, 0.5, mGradY_abs, 0.5, 0, mFrameGradMag );
+		mFrameGradMag = mGradX_abs + mGradY_abs;			
+		//convertScaleAbs(mFrameGradMag, mFrameGradMag);
+		mFrameGradMag.convertTo(mFrameGradMag, CV_8U);
 			
-		//TODO: REMOVE CONVERION IN GENERIC IMPLEMENTATION. MAG IS CLOSE TO EXPECTED	
-		//rounding to next number if 0.5 or greater
-			// These must be internally handled on APEX side. OpenCV is not rounding.			
-			mGradX_abs.convertTo(mGradX_abs, CV_32F, 1.0, 0.5);
-			mGradY_abs.convertTo(mGradY_abs, CV_32F, 1.0, 0.5);
-			mGradX_abs.convertTo(mGradX_abs, CV_16S);
-			mGradY_abs.convertTo(mGradY_abs, CV_16S);
 			
-			addWeighted( mGradX_abs, 0.5, mGradY_abs, 0.5, 0, mFrameGradMag );
-			//convertScaleAbs(mFrameGradMag, mFrameGradMag);
-			mFrameGradMag.convertTo(mFrameGradMag, CV_8U);
-
-				
  #ifdef PROFILER_ENABLED
  mProfiler.end();
  LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
@@ -129,75 +101,7 @@ mProfiler.start("GradientsComputation");
 										  <<"******************************"<<endl<<endl;	
 										 #endif
 
-				
-/*			
-			uint8_t* Gray_pixel;
-			uint8_t* GradMag_pixel;
-			int16_t* GradTan_pixel;
-			int16_t* GradTanTemplate_pixel;
-			uint8_t* TOT_PROB;
-
-			if(	mFrameGRAY_ROI.isContinuous()
-				&& mFrameGradMag.isContinuous()
-				&& mBufferPool->GradientTangent[bufferPos].isContinuous()
-				&& mBufferPool->Probability[bufferPos].isContinuous()
-				&& mGradTanTemplate.isContinuous()
-			  )
-				  
-			{
-				nCols *= nRows;
-				nRows = 1;
-			}
-			
-			
-
-
-			// Initialise Variables
-				mBufferPool->Probability[bufferPos] 
-				= Mat(mFrameGRAY_ROI.rows, mFrameGRAY_ROI.cols, CV_8U);
-				
-				int32_t GrayPixel;
-				int32_t GradMagPixel;
-				int32_t GradTanPixel;
-				int32_t GradTanTemplatePixel;
-			
-				int32_t GrayProb, GradMagProb, GradTanProb, Prob;
-
-			for(int i = 0; i < nRows; ++i)
-			{
-				Gray_pixel  			= mFrameGRAY_ROI.ptr<uint8_t>(i);
-				GradMag_pixel 			= mFrameGradMag.ptr<uint8_t>(i);
-				GradTanTemplate_pixel	= mGradTanTemplate.ptr<int16_t>(i);
-				GradTan_pixel   		= mBufferPool->GradientTangent[bufferPos].ptr<int16_t>(i);
-				TOT_PROB				= mBufferPool->Probability[bufferPos].ptr<uint8_t>(i);
-				
-				for ( int j = 0; j < nCols; j++)
-				{
-					// casting to 32bit integers
-					GrayPixel 				= Gray_pixel[j];
-					GradMagPixel    		= GradMag_pixel[j];
-					GradTanPixel    		= GradTan_pixel[j];
-					GradTanTemplatePixel	= GradTanTemplate_pixel[j];
-					
-					GrayProb = GrayPixel -  mLaneMembership.TIPPING_POINT_GRAY;
-					if(GrayProb < 0) GrayProb=0;
-					GrayProb = std::round((GrayProb*255.0)/(10.0+GrayProb));
-					
-					GradMagProb = GradMagPixel -  mLaneMembership.TIPPING_POINT_GRAD_Mag;
-					GradMagProb = std::round( (GradMagProb*255.0)/(10.0 + abs(GradMagProb)) );
-					
-					Prob = GradMagProb + GrayProb;
-					if(Prob < 0) Prob=0;
-					
-					GradTanProb = abs(GradTanPixel - GradTanTemplatePixel);
-					GradTanProb = 255 - std::round( (GradTanProb*255.0)/(60.0 + GradTanProb) );
-					
-					Prob = std::round(Prob*GradTanProb/255.0);
-					TOT_PROB[j] = Prob;
-					
-				}
-			}			
-*/
+										 
 #ifdef PROFILER_ENABLED
 mProfiler.start("computeProbabilities");
 #endif 		
@@ -208,13 +112,14 @@ mProfiler.start("computeProbabilities");
 			mTempProbMat.copyTo(mProbMap_Gray);
 			mTempProbMat = mTempProbMat + 10;
 			divide(mProbMap_Gray, mTempProbMat, mProbMap_Gray, 255, -1);
-			
+			mProbMap_Gray.convertTo(mProbMap_Gray, CV_32S);
+		
 			//GradientMag Probabilities
 			subtract(mFrameGradMag, mLaneMembership.TIPPING_POINT_GRAD_Mag, mTempProbMat, noArray(), CV_32F);
 			mTempProbMat.copyTo(mProbMap_GradMag);
 			mTempProbMat= abs(mTempProbMat) + 10;
 			divide(mProbMap_GradMag, mTempProbMat, mProbMap_GradMag, 255, -1);
-
+			mProbMap_GradMag.convertTo(mProbMap_GradMag, CV_32S);
 
 				
 			#ifdef PROFILER_ENABLED
@@ -237,25 +142,26 @@ mProfiler.start("computeProbabilities");
 
 			// Intermediate Probability Map
 			mBufferPool->Probability[bufferPos] = mProbMap_GradMag + mProbMap_Gray;
-			threshold(mBufferPool->Probability[bufferPos], mBufferPool->Probability[bufferPos], 0, 255, THRESH_TOZERO );
-			mBufferPool->Probability[bufferPos].convertTo(mBufferPool->Probability[bufferPos], CV_8U);			
-			mBufferPool->Probability[bufferPos].convertTo(mBufferPool->Probability[bufferPos], CV_16U);
-			
+			mMask = mBufferPool->Probability[bufferPos] <0 ;
+			mBufferPool->Probability[bufferPos].setTo(0,mMask);
+			//mBufferPool->Probability[bufferPos].convertTo(mBufferPool->Probability[bufferPos], CV_8U);			
+			//mBufferPool->Probability[bufferPos].convertTo(mBufferPool->Probability[bufferPos], CV_16U);
+
+
 			//Gradient Tangent Probability Map
 			subtract(mGradTanTemplate, mBufferPool->GradientTangent[bufferPos], mTempProbMat, noArray(), CV_32F);
 			mTempProbMat= abs(mTempProbMat);
 			mTempProbMat.copyTo(mProbMap_GradDir);
 			mTempProbMat = mTempProbMat + 60;
 			divide(mProbMap_GradDir, mTempProbMat, mProbMap_GradDir, 255, -1);
-			
+			mProbMap_GradDir.convertTo(mProbMap_GradDir, CV_32S);
 			subtract(255, mProbMap_GradDir, mProbMap_GradDir, noArray(), -1);
-			mProbMap_GradDir.convertTo(mProbMap_GradDir, CV_16U);
-					
+
 	
 			//Final Probability Map
 			multiply(mBufferPool->Probability[bufferPos], mProbMap_GradDir, mBufferPool->Probability[bufferPos]);
 		    mBufferPool->Probability[bufferPos].convertTo(mBufferPool->Probability[bufferPos], CV_8U, 1.0/255, 0);
-			
+		
 			mBufferReady= false;
 			wrtLock.unlock();
 		
@@ -276,14 +182,16 @@ void BufferingDAG_generic::auxillaryTasks()
 {
 
 		
-	int offset = mCAMERA.RES_VH(0)-mSpan;
+	int offset =  mCAMERA.RES_VH(0)-mSpan;
 	int rowIndex= mCAMERA.RES_VH(0) - mCAMERA.FRAME_CENTER(0) -mVanishPt.V +offset ;
 	int colIndex= mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
 	
 	
 	WriteLock  wrtLock(_mutex);
+	
 		Rect ROI = Rect(colIndex, rowIndex, mCAMERA.RES_VH(1), mSpan);
 		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
+		
 			
 		ROI = Rect(0,rowIndex,mCAMERA.RES_VH(1), mSpan);
 		mDEPTH_MAP_ROOT(ROI).copyTo(mDepthTemplate);
@@ -294,13 +202,12 @@ void BufferingDAG_generic::auxillaryTasks()
 		
 		for ( int i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
 		{
-		
-			mBufferPool->Probability[i] 	= mBufferPool->Probability[i+1];		
-			mBufferPool->GradientTangent[i] = mBufferPool->GradientTangent[i+1];
+			mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
+			mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);
 		}	
 		
 	mBufferReady = true;
-	//cout<< "Templates Ready"<<endl;
+
 	wrtLock.unlock();
 	_sateChange.notify_one();
 }
@@ -317,8 +224,8 @@ int BufferingDAG_generic::grabFrame()
 	#ifdef PROFILER_ENABLED
 	mProfiler.start("ImageRead");
 	#endif 
-
-		mFrameRGB = imread(mFiles[mFrameCount]);	
+	
+		mFrameRGB = imread(mFiles[mFrameCount]);
 	 
 
 	#ifdef PROFILER_ENABLED

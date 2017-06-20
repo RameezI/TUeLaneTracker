@@ -30,9 +30,7 @@ public:
 		
 		int 	confidenceLeft;
 		int     confidenceRight;
-		
 
-		
 		float   laneWidth_cm;
 
 		

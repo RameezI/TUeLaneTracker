@@ -24,11 +24,15 @@ public:
 	  
 	  int Span =-1;
 	  int testTypes =-1;
-
+	  int testResult_BlurFrame=-1;
 	  int testResult_GradX=-1;
 	  int testResult_GradY=-1;
 	  int testResult_Mag=-1;
 	  int testResult_GradTan=-1;
+	  int testResult_ProbGray=-1;
+	  int testResult_ProbMag=-1;
+	  int testResult_ProbDir=-1;
+	  int testResult_ProbFrame=-1;
 
 	 States  mCurrentState;
 	  
@@ -37,7 +41,8 @@ public:
 	{ 
 		
 		vector< cv::String> lFiles;
-		cv::String folder = "../TestData/TestImages";
+		//cv::String folder = "../TestData/TestImages";
+		cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
 		glob(folder, lFiles);
 		
 		Camera			  camera;
@@ -56,9 +61,14 @@ public:
 		templates           = bootingState.createTemplates();
 		
 
-		Mat exp_GradientX, exp_GradientY,	exp_MagFrame, exp_GradTan, exp_ProbFrame;
+		Mat exp_BlurFrame, exp_GradientX, exp_GradientY,	exp_MagFrame, exp_GradTan;
+		Mat BlurFrame, GradientX,    GradientY,        MagFrame,     GradTan;
 		
-
+		
+		Mat exp_ProbGray, exp_ProbMag, exp_ProbDir, exp_ProbFrame;
+		Mat ProbGray, ProbMag, ProbDir, ProbFrame;
+	
+		
 		if (bootingState.currentStatus == StateStatus::DONE)						
 		{
 			
@@ -74,12 +84,26 @@ public:
 			{
 				bufferingState.run();
 
+
 				BufferingDAG_generic lBufferingGraph(std::move(bufferingState.bufferingGraph));
 				Span = lBufferingGraph.mSpan;
-						
-						
+				
+				BlurFrame = lBufferingGraph.mFrameGRAY_ROI;
+				ProbGray = lBufferingGraph.mProbMap_Gray;
+				ProbMag  = lBufferingGraph.mProbMap_GradMag;
+				ProbDir  = lBufferingGraph.mProbMap_GradDir;
+				ProbFrame = lBufferingGraph.mBufferPool->Probability[2];
+				
+							
 									/* Simulated */
-				//-----------------------------------------------------------------------//		
+				//-----------------------------------------------------------------------//
+				exp_BlurFrame = loadCSV("BlurredFrame.csv", CV_8UC1);
+				cv::compare(exp_BlurFrame, BlurFrame, comparison, cv::CMP_NE);
+				testResult_BlurFrame = cv::countNonZero(comparison);
+
+
+											/*Actual */
+				//-----------------------------------------------------------------------//
 				exp_GradientX = loadCSV("GradientX.csv", CV_16SC1);
 				cv::compare(exp_GradientX, lBufferingGraph.mGradX, comparison, cv::CMP_NE);
 				testResult_GradX = cv::countNonZero(comparison);
@@ -88,8 +112,7 @@ public:
 				cv::compare(exp_GradientY, lBufferingGraph.mGradY, comparison, cv::CMP_NE);
 				testResult_GradY = cv::countNonZero(comparison);
 				
-									/*Actual */
-				//-------------------------------------------------------------------------//		
+		
 				exp_MagFrame = loadCSV("MAG_FRAME.csv", CV_8UC1);
 				cv::compare(exp_MagFrame, lBufferingGraph.mFrameGradMag, comparison, cv::CMP_NE);
 				testResult_Mag = cv::countNonZero(comparison);
@@ -103,10 +126,33 @@ public:
 					testTypes=0;		
 				}
 				
-				// ^TODO ProbFrame is only varified visually
-				//imshow("ExpectedFrame", exp_ProbFrame);
-				//imshow("ActualFrame",   lBufferingGraph.mBufferPool->Probability[2]);
-				//waitKey(0);
+				if (lBufferingGraph.mGradY.type() == CV_16SC1)
+				{
+					testTypes=0;		
+				}
+				
+				
+				exp_ProbGray = loadCSV("PROB_GRAY.csv", CV_32SC1);
+				cv::compare(exp_ProbGray, ProbGray, comparison, cv::CMP_NE);
+				testResult_ProbGray = cv::countNonZero(comparison);
+				
+				exp_ProbMag = loadCSV("PROB_MAG.csv", CV_32SC1);
+				cv::compare(exp_ProbMag, ProbMag, comparison, cv::CMP_NE);
+				testResult_ProbMag = cv::countNonZero(comparison);
+				
+				exp_ProbDir = loadCSV("PROB_DIR.csv", CV_32SC1);
+				cv::compare(exp_ProbDir, ProbDir, comparison, cv::CMP_NE);
+				testResult_ProbDir = cv::countNonZero(comparison);
+				
+				exp_ProbFrame = loadCSV("PROB_FRAME.csv", CV_8UC1);
+				cv::compare(exp_ProbFrame, ProbFrame, comparison, cv::CMP_NE);
+				testResult_ProbFrame = cv::countNonZero(comparison);
+				
+				saveMatToCsv(ProbDir, "ProbDir.csv");
+				
+				
+
+	
 			}
 		}
 

@@ -64,7 +64,6 @@ private:
 	Mat						mHistBase;
 	Mat						mHistPurview;
 	
-	Mat 					mMask;
 	Mat						mProbMapFocussed;
 	Mat 					mGradTanFocussed;
 	

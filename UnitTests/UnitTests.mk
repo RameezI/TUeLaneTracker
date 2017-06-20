@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=rameez
-Date                   :=18/06/17
+Date                   :=20/06/17
 CodeLitePath           :="/home/rameez/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -60,7 +60,7 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/vpFilterTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneFilterTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/BootingStateTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/time_measure.cpp$(ObjectSuffix) $(IntermediateDirectory)/BufferingStateTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/TrackingStateTests.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/vpFilterTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/LaneFilterTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/BootingStateTests.cpp$(ObjectSuffix) $(IntermediateDirectory)/time_measure.cpp$(ObjectSuffix) $(IntermediateDirectory)/TrackingTests.cpp$(ObjectSuffix) 
 
 
 
@@ -138,21 +138,13 @@ $(IntermediateDirectory)/time_measure.cpp$(DependSuffix): time_measure.cpp
 $(IntermediateDirectory)/time_measure.cpp$(PreprocessSuffix): time_measure.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/time_measure.cpp$(PreprocessSuffix) "time_measure.cpp"
 
-$(IntermediateDirectory)/BufferingStateTests.cpp$(ObjectSuffix): BufferingStateTests.cpp $(IntermediateDirectory)/BufferingStateTests.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/UnitTests/BufferingStateTests.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/BufferingStateTests.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/BufferingStateTests.cpp$(DependSuffix): BufferingStateTests.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/BufferingStateTests.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/BufferingStateTests.cpp$(DependSuffix) -MM "BufferingStateTests.cpp"
+$(IntermediateDirectory)/TrackingTests.cpp$(ObjectSuffix): TrackingTests.cpp $(IntermediateDirectory)/TrackingTests.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/UnitTests/TrackingTests.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/TrackingTests.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/TrackingTests.cpp$(DependSuffix): TrackingTests.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/TrackingTests.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/TrackingTests.cpp$(DependSuffix) -MM "TrackingTests.cpp"
 
-$(IntermediateDirectory)/BufferingStateTests.cpp$(PreprocessSuffix): BufferingStateTests.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/BufferingStateTests.cpp$(PreprocessSuffix) "BufferingStateTests.cpp"
-
-$(IntermediateDirectory)/TrackingStateTests.cpp$(ObjectSuffix): TrackingStateTests.cpp $(IntermediateDirectory)/TrackingStateTests.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/rameez/TUeLaneTracker/UnitTests/TrackingStateTests.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/TrackingStateTests.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/TrackingStateTests.cpp$(DependSuffix): TrackingStateTests.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/TrackingStateTests.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/TrackingStateTests.cpp$(DependSuffix) -MM "TrackingStateTests.cpp"
-
-$(IntermediateDirectory)/TrackingStateTests.cpp$(PreprocessSuffix): TrackingStateTests.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/TrackingStateTests.cpp$(PreprocessSuffix) "TrackingStateTests.cpp"
+$(IntermediateDirectory)/TrackingTests.cpp$(PreprocessSuffix): TrackingTests.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/TrackingTests.cpp$(PreprocessSuffix) "TrackingTests.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
