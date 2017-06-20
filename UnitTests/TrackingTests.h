@@ -446,10 +446,6 @@ public:
 				exp_laneModel= loadCSV("LaneModel.csv", CV_32SC1);
 				cv::compare(exp_laneModel, laneModel, comparison, cv::CMP_NE);
 				testResult_laneModel = cv::countNonZero(comparison);
-			
-				
-				
-				
 
 			}
 		}
