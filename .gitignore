@@ -1,7 +1,6 @@
 # TUeLDT
 .clang/
-
+./*
 .codelite/
-
 TUeLaneTracker.workspace
 
