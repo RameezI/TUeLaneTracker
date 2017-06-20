@@ -10,16 +10,16 @@ using namespace Eigen;
 struct Templates
 {
 	
-	public:
-		const int MARGIN;
-		const int VP_RANGE_V;
-		const int SPAN;
-		
-		Mat GRADIENT_TAN_ROOT;
-		Mat FOCUS_MASK_ROOT;
-		Mat DEPTH_MAP_ROOT;
-		Mat X_IRS;
-		Mat Y_IRS;
+public:
+	const int MARGIN;
+	const int VP_RANGE_V;
+	const int SPAN;
+
+	Mat GRADIENT_TAN_ROOT;
+	Mat FOCUS_MASK_ROOT;
+	Mat DEPTH_MAP_ROOT;
+	Mat X_IRS;
+	Mat Y_IRS;
 
   
   
@@ -29,7 +29,8 @@ struct Templates
 	  SPAN((RES_V/2)-MARGIN + VP_RANGE_ROWS) 
 	{
 		   
-		/* Create Focus Template */			
+		/* Create Focus Template */
+			
 			MatrixXi FOCUS_ROOT     = MatrixXi::Zero(SPAN + 2*VP_RANGE_V, RES_H);
 			FOCUS_ROOT.block(2*VP_RANGE_V, 0, SPAN, RES_H) = MatrixXi::Constant(SPAN, RES_H, 255);			
 			eigen2cv(FOCUS_ROOT, FOCUS_MASK_ROOT);
@@ -66,7 +67,8 @@ struct Templates
 		
 
 		
-			/* Create Y Template */
+		/* Create Y Template */
+
 			Mat Col = Mat(SPAN, 1, CV_16S);
 			ptr = Col.ptr<int16_t>(0);
 			for (int i=0; i<SPAN; i++)
@@ -78,6 +80,7 @@ struct Templates
 
 
 	  /* Load Gradient Tangent Template */
+
 			std::stringstream formattedString;
 			string templateFile, prefix, format;
 			prefix= "Templates/GradientTangent_";

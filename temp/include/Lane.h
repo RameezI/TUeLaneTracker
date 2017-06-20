@@ -23,7 +23,7 @@ public:
 struct LaneModel
 {
 public:
-	    int 	leftOffset;
+	    	int 	leftOffset;
 		int 	rightOffset;
 		
 		int     centerLane;

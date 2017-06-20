@@ -20,13 +20,14 @@ private:
 		   const   	VectorXd PX_ANG  	= atan( PX_SIZE * (vRows.array()/FOCAL_LENGTH) ) * 180.0 /M_PI ;
 		   const	VectorXd DEPTH_P 	= HEIGHT * tan( (90 - PX_ANG.array()) * M_PI/180.0 );
 	
-		  return 	H_RES_H/(100*tan(H_FOV_H * M_PI /180.0)*DEPTH_P(H_RES_V-2)); //The horizontal pixel to cm ratio at the bottom
+		//The horizontal pixel to cm ratio at the bottom
+		  return 	H_RES_H/(100*tan(H_FOV_H * M_PI /180.0)*DEPTH_P(H_RES_V-2)); 
 	   }
 	
 public:
 		const Vector2i	RES_VH; 	    	// resolution of camera
 		const Vector2i  FRAME_CENTER;		// frame center in image coordinate system
-		const Vector2f  FOV;				// field of view of camera
+		const Vector2f  FOV;			// field of view of camera
 		const float  	HEIGHT;		    	// camera height in meters
 		const double 	FOCAL_LENGTH;    	// camera focal length in meters
 		const double    CM_TO_PIXEL;		// CM_TO_PIXCEL RATIO

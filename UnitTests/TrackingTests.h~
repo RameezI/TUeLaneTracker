@@ -242,17 +242,17 @@ public:
 				testResult_PurviewBinIdx	= -1;
 				testResult_WeightsBin		= -1;
 
-				testResult_HistBase		= -1;
+				testResult_HistBase			= -1;
 				testResult_HistPurview		= -1;
 
 				testResult_TransitionedFilterLane	= -1;
 				testResult_UpdatedFilterLane		= -1;
 				testResult_TransitionedFilterVP		= -1;
-				testResult_UpdatedFilterVP		= -1;
+				testResult_UpdatedFilterVP			= -1;
 				
 				
-				testResult_laneModel		= -1;
-				testResult_vp			= -1;
+				testResult_laneModel				= -1;
+				testResult_vp						= -1;
 			
 			
 			TrackingLaneState& trackingState = *pTrackingState;			
@@ -264,18 +264,18 @@ public:
 			{
 				trackingState.run();
 				
-				BlurFrame	= trackingState.mTrackingLanesGraph.mFrameGRAY_ROI;
+				BlurFrame 			= trackingState.mTrackingLanesGraph.mFrameGRAY_ROI;
 				GradientTanTemplate = trackingState.mTrackingLanesGraph.mGradTanTemplate;
-				FocusTemplate 	= trackingState.mTrackingLanesGraph.mFocusTemplate;
-				DepthTemplate	= trackingState.mTrackingLanesGraph.mDepthTemplate;
-				GradientX   	= trackingState.mTrackingLanesGraph.mGradX;
-				GradientY  	= trackingState.mTrackingLanesGraph.mGradY;
-				MagFrame    	= trackingState.mTrackingLanesGraph.mFrameGradMag;
-				GradTan		= trackingState.mTrackingLanesGraph.mBufferPool->GradientTangent[2];
-				ProbGray 	= trackingState.mTrackingLanesGraph.mProbMap_Gray;
-				ProbMag  	= trackingState.mTrackingLanesGraph.mProbMap_GradMag;
-				ProbDir  	= trackingState.mTrackingLanesGraph.mProbMap_GradDir;
-				ProbFrame 	= trackingState.mTrackingLanesGraph.mBufferPool->Probability[2];
+				FocusTemplate       = trackingState.mTrackingLanesGraph.mFocusTemplate;
+				DepthTemplate	    = trackingState.mTrackingLanesGraph.mDepthTemplate;
+				GradientX   		= trackingState.mTrackingLanesGraph.mGradX;
+				GradientY  			= trackingState.mTrackingLanesGraph.mGradY;
+				MagFrame    		= trackingState.mTrackingLanesGraph.mFrameGradMag;
+				GradTan				= trackingState.mTrackingLanesGraph.mBufferPool->GradientTangent[2];
+				ProbGray 			= trackingState.mTrackingLanesGraph.mProbMap_Gray;
+				ProbMag  			= trackingState.mTrackingLanesGraph.mProbMap_GradMag;
+				ProbDir  			= trackingState.mTrackingLanesGraph.mProbMap_GradDir;
+				ProbFrame 			= trackingState.mTrackingLanesGraph.mBufferPool->Probability[2];
 
 				
 
@@ -283,11 +283,11 @@ public:
 				MaxProbFocussed = trackingState.mTrackingLanesGraph.mProbMapFocussed;
 				GradTanFocussed = trackingState.mTrackingLanesGraph.mGradTanFocussed;
 			
-				BaseBinIdx 	= Mat(trackingState.mTrackingLanesGraph.mBaseBinIdx);
+				BaseBinIdx 		= Mat(trackingState.mTrackingLanesGraph.mBaseBinIdx);
 				PurviewBinIdx 	= Mat(trackingState.mTrackingLanesGraph.mPurviewBinIdx);			
-				WeightsBin 	= Mat(trackingState.mTrackingLanesGraph.mWeightBin);
+				WeightsBin 		= Mat(trackingState.mTrackingLanesGraph.mWeightBin);
 				
-				HistBase 	= trackingState.mTrackingLanesGraph.mHistBase;
+				HistBase 		= trackingState.mTrackingLanesGraph.mHistBase;
 				HistPurview 	= trackingState.mTrackingLanesGraph.mHistPurview;
 				
 				TransitionedFilterLane = trackingState.mTrackingLanesGraph.mTransitLaneFilter;
@@ -310,14 +310,14 @@ public:
 				laneModel = Mat(Lane);
 				
 				
-							/* Simulated */
+									/* Simulated */
 				//--------------------------------------------------------//
 				exp_BlurFrame = loadCSV("BlurredFrame.csv", CV_8UC1);
 				cv::compare(exp_BlurFrame, BlurFrame, comparison, cv::CMP_NE);
 				testResult_BlurFrame = cv::countNonZero(comparison);
 
 
-							/*Actual */
+										/*Actual */
 				//--------------------------------------------------------//
 				
 				exp_GradientTanTemplate = loadCSV("TemplateGradientTan.csv", CV_16SC1);

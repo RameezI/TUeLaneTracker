@@ -36,41 +36,39 @@ using  namespace std;
 
 private:
             
-		double mStartTime;
-		double mEndTime;
+	double mStartTime;
+	double mEndTime;
 
-		vector<uint64_t> mStartTick;
-	    uint64_t mEndTick;
+	vector<uint64_t> mStartTick;
+	uint64_t mEndTick;
 
+	vector<string> mBlockName;
 
-	    vector<string> mBlockName;
-
-		std::map<string, double> 			mBlockMaxTime;
-	    std::map<string, double> 			mBlockAvgTime;
-	    std::map<string, double> 			mBlockMinTime;
-		std::map<string, uint64_t> 			mBlockMultiplicity;
+	std::map<string, double> 	mBlockMaxTime;
+	std::map<string, double> 	mBlockAvgTime;
+	std::map<string, double> 	mBlockMinTime;
+	std::map<string, uint64_t> 	mBlockMultiplicity;
 	   
-	    void blockTime_ms(uint64_t , uint64_t );
+	void blockTime_ms(uint64_t , uint64_t );
             
 public:
 	
-	
-	    ProfilerLDT();		
+	ProfilerLDT();		
 	   
-	    void    	start(std::string);
+	void    	start(std::string);
  
-		void 		writeTimings(); 	//write Timings to a file
+	void 		writeTimings(); 	//write Timings to a file
 
-		double 		getAvgTime(std::string);  	//get Timings for a specific block
-		double 		getMaxTime(std::string);  	//get Timings for a specific block
-		double 		getMinTime(std::string);  	//get Timings for a specific block
+	double 		getAvgTime(std::string);  	//get Timings for a specific block
+	double 		getMaxTime(std::string);  	//get Timings for a specific block
+	double 		getMinTime(std::string);  	//get Timings for a specific block
 		
 
-	    uint64_t 	getMultiplicity(std::string);
+	uint64_t 	getMultiplicity(std::string);
 	
-		void        end(); 
+	void        end(); 
 
-		~ProfilerLDT();
+	~ProfilerLDT();
     };
 	
 #endif

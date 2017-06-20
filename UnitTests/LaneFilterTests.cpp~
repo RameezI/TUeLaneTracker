@@ -26,7 +26,7 @@ public:
 	{
 
 		Camera 			 camera;
-		LaneParameters   	lane;
+		LaneParameters   lane;
 			
 		LaneFilter laneFilter(lane, camera);
 		

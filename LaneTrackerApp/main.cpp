@@ -13,14 +13,12 @@ int main()
 	
 	
 	
-	//namedWindow( "Lane Tracker TU/e", WINDOW_AUTOSIZE ); // Create a window for display.
 #ifdef DIRECTORY_INPUT
 	vector< cv::String> IMG_filenames;
 	cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
 	glob(folder, IMG_filenames);
 
 #endif
-	//Object that handles Signal interrupts from the user i.e. ctrl+c
 	shared_ptr<SigInit> sigInit= make_shared<SigInit>();
 	
 	 //Check if Siginit is properly initialised
@@ -33,6 +31,7 @@ int main()
 	std::cout<<" Press Ctrl+C to terminate."<<std::endl;
 	std::cout<<"******************************"<<std::endl;
 	
+
 #ifdef DIRECTORY_INPUT	
 	StateMachine stateMachine(IMG_filenames);
 #else

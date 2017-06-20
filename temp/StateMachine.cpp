@@ -27,7 +27,7 @@ States StateMachine::sCurrentState = States::BOOTING;
 		#ifdef PROFILER_ENABLED
 		LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 			 <<"******************************" <<endl
-			 <<  "StateMachine Constructed" 	<<endl
+			 <<  "StateMachine Constructed"     <<endl
 			 <<"******************************" <<endl<<endl;
 			#endif						
 	}
@@ -60,12 +60,12 @@ States StateMachine::sCurrentState = States::BOOTING;
 		{				
 			InitState		bootingState;
 
-			pLaneFilter 			= bootingState.createLaneFilter();
-			pVanishingPtFilter		= bootingState.createVanishingPtFilter();
+			pLaneFilter 		= bootingState.createLaneFilter();
+			pVanishingPtFilter	= bootingState.createVanishingPtFilter();
 			pTemplates           	= bootingState.createTemplates();
 					
 			if (bootingState.currentStatus == StateStatus::DONE)						
-				sCurrentState =	States::BUFFERING;																																					
+				sCurrentState = States::BUFFERING;	
 			else 
 				sCurrentState = States::DISPOSING;							
 		} 
@@ -79,13 +79,13 @@ States StateMachine::sCurrentState = States::BOOTING;
 			if (bufferingState.currentStatus == StateStatus::INACTIVE)
 			{			
 				/*Inject Dependencies for Buffering State */								  
-					#ifdef DIRECTORY_INPUT 
-						bufferingState.setSource(mFiles);
-					#else
-						bufferingState.setSource();
-					#endif				
+				#ifdef DIRECTORY_INPUT 
+					bufferingState.setSource(mFiles);
+				#else
+					bufferingState.setSource();
+				#endif
 						
-					bufferingState.setupDAG(std::ref(*pTemplates));
+				bufferingState.setupDAG(std::ref(*pTemplates));
 			}
 	
 			while (bufferingState.currentStatus == StateStatus::ACTIVE)
@@ -94,12 +94,12 @@ States StateMachine::sCurrentState = States::BOOTING;
 			
 			if( bufferingState.currentStatus == StateStatus::DONE)
 			{
-				sCurrentState = States::DETECTING_LANES;
-				pTrackingState.reset(new TrackingLaneState(move(bufferingState.bufferingGraph)));				
+			    sCurrentState = States::DETECTING_LANES;
+			    pTrackingState.reset(new TrackingLaneState(move(bufferingState.bufferingGraph)));				
 			}
 			
 			else
-				sCurrentState = States::DISPOSING;
+			    sCurrentState = States::DISPOSING;
 				
 		} 
 		
@@ -110,7 +110,7 @@ States StateMachine::sCurrentState = States::BOOTING;
 			TrackingLaneState& trackingState = *pTrackingState;
 
 			if (trackingState.currentStatus == StateStatus::INACTIVE)			
-				trackingState.setupDAG(pLaneFilter.get(), pVanishingPtFilter.get());
+			trackingState.setupDAG(pLaneFilter.get(), pVanishingPtFilter.get());
 		
 		
 			while (trackingState.currentStatus == StateStatus::ACTIVE)
@@ -125,8 +125,8 @@ States StateMachine::sCurrentState = States::BOOTING;
 				 #ifdef PROFILER_ENABLED
 				 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 				 <<"******************************"<<endl
-				 <<  "Tracking Finished"<<endl
-				 <<  "Shutting Down the State-Machine." <<endl
+				 <<  "Tracking Finished"           <<endl
+				 <<  "Shutting Down the State-Machine."<<endl
 				 <<"******************************"<<endl<<endl;
 				#endif 
 				return 0;				

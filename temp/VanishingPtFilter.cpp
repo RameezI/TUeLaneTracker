@@ -38,30 +38,24 @@ VanishingPtFilter::VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_B
 void VanishingPtFilter::createPrior()
 {
 	
-    float  sigma = 5.0*VP_RANGE_V/mVP_STEP;
-    double pv,ph,p;
-
-
+	float  sigma = 5.0*VP_RANGE_V/mVP_STEP;
+	double pv,ph,p;
 	
-    for (int v = 1; v <= mNb_VP_BINS_V; v++)
-	{
-       for (int h = 1; h <= mNb_VP_BINS_H; h++)
+	for (int v = 1; v <= mNb_VP_BINS_V; v++)
+   	{
+           for (int h = 1; h <= mNb_VP_BINS_H; h++)
 	   {  
             pv = exp( -pow(v-mNb_VP_BINS_V/2.0,2)  / pow(sigma,2) ) *128 ;     
             ph = exp( -pow(h-mNb_VP_BINS_H/2.0,2)  / pow(sigma,2) ) *128;  
 			
-			this->prior.at<int>(v-1,h-1) = (int)(std::round(pv*ph));                
+	    this->prior.at<int>(v-1,h-1) = (int)(std::round(pv*ph));                
 	   }    
-    }
-    
-
+    	}
 
 	// Normalize
 	int32_t SUM = cv::sum(this->prior)[0];
 	this->prior.convertTo(this->prior,CV_32SC1,SCALE_FILTER);
 	this->prior = this->prior/(SUM);
-
-
 	  
 }
 

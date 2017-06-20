@@ -52,9 +52,9 @@ protected:
 	
 public:
 
-	static const  int      sNbBuffer =3;
-	int64_t 			   StateCounter;     	
-	StateStatus 	       currentStatus;
+	static const  int      	sNbBuffer =3;
+	int64_t 		StateCounter;     	
+	StateStatus 	       	currentStatus;
 	
 	void conclude(){currentStatus = StateStatus::DONE;}
 	

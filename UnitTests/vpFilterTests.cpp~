@@ -29,8 +29,8 @@ public:
 	Mat exp_vpFilter, exp_vpPrior, exp_HistogramBINS, exp_BINS_V, exp_BINS_H;
 	Mat BINS_V, BINS_H, HistogramBINS;
 		
-	Camera				camera;
-	LaneParameters			lane;
+	Camera 	   			camera;
+	LaneParameters      lane;
 	LaneFilter 			laneFilter(lane, camera);
 	
 		

@@ -22,31 +22,32 @@ public:
 	
 	{ 
 		
-		Camera			camera;
-		LaneParameters    	lane;
+		Camera			  camera;
+		LaneParameters    lane;
 
 		unique_ptr<LaneFilter>  		laneFilter;
-		unique_ptr<VanishingPtFilter>   	vanishingPtFilter;
+		unique_ptr<VanishingPtFilter>   vanishingPtFilter;
 		unique_ptr<Templates> 			templates;
 				
 		InitState		bootingState;
 		
-		laneFilter 		= bootingState.createLaneFilter();
+		laneFilter 			= bootingState.createLaneFilter();
 		vanishingPtFilter	= bootingState.createVanishingPtFilter();
-		templates           	= bootingState.createTemplates();
+		templates           = bootingState.createTemplates();
 	
 		Mat comparison;
 		
 		Mat exp_GradientTangent, exp_DepthRoot, exp_FocusRoot;
 		Mat GradientTangent, 	 DepthRoot, 	 FocusRoot;
 		
-		GradientTangent 	= templates->GRADIENT_TAN_ROOT;
+		GradientTangent = templates->GRADIENT_TAN_ROOT;
 		DepthRoot		= templates->DEPTH_MAP_ROOT;
 		FocusRoot  		= templates->FOCUS_MASK_ROOT;
 		
 		exp_GradientTangent = loadCSV("GRADIENT_TANGENT_ROOT.csv", CV_16SC1);
 		cv::compare(exp_GradientTangent, GradientTangent , comparison, cv::CMP_NE);
 		testResult_GradTangentRoot = cv::countNonZero(comparison);
+		
 		
 		exp_DepthRoot = loadCSV("DEPTH_ROOT.csv", CV_16UC1);
 		cv::compare(exp_DepthRoot, DepthRoot, comparison, cv::CMP_NE);

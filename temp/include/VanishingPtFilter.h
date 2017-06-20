@@ -47,49 +47,49 @@ struct PurviewHistogramModel
 
 
 
-	class VanishingPtFilter
+class VanishingPtFilter
 {
 
 		
-	public:
+public:
 
-		VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_BINS, 
-						  const int&  LANE_FILTER_OFFSET_V,
-						  const Camera& CAMERA);
-						  
-		~VanishingPtFilter();
-
-
+	VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_BINS, 
+					  const int&  LANE_FILTER_OFFSET_V,
+					  const Camera& CAMERA);
+					  
+	~VanishingPtFilter();
 
 
-private: //Internal variables
-	        const int       mVP_STEP;         // Step for VP Bins
+
+
+private: 
+        	const int       mVP_STEP;         // Step for VP Bins
 
 public: 
-			const int 	 	VP_RANGE_V;
-			const int 	 	VP_RANGE_H;
-						
-			const int    	mNb_VP_BINS_V;    // number of bins in the  vertical   direction.
-			const int    	mNb_VP_BINS_H;    // number of bins in the horizental direction.
+		const int 	VP_RANGE_V;
+		const int 	VP_RANGE_H;
+					
+		const int    	mNb_VP_BINS_V;    // number of bins in the  vertical   direction.
+		const int    	mNb_VP_BINS_H;    // number of bins in the horizental direction.
 
-			const VectorXi 	VP_BINS_V;	    	//Histogram Bins in Pixels.
-			const VectorXi 	VP_BINS_H;     		//Histogram Bins in Pixels.
-			const int  	 	OFFSET_V;
-			
-			const float     mVP_LANE_RATIO;			
+		const VectorXi 	VP_BINS_V;	 //Histogram Bins in Pixels.
+		const VectorXi 	VP_BINS_H;     	 //Histogram Bins in Pixels.
+		const int  	OFFSET_V;
+		
+		const float     mVP_LANE_RATIO;			
 
 
 public:			
 			
-			const VectorXi  HISTOGRAM_BINS;	    //Purview Histogram Bins in Pixels.
-			const int    	STEP;  				//Purview Histogram STEP
-			      
-		    Mat  prior;
-		    Mat  filter;
+		const VectorXi  HISTOGRAM_BINS;	    //Purview Histogram Bins in Pixels.
+		const int    	STEP;  		    //Purview Histogram STEP
+		      
+	    	Mat  prior;
+	    	Mat  filter;
 
 				  		
 private:		 
-			void  createPrior();
+		void  createPrior();
 
 };
 	
