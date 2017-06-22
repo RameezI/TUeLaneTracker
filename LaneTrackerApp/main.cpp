@@ -14,11 +14,17 @@ int main()
 	
 	
 #ifdef DIRECTORY_INPUT
-	vector< cv::String> IMG_filenames;
-	cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
-	glob(folder, IMG_filenames);
-
+	 vector< cv::String> IMG_filenames;
+	 cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
+	 glob(folder, IMG_filenames);	
+	 cout<<endl;
+	 cout<<"Total Number of Image Files : " << IMG_filenames.size();
+	 cout<<endl;
+	 
+	 if (IMG_filenames.size() < 1)
+		 return -1;
 #endif
+
 	shared_ptr<SigInit> sigInit= make_shared<SigInit>();
 	
 	 //Check if Siginit is properly initialised
