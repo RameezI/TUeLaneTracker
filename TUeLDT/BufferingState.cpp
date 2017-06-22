@@ -13,10 +13,10 @@ BufferingState::BufferingState()
 
   
 #ifdef DIRECTORY_INPUT
-void BufferingState::setSource(const vector<cv::String>& files)
+void BufferingState::setSource(const vector<cv::String>& files, int skipFrames)
 {
 	bufferingGraph.mFiles = files;
-	bufferingGraph.mFrameCount =0;
+	bufferingGraph.mFrameCount =skipFrames;
 }
 
 #else

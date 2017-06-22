@@ -27,7 +27,7 @@ public:
 	#endif
 		
 	#ifdef DIRECTORY_INPUT
-	void setSource(const vector<cv::String>& files);
+	void setSource(const vector<cv::String>& files, int skipFrames);
 	#else
 	void setSource();
 	#endif

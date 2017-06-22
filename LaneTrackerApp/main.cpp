@@ -14,14 +14,16 @@ int main()
 	
 	
 #ifdef DIRECTORY_INPUT
+	 
 	 vector< cv::String> IMG_filenames;
 	 cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
-	 glob(folder, IMG_filenames);	
+	 glob(folder, IMG_filenames);
+	 const int skipFrames = 0;	
 	 cout<<endl;
-	 cout<<"Total Number of Image Files : " << IMG_filenames.size();
+	 cout<<"Total Number of Image Files : " << IMG_filenames.size() - skipFrames;
 	 cout<<endl;
 	 
-	 if (IMG_filenames.size() < 1)
+	 if (IMG_filenames.size()- skipFrames < 1)
 		 return -1;
 #endif
 
@@ -39,7 +41,7 @@ int main()
 	
 
 #ifdef DIRECTORY_INPUT	
-	StateMachine stateMachine(IMG_filenames);
+	StateMachine stateMachine(IMG_filenames, skipFrames);
 #else
 	StateMachine stateMachine;
 #endif

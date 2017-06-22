@@ -11,9 +11,9 @@ States StateMachine::sCurrentState = States::BOOTING;
 /*Constructor*/
 #ifdef DIRECTORY_INPUT  
  
-	StateMachine::StateMachine(const vector<cv::String>& filenames) 
-	: mFiles(filenames)
-
+	StateMachine::StateMachine(const vector<cv::String>& filenames, const int& skipFrames) 
+	: mFiles(filenames),
+      mSkipFrames(skipFrames)
 	{
 		#ifdef PROFILER_ENABLED
 		const std::string str = filenames[0];
@@ -80,7 +80,7 @@ States StateMachine::sCurrentState = States::BOOTING;
 			{			
 				/*Inject Dependencies for Buffering State */								  
 				#ifdef DIRECTORY_INPUT 
-					bufferingState.setSource(mFiles);
+					bufferingState.setSource(mFiles, mSkipFrames);
 				#else
 					bufferingState.setSource();
 				#endif

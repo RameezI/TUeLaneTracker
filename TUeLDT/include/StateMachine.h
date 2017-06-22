@@ -16,6 +16,7 @@ private:
 
 #ifdef DIRECTORY_INPUT
 	const vector<cv::String>& mFiles;
+	const int mSkipFrames;
 #endif
 	static States   sCurrentState;
 
@@ -23,7 +24,7 @@ private:
 public:	
 	// STATE MACHINE METHODS
 #ifdef DIRECTORY_INPUT
-	StateMachine(const vector<cv::String>&);
+	StateMachine(const vector<cv::String>&, const int& skipFrames);
 #else
 	StateMachine();
 #endif
