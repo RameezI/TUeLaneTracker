@@ -83,7 +83,7 @@ public:
 
 			std::stringstream formattedString;
 			string templateFile, prefix, format;
-			prefix= "Templates/GradientTangent_";
+			prefix= "../../Templates/GradientTangent_";
 			formattedString<<prefix<<std::to_string(RES_H)<<"x"<<std::to_string(RES_V);
 			templateFile = formattedString.str();
 			struct stat buf;
