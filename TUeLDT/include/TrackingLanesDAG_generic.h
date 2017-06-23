@@ -15,7 +15,7 @@ friend class TEST_TrackingState;
 private:
 
 	bool 		mFiltersReady;
-    	bool           	mStartFiltering;
+	bool    	mStartFiltering;
 	
 	const int	mMAX_PIXELS_ROI;
 
@@ -43,7 +43,8 @@ private:
     	float		mLikelihoodVP_Width;
 	int       	mPosteriorProbVP;
 	
-	//Caclutaions of Weighted Center Lane
+	//Caclutaions of Weighted Center LaneProgram exited with return code: 0
+
 	//int 					mCarWidth_pixels;
 	//float					mCenterOffset;
 	
@@ -66,12 +67,12 @@ private:
 	Mat			mHistPurview;
 	
 	Mat			mProbMapFocussed;
-	Mat 			mGradTanFocussed;
+	Mat 		mGradTanFocussed;
 	
-	Mat 			mTransitLaneFilter;
-	Mat 			mTransitVpFilter;
+	Mat 		mTransitLaneFilter;
+	Mat 		mTransitVpFilter;
 
-	LaneModel               mLaneModel;
+	LaneModel   mLaneModel;
 	
 	
 public:

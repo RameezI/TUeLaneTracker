@@ -52,7 +52,7 @@ protected:
 	
 public:
 
-	static const  int      	sNbBuffer =3;
+	static const  int      	sNbBuffer =5;
 	int64_t 		StateCounter;     	
 	StateStatus 	       	currentStatus;
 	

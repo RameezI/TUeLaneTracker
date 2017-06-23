@@ -536,8 +536,6 @@ mProfiler.start("Display");
 		 CvScalar(0,255,0),
 		 3
 	   	);
-	
-	
 	    imshow( "Display window", mFrameRGB);
 	    waitKey(10);
 	}
@@ -613,7 +611,7 @@ void TrackingLanesDAG_generic::auxillaryTasks()
 	SUM = sum(mTransitLaneFilter)[0];
 	mTransitLaneFilter= mTransitLaneFilter*SCALE_FILTER;
 	mTransitLaneFilter.convertTo(mTransitLaneFilter, CV_32S, 1.0/SUM);
-	mTransitLaneFilter = 	mTransitLaneFilter + mLaneFilter->prior;
+	mTransitLaneFilter = 	mTransitLaneFilter + 0.1*mLaneFilter->prior;
 
 
 	//Predict VP States
@@ -624,7 +622,7 @@ void TrackingLanesDAG_generic::auxillaryTasks()
 	SUM = sum(mTransitVpFilter)[0];
 	mTransitVpFilter= mTransitVpFilter*SCALE_FILTER;
 	mTransitVpFilter.convertTo(mTransitVpFilter, CV_32S, 1.0/SUM);	
-	mTransitVpFilter = mTransitVpFilter + mVpFilter->prior;
+	mTransitVpFilter = mTransitVpFilter + 0.5*mVpFilter->prior;
 			
 	mFiltersReady   = true;
 	mStartFiltering = false;

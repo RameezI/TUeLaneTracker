@@ -18,7 +18,7 @@ int main()
 	 vector< cv::String> IMG_filenames;
 	 cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
 	 glob(folder, IMG_filenames);
-	 const int skipFrames = 0;	
+	 const int skipFrames = 4000;	
 	 cout<<endl;
 	 cout<<"Total Number of Image Files : " << IMG_filenames.size() - skipFrames;
 	 cout<<endl;
