@@ -14,7 +14,8 @@ int main()
 	
 	
 #ifdef DIRECTORY_INPUT
-	 
+	
+
 	 vector< cv::String> IMG_filenames;
 	 cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
 	 glob(folder, IMG_filenames);
