@@ -9,25 +9,7 @@ void BufferingDAG_generic::buffer()
 {
 
 
-#ifdef PROFILER_ENABLED
-	mProfiler.start("TemplatesWait");
-	#endif 							
 
-		WriteLock  wrtLock(_mutex);
-		_sateChange.wait(wrtLock,[this]{return mBufferReady;} );
-				
-	 #ifdef PROFILER_ENABLED
-	 mProfiler.end();
-
-	 
-LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
-	 <<"******************************"<<endl
-	 <<  "Waiting For Worker thread (Templates)." <<endl
-	 <<  "Wait Time: " << mProfiler.getAvgTime("TemplatesWait")<<endl
-	 <<"******************************"<<endl<<endl;	
-	#endif	
-	
-	
 
 
 #ifdef PROFILER_ENABLED
@@ -55,6 +37,9 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				#endif
 
 
+
+
+
 								
 #ifdef PROFILER_ENABLED
 mProfiler.start("GaussianFiltering");
@@ -62,6 +47,11 @@ mProfiler.start("GaussianFiltering");
 	
 	GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, Size( 5, 5 ), 1.5, 1.5, BORDER_REPLICATE);
 
+	/*std::stringstream formattedString;
+	string prefix= "/media/rameez/Linux-Extended/DataSet/eindhoven/GRAY_OPENCV/";
+	formattedString<<prefix<<std::setw(6)<<std::to_string(mFrameCount)<<".png";
+	imwrite( formattedString.str(), mFrameGRAY_ROI );
+	*/	
 				
  #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -145,6 +135,23 @@ mProfiler.start("computeProbabilities");
 	mTempProbMat= abs(mTempProbMat) + 10;
 	divide(mProbMap_GradMag, mTempProbMat, mProbMap_GradMag, 255, -1);
 	mProbMap_GradMag.convertTo(mProbMap_GradMag, CV_32S);
+
+				
+	#ifdef PROFILER_ENABLED
+	mProfiler.start("TemplatesWait");
+	#endif 							
+
+		WriteLock  wrtLock(_mutex);
+		_sateChange.wait(wrtLock,[this]{return mBufferReady;} );
+				
+	 #ifdef PROFILER_ENABLED
+	 mProfiler.end();
+	 LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
+	 <<"******************************"<<endl
+	 <<  "Waiting For Worker thread (Templates)." <<endl
+	 <<  "Wait Time: " << mProfiler.getAvgTime("TemplatesWait")<<endl
+	 <<"******************************"<<endl<<endl;	
+	#endif	
 
 
 	// Intermediate Probability Map
