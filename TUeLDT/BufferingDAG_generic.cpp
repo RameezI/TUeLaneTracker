@@ -14,12 +14,8 @@ mProfiler.start("grabGRAYFrame");
 
 	cvtColor(mFrameRGB, mFrameGRAY, cv::COLOR_BGR2GRAY);
 
-	//int rowIndex= mVanishPt.V + mVP_Range_V;
 	int rowIndex= mCAMERA.RES_VH(0) - mSpan;
-
-
 	Rect ROI;
-
 	ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mSpan);	
 	mFrameGRAY_ROI = mFrameGRAY(ROI);
 			 
@@ -39,11 +35,6 @@ mProfiler.start("GaussianFiltering");
 	
 	GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, Size( 5, 5 ), 1.5, 1.5, BORDER_REPLICATE);
 
-	/*std::stringstream formattedString;
-	string prefix= "/media/rameez/Linux-Extended/DataSet/eindhoven/GRAY_OPENCV/";
-	formattedString<<prefix<<std::setw(6)<<std::to_string(mFrameCount)<<".png";
-	imwrite( formattedString.str(), mFrameGRAY_ROI );
-	*/	
 				
  #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -72,9 +63,14 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				<<  "Wait Time: " << mProfiler.getAvgTime("TemplatesWait")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif	
-
-
-
+				
+				
+				
+				
+				
+				
+				
+				
 				
 #ifdef PROFILER_ENABLED
 mProfiler.start("GradientsComputation");
@@ -98,8 +94,7 @@ mProfiler.start("GradientsComputation");
 	mGradY.setTo(-255, mMask);
 	mMask = mGradY ==0;
 	mGradY.setTo(1, mMask);
-
-	// Compute Dx/Dy			
+			
 	int bufferPos = mBufferPool->GradientTangent.size()-1;
 	cv::divide(mGradX, mGradY, mBufferPool->GradientTangent[bufferPos], 128, -1);
 							
@@ -108,9 +103,12 @@ mProfiler.start("GradientsComputation");
 	mGradY_abs = abs(mGradY );
 	
 	//addWeighted( mGradX_abs, 0.5, mGradY_abs, 0.5, 0, mFrameGradMag );
-	mFrameGradMag = mGradX_abs + mGradY_abs;			
+	mFrameGradMag = mGradX_abs + mGradY_abs;
+
+			
 	//convertScaleAbs(mFrameGradMag, mFrameGradMag);
 	mFrameGradMag.convertTo(mFrameGradMag, CV_8U);
+			
 			
  #ifdef PROFILER_ENABLED
  mProfiler.end();
@@ -125,6 +123,8 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
+			 
+			 
 			 
 #ifdef PROFILER_ENABLED
 mProfiler.start("computeProbabilities");
@@ -150,8 +150,6 @@ mProfiler.start("computeProbabilities");
 	mBufferPool->Probability[bufferPos] = mProbMap_GradMag + mProbMap_Gray;
 	mMask = mBufferPool->Probability[bufferPos] <0 ;
 	mBufferPool->Probability[bufferPos].setTo(0,mMask);
-	//mBufferPool->Probability[bufferPos].convertTo(mBufferPool->Probability[bufferPos], CV_8U);			
-	//mBufferPool->Probability[bufferPos].convertTo(mBufferPool->Probability[bufferPos], CV_16U);
 
 
 	//Gradient Tangent Probability Map
