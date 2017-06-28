@@ -8,10 +8,6 @@ BufferingDAG_generic::BufferingDAG_generic()
 void BufferingDAG_generic::buffer()
 {
 
-
-
-
-
 #ifdef PROFILER_ENABLED
 mProfiler.start("grabGRAYFrame");
 #endif				
@@ -36,10 +32,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
 
-
-
-
-
 								
 #ifdef PROFILER_ENABLED
 mProfiler.start("GaussianFiltering");
@@ -63,6 +55,23 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				#endif
 
 
+
+
+#ifdef PROFILER_ENABLED
+mProfiler.start("TemplatesWait");
+#endif 							
+
+		WriteLock  wrtLock(_mutex);
+		_sateChange.wait(wrtLock,[this]{return mBufferReady;} );
+				
+#ifdef PROFILER_ENABLED
+mProfiler.end();
+LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
+				<<"******************************"<<endl
+				<<  "Waiting For Worker thread (Templates and Buffer)." <<endl
+				<<  "Wait Time: " << mProfiler.getAvgTime("TemplatesWait")<<endl
+				<<"******************************"<<endl<<endl;	
+				#endif	
 
 
 
@@ -135,23 +144,6 @@ mProfiler.start("computeProbabilities");
 	mTempProbMat= abs(mTempProbMat) + 10;
 	divide(mProbMap_GradMag, mTempProbMat, mProbMap_GradMag, 255, -1);
 	mProbMap_GradMag.convertTo(mProbMap_GradMag, CV_32S);
-
-				
-	#ifdef PROFILER_ENABLED
-	mProfiler.start("TemplatesWait");
-	#endif 							
-
-		WriteLock  wrtLock(_mutex);
-		_sateChange.wait(wrtLock,[this]{return mBufferReady;} );
-				
-	 #ifdef PROFILER_ENABLED
-	 mProfiler.end();
-	 LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
-	 <<"******************************"<<endl
-	 <<  "Waiting For Worker thread (Templates)." <<endl
-	 <<  "Wait Time: " << mProfiler.getAvgTime("TemplatesWait")<<endl
-	 <<"******************************"<<endl<<endl;	
-	#endif	
 
 
 	// Intermediate Probability Map

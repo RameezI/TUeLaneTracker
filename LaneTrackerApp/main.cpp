@@ -12,7 +12,6 @@ int main()
 #endif	
 	
 	
-	
 #ifdef DIRECTORY_INPUT
 	 
 	 vector< cv::String> IMG_filenames;
@@ -38,15 +37,13 @@ int main()
 	std::cout<<"******************************"<<std::endl;
 	std::cout<<" Press Ctrl+C to terminate."<<std::endl;
 	std::cout<<"******************************"<<std::endl;
-	
+
 
 #ifdef DIRECTORY_INPUT	
 	StateMachine stateMachine(IMG_filenames, skipFrames);
 #else
 	StateMachine stateMachine;
 #endif
-
-
 
 
 	return stateMachine.spin(sigInit);
