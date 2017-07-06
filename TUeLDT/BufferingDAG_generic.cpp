@@ -234,6 +234,7 @@ int BufferingDAG_generic::grabFrame()
 
 	#ifdef PROFILER_ENABLED
 	mProfiler.end();
+
 	const std::string str = mFiles[mFrameCount];	
 	LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				<<"******************************"<<endl
