@@ -39,7 +39,7 @@ void VanishingPtFilter::createPrior()
 {
 	
 	float  sigma = 5.0*VP_RANGE_V/mVP_STEP;
-	double pv,ph,p;
+	double pv,ph;
 	
 	for (int v = 1; v <= mNb_VP_BINS_V; v++)
    	{

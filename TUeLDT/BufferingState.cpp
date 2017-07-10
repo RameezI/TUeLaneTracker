@@ -52,8 +52,6 @@ mProfiler.start("SetRootTemplates");
 	bufferingGraph.mY_VPRS	 =   -(templates.Y_IRS + ORIGIN_Y_CRS);
 	bufferingGraph.mX_VPRS   =    templates.X_IRS  + ORIGIN_X_CRS;
 
-
-	const int RES_V = bufferingGraph.mCAMERA.RES_VH(0);
 	const int RES_H = bufferingGraph.mCAMERA.RES_VH(1);
 	bufferingGraph.mBufferPool.reset(new BufferPool(templates.SPAN, RES_H)); 
 
@@ -120,7 +118,7 @@ BufferingState::~BufferingState()
 		mSideExecutor.join();	
 }
 
-/* ********************************************* /*
+/* ********************************************* */
 /*  Low level Class PRIVATE FUnction for _Profiling/ Logging
  *  getOpenClInfo()
 */
@@ -154,7 +152,7 @@ void BufferingState::getOpenClInfo()
 	{
 
 
-		for (int i = 0; i < context.ndevices(); i++)
+		for (std::size_t i = 0; i < context.ndevices(); i++)
 		{
 			cv::ocl::Device device = context.device(i);
 			std::string name= device.name();

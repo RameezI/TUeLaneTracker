@@ -14,8 +14,9 @@ friend class TEST_TrackingState;
 	
 private:
 
-	bool 		mFiltersReady;
 	bool    	mStartFiltering;
+	bool 		mFiltersReady;
+	
 	
 	const int	mMAX_PIXELS_ROI;
 

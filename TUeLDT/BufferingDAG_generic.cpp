@@ -205,7 +205,7 @@ void BufferingDAG_generic::auxillaryTasks()
 		ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mSpan);
 		mFOCUS_MASK_ROOT(ROI).copyTo(mFocusTemplate);	
 
-		for ( int i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
+		for ( std::size_t i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
 		{
 			mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
 			mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);

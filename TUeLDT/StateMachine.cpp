@@ -51,9 +51,9 @@ States StateMachine::sCurrentState = States::BOOTING;
 	{	
 		// These pointers have life until the Span of this function
 		unique_ptr<LaneFilter>  		pLaneFilter;
-		unique_ptr<VanishingPtFilter>   pVanishingPtFilter;
+		unique_ptr<VanishingPtFilter>   	pVanishingPtFilter;
 		unique_ptr<Templates> 			pTemplates;
-		unique_ptr<TrackingLaneState>   pTrackingState = NULL;
+		unique_ptr<TrackingLaneState>   	pTrackingState;
 
 
 		/* BOOTING PROCESS */
@@ -147,6 +147,8 @@ States StateMachine::sCurrentState = States::BOOTING;
 				#endif 
 				return -1;			
 		}
+
+		return 0;
 
 	}
 

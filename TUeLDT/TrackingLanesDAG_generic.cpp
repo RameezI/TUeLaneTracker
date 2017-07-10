@@ -3,12 +3,11 @@
 
 TrackingLanesDAG_generic::TrackingLanesDAG_generic(BufferingDAG_generic&& bufferingGraph)
 
-: mStartFiltering(false),
-  mFiltersReady(false),
+: 
   BufferingDAG_generic(std::move(bufferingGraph)),
-  mMAX_PIXELS_ROI(mFrameGRAY_ROI.size().height * mFrameGRAY_ROI.size().width),
-  mProbMapFocussed(mFrameGRAY_ROI.size(),CV_8U),
-  mGradTanFocussed(mFrameGRAY_ROI.size(),CV_16S)
+  mStartFiltering(false),
+  mFiltersReady(false),
+  mMAX_PIXELS_ROI(mFrameGRAY_ROI.size().height * mFrameGRAY_ROI.size().width)
 {	
 	mX_VPRS.convertTo(mX_VPRS_SCALED, CV_32S, SCALE_INTSEC );
 	mBaseBinIdx.reserve(mMAX_PIXELS_ROI);
@@ -39,7 +38,7 @@ mProfiler.start("TemporalFiltering");
 	mProbMapFocussed = mBufferPool->Probability[0];
 	mGradTanFocussed = mBufferPool->GradientTangent[0];
 	
-	for ( int i=1; i< mBufferPool->Probability.size(); i++ )
+	for ( std::size_t i=1; i< mBufferPool->Probability.size(); i++ )
 	{	
 	    mMask = mProbMapFocussed < mBufferPool->Probability[i];
 	    mBufferPool->Probability[i].copyTo(mProbMapFocussed, mMask );
@@ -174,7 +173,7 @@ mProfiler.start("ComputeHistograms");
 	   register int32_t* HistBase_pixelPTR    =  mHistBase.ptr<int32_t>(0);
 	   register int32_t* HistPurview_pixelPTR =  mHistPurview.ptr<int32_t>(0);
 
-	   for ( int j = 0; j < mBaseBinIdx.size(); ++j)
+	   for ( std::size_t j = 0; j < mBaseBinIdx.size(); ++j)
 	   {
 		*(HistBase_pixelPTR 	+ mBaseBinIdx[j])  += mWeightBin[j];
 		*(HistPurview_pixelPTR  + mPurviewBinIdx[j]) += mWeightBin[j];
@@ -374,7 +373,7 @@ mProfiler.start("VP_HistogramMatching");
 	
 	   Mat   range;
 	
-	   float  width_cm, widthProb;
+	   float  width_cm;
 	
 	   /* Store Previous values of VP */
 	   mVanishPt.V_prev = mVanishPt.V;
@@ -586,7 +585,7 @@ void TrackingLanesDAG_generic::auxillaryTasks()
 
 	
 
-		for ( int i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
+		for ( std::size_t i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
 		{
 			mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
 			mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);		

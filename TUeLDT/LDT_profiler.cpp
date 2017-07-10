@@ -52,7 +52,7 @@ void ProfilerLDT::blockTime_ms(uint64_t t_start, uint64_t t_finish)
 
 	{// found
 
-		if ( mBlockMultiplicity[mBlockName.back()] != 0 & mBlockMultiplicity[mBlockName.back()] <UINTMAX_MAX)
+		if ( (mBlockMultiplicity[mBlockName.back()] != 0) & (mBlockMultiplicity[mBlockName.back()] <UINTMAX_MAX) )
 		{    
 
 		   mBlockMultiplicity[mBlockName.back()] = mBlockMultiplicity[mBlockName.back()]+1;
