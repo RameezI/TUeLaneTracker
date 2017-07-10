@@ -1,0 +1,2 @@
+/home/rameez/Master/TUeLaneTracker/install/lib/libTUeLDT.a
+/home/rameez/Master/TUeLaneTracker/install/bin/TUeLaneTracker

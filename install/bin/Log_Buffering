@@ -1,0 +1,42 @@
+﻿2017-07-06 18:43:25.092 INFO  [1075] [BufferingState::getOpenClInfo@135] 
+******************************
+OpenCL Info:
+Sorry, OpenCl is not available. 
+******************************
+
+
+2017-07-06 18:43:25.093 INFO  [1075] [BufferingState::getOpenClInfo@146] 
+******************************
+OpenCL Info:
+Sorry, Failed creating the Context. 
+******************************
+
+
+2017-07-07 11:23:07.890 INFO  [3246] [BufferingState::getOpenClInfo@135] 
+******************************
+OpenCL Info:
+Sorry, OpenCl is not available. 
+******************************
+
+
+2017-07-07 11:23:07.890 INFO  [3246] [BufferingState::getOpenClInfo@146] 
+******************************
+OpenCL Info:
+Sorry, Failed creating the Context. 
+******************************
+
+
+2017-07-07 12:32:44.501 INFO  [5637] [BufferingState::getOpenClInfo@135] 
+******************************
+OpenCL Info:
+Sorry, OpenCl is not available. 
+******************************
+
+
+2017-07-07 12:32:44.501 INFO  [5637] [BufferingState::getOpenClInfo@146] 
+******************************
+OpenCL Info:
+Sorry, Failed creating the Context. 
+******************************
+
+

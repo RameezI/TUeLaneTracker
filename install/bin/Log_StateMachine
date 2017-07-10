@@ -1,0 +1,57 @@
+﻿2017-07-06 18:43:24.933 INFO  [1075] [StateMachine::StateMachine@20] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2017-07-06 18:43:24.933 INFO  [1075] [StateMachine::StateMachine@28] 
+******************************
+StateMachine Constructed
+******************************
+
+
+2017-07-06 18:46:05.415 INFO  [1075] [StateMachine::spin@126] 
+******************************
+Tracking Finished
+Shutting Down the State-Machine.
+******************************
+
+
+2017-07-07 11:23:07.703 INFO  [3246] [StateMachine::StateMachine@20] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2017-07-07 11:23:07.709 INFO  [3246] [StateMachine::StateMachine@28] 
+******************************
+StateMachine Constructed
+******************************
+
+
+2017-07-07 11:23:10.589 INFO  [3246] [StateMachine::spin@126] 
+******************************
+Tracking Finished
+Shutting Down the State-Machine.
+******************************
+
+
+2017-07-07 12:32:44.345 INFO  [5637] [StateMachine::StateMachine@20] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2017-07-07 12:32:44.345 INFO  [5637] [StateMachine::StateMachine@28] 
+******************************
+StateMachine Constructed
+******************************
+
+
+2017-07-07 12:41:40.772 INFO  [5637] [StateMachine::spin@126] 
+******************************
+Tracking Finished
+Shutting Down the State-Machine.
+******************************
+
+
