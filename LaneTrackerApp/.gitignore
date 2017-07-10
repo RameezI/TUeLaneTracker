@@ -1,4 +1,7 @@
 *.project
-*.~
-/Debug/
-/Release/
+*~
+*.swp
+*.swo
+build/
+Debug/
+Release/

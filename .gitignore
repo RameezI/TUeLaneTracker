@@ -2,5 +2,9 @@
 .clang/
 .build-debug/
 .codelite/
+build/
+install/
+*~
+*.swp
+*.swo
 TUeLaneTracker.workspace
-

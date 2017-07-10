@@ -1,4 +1,4 @@
-#Add executable called "TUeLaneTracker"
+dd executable called "TUeLaneTracker"
 find_package(OpenCV REQUIRED) 
 file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.c )
 add_executable (TUeLaneTracker ${SOURCES})
