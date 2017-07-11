@@ -68,13 +68,19 @@ private:
 	Mat			mHistPurview;
 	
 	Mat			mProbMapFocussed;
-	Mat 		mGradTanFocussed;
+	Mat 			mGradTanFocussed;
 	
-	Mat 		mTransitLaneFilter;
-	Mat 		mTransitVpFilter;
+	Mat 			mTransitLaneFilter;
+	Mat 			mTransitVpFilter;
 
-	LaneModel   mLaneModel;
+	LaneModel   		mLaneModel;
 	
+/*
+	// Only Enable in case of Video Recording
+	VideoWriter mOutputVideo;
+*/
+
+
 	
 public:
 

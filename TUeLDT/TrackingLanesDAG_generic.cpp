@@ -13,6 +13,12 @@ TrackingLanesDAG_generic::TrackingLanesDAG_generic(BufferingDAG_generic&& buffer
 	mBaseBinIdx.reserve(mMAX_PIXELS_ROI);
 	mPurviewBinIdx.reserve(mMAX_PIXELS_ROI);
 	mWeightBin.reserve(mMAX_PIXELS_ROI);
+
+/*
+	//Write Images to a video file
+	mOutputVideo.open("TUeLaneTracker.avi", CV_FOURCC('M','P','4','V'), 30, mFrameRGB.size());
+*/
+
 }
 
 
@@ -355,13 +361,13 @@ mProfiler.start("VP_HistogramMatching");
 	   const int    FRAME_CENTER_V	= mCAMERA.FRAME_CENTER(0); 
 	   const float  PIXEL_TO_CM     	= 1.0/mCAMERA.CM_TO_PIXEL;
 
-	   const int    VP_FILTER_OFFSET  	= mVpFilter->OFFSET_V;
-	   const int    VP_HIST_STEP	= mVpFilter->STEP;
-	   const int    VP_HIST_START	= mVpFilter->HISTOGRAM_BINS(0);
-	   const int    VP_HIST_SIZE	= mVpFilter->HISTOGRAM_BINS.size();
-	   const int    VP_HIST_END	= mVpFilter->HISTOGRAM_BINS(VP_HIST_SIZE-1);
-	   const float  VP_HIST_RATIO      = mVpFilter->mVP_LANE_RATIO;
-	   const float  WIDTH_FACTOR       = PIXEL_TO_CM* 1.0/VP_HIST_RATIO;
+	   const int    VP_FILTER_OFFSET = mVpFilter->OFFSET_V;
+	   const int    VP_HIST_STEP	 = mVpFilter->STEP;
+	   const int    VP_HIST_START	 = mVpFilter->HISTOGRAM_BINS(0);
+	   const int    VP_HIST_SIZE	 = mVpFilter->HISTOGRAM_BINS.size();
+	   const int    VP_HIST_END	 = mVpFilter->HISTOGRAM_BINS(VP_HIST_SIZE-1);
+	   const float  VP_HIST_RATIO  	 = mVpFilter->mVP_LANE_RATIO;
+	   const float  WIDTH_FACTOR   	 = PIXEL_TO_CM* 1.0/VP_HIST_RATIO;
 		
 
 	   float  IntSecLeft, IntSecRight; 
@@ -537,6 +543,13 @@ mProfiler.start("Display");
 	   	);
 	    imshow( "Display window", mFrameRGB);
 	    waitKey(10);
+
+	    //mOutputVideo<<mFrameRGB;
+	    
+	
+		
+
+
 	}
 		
 										
