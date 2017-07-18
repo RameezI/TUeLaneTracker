@@ -84,7 +84,9 @@ void BufferingState::run()
 	mSideExecutor =
 	#ifndef s32v2xx
 		std::thread(&BufferingDAG_generic::auxillaryTasks, std::ref(bufferingGraph));
-		#endif
+	#else
+		std::thread(&BufferingDAG_s32v::auxillaryTasks,    std::ref(bufferingGraph));
+	#endif
 
 	if (0==bufferingGraph.grabFrame())
 		bufferingGraph.buffer();		

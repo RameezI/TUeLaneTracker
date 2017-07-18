@@ -1,7 +1,7 @@
-#include "TrackingLanesDAG_generic.h"
+#include "TrackingLaneDAG_generic.h"
 
 
-TrackingLanesDAG_generic::TrackingLanesDAG_generic(BufferingDAG_generic&& bufferingGraph)
+TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferingGraph)
 
 : 
   BufferingDAG_generic(std::move(bufferingGraph)),
@@ -16,7 +16,7 @@ TrackingLanesDAG_generic::TrackingLanesDAG_generic(BufferingDAG_generic&& buffer
 }
 
 
-void TrackingLanesDAG_generic::extractLanes()
+void TrackingLaneDAG_generic::extractLanes()
 {
 
 	WriteLock  wrtLock(_mutex, std::defer_lock);
@@ -551,12 +551,12 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 		
 }
 
-void TrackingLanesDAG_generic::extractControllerInputs()
+void TrackingLaneDAG_generic::extractControllerInputs()
 {
 	
 }
 
-void TrackingLanesDAG_generic::auxillaryTasks()
+void TrackingLaneDAG_generic::auxillaryTasks()
 {
 
 
@@ -673,7 +673,7 @@ void TrackingLanesDAG_generic::auxillaryTasks()
 
 }
 
-TrackingLanesDAG_generic::~TrackingLanesDAG_generic()
+TrackingLaneDAG_generic::~TrackingLaneDAG_generic()
 {
 	
 

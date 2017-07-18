@@ -53,10 +53,7 @@ class VanishingPtFilter
 		
 public:
 
-	VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_BINS, 
-					  const int&  LANE_FILTER_OFFSET_V,
-					  const Camera& CAMERA);
-					  
+	VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_BINS, const int&  LANE_FILTER_OFFSET_V);
 	~VanishingPtFilter();
 
 

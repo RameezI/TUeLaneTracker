@@ -6,7 +6,7 @@
 
 using namespace Eigen;
 
-class TrackingLanesDAG_generic: public BufferingDAG_generic
+class TrackingLaneDAG_generic: public BufferingDAG_generic
 {
 	
 friend class TrackingLaneState;
@@ -78,11 +78,11 @@ private:
 	
 public:
 
-	TrackingLanesDAG_generic(BufferingDAG_generic&& bufferingGraph);
+	TrackingLaneDAG_generic(BufferingDAG_generic&& bufferingGraph);
 	void auxillaryTasks();
 	void extractLanes();
 	void extractControllerInputs();
-	~TrackingLanesDAG_generic();
+	~TrackingLaneDAG_generic();
 
 };
 

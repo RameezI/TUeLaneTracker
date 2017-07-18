@@ -1,9 +1,7 @@
 #include "VanishingPtFilter.h"
 
 
-VanishingPtFilter::VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_BINS, 
-									 const int&  LANE_FILTER_OFFSET_V,
-									 const Camera& CAMERA)
+VanishingPtFilter::VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_BINS, const int&  LANE_FILTER_OFFSET_V)
 : 
   mVP_STEP(10),
   

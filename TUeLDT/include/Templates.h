@@ -88,7 +88,7 @@ public:
 			templateFile = formattedString.str();
 			struct stat buf;
 			int statResult = stat(templateFile.c_str(),&buf);
-			if (statResult || buf.st_ino < 0) 
+			if (statResult != 0) 
 			{
 				cout << "File not found: " << templateFile.c_str() << endl;
 				exit(-2);
