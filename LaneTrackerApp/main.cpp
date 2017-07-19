@@ -17,13 +17,22 @@ int main()
 	 vector< cv::String> IMG_filenames;
 	 cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
 	 glob(folder, IMG_filenames);
-	 const int skipFrames = 4000;	
-	 cout<<endl;
-	 cout<<"Total Number of Image Files : " << IMG_filenames.size() - skipFrames;
-	 cout<<endl;
+	 const uint skipFrames = 4000;	
 	 
-	 if (IMG_filenames.size()- skipFrames < 1)
-		 return -1;
+	if (IMG_filenames.size() <= skipFrames)
+	{
+	 cout<<endl;
+	 cout<<"Total Number of Image Files to Process : " << 0;
+	 cout<<endl;
+	 return -1; //Nothing to do
+	}
+
+	 cout<<endl;
+	 cout<<"Total Number of Image Files to Process : " << IMG_filenames.size() - skipFrames;
+	 cout<<endl;
+
+
+
 #endif
 
 	shared_ptr<SigInit> sigInit= make_shared<SigInit>();

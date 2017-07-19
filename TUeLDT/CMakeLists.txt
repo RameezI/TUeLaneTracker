@@ -9,6 +9,7 @@ file(GLOB  SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}
 add_library(TUeLDT STATIC ${SOURCES})
 target_include_directories (TUeLDT PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 					   ${CMAKE_CURRENT_SOURCE_DIR}/../include
+					   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyLibs
 					   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyLibs/eigen3)
 
 #Message("Current Souce Dir	:  " ${CMAKE_CURRENT_SOURCE_DIR})
