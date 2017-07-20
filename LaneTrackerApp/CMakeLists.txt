@@ -1,10 +1,12 @@
 # This compiles and links Executable called "TUeLaneTracker"
-find_package(OpenCV REQUIRED) 
+find_package(OpenCV REQUIRED)
+find_package(Threads REQUIRED)
+
 file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.c )
 add_executable (TUeLaneTracker ${SOURCES})
 
 # Link the executable to the TUeLDT library. Since the TUeLDT library has
 # public include directories we will use those includes when buiding TUeLaneTracker
 target_include_directories (TUeLaneTracker PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries (TUeLaneTracker LINK_PUBLIC TUeLDT ${OpenCV_LIBS})
+target_link_libraries (TUeLaneTracker LINK_PUBLIC TUeLDT ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 install(TARGETS TUeLaneTracker DESTINATION bin)
