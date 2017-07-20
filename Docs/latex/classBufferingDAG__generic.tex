@@ -1,0 +1,150 @@
+\hypertarget{classBufferingDAG__generic}{\section{Buffering\-D\-A\-G\-\_\-generic Class Reference}
+\label{classBufferingDAG__generic}\index{Buffering\-D\-A\-G\-\_\-generic@{Buffering\-D\-A\-G\-\_\-generic}}
+}
+Inheritance diagram for Buffering\-D\-A\-G\-\_\-generic\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classBufferingDAG__generic}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classBufferingDAG__generic_a0e1ee4f8a694fd0fdf2b9893944929e8}{int {\bfseries grab\-Frame} ()}\label{classBufferingDAG__generic_a0e1ee4f8a694fd0fdf2b9893944929e8}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a7d58d28db3981dac7aaed4b1badb5d88}{void {\bfseries auxillary\-Tasks} ()}\label{classBufferingDAG__generic_a7d58d28db3981dac7aaed4b1badb5d88}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a34a33f6c25ab56c002bb4cd67a9c990c}{void {\bfseries buffer} ()}\label{classBufferingDAG__generic_a34a33f6c25ab56c002bb4cd67a9c990c}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a06d2690141f61dec3a1c55fb28d52d22}{{\bfseries Buffering\-D\-A\-G\-\_\-generic} (\hyperlink{classBufferingDAG__generic}{Buffering\-D\-A\-G\-\_\-generic} \&\&buffering\-Graph)}\label{classBufferingDAG__generic_a06d2690141f61dec3a1c55fb28d52d22}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classBufferingDAG__generic_aee268cc775360e87f89fd05a72f21ec3}{using {\bfseries Mutex\-Type} = std\-::mutex}\label{classBufferingDAG__generic_aee268cc775360e87f89fd05a72f21ec3}
+
+\item 
+\hypertarget{classBufferingDAG__generic_af3b29cf93b8f1f13d4c2c5d369daf999}{using {\bfseries Write\-Lock} = std\-::unique\-\_\-lock$<$ Mutex\-Type $>$}\label{classBufferingDAG__generic_af3b29cf93b8f1f13d4c2c5d369daf999}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classBufferingDAG__generic_af879ecf94770c873deaff67a9ad6025d}{Mutex\-Type {\bfseries \-\_\-mutex}}\label{classBufferingDAG__generic_af879ecf94770c873deaff67a9ad6025d}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a6341f9fc09996792aa87904262ed1021}{condition\-\_\-variable {\bfseries \-\_\-sate\-Change}}\label{classBufferingDAG__generic_a6341f9fc09996792aa87904262ed1021}
+
+\item 
+\hypertarget{classBufferingDAG__generic_adc18bb042c1ecc8d7bc0b06eef486883}{bool {\bfseries m\-Buffer\-Ready} = false}\label{classBufferingDAG__generic_adc18bb042c1ecc8d7bc0b06eef486883}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a2bdef2f9b832ee9be9ce191bbb45ecdd}{int {\bfseries m\-Span}}\label{classBufferingDAG__generic_a2bdef2f9b832ee9be9ce191bbb45ecdd}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a544dea7677a3b16c844cc5abf8ba0a3f}{int {\bfseries m\-Margin}}\label{classBufferingDAG__generic_a544dea7677a3b16c844cc5abf8ba0a3f}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a61137ddfd7dd16a776addb32212c6504}{int {\bfseries m\-V\-P\-\_\-\-Range\-\_\-\-V}}\label{classBufferingDAG__generic_a61137ddfd7dd16a776addb32212c6504}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a637579defa89ce38045c17af56fe9c2c}{Mat {\bfseries m\-G\-R\-A\-D\-I\-E\-N\-T\-\_\-\-T\-A\-N\-\_\-\-R\-O\-O\-T}}\label{classBufferingDAG__generic_a637579defa89ce38045c17af56fe9c2c}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a3405cbeb082d1e325619503bcfce78c8}{Mat {\bfseries m\-F\-O\-C\-U\-S\-\_\-\-M\-A\-S\-K\-\_\-\-R\-O\-O\-T}}\label{classBufferingDAG__generic_a3405cbeb082d1e325619503bcfce78c8}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a7345dc24ebe8cb7e0eefb571cf40513f}{Mat {\bfseries m\-D\-E\-P\-T\-H\-\_\-\-M\-A\-P\-\_\-\-R\-O\-O\-T}}\label{classBufferingDAG__generic_a7345dc24ebe8cb7e0eefb571cf40513f}
+
+\item 
+\hypertarget{classBufferingDAG__generic_ab6676cc4a2b32f5386420794df2dc0cb}{unique\-\_\-ptr$<$ \hyperlink{structBufferPool}{Buffer\-Pool} $>$ {\bfseries m\-Buffer\-Pool}}\label{classBufferingDAG__generic_ab6676cc4a2b32f5386420794df2dc0cb}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a3f5ecf31daf744fe63ee7a4218da4e2f}{const \hyperlink{structCamera}{Camera} {\bfseries m\-C\-A\-M\-E\-R\-A}}\label{classBufferingDAG__generic_a3f5ecf31daf744fe63ee7a4218da4e2f}
+
+\item 
+\hypertarget{classBufferingDAG__generic_aa91e170d5f81edaa18581cf9f5c81e43}{const \hyperlink{structLaneMembership}{Lane\-Membership} {\bfseries m\-Lane\-Membership}}\label{classBufferingDAG__generic_aa91e170d5f81edaa18581cf9f5c81e43}
+
+\item 
+\hypertarget{classBufferingDAG__generic_acce7fc93b09bbe166aba16d715a8cb26}{\hyperlink{structVanishingPt}{Vanishing\-Pt} {\bfseries m\-Vanish\-Pt}}\label{classBufferingDAG__generic_acce7fc93b09bbe166aba16d715a8cb26}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a8033352cce24f0e9d96c49328f8180c2}{Mat {\bfseries m\-Frame\-R\-G\-B}}\label{classBufferingDAG__generic_a8033352cce24f0e9d96c49328f8180c2}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a599ee714259c7a1b17f2c70f31020108}{Mat {\bfseries m\-Frame\-G\-R\-A\-Y}}\label{classBufferingDAG__generic_a599ee714259c7a1b17f2c70f31020108}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a92c76720cf3d2a6dbd53eba2bdafcb03}{Mat {\bfseries m\-Frame\-G\-R\-A\-Y\-\_\-\-R\-O\-I}}\label{classBufferingDAG__generic_a92c76720cf3d2a6dbd53eba2bdafcb03}
+
+\item 
+\hypertarget{classBufferingDAG__generic_abaed06745e73e463d4fab4d9b98371e6}{Mat {\bfseries m\-Mask}}\label{classBufferingDAG__generic_abaed06745e73e463d4fab4d9b98371e6}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a7ca79a2d779c55ea8497a9606996c7b9}{Mat {\bfseries m\-Grad\-X}}\label{classBufferingDAG__generic_a7ca79a2d779c55ea8497a9606996c7b9}
+
+\item 
+\hypertarget{classBufferingDAG__generic_ae08d118e71cafb27673c6b0049974e61}{Mat {\bfseries m\-Grad\-Y}}\label{classBufferingDAG__generic_ae08d118e71cafb27673c6b0049974e61}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a18448e2e54c401207b24e4ccbf703f44}{Mat {\bfseries m\-Grad\-X\-\_\-abs}}\label{classBufferingDAG__generic_a18448e2e54c401207b24e4ccbf703f44}
+
+\item 
+\hypertarget{classBufferingDAG__generic_aa261d218e9d85dcf06d019677275f30e}{Mat {\bfseries m\-Grad\-Y\-\_\-abs}}\label{classBufferingDAG__generic_aa261d218e9d85dcf06d019677275f30e}
+
+\item 
+\hypertarget{classBufferingDAG__generic_af971e5dcf352f95ca402129ce2148edf}{Mat {\bfseries m\-Frame\-Grad\-Mag}}\label{classBufferingDAG__generic_af971e5dcf352f95ca402129ce2148edf}
+
+\item 
+\hypertarget{classBufferingDAG__generic_adcf79e354c59053c73f18a94f5f806a1}{Mat {\bfseries m\-Grad\-Tan\-Template}}\label{classBufferingDAG__generic_adcf79e354c59053c73f18a94f5f806a1}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a5438b4439859e3668e02ee43b793ef33}{Mat {\bfseries m\-Depth\-Template}}\label{classBufferingDAG__generic_a5438b4439859e3668e02ee43b793ef33}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a0d2c7b38fff3307f45242fe5808aca57}{Mat {\bfseries m\-Focus\-Template}}\label{classBufferingDAG__generic_a0d2c7b38fff3307f45242fe5808aca57}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a95b8dbe5a220f1eede4cb021abb5a79b}{Mat {\bfseries m\-X\-\_\-\-V\-P\-R\-S}}\label{classBufferingDAG__generic_a95b8dbe5a220f1eede4cb021abb5a79b}
+
+\item 
+\hypertarget{classBufferingDAG__generic_aecd1a5bfd2cc730028f4c0e93549b5b2}{Mat {\bfseries m\-Y\-\_\-\-V\-P\-R\-S}}\label{classBufferingDAG__generic_aecd1a5bfd2cc730028f4c0e93549b5b2}
+
+\item 
+\hypertarget{classBufferingDAG__generic_ac8e573e248cf6c2ae5753295985f2e35}{Mat {\bfseries m\-Temp\-Prob\-Mat}}\label{classBufferingDAG__generic_ac8e573e248cf6c2ae5753295985f2e35}
+
+\item 
+\hypertarget{classBufferingDAG__generic_ac655ff8f94e89cc25b7597dfe893e4db}{Mat {\bfseries m\-Prob\-Map\-\_\-\-Gray}}\label{classBufferingDAG__generic_ac655ff8f94e89cc25b7597dfe893e4db}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a700212b57de614f4763d8b345c2a06c4}{Mat {\bfseries m\-Prob\-Map\-\_\-\-Grad\-Mag}}\label{classBufferingDAG__generic_a700212b57de614f4763d8b345c2a06c4}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a10a2b2efa34a2908ca713a81a0ebceed}{Mat {\bfseries m\-Prob\-Map\-\_\-\-Grad\-Dir}}\label{classBufferingDAG__generic_a10a2b2efa34a2908ca713a81a0ebceed}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a10eaaacc6922fc65a24abbda1aba8054}{uint64\-\_\-t {\bfseries m\-Frame\-Count}}\label{classBufferingDAG__generic_a10eaaacc6922fc65a24abbda1aba8054}
+
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classBufferingDAG__generic_afcf0911536b5245e56993e60557631ea}{class {\bfseries Buffering\-State}}\label{classBufferingDAG__generic_afcf0911536b5245e56993e60557631ea}
+
+\item 
+\hypertarget{classBufferingDAG__generic_ae434ad700893dfcec0c63fdb5a1b7d54}{class {\bfseries T\-E\-S\-T\-\_\-\-Buffering\-State}}\label{classBufferingDAG__generic_ae434ad700893dfcec0c63fdb5a1b7d54}
+
+\item 
+\hypertarget{classBufferingDAG__generic_a3084c090c58f2a0dcf5e638b19d63653}{class {\bfseries T\-E\-S\-T\-\_\-\-Tracking\-State}}\label{classBufferingDAG__generic_a3084c090c58f2a0dcf5e638b19d63653}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/rameez/\-Master/\-T\-Ue\-Lane\-Tracker/\-T\-Ue\-L\-D\-T/include/Buffering\-D\-A\-G\-\_\-generic.\-h\item 
+/home/rameez/\-Master/\-T\-Ue\-Lane\-Tracker/\-T\-Ue\-L\-D\-T/Buffering\-D\-A\-G\-\_\-generic.\-cpp\end{DoxyCompactItemize}

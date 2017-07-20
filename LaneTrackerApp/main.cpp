@@ -1,10 +1,16 @@
+/** \file */ 
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "StateMachine.h"
 using namespace std;
 using namespace cv;
 
-int main()
+int main() /**  
+		This is the entry point of the application.
+		- Sets the path to the input images if flag DIRECTORY_INPUT is defined
+		- Initialises the sigInit handler
+		- Creates a stateMachine and spins it until user issues a quit signal through the sigInit handler. 		
+	  */
 {
 	
 #ifdef PROFILER_ENABLED
