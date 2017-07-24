@@ -13,9 +13,9 @@ These instructions will get you a copy of the project up and running on your loc
 What things you need to install the software and how to install them
 
 ```
-OpenCv-3.1.0
+* OpenCv-3.1.0
 ```
-* [OpenCv Installaion Guide](http://docs.opencv.org/3.1.0/d7/d9f/tutorial_linux_install.html)
+[OpenCv Installaion Guide](http://docs.opencv.org/3.1.0/d7/d9f/tutorial_linux_install.html)
 
 ### Installing
 
