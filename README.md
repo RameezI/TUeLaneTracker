@@ -17,7 +17,7 @@ What things you need to install the software and how to install them
 ```
 [OpenCv Installaion Guide](http://docs.opencv.org/3.1.0/d7/d9f/tutorial_linux_install.html)
 
-### Installing
+### Building and Installing the Application
 
 A step by step series of examples that tell you have to get a development env running
 
@@ -27,8 +27,6 @@ clone this repository
 git clone https://github.com/RameezI/TUeLaneTracker.git
 ```
 
-## Building the Aplication
-
 Go to the parent directory of the cloned repository:
 ```
 cd TUeLaneTracker
@@ -37,7 +35,7 @@ Open main.cpp file in an editor:
 ```
 vim  +24 LaneTrackerApp/main.cpp
 ```
-Update location of the DataSet by editing the folllowing lines in main.cpp:
+Update the location for the DataSet by editing the folllowing lines in main.cpp:
 ```
 cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
 ```
@@ -48,10 +46,6 @@ cd build
 cmake ..
 ```
 
-Note: The DataSet must have PNG images of resolution 640x480
-
-## Deployment
-
 Build and Install the executeable
 ```
 make istall
@@ -61,7 +55,9 @@ Run the Executeable
 cd ../install/bin
 ./TUeLaneTracker
 ```
-Note: Executeable must be invoked from within the bin directory.
+Note: The DataSet must have PNG images of resolution 640x480.
+      Executeable must be invoked from within the bin directory.
+       
 
 
 ## Built With
