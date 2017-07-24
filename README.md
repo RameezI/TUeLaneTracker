@@ -55,9 +55,9 @@ Run the executeable <sup>2</sup>.
 cd ../install/bin
 ./TUeLaneTracker
 ```
-<sup>1</sup>The DataSet must have PNG images of resolution 640x480.
+1. The DataSet must have PNG images of resolution 640x480.
 
-<sup>2</sup>Executeable must be invoked from within the bin directory.
+2. Executeable must be invoked from within the bin directory.
        
 
 
