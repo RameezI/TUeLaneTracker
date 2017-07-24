@@ -89,7 +89,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
-
+This research and design project was supported by NXP Semiconductors and Eindoven University of Technology. I thank everyone who provided insight and expertise that greatly assisted this project.
