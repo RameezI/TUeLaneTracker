@@ -35,7 +35,7 @@ Open main.cpp file in an editor:
 ```
 vim  +24 LaneTrackerApp/main.cpp
 ```
-Update the location for the DataSet by editing the folllowing lines in main.cpp:
+Update the location or the DataSet<sup>1</sup>. by editing the folllowing lines in main.cpp:
 ```
 cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
 ```
@@ -50,13 +50,14 @@ Build and Install the executeable
 ```
 make istall
 ```
-Run the Executeable
+Run the executeable <sup>2</sup>. 
 ```
 cd ../install/bin
 ./TUeLaneTracker
 ```
-Note: The DataSet must have PNG images of resolution 640x480.
-      Executeable must be invoked from within the bin directory.
+<sup>1</sup>. The DataSet must have PNG images of resolution 640x480.
+
+<sup>2</sup>. Executeable must be invoked from within the bin directory.
        
 
 
@@ -65,6 +66,7 @@ Note: The DataSet must have PNG images of resolution 640x480.
 * [OpenCV3.1](http://docs.opencv.org/3.1.0/index.html) - Copmputer vision library
 * [CMake](https://maven.apache.org/) - Dependency management and makefiles generation
 * [Eigen 3.3.3](http://eigen.tuxfamily.org/index.php?title=Main_Page) - Linear Algebra  library
+
 
 ## Contributing
 
