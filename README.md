@@ -13,17 +13,18 @@ These instructions will get you a copy of the project up and running on your loc
 What things you need to install the software and how to install them
 
 ```
-Give examples
+OpenCv-3.1.0
+[OpenCv Installaion Guide] (http://docs.opencv.org/3.1.0/d7/d9f/tutorial_linux_install.html)
 ```
 
 ### Installing
 
 A step by step series of examples that tell you have to get a development env running
 
-Say what the step will be
+clone this repository 
 
 ```
-Give the example
+git clone https://github.com/RameezI/TUeLaneTracker.git
 ```
 
 And repeat
@@ -34,35 +35,48 @@ until finished
 
 End with an example of getting some data out of the system or using it for a little demo
 
-## Running the tests
+## Building the Aplication
 
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
+Go to the parent directory of the cloned repository:
 ```
-Give an example
+cd TUeLaneTracker
+```
+Open main.cpp file in an editor:
+```
+vim  +24 LaneTrackerApp/main.cpp
+```
+Update location of the DataSet by editing the folllowing lines in main.cpp:
+```
+cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
+```
+Create a build subdirectory and invoke cmake
+```
+mkdir build
+cd build
+cmake ..
 ```
 
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
+Note: The DataSet must have PNG images of resolution 640x480
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+Build and Install the executeable
+```
+make istall
+```
+Run the Executeable
+```
+cd ../install/bin
+./TUeLaneTracker
+```
+Note: Executeable must be invoked from within the bin directory.
+
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [OpenCV3.1](http://docs.opencv.org/3.1.0/index.html) - Copmputer vision library
+* [CMake](https://maven.apache.org/) - Dependency management and makefiles generation
+* [Eigen 3.3.3](http://eigen.tuxfamily.org/index.php?title=Main_Page) - Linear Algebra  library
 
 ## Contributing
 
