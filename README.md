@@ -48,16 +48,16 @@ cmake ..
 
 Build and Install the executeable
 ```
-make istall
+make install
 ```
 Run the executeable <sup>2</sup>. 
 ```
 cd ../install/bin
 ./TUeLaneTracker
 ```
-<sup>1</sup>. The DataSet must have PNG images of resolution 640x480.
+<sup>1</sup>The DataSet must have PNG images of resolution 640x480.
 
-<sup>2</sup>. Executeable must be invoked from within the bin directory.
+<sup>2</sup>Executeable must be invoked from within the bin directory.
        
 
 
