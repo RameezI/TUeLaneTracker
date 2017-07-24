@@ -60,7 +60,7 @@ cd ../install/bin
 2. Executeable must be invoked from within the bin directory.
        
 ## Youtube Videos
-   This video showcases the functional performance of the algorithm:
+   These videos showcase the functional performance of the algorithm:
    * [Eindhoven](https://www.youtube.com/watch?v=u4oVjcPDNfw)
 
 
