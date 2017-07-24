@@ -61,7 +61,7 @@ cd ../install/bin
        
 ## Youtube Video
    This video showcases the functional performance of the algorithm:
-   * [Eindhoven](https://www.youtube.com/)
+   * [Eindhoven](https://www.youtube.com/watch?v=u4oVjcPDNfw)
 
 
 
