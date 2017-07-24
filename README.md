@@ -14,8 +14,8 @@ What things you need to install the software and how to install them
 
 ```
 OpenCv-3.1.0
-[OpenCv Installaion Guide] (http://docs.opencv.org/3.1.0/d7/d9f/tutorial_linux_install.html)
 ```
+[OpenCv Installaion Guide] (http://docs.opencv.org/3.1.0/d7/d9f/tutorial_linux_install.html)
 
 ### Installing
 
@@ -26,14 +26,6 @@ clone this repository
 ```
 git clone https://github.com/RameezI/TUeLaneTracker.git
 ```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
 
 ## Building the Aplication
 
