@@ -691,7 +691,7 @@ void TrackingLaneDAG_generic::auxillaryTasks()
 	   }	
 
 	   mBufferReady    = true;
-	 
+	   mStartBufferShift=false;
 
 	 wrtLock.unlock();
 	_sateChange.notify_one();
