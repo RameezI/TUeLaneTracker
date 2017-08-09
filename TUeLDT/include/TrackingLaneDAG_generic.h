@@ -14,6 +14,7 @@ friend class TEST_TrackingState;
 	
 private:
 
+	bool            mStartBufferShift;
 	bool    	mStartFiltering;
 	bool 		mFiltersReady;
 	

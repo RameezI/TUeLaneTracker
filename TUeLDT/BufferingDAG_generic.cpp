@@ -53,7 +53,7 @@ mProfiler.start("TemplatesWait");
 #endif 							
 
 		WriteLock  wrtLock(_mutex);
-		_sateChange.wait(wrtLock,[this]{return mBufferReady;} );
+		_sateChange.wait(wrtLock,[this]{return (mTemplatesReady && mBufferReady) ;} );
 				
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -165,8 +165,10 @@ mProfiler.start("computeProbabilities");
 	//Final Probability Map
 	multiply(mBufferPool->Probability[bufferPos], mProbMap_GradDir, mBufferPool->Probability[bufferPos]);
 	mBufferPool->Probability[bufferPos].convertTo(mBufferPool->Probability[bufferPos], CV_8U, 1.0/255, 0);
-		
-	mBufferReady= false;
+	
+	mTemplatesReady = false;	
+	mBufferReady    = false;
+	
 	wrtLock.unlock();
 
 #ifdef PROFILER_ENABLED
@@ -182,7 +184,11 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 }
 
+/** 
+Parallel Execution Path.
+Description of Modes:
 
+*/
 void BufferingDAG_generic::auxillaryTasks()
 {
 
@@ -190,10 +196,13 @@ void BufferingDAG_generic::auxillaryTasks()
 	int offset =  mCAMERA.RES_VH(0)-mSpan;
 	int rowIndex= mCAMERA.RES_VH(0) - mCAMERA.FRAME_CENTER(0) -mVanishPt.V +offset ;
 	int colIndex= mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
-	
-	
-	WriteLock  wrtLock(_mutex);
-	
+
+	WriteLock  wrtLock(_mutex, std::defer_lock);	
+
+/* MODE: (A + C) */	
+
+	wrtLock.lock();
+
 		Rect ROI = Rect(colIndex, rowIndex, mCAMERA.RES_VH(1), mSpan);
 		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
 
@@ -211,10 +220,13 @@ void BufferingDAG_generic::auxillaryTasks()
 			mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);
 		}	
 		
-	mBufferReady = true;
+		mTemplatesReady = true;
+		mBufferReady    = true;
+
 
 	wrtLock.unlock();
 	_sateChange.notify_one();
+
 }
 
 
@@ -230,6 +242,7 @@ int BufferingDAG_generic::grabFrame()
 	#endif 
 	
 		mFrameRGB = imread(mFiles[mFrameCount]);
+		cout<<"Processing Frame: "<<mFrameCount<<endl;
 	 
 
 	#ifdef PROFILER_ENABLED
@@ -244,13 +257,15 @@ int BufferingDAG_generic::grabFrame()
 				#endif
 			  
 		  
-	if(!mFrameRGB.data)
-		return -1;
 						
-	else if (mFrameCount+1 < mFiles.size())
+	if (mFrameCount+1 < mFiles.size())
 		 mFrameCount ++;
 
-		return 0;
+	
+	if(!mFrameRGB.data)
+	   return -1;
+	else	
+	   return 0;
 
 #else
 

@@ -1,10 +1,11 @@
 #include "TrackingLaneDAG_generic.h"
 
-
 TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferingGraph)
+
 
 : 
   BufferingDAG_generic(std::move(bufferingGraph)),
+  mStartBufferShift(false),
   mStartFiltering(false),
   mFiltersReady(false),
   mMAX_PIXELS_ROI(mFrameGRAY_ROI.size().height * mFrameGRAY_ROI.size().width)
@@ -232,6 +233,16 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				#endif	
 
 
+	
+
+
+
+//^TODO: Confirm with the architecture
+//Start Buffer Shifting
+	wrtLock.lock();
+	this->mStartBufferShift = true;
+	wrtLock.unlock();
+	_sateChange.notify_one();
 
 
 
@@ -573,7 +584,7 @@ void TrackingLaneDAG_generic::auxillaryTasks()
 {
 
 
-// MODE: A
+/* MODE: (A+C) OR A */
 		
 	int offset   =  mCAMERA.RES_VH(0)  -mSpan;
 	int rowIndex =  mCAMERA.RES_VH(0) - mCAMERA.FRAME_CENTER(0) -mVanishPt.V +offset ;
@@ -583,7 +594,9 @@ void TrackingLaneDAG_generic::auxillaryTasks()
 	WriteLock  wrtLock(_mutex, std::defer_lock);
 	
 	wrtLock.lock();
+
 	if (mBufferReady == false)
+/* MODE: A + C */
 	{
 		
 		Rect ROI = Rect(colIndex, rowIndex, mCAMERA.RES_VH(1), mSpan);
@@ -604,7 +617,24 @@ void TrackingLaneDAG_generic::auxillaryTasks()
 			mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);		
 		}
 		
-		mBufferReady = true;
+		mTemplatesReady = true;
+		mBufferReady    = true;
+	}
+
+	else
+/* MODE: A ONLY */
+	{
+		Rect ROI = Rect(colIndex, rowIndex, mCAMERA.RES_VH(1), mSpan);
+		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
+			
+		ROI = Rect(0,rowIndex,mCAMERA.RES_VH(1), mSpan);
+		mDEPTH_MAP_ROOT(ROI).copyTo(mDepthTemplate);
+		
+		rowIndex = mVP_Range_V-mVanishPt.V;
+		ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mSpan);
+		mFOCUS_MASK_ROOT(ROI).copyTo(mFocusTemplate);
+
+		mTemplatesReady= true;		
 	}
 	
 	wrtLock.unlock();
@@ -647,42 +677,27 @@ void TrackingLaneDAG_generic::auxillaryTasks()
 
 
 
-//MODE C:
-/*
+
+/* MODE: C  */
+
 	wrtLock.lock();
-	if (mBufferReady == false)
-	{
-		
-		Rect ROI = Rect(colIndex, rowIndex, mCAMERA.RES_VH(1), mSpan);
-		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
-			
-		ROI = Rect(0,rowIndex,mCAMERA.RES_VH(1), mSpan);
-		mDEPTH_MAP_ROOT(ROI).copyTo(mDepthTemplate);
-		
-		rowIndex = mVP_Range_V-mVanishPt.V;
-		ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mSpan);
-		mFOCUS_MASK_ROOT(ROI).copyTo(mFocusTemplate);	
-
+	_sateChange.wait(wrtLock,[this]{return mStartBufferShift;} );
 	
 
-		for ( int i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
-		{
-			mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
-			mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);		
-		}
-		
-		mBufferReady = true;
-	}
+	   for ( std::size_t i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
+	   {
+	 	mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
+		mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);
+	   }	
 
-	wrtLock.unlock();
-*/
+	   mBufferReady    = true;
+	 
+
+	 wrtLock.unlock();
+	_sateChange.notify_one();
 
 
-//MODE D:
-	wrtLock.lock();
-	
-	wrtLock.unlock();
-	
+
 
 }
 

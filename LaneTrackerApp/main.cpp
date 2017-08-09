@@ -22,6 +22,8 @@ int main() /**
 	 
 	 vector< cv::String> IMG_filenames;
 	 cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
+	 //cv::String folder = "/home/rameez/Desktop/subDataSet";
+	 glob(folder, IMG_filenames);
 	 glob(folder, IMG_filenames);
 	 const uint skipFrames = 4000;	
 	 

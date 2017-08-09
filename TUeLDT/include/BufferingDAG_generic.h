@@ -29,7 +29,8 @@ protected:
 
 	MutexType 			_mutex;
 	condition_variable  		_sateChange;
-	bool 				mBufferReady= false;
+	bool 				mTemplatesReady = false;
+	bool 				mBufferReady    = false;
 
 #ifdef PROFILER_ENABLED
     ProfilerLDT         mProfiler;
