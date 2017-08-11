@@ -4,8 +4,8 @@ BufferingState::BufferingState()
 {
 
  #ifdef PROFILER_ENABLED
-  	getOpenClInfo(); 
-	#endif	
+  	//getOpenClInfo(); 
+ #endif	
 
 }
 
