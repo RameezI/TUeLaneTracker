@@ -77,30 +77,36 @@ void BufferingState::run()
 	mProfiler.start("SingleRun_BUFFER");
 #endif	
 		
-
 	if (mSideExecutor.joinable())
 		mSideExecutor.join();
-		
-	mSideExecutor =
-	#ifndef s32v2xx
-		std::thread(&BufferingDAG_generic::auxillaryTasks, std::ref(bufferingGraph));
-	#else
-		std::thread(&BufferingDAG_s32v::auxillaryTasks,    std::ref(bufferingGraph));
-	#endif
+	
 
 	if (0==bufferingGraph.grabFrame())
-		bufferingGraph.buffer();		
+	{
+		mSideExecutor =
+		#ifndef s32v2xx
+			std::thread(&BufferingDAG_generic::auxillaryTasks, std::ref(bufferingGraph));
+		#else
+			std::thread(&BufferingDAG_s32v::auxillaryTasks,    std::ref(bufferingGraph));
+		#endif
+		
+
+		bufferingGraph.buffer();
+
+		
+		if(this->StateCounter < sNbBuffer-2)
+		  this->StateCounter++;
+		
+		else
+		{
+		  this->StateCounter++;
+		  this->currentStatus = StateStatus::DONE;
+		}
+	}
+		
 	else
 		currentStatus = StateStatus::ERROR;
-												
 
-	if(this->StateCounter < sNbBuffer-2)
-		this->StateCounter++;
-	else
-	{
-		this->StateCounter++;
-		this->currentStatus = StateStatus::DONE;
-	}	
 
 
  #ifdef PROFILER_ENABLED

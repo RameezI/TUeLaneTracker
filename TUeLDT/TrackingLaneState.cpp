@@ -59,25 +59,30 @@ mProfiler.start("SingleRun_TRACK");
 	if (mSideExecutor.joinable())
 		mSideExecutor.join();
 	
-	mSideExecutor =
-#ifdef s32v2xx
-	std::thread(&TrackingLaneDAG_s32v::auxillaryTasks, 	std::ref(mTrackingLaneGraph));
-#else
-	std::thread(&TrackingLaneDAG_generic::auxillaryTasks, 	std::ref(mTrackingLaneGraph));
-#endif
 		
 		
 	//Grab and Buffer Required Frames
 	if (0==mTrackingLaneGraph.grabFrame())
 	{
-		mTrackingLaneGraph.buffer();
-		mTrackingLaneGraph.extractLanes();
-	}			
+		 
+	  mSideExecutor =
+	  #ifdef s32v2xx
+			std::thread(&TrackingLaneDAG_s32v::auxillaryTasks, 	std::ref(mTrackingLaneGraph));
+	  #else
+			std::thread(&TrackingLaneDAG_generic::auxillaryTasks, 	std::ref(mTrackingLaneGraph));
+	  #endif
+
+	  mTrackingLaneGraph.buffer();
+	  mTrackingLaneGraph.extractLanes();
+	  this->StateCounter++;
+
+	}
+			
 	else
-		currentStatus = StateStatus::ERROR;	
+		currentStatus = StateStatus::ERROR;
+			
 
 
-	this->StateCounter++;
 		
 #ifdef PROFILER_ENABLED
 mProfiler.end();

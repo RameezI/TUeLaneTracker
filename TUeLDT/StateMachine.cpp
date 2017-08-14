@@ -139,15 +139,17 @@ States StateMachine::sCurrentState = States::BOOTING;
 		/* Shutting Down */
 		if(sCurrentState==States::DISPOSING)
 		{
+				
+			cout<< "State Machine is in Disposed State"<< endl;
+
 				#ifdef PROFILER_ENABLED
 				 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 				 <<"******************************"<<endl
 				 <<  "Shutting Down the State-Machine."   <<endl
 				 <<"******************************"<<endl<<endl;
 				#endif 
-				return -1;			
 		}
-
+		cout <<"returning 0";
 		return 0;
 
 	}
