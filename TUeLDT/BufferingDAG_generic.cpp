@@ -256,7 +256,6 @@ int BufferingDAG_generic::grabFrame()
 				<<"******************************"<<endl<<endl;
 				#endif
 			  
-		  
 						
 	if (mFrameCount+1 < mFiles.size())
 		 mFrameCount ++;
