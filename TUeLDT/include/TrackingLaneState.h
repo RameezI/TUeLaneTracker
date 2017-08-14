@@ -17,6 +17,7 @@ class TrackingLaneState: public State
 friend class TEST_TrackingState;	
 	
 private:
+	uint_fast8_t mRetryGrab;
 	std::thread mSideExecutor;
 
 #ifdef s32v2xx

@@ -2,7 +2,8 @@
 
 #ifdef s32v2xx
      TrackingLaneState::TrackingLaneState(BufferingDAG_s32v&& bufferingGraph)
-     :mTrackingLaneGraph(std::move(bufferingGraph))
+     :  mRetryGrab(0),
+	mTrackingLaneGraph(std::move(bufferingGraph))
      {	
 		
      }
@@ -79,9 +80,11 @@ mProfiler.start("SingleRun_TRACK");
 	}
 			
 	else
+	{
+	   mRetryGrab ++;
+	   if(mRetryGrab >3)
 		currentStatus = StateStatus::ERROR;
-			
-
+	}
 
 		
 #ifdef PROFILER_ENABLED

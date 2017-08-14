@@ -1,6 +1,7 @@
 #include "BufferingState.h"
 
 BufferingState::BufferingState()
+:mRetryGrab(0)
 {
 
  #ifdef PROFILER_ENABLED
@@ -105,8 +106,11 @@ void BufferingState::run()
 	}
 		
 	else
+	{ 	
+		mRetryGrab ++;
+		if(mRetryGrab > 3)
 		currentStatus = StateStatus::ERROR;
-
+	}
 
 
  #ifdef PROFILER_ENABLED

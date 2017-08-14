@@ -19,7 +19,7 @@ class BufferingState : public State
 friend class TEST_BufferingState;
 	
 private:
-
+	uint_fast8_t mRetryGrab;
 	std::thread mSideExecutor;
 	
 public:	
