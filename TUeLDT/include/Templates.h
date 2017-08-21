@@ -20,9 +20,7 @@ public:
 	Mat DEPTH_MAP_ROOT;
 	Mat X_IRS;
 	Mat Y_IRS;
-
-  
-  
+	
 	Templates(const int RES_V, const int RES_H, const int VP_RANGE_ROWS)
 	: MARGIN(80), 
 	  VP_RANGE_V(VP_RANGE_ROWS), 
