@@ -506,6 +506,7 @@ mProfiler.end();
 #ifdef PROFILER_ENABLED
 mProfiler.start("Display");
 #endif
+	#ifdef DISPLAY_GRAPHICS_OPENCV
 	{
 	   /*  Transform VP to Image Coordianate System */
 	   int VP_V =  mVanishPt.V + mCAMERA.FRAME_CENTER(0);
@@ -556,13 +557,8 @@ mProfiler.start("Display");
 	    waitKey(10);
 
 	    //mOutputVideo<<mFrameRGB;
-	    
-	
-		
-
-
 	}
-		
+	#endif
 										
 #ifdef PROFILER_ENABLED
 mProfiler.end();
