@@ -36,7 +36,6 @@ public:
 
 			
 		/* Create Depth Template */
-
 			MatrixXf DEPTH_ROOT  = MatrixXf::Zero(2*RES_V +1,RES_H);			
 			const float step 	= 45.0/RES_V;
 			float angle = 90- step;
@@ -53,7 +52,8 @@ public:
 			eigen2cv(DEPTH_ROOT, DEPTH_MAP_ROOT);
 			DEPTH_MAP_ROOT.convertTo(DEPTH_MAP_ROOT, CV_16U);
 
-			/* Create X Template */
+
+		/* Create X Template */
 			Mat Row = Mat(1, RES_H, CV_16S);
 			int16_t* ptr = Row.ptr<int16_t>(0);
 			for (int i=0; i<RES_H; i++)
@@ -66,7 +66,6 @@ public:
 
 		
 		/* Create Y Template */
-
 			Mat Col = Mat(SPAN, 1, CV_16S);
 			ptr = Col.ptr<int16_t>(0);
 			for (int i=0; i<SPAN; i++)
@@ -77,13 +76,14 @@ public:
 
 
 
-	  /* Load Gradient Tangent Template */
-
+	 	/* Load Gradient Tangent Template */
 			std::stringstream formattedString;
 			string templateFile, prefix, format;
 			prefix= "../../Templates/GradientTangent_";
+
 			formattedString<<prefix<<std::to_string(RES_H)<<"x"<<std::to_string(RES_V);
 			templateFile = formattedString.str();
+
 			struct stat buf;
 			int statResult = stat(templateFile.c_str(),&buf);
 			if (statResult != 0) 

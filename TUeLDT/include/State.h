@@ -22,10 +22,10 @@
 #include "Templates.h"
 
 
-
-
-
 #ifdef s32v2xx
+#include <apex.h>
+#include <oal.h>
+#include <umat.hpp>
 #include "frame_output_v234fb.h"
 #endif
 
@@ -65,25 +65,35 @@ public:
 
 struct BufferPool
 {
-		std::array<Mat, State::sNbBuffer> Probability;
-		std::array<Mat, State::sNbBuffer> GradientTangent;
-		
-		BufferPool(const int RES_V, const int RES_H)
-		{
-			
+		#ifdef s32v2xx
+
+		  std::array<vsdk::UMat, State::sNbBuffer> Probability;
+		  std::array<vsdk::UMat, State::sNbBuffer> GradientTangent;
+		  
+		   BufferPool(const int RES_V, const int RES_H)
+		   {
 			for (int i=0; i< State::sNbBuffer; i++)
 			{   
-				#ifdef s32v2xx
-				 Probability[i]		= Mat::zeros(RES_V, RES_H,  CV_8UC1);
-				 GradientTangent[i]	= Mat::zeros(RES_V,RES_H, CV_16SC1);
-				 //Probability[i]	= UMat::zeros(RES_V, RES_H,  CV_8UC1);
-				 //GradientTangent[i]	= UMat::zeros(RES_V,RES_H, CV_16SC1);
-				#else
-				 Probability[i]		= Mat::zeros(RES_V, RES_H,  CV_8UC1);
-				 GradientTangent[i]	= Mat::zeros(RES_V,RES_H, CV_16SC1);
-				#endif
+			   Probability[i]	= vsdk::UMat(RES_V, RES_H,  VSDK_CV_8UC1);
+			   GradientTangent[i]	= vsdk::UMat(RES_V, RES_H,  VSDK_CV_16SC1);
 			}
-		}		
+		   }
+
+		#else
+
+		  std::array<Mat, State::sNbBuffer> Probability;
+		  std::array<Mat, State::sNbBuffer> GradientTangent;
+
+		   BufferPool(const int RES_V, const int RES_H)
+		   {	
+			for (int i=0; i< State::sNbBuffer; i++)
+			{   
+			   Probability[i]	= Mat::zeros(RES_V, RES_H,  CV_8UC1);
+			   GradientTangent[i]	= Mat::zeros(RES_V, RES_H, CV_16SC1);
+			}
+		   }
+
+	 	#endif		
 };
 
-#endif // STATE_H
+#endif
