@@ -10,12 +10,15 @@ BufferingDAG_generic::BufferingDAG_generic()
 void BufferingDAG_generic::buffer()
 {
 
+
+
+
+
 #ifdef PROFILER_ENABLED
-mProfiler.start("grabGRAYFrame");
+mProfiler.start("GRAY_FRAME_CONVERSION");
 #endif				
 
 	cvtColor(mFrameRGB, mFrameGRAY, cv::COLOR_BGR2GRAY);
-
 	int rowIndex= mCAMERA.RES_VH(0) - mSpan;
 	Rect ROI;
 	ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mSpan);	
@@ -26,13 +29,18 @@ mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
 				<<  "GRAY Frame Conversion." <<endl
-				<<  "Conversion Time: " << mProfiler.getAvgTime("grabGRAYFrame")<<endl
+				<<  "Conversion Time: " << mProfiler.getAvgTime("GRAY_FRAME_CONVERSION")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
 
-								
+
+
+
+
+
+
 #ifdef PROFILER_ENABLED
-mProfiler.start("GaussianFiltering");
+mProfiler.start("GAUSSIAN_BLUR");
 #endif 
 	
 	GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, Size( 5, 5 ), 1.5, 1.5, BORDER_REPLICATE);
@@ -43,15 +51,18 @@ mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
 				<<  "Gaussian Filtering." <<endl
-				<<  "Gaussian(11x11) Time: " << mProfiler.getAvgTime("GaussianFiltering")<<endl
+				<<  "Gaussian(5x5) Time: " << mProfiler.getAvgTime("GAUSSIAN_BLUR")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
 
 
 
 
+
+
+
 #ifdef PROFILER_ENABLED
-mProfiler.start("TemplatesWait");
+mProfiler.start("TEMPLATES_WAIT");
 #endif 							
 
 		WriteLock  wrtLock(_mutex);
@@ -61,21 +72,19 @@ mProfiler.start("TemplatesWait");
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				<<"******************************"<<endl
-				<<  "Waiting For Worker thread (Templates and Buffer)." <<endl
-				<<  "Wait Time: " << mProfiler.getAvgTime("TemplatesWait")<<endl
+				<<  "Waiting For Worker thread." <<endl
+				<<  "Wait Time: " << mProfiler.getAvgTime("TEMPLATES_WAIT")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif	
-				
-				
-				
-				
-				
-				
-				
-				
+
+
+
+
+
+
 				
 #ifdef PROFILER_ENABLED
-mProfiler.start("GradientsComputation");
+mProfiler.start("GRADIENT_COMPUTATION");
 #endif 								
 
 	int scale = 1;
@@ -117,7 +126,7 @@ mProfiler.start("GradientsComputation");
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
 				<<  "Gradients Computations." <<endl
-				<<  "Gradients compute Time: " << mProfiler.getAvgTime("GradientsComputation")<<endl
+				<<  "Gradients compute Time: " << mProfiler.getAvgTime("GRADIENT_COMPUTATION")<<endl
 			  	<<"******************************"<<endl<<endl;	
 			 	#endif
 
@@ -125,11 +134,9 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
-			 
-			 
-			 
+
 #ifdef PROFILER_ENABLED
-mProfiler.start("computeProbabilities");
+mProfiler.start("COMPUTE_PROBABILITIES");
 #endif 		
 
 	//GrayChannel Probabilities
@@ -178,25 +185,23 @@ mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
 				<<  "Compute total LaneMarker Proability ." <<endl
-				<<  "Max Time: " << mProfiler.getMaxTime("computeProbabilities")<<endl
-				<<  "Avg Time: " << mProfiler.getAvgTime("computeProbabilities")<<endl
-				<<  "Min Time: " << mProfiler.getMinTime("computeProbabilities")<<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("COMPUTE_PROBABILITIES")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("COMPUTE_PROBABILITIES")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("COMPUTE_PROBABILITIES")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
-
 }
 
-/** 
-Parallel Execution Path.
-Description of Modes:
 
+/** 
+Parallel Execution Path for Buffering Graph.
+Description of Modes:
 */
+
 void BufferingDAG_generic::auxillaryTasks()
 {
-
-	
-	int offset =  mCAMERA.RES_VH(0)-mSpan;
-	int rowIndex= mCAMERA.RES_VH(0) - mCAMERA.FRAME_CENTER(0) -mVanishPt.V +offset ;
+	const int OFFSET =  mCAMERA.RES_VH(0)-mSpan;
+	int rowIndex= mCAMERA.RES_VH(0) - mCAMERA.FRAME_CENTER(0) -mVanishPt.V + OFFSET ;
 	int colIndex= mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
 
 	WriteLock  wrtLock(_mutex, std::defer_lock);	
@@ -208,7 +213,6 @@ void BufferingDAG_generic::auxillaryTasks()
 		Rect ROI = Rect(colIndex, rowIndex, mCAMERA.RES_VH(1), mSpan);
 		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
 
-	
 		ROI = Rect(0,rowIndex,mCAMERA.RES_VH(1), mSpan);
 		mDEPTH_MAP_ROOT(ROI).copyTo(mDepthTemplate);
 
@@ -240,7 +244,7 @@ int BufferingDAG_generic::grabFrame()
 #ifdef DIRECTORY_INPUT
 
 	#ifdef PROFILER_ENABLED
-	mProfiler.start("ImageRead");
+	mProfiler.start("IMAGE_READ");
 	#endif 
 	
 		mFrameRGB = imread(mFiles[mFrameCount]);
@@ -254,15 +258,13 @@ int BufferingDAG_generic::grabFrame()
 	LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				<<"******************************"<<endl
 				<<  "Reading frame from directory." <<endl <<str<<endl
-				<<  "Read time: " << mProfiler.getAvgTime("ImageRead")<<endl
+				<<  "Read time: " << mProfiler.getAvgTime("IMAGE_READ")<<endl
 				<<"******************************"<<endl<<endl;
 				#endif
-			  
 						
 	if (mFrameCount+1 < mFiles.size())
 		 mFrameCount ++;
 
-	
 	if(!mFrameRGB.data)
 	   return -1;
 	else	
