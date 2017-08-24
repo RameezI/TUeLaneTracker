@@ -40,29 +40,30 @@ mProfiler.start("SetRootTemplates");
 	bufferingGraph.mSpan		= templates.SPAN;
 	bufferingGraph.mMargin		= templates.MARGIN;
 
+	
+	//^TODO:Dangerous! Put it in other location this is nonintutive to put this code here
+	int16_t ORIGIN_Y_CRS	 =  bufferingGraph.mCAMERA.FRAME_CENTER(0) - templates.SPAN;
+	int16_t ORIGIN_X_CRS 	 = -bufferingGraph.mCAMERA.FRAME_CENTER(1);
+	const int RES_H = bufferingGraph.mCAMERA.RES_VH(1);
+
+	// Define X and Y coordinates in VP reffernce system
+	bufferingGraph.mY_VPRS	 =   -(templates.Y_IRS + ORIGIN_Y_CRS);
+	bufferingGraph.mX_VPRS   =    templates.X_IRS  + ORIGIN_X_CRS;
+	
+	//Allocate Buffers
+	bufferingGraph.mBufferPool.reset(new BufferPool(templates.SPAN, RES_H)); 
+
 #ifdef s32v2xx
-	bufferingGraph.mGRADIENT_TAN_ROOT = templates.GRADIENT_TAN_ROOT.getUMat(cv::ACCESS_RW);
+	//bufferingGraph.mGRADIENT_TAN_ROOT = templates.GRADIENT_TAN_ROOT.getUMat(cv::ACCESS_RW);
+	bufferingGraph.mGRADIENT_TAN_ROOT = templates.GRADIENT_TAN_ROOT;
 	bufferingGraph.mDEPTH_MAP_ROOT    = templates.DEPTH_MAP_ROOT;
 	bufferingGraph.mFOCUS_MASK_ROOT   = templates.FOCUS_MASK_ROOT;
 
-	/* Initialise certain UMat*/
-	//bufferingGraph.mGradX = cv::UMat(templates.SPAN, )
 #else
 	bufferingGraph.mGRADIENT_TAN_ROOT = templates.GRADIENT_TAN_ROOT;
 	bufferingGraph.mDEPTH_MAP_ROOT    = templates.DEPTH_MAP_ROOT;
 	bufferingGraph.mFOCUS_MASK_ROOT   = templates.FOCUS_MASK_ROOT;
 #endif
-
-	int16_t ORIGIN_Y_CRS	=  bufferingGraph.mCAMERA.FRAME_CENTER(0) - templates.SPAN;
-	int16_t ORIGIN_X_CRS 	= -bufferingGraph.mCAMERA.FRAME_CENTER(1);
-
-
-	//^TODO:Dangerous! Put it in other location this is nonintutive to put this code here
-	bufferingGraph.mY_VPRS	 =   -(templates.Y_IRS + ORIGIN_Y_CRS);
-	bufferingGraph.mX_VPRS   =    templates.X_IRS  + ORIGIN_X_CRS;
-
-	const int RES_H = bufferingGraph.mCAMERA.RES_VH(1);
-	bufferingGraph.mBufferPool.reset(new BufferPool(templates.SPAN, RES_H)); 
 
 	this->currentStatus= StateStatus::ACTIVE;
 		
