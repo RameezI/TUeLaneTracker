@@ -7,11 +7,18 @@ BufferingDAG_generic::BufferingDAG_generic()
 	
 }
 
+int BufferingDAG_generic::init_DAG()
+{
+        int16_t   ORIGIN_Y_CRS   =  mCAMERA.FRAME_CENTER(0) - mSPAN;
+        int16_t   ORIGIN_X_CRS   = -mCAMERA.FRAME_CENTER(1);
+
+        bufferingGraph.mY_VPRS   = -(mY_IRS + ORIGIN_Y_CRS);
+        bufferingGraph.mX_VPRS   =   mX_IRS + ORIGIN_X_CRS;
+}
+
+
 void BufferingDAG_generic::buffer()
 {
-
-
-
 
 
 #ifdef PROFILER_ENABLED

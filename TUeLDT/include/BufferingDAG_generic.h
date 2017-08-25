@@ -41,6 +41,9 @@ using WriteLock = std::unique_lock<MutexType>;
 	Mat 	mGRADIENT_TAN_ROOT;
     	Mat	mFOCUS_MASK_ROOT;
     	Mat	mDEPTH_MAP_ROOT;
+
+	Mat     mX_IRS;
+	Mat     mY_IRS;
 	
 	unique_ptr<BufferPool>	mBufferPool;
 	/***************************************************/
@@ -92,9 +95,12 @@ using WriteLock = std::unique_lock<MutexType>;
 
 	
 public:
+
+	int  init_DAG()			// For initialising DAG ONE TIME EXECUTION
+
 	int  grabFrame(); 		// Grab Frame from the Source
-	void auxillaryTasks();          // Perform tasks from seperate executor
-	void buffer();   		//  Perform tasks from main Thread
+	void auxillaryTasks();          // Perform assitve tasks for buffering from seperate executor
+	void buffer();   		// Perform tasks for buffering from main Thread
 	
 	
 	
@@ -115,6 +121,9 @@ public:
 	   mGRADIENT_TAN_ROOT 		= std::move(bufferingGraph.mGRADIENT_TAN_ROOT);
 	   mFOCUS_MASK_ROOT   		= std::move(bufferingGraph.mFOCUS_MASK_ROOT);
     	   mDEPTH_MAP_ROOT    		= std::move(bufferingGraph.mDEPTH_MAP_ROOT);
+
+           mX_IRS                       = std::move(bufferingGraph.mX_IRS); 
+           mY_IRS                       = std::move(bufferingGraph.mY_IRS);
 	
 	   mBufferPool   		= std::move(bufferingGraph.mBufferPool);
 	   mVanishPt			= std::move(bufferingGraph.mVanishPt);

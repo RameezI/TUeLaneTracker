@@ -36,10 +36,7 @@ void BufferingState::setupDAG(const Templates& templates)
 mProfiler.start("SET_UP_BUFFERING_DAG");
 #endif
 
-	int16_t   ORIGIN_Y_CRS	 =  bufferingGraph.mCAMERA.FRAME_CENTER(0) - templates.SPAN;
-	int16_t   ORIGIN_X_CRS 	 = -bufferingGraph.mCAMERA.FRAME_CENTER(1);
-	const int RES_H 	 =  bufferingGraph.mCAMERA.RES_VH(1);
-
+	const int RES_H 	 	=  bufferingGraph.mCAMERA.RES_VH(1);
 
 	bufferingGraph.mVP_Range_V   	= templates.VP_RANGE_V;
 	bufferingGraph.mSpan		= templates.SPAN;
@@ -57,11 +54,11 @@ mProfiler.start("SET_UP_BUFFERING_DAG");
 
 	
 	// Define X and Y coordinates in VP reffernce system
-	bufferingGraph.mY_VPRS	 =   -(templates.Y_IRS + ORIGIN_Y_CRS);
-	bufferingGraph.mX_VPRS   =    templates.X_IRS  + ORIGIN_X_CRS;
+	bufferingGraph.mY_IRS	 =   templates.Y_IRS;
+	bufferingGraph.mX_IRS   =    templates.X_IRS;
 
-	
 
+	if ( 0 == bufferingGraph.init_DAG() );
 	this->currentStatus= StateStatus::ACTIVE;
 
 		
