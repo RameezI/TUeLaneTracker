@@ -5,7 +5,7 @@
 #include <mutex>
 #include <condition_variable>
 
-
+struct BufferPool;
 
 class BufferingDAG_generic
 {
@@ -144,12 +144,30 @@ public:
 	   mFiles			= std::move(bufferingGraph.mFiles);
 	   #endif
 	
-	
-	
 	   wrtLock.unlock();
    	}
 
 
 };
+
+struct BufferPool
+{
+        vector<Mat> Probability;
+        vector<Mat> GradientTangent;
+
+        BufferPool(const int RES_V, const int RES_H, std::size_t bufferSize)
+        {
+          for (std::size_t i=0; i< bufferSize; i++)
+          {
+             Mat PROB_MAP( RES_V, RES_H, CV_8UC1  );
+             Mat GRAD_TAN( RES_V, RES_H, CV_16SC1 );
+
+             Probability.push_back(PROB_MAP);
+             GradientTangent.push_back(GRAD_TAN);
+
+          }
+        }
+};
+
 
 #endif // BUFFERINGDAG_GENERIC_H

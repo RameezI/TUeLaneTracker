@@ -52,48 +52,13 @@ protected:
 	
 public:
 
-	static const  int      	sNbBuffer =5;
-	int64_t 		StateCounter;     	
-	StateStatus 	       	currentStatus;
+	static const  int      	sNbBuffer      =  5;
+	int64_t 		StateCounter   =  0;     	
+	StateStatus 	       	currentStatus  =  StateStatus::INACTIVE;
 	
 	void conclude(){currentStatus = StateStatus::DONE;}
 	
-	State();
-	~State();
+	State(){}
+	~State(){}
 };
-
-
-struct BufferPool
-{
-		#ifdef s32v2xx
-
-		  std::array<vsdk::UMat, State::sNbBuffer> Probability;
-		  std::array<vsdk::UMat, State::sNbBuffer> GradientTangent;
-		  
-		   BufferPool(const int RES_V, const int RES_H)
-		   {
-			for (int i=0; i< State::sNbBuffer; i++)
-			{   
-			   Probability[i]	= vsdk::UMat(RES_V, RES_H,  VSDK_CV_8UC1);
-			   GradientTangent[i]	= vsdk::UMat(RES_V, RES_H,  VSDK_CV_16SC1);
-			}
-		   }
-
-		#else
-
-		  std::array<Mat, State::sNbBuffer> Probability;
-		  std::array<Mat, State::sNbBuffer> GradientTangent;
-
-		   BufferPool(const int RES_V, const int RES_H)
-		   {	
-			for (int i=0; i< State::sNbBuffer; i++)
-			{   
-			   Probability[i]	= Mat::zeros(RES_V, RES_H,  CV_8UC1);
-			   GradientTangent[i]	= Mat::zeros(RES_V, RES_H, CV_16SC1);
-			}
-		   }
-
-	 	#endif		
-};
-
 #endif

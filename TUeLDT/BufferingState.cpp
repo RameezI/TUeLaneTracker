@@ -33,46 +33,44 @@ void BufferingState::setupDAG(const Templates& templates)
 {
 	
 #ifdef PROFILER_ENABLED
-mProfiler.start("SetRootTemplates");
+mProfiler.start("SET_UP_BUFFERING_DAG");
 #endif
+
+	int16_t   ORIGIN_Y_CRS	 =  bufferingGraph.mCAMERA.FRAME_CENTER(0) - templates.SPAN;
+	int16_t   ORIGIN_X_CRS 	 = -bufferingGraph.mCAMERA.FRAME_CENTER(1);
+	const int RES_H 	 =  bufferingGraph.mCAMERA.RES_VH(1);
+
 
 	bufferingGraph.mVP_Range_V   	= templates.VP_RANGE_V;
 	bufferingGraph.mSpan		= templates.SPAN;
 	bufferingGraph.mMargin		= templates.MARGIN;
+	
+
+	//Allocate Buffers
+	bufferingGraph.mBufferPool.reset(new BufferPool(templates.SPAN, RES_H, sNbBuffer)); 
+
+
+	// Assign Templates
+	bufferingGraph.mGRADIENT_TAN_ROOT = templates.GRADIENT_TAN_ROOT;
+	bufferingGraph.mDEPTH_MAP_ROOT    = templates.DEPTH_MAP_ROOT;
+	bufferingGraph.mFOCUS_MASK_ROOT   = templates.FOCUS_MASK_ROOT;
 
 	
-	//^TODO:Dangerous! Put it in other location this is nonintutive to put this code here
-	int16_t ORIGIN_Y_CRS	 =  bufferingGraph.mCAMERA.FRAME_CENTER(0) - templates.SPAN;
-	int16_t ORIGIN_X_CRS 	 = -bufferingGraph.mCAMERA.FRAME_CENTER(1);
-	const int RES_H = bufferingGraph.mCAMERA.RES_VH(1);
-
 	// Define X and Y coordinates in VP reffernce system
 	bufferingGraph.mY_VPRS	 =   -(templates.Y_IRS + ORIGIN_Y_CRS);
 	bufferingGraph.mX_VPRS   =    templates.X_IRS  + ORIGIN_X_CRS;
+
 	
-	//Allocate Buffers
-	bufferingGraph.mBufferPool.reset(new BufferPool(templates.SPAN, RES_H)); 
-
-#ifdef s32v2xx
-	//bufferingGraph.mGRADIENT_TAN_ROOT = templates.GRADIENT_TAN_ROOT.getUMat(cv::ACCESS_RW);
-	bufferingGraph.mGRADIENT_TAN_ROOT = templates.GRADIENT_TAN_ROOT;
-	bufferingGraph.mDEPTH_MAP_ROOT    = templates.DEPTH_MAP_ROOT;
-	bufferingGraph.mFOCUS_MASK_ROOT   = templates.FOCUS_MASK_ROOT;
-
-#else
-	bufferingGraph.mGRADIENT_TAN_ROOT = templates.GRADIENT_TAN_ROOT;
-	bufferingGraph.mDEPTH_MAP_ROOT    = templates.DEPTH_MAP_ROOT;
-	bufferingGraph.mFOCUS_MASK_ROOT   = templates.FOCUS_MASK_ROOT;
-#endif
 
 	this->currentStatus= StateStatus::ACTIVE;
+
 		
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
-				<<  "Completing Buffering Setup." <<endl
-				<<  "Setup Time: "  << mProfiler.getAvgTime("SetRootTemplates")<<endl
+				<<  "Setting up Buffering Graph." <<endl
+				<<  "Setup Time: "  << mProfiler.getAvgTime("SET_UP_BUFFERING_DAG")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
 		
