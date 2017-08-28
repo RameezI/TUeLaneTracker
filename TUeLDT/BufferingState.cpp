@@ -58,7 +58,7 @@ mProfiler.start("SET_UP_BUFFERING_DAG");
 	bufferingGraph.mX_IRS   =    templates.X_IRS;
 
 
-	if ( 0 == bufferingGraph.init_DAG() );
+	if ( 0 == bufferingGraph.init_DAG() )
 	this->currentStatus= StateStatus::ACTIVE;
 
 		
