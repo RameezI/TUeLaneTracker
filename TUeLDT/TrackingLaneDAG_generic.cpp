@@ -10,10 +10,6 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
   mFiltersReady(false),
   mMAX_PIXELS_ROI(mFrameGRAY_ROI.size().height * mFrameGRAY_ROI.size().width)
 {	
-	mX_VPRS.convertTo(mX_VPRS_SCALED, CV_32S, SCALE_INTSEC );
-	mBaseBinIdx.reserve(mMAX_PIXELS_ROI);
-	mPurviewBinIdx.reserve(mMAX_PIXELS_ROI);
-	mWeightBin.reserve(mMAX_PIXELS_ROI);
 
 /*
 	//Write Images to a video file
@@ -21,6 +17,24 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
 */
 
 }
+
+
+int TrackingLaneDAG_generic::init_DAG()
+{
+
+
+	mX_VPRS.convertTo(mX_VPRS_SCALED, CV_32S, SCALE_INTSEC );
+	mBaseBinIdx.reserve(mMAX_PIXELS_ROI);
+	mPurviewBinIdx.reserve(mMAX_PIXELS_ROI);
+	mWeightBin.reserve(mMAX_PIXELS_ROI);
+
+        mHistBase      = Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
+        mHistPurview   = Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
+
+  	return 0;
+}
+
+
 
 
 void TrackingLaneDAG_generic::extractLanes()

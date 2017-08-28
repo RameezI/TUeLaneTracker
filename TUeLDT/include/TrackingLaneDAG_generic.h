@@ -86,6 +86,7 @@ private:
 public:
 
 	TrackingLaneDAG_generic(BufferingDAG_generic&& bufferingGraph);
+	int  init_DAG();
 	void auxillaryTasks();
 	void extractLanes();
 	void extractControllerInputs();

@@ -43,10 +43,9 @@ void TrackingLaneState::setupDAG(LaneFilter* laneFilter, VanishingPtFilter* vpFi
 	 mTrackingLaneGraph.mSCALED_START_VP_FILTER	= vpFilter->HISTOGRAM_BINS(0)*SCALE_INTSEC;
 
 	
-	 mTrackingLaneGraph.mHistBase 	   = Mat::zeros(laneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
-	 mTrackingLaneGraph.mHistPurview   = Mat::zeros(laneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
-	
+	if (0== mTrackingLaneGraph.init_DAG())
 	 this->currentStatus= StateStatus::ACTIVE;	
+	
 }
 
 
