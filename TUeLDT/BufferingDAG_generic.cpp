@@ -149,19 +149,18 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 #endif 		
 
 	//GrayChannel Probabilities
-	subtract(mFrameGRAY_ROI, mLaneMembership.TIPPING_POINT_GRAY, mTempProbMat, noArray(), CV_32F);
-	threshold(mTempProbMat, mTempProbMat, 0, 255, THRESH_TOZERO );
+	subtract(mFrameGRAY_ROI, mLaneMembership.TIPPING_POINT_GRAY, mTempProbMat, noArray(), CV_32S);
+	mMask = mTempProbMat <0 ;
+	mTempProbMat.setTo(0,mMask);
 	mTempProbMat.copyTo(mProbMap_Gray);
 	mTempProbMat = mTempProbMat + 10;
 	divide(mProbMap_Gray, mTempProbMat, mProbMap_Gray, 255, -1);
-	mProbMap_Gray.convertTo(mProbMap_Gray, CV_32S);
 	
 	//GradientMag Probabilities
-	subtract(mFrameGradMag, mLaneMembership.TIPPING_POINT_GRAD_Mag, mTempProbMat, noArray(), CV_32F);
+	subtract(mFrameGradMag, mLaneMembership.TIPPING_POINT_GRAD_Mag, mTempProbMat, noArray(), CV_32S);
 	mTempProbMat.copyTo(mProbMap_GradMag);
 	mTempProbMat= abs(mTempProbMat) + 10;
 	divide(mProbMap_GradMag, mTempProbMat, mProbMap_GradMag, 255, -1);
-	mProbMap_GradMag.convertTo(mProbMap_GradMag, CV_32S);
 
 
 	// Intermediate Probability Map
@@ -171,12 +170,11 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 
 
 	//Gradient Tangent Probability Map
-	subtract(mGradTanTemplate, mBufferPool->GradientTangent[bufferPos], mTempProbMat, noArray(), CV_32F);
+	subtract(mGradTanTemplate, mBufferPool->GradientTangent[bufferPos], mTempProbMat, noArray(), CV_32S);
 	mTempProbMat= abs(mTempProbMat);
 	mTempProbMat.copyTo(mProbMap_GradDir);
 	mTempProbMat = mTempProbMat + 60;
 	divide(mProbMap_GradDir, mTempProbMat, mProbMap_GradDir, 255, -1);
-	mProbMap_GradDir.convertTo(mProbMap_GradDir, CV_32S);
 	subtract(255, mProbMap_GradDir, mProbMap_GradDir, noArray(), -1);
 
 	
