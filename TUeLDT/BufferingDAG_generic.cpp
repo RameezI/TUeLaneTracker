@@ -149,13 +149,14 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 #endif 		
 
 	//GrayChannel Probabilities
-	subtract(mFrameGRAY_ROI, mLaneMembership.TIPPING_POINT_GRAY, mTempProbMat, noArray(), CV_32S);
+	subtract(mFrameGRAY_ROI, mLaneMembership.TIPPING_POINT_GRAY, mTempProbMat, noArray(), CV_16S);
 	mMask = mTempProbMat <0 ;
 	mTempProbMat.setTo(0,mMask);
 	mTempProbMat.copyTo(mProbMap_Gray);
 	mTempProbMat = mTempProbMat + 10;
-	divide(mProbMap_Gray, mTempProbMat, mProbMap_Gray, 255, -1);
+	divide(mProbMap_Gray, mTempProbMat, mProbMap_Gray, 255, CV_32S);
 	
+
 	//GradientMag Probabilities
 	subtract(mFrameGradMag, mLaneMembership.TIPPING_POINT_GRAD_Mag, mTempProbMat, noArray(), CV_32S);
 	mTempProbMat.copyTo(mProbMap_GradMag);
