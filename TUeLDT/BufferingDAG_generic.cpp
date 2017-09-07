@@ -249,39 +249,37 @@ void BufferingDAG_generic::auxillaryTasks()
 int BufferingDAG_generic::grabFrame()	
 {		
 
-#ifdef DIRECTORY_INPUT
-
-	#ifdef PROFILER_ENABLED
-	mProfiler.start("IMAGE_READ");
-	#endif 
+#ifdef PROFILER_ENABLED
+mProfiler.start("IMAGE_READ");
+#endif 
 	
+	#ifdef DIRECTORY_INPUT
 		mFrameRGB = imread(mFiles[mFrameCount]);
 		cout<<"Processing Frame: "<<mFrameCount<<endl;
-	 
+	#else
 
-	#ifdef PROFILER_ENABLED
-	mProfiler.end();
 
-	const std::string str = mFiles[mFrameCount];	
-	LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
-				<<"******************************"<<endl
-				<<  "Reading frame from directory." <<endl <<str<<endl
-				<<  "Read time: " << mProfiler.getAvgTime("IMAGE_READ")<<endl
-				<<"******************************"<<endl<<endl;
-				#endif
-						
+
+					
+	#endif
+
+				
 	if (mFrameCount+1 < mFiles.size())
 		 mFrameCount ++;
-
 	if(!mFrameRGB.data)
 	   return -1;
 	else	
 	   return 0;
 
-#else
-
-					
-#endif
+#ifdef PROFILER_ENABLED
+mProfiler.end();
+const std::string str = mFiles[mFrameCount];	
+LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
+				<<"******************************"<<endl
+				<<  "Reading frame from directory." <<endl <<str<<endl
+				<<  "Read time: " << mProfiler.getAvgTime("IMAGE_READ")<<endl
+				<<"******************************"<<endl<<endl;
+				#endif
 
 
 }
