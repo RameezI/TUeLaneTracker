@@ -37,7 +37,7 @@ using namespace Eigen;
 using namespace cv;
 
 
-enum States{BOOTING, BUFFERING, DETECTING_LANES, RESETING, DISPOSING }; //^TODO: Add PAUSED state as well
+enum States{BOOTING, BUFFERING, DETECTING_LANES, DISPOSING };
 enum StateStatus {DONE, ACTIVE, INACTIVE, ERROR };
 
 
@@ -46,6 +46,7 @@ class State
 
 	
 protected:
+
 	#ifdef PROFILER_ENABLED
 	ProfilerLDT mProfiler;
 	#endif
@@ -56,8 +57,8 @@ public:
 	int64_t 		StateCounter   =  0;     	
 	StateStatus 	       	currentStatus  =  StateStatus::INACTIVE;
 	
-	void conclude(){currentStatus = StateStatus::DONE;}
-	
+	void dispose(){currentStatus = StateStatus::ERROR;}
+
 	State(){}
 	~State(){}
 };

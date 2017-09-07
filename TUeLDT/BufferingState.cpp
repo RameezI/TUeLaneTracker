@@ -10,22 +10,45 @@ BufferingState::BufferingState()
 
 }
 
-
-
   
-#ifdef DIRECTORY_INPUT
-void BufferingState::setSource(const vector<cv::String>& files, int skipFrames)
+int BufferingState::setSource()
 {
-	bufferingGraph.mFiles = files;
-	bufferingGraph.mFrameCount =skipFrames;
+
+	#ifdef DIRECTORY_INPUT
+	{
+	   vector< cv::String> lFiles;
+           cv::String lFolder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
+           
+	   glob(lFolder, lFiles);
+           const uint lSkipFrames = 4000;  
+         
+      	   if (lFiles.size() <= lSkipFrames)
+           {
+         	cout<<endl;
+         	cout<<"Total Number of Image Files to Process : " << 0;
+         	cout<<endl;
+         	return -1;
+           }
+
+     	   cout<<endl;
+           cout<<"Total Number of Image Files to Process : " << lFiles.size() - lSkipFrames;
+           cout<<endl;
+
+	   bufferingGraph.mFiles = lFiles;
+	   bufferingGraph.mFrameCount =lSkipFrames;
+	   return 0;
+	}
+	#else
+	{
+
+
+
+
+
+	}
+	#endif
 }
 
-#else
-void BufferingState::setSource()
-{
-
-}	
-#endif
 
 
 

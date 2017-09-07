@@ -22,24 +22,21 @@ private:
 	uint_fast8_t mRetryGrab;
 	std::thread mSideExecutor;
 	
-public:	
-#ifdef s32v2xx	
-	BufferingDAG_s32v    bufferingGraph;
-#else
-	BufferingDAG_generic bufferingGraph;
-#endif	
+public:		
+	int setSource();
 	void setupDAG(const Templates& templates);
 	void run();
 	
+	#ifdef s32v2xx	
+	   BufferingDAG_s32v    bufferingGraph;
+	#else
+	   BufferingDAG_generic bufferingGraph;
+	#endif
+
 	#ifdef PROFILER_ENABLED
 	void getOpenClInfo();
 	#endif
 		
-	#ifdef DIRECTORY_INPUT
-	void setSource(const vector<cv::String>& files, int skipFrames);
-	#else
-	void setSource();
-	#endif
 	
 	 BufferingState();
 	~BufferingState();
