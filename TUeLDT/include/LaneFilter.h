@@ -67,14 +67,14 @@ public:	 //Public Interface of the class
 		Mat prior;
 		Mat filter;
 
-	    std::vector<BaseHistogramModel>  baseHistogramModels; 	
+		std::vector<BaseHistogramModel>  baseHistogramModels; 	
 
-    private:	
+private:	
 		void  createHistogramModels();	
 
-	public:	
+public:	
 		LaneFilter(const LaneParameters& LANE,  const Camera& CAMERA);
-	   ~LaneFilter();
+	   	~LaneFilter();
 	};
 	
 #endif // LANEFILTER_H

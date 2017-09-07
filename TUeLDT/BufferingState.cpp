@@ -20,7 +20,7 @@ int BufferingState::setSource()
            cv::String lFolder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
            
 	   glob(lFolder, lFiles);
-           const uint lSkipFrames = 4000;  
+           const uint lSkipFrames = 0;  
          
       	   if (lFiles.size() <= lSkipFrames)
            {

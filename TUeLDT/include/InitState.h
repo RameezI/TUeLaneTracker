@@ -13,7 +13,6 @@ private :
         	bool  checkCreationStatus();
 		
 public	:
-
 		/* These methods create instances and also keep record of the already created objects
 		 * Make sure all objects are created before indicating "StateStatus::DONE". */
 		 
