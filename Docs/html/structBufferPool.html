@@ -62,6 +62,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
+      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
 <!-- window showing the filter options -->
@@ -69,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -91,26 +92,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a308f8fe879033bfed29a5aa9878e9bf4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a308f8fe879033bfed29a5aa9878e9bf4"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>BufferPool</b> (const int RES_V, const int RES_H)</td></tr>
-<tr class="separator:a308f8fe879033bfed29a5aa9878e9bf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acfdbb8041159b866dc8115c3f88b0f1d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acfdbb8041159b866dc8115c3f88b0f1d"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>BufferPool</b> (const int RES_V, const int RES_H, std::size_t bufferSize)</td></tr>
+<tr class="separator:acfdbb8041159b866dc8115c3f88b0f1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:ae49e6984dda0b1968e6dd9ded3539453"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae49e6984dda0b1968e6dd9ded3539453"></a>
-std::array&lt; Mat, State::sNbBuffer &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>Probability</b></td></tr>
-<tr class="separator:ae49e6984dda0b1968e6dd9ded3539453"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30aaffee46f5a4121b349615488bbe9b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a30aaffee46f5a4121b349615488bbe9b"></a>
-std::array&lt; Mat, State::sNbBuffer &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>GradientTangent</b></td></tr>
-<tr class="separator:a30aaffee46f5a4121b349615488bbe9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a056770858422c1e4d7caea296da98050"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a056770858422c1e4d7caea296da98050"></a>
+vector&lt; Mat &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>Probability</b></td></tr>
+<tr class="separator:a056770858422c1e4d7caea296da98050"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94171755f6ad5abd45ea909bb3dad863"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a94171755f6ad5abd45ea909bb3dad863"></a>
+vector&lt; Mat &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>GradientTangent</b></td></tr>
+<tr class="separator:a94171755f6ad5abd45ea909bb3dad863"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>/home/rameez/Master/TUeLaneTracker/TUeLDT/include/<a class="el" href="State_8h_source.html">State.h</a></li>
+<li>/home/rameez/Master/TUeLaneTracker/TUeLDT/include/<a class="el" href="BufferingDAG__generic_8h_source.html">BufferingDAG_generic.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 19 2017 16:00:26 for TUeLaneTracker by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Sep 8 2017 19:14:15 for TUeLaneTracker by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

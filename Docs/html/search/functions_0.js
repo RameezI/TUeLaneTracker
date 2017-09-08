@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['main',['main',['../main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main.cpp']]]
+  ['auxillarytasks',['auxillaryTasks',['../classBufferingDAG__generic.html#a7d58d28db3981dac7aaed4b1badb5d88',1,'BufferingDAG_generic']]]
 ];

@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -102,25 +102,24 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;            <span class="keywordtype">bool</span>  checkCreationStatus();</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;        </div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">public</span>  :</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;        <span class="comment">/* These methods create instances and also keep record of the already created objects</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">         * Make sure all objects are created before indicating &quot;StateStatus::DONE&quot;. */</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;         </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;        unique_ptr&lt;LaneFilter&gt;      createLaneFilter();</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        unique_ptr&lt;VanishingPtFilter&gt;   createVanishingPtFilter();</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        unique_ptr&lt;Templates&gt;       createTemplates();</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        <a class="code" href="classInitState.html">InitState</a>();</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        ~<a class="code" href="classInitState.html">InitState</a>();</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;};</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    </div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#endif // INITSTATE_H</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;        <span class="comment">/* These methods create instances and also keep record of the already created objects</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">         * Make sure all objects are created before indicating &quot;StateStatus::DONE&quot;. */</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;         </div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        unique_ptr&lt;LaneFilter&gt;      createLaneFilter();</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;        unique_ptr&lt;VanishingPtFilter&gt;   createVanishingPtFilter();</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        unique_ptr&lt;Templates&gt;       createTemplates();</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        <a class="code" href="classInitState.html">InitState</a>();</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        ~<a class="code" href="classInitState.html">InitState</a>();</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;};</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#endif // INITSTATE_H</span></div>
 <div class="ttc" id="classInitState_html"><div class="ttname"><a href="classInitState.html">InitState</a></div><div class="ttdef"><b>Definition:</b> InitState.h:5</div></div>
 <div class="ttc" id="classState_html"><div class="ttname"><a href="classState.html">State</a></div><div class="ttdef"><b>Definition:</b> State.h:44</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 19 2017 16:00:26 for TUeLaneTracker by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Sep 8 2017 19:14:14 for TUeLaneTracker by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

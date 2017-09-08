@@ -1,7 +1,4 @@
 var searchData=
 [
-  ['basehistogrammodel',['BaseHistogramModel',['../structBaseHistogramModel.html',1,'']]],
-  ['bufferingdag_5fgeneric',['BufferingDAG_generic',['../classBufferingDAG__generic.html',1,'']]],
-  ['bufferingstate',['BufferingState',['../classBufferingState.html',1,'']]],
-  ['bufferpool',['BufferPool',['../structBufferPool.html',1,'']]]
+  ['auxillarytasks',['auxillaryTasks',['../classBufferingDAG__generic.html#a7d58d28db3981dac7aaed4b1badb5d88',1,'BufferingDAG_generic']]]
 ];
