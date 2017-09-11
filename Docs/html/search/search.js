@@ -10,7 +10,8 @@ var indexSectionsWithContent =
   0: "abcilmpstv",
   1: "bcilpstv",
   2: "m",
-  3: "am"
+  3: "am",
+  4: "ps"
 };
 
 var indexSectionNames =
@@ -18,7 +19,8 @@ var indexSectionNames =
   0: "all",
   1: "classes",
   2: "files",
-  3: "functions"
+  3: "functions",
+  4: "pages"
 };
 
 function convertToId(search)

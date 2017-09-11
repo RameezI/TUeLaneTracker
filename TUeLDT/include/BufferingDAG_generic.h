@@ -131,6 +131,8 @@ public:
 	   mFrameRGB			= std::move(bufferingGraph.mFrameRGB);
 	   mFrameGRAY			= std::move(bufferingGraph.mFrameGRAY);
 	   mFrameGRAY_ROI		= std::move(bufferingGraph.mFrameGRAY_ROI);
+
+	   mMask 			= std::move(bufferingGraph.mMask);
 	
 	   mGradX			= std::move(bufferingGraph.mGradX);
 	   mGradY			= std::move(bufferingGraph.mGradY);

@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -63,7 +64,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -77,364 +78,34 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">TUeLaneTracker Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="Contents"></a> </p>
-<h1><a class="anchor" id="contents_sec"></a>
-Table of Contents</h1>
-<p><a href="#Introduction">Introduction</a><br/>
- <a href="#VersionLog">Version Log</a><br/>
- <a href="#Acronyms">Acronyms</a><br/>
- <a href="#API">API's</a><br/>
- <a href="#CodingStandard">Coding Standard</a><br/>
- <a href="#Documentation">Documentation</a><br/>
- <a href="#Requirements">Requirements</a><br/>
- <a href="#Testing">Testing</a><br/>
- <a href="#Tools">Tools</a><br/>
-</p>
-<hr/>
-<p><a class="anchor" id="Introduction"></a> </p>
-<h1><a class="anchor" id="intro_sec"></a>
-Introduction</h1>
-<p>This document serves the purpose of providing the background and details of the embedded software that was developed for ........</p>
-<p>Provide an introduction to the project, its purpose, and basic overview of what the system does.</p>
-<div class="image">
-<img src="blockdiagram.jpg" alt="blockdiagram.jpg"/>
+<div class="toc"><h3>Table of Contents</h3>
+<ul><li class="level1"><a href="#Purpose">Purpose</a></li>
+<li class="level1"><a href="#Architecture">Application Architecture</a></li>
+<li class="level1"><a href="#installing">Appliction Installation</a></li>
+<li class="level1"><a href="#running">Running the Application</a></li>
+</ul>
 </div>
-<p><br/>
-<a href="#Contents">Table of Contents</a><br/>
-</p>
-<hr/>
-<p><a class="anchor" id="VersionLog"></a></p>
-<h1><a class="anchor" id="Version"></a>
-Version Log</h1>
-<h2><a class="anchor" id="Release1"></a>
-Release 1</h2>
+<div class="textblock"><dl class="section author"><dt>Author</dt><dd>Rameez Ismail</dd></dl>
+<p>This is a software application that detects and tracks lanes on the road. The underlying algorithm is a probabilistic algorithm which is originally developed at, under the strategic area of Smart Mobility, Eindhoven University of Technology (TU/e). The algorithm exploits the concept of hierarchical classification from deep learning however, unlike deep learning, classification at each hierarchical level is engineered instead of being trained through images. This make it more predictable as well as verifiable. The software application is completely object oriented and follows various software design principles recommended by safety standard ISO26262.</p>
+<p>This application provide a loose coupling between the software control flow and actual realisation of the algorithm, making it possible to generate various target specific implementations of the algorithm. Current version of the software applicataion is developed in cooperation with NXP Semiconductors. This repository provides real-time generic implementation of the algorithm using OpenCV library. A real time embedded implementation, using NXP Bluebox, is underdevelopment.</p>
+<h1><a class="anchor" id="Purpose"></a>
+Purpose</h1>
+<h1><a class="anchor" id="Architecture"></a>
+Application Architecture</h1>
+<p>The software application architecture is explained using following views</p>
 <ul>
-<li>added Initial Program Structure</li>
-<li>added Spi Driver</li>
-<li>added Dio Driver</li>
-<li>added Task Scheduler</li>
-<li>added Adc driver</li>
-<li>added Canbus Driver</li>
-<li>added CAN Application Layer</li>
+<li><a class="el" href="static.html">Static View</a></li>
+<li><a class="el" href="process.html">Process View</a></li>
+<li>Development View</li>
 </ul>
-<p>Final build capable of detecting an event through Adc and storing the event to RAM. RAM data can be retrieved through the CAN bus.</p>
-<p><br/>
-<a href="#Contents">Table of Contents</a><br/>
- </p>
-<hr/>
-<p><a class="anchor" id="Acronyms"></a></p>
-<h1><a class="anchor" id="Acronyms"></a>
-Acronyms and Abbreviations</h1>
-<p>Any acronyms used within this documentation are defined here.<br/>
-</p>
-<p>A2D - Analog to Digital Converter <br/>
- ADC - Analog to Digital Converter <br/>
- ATD - Analog To Digital converter <br/>
- CAN - Controller Area Network <br/>
- DIO - Digital Input / Output <br/>
- I2C - Inter-Integrated Circuit <br/>
- MCU - Micro Controller Unit <br/>
- MEM - Memory <br/>
- RAM - Random Access Memory <br/>
- ROM - Read Only Memory <br/>
- RTC - Real Time Clock <br/>
- SPI - Serial Peripheral Interface <br/>
- SYS - System <br/>
- TMR - Timer <br/>
- TSK - Task WDT - Watchdog Timer <br/>
-<br/>
-</p>
-<p>Any abbreviations used within this documentation are defined here. <br/>
-</p>
-<p>Rq - Request <br/>
- Rs - Response <br/>
- Sm - <a class="el" href="classState.html">State</a> Machine <br/>
- St - <a class="el" href="classState.html">State</a> <br/>
-</p>
-<p><br/>
-<a href="#Contents">Table of Contents</a><br/>
- </p>
-<hr/>
-<p><a class="anchor" id="API"></a></p>
-<h1><a class="anchor" id="API"></a>
-API</h1>
-<p>The Application Programming Interface (API) describes the functions that are available to the application for accessing the peripherals and library routines.</p>
-<p>"Update this section with an API or links to the API's used in the software.  "</p>
-<h2><a class="anchor" id="Controller"></a>
-Area Network (CAN)</h2>
-<p>Some useful functions for controlling CAN </p>
-<dl class="section see"><dt>See Also</dt><dd>Can_Transmit - Transmit data over CANbus. <br/>
- </dd>
-<dd>
-Can_Receive - Receive data from CANbus. <br/>
-</dd></dl>
-<p><br/>
-<a href="#Contents">Table of Contents</a><br/>
- </p>
-<hr/>
-<p><a class="anchor" id="CodingStandard"></a></p>
-<h1><a class="anchor" id="Standard"></a>
-Coding Standard Overview</h1>
-<p>The XXXXX Coding Standard was used to develop the embedded firmware for this project. While the standard itself is extensive, a general overview is presented here so that a basic understanding of how the code is organized and developed can be understood. <br/>
-<br/>
-</p>
-<p>"Update this section with a description of the Coding Standard used, where it is located and some highlights" "Some basic examples are below"</p>
-<h2><a class="anchor" id="CNC"></a>
-Code Naming Convention</h2>
-<p>Function names should conform to the following standard, <br/>
-</p>
-<ul>
-<li>Function names should start with a three letter sub-system name followed by an under-score. <br/>
-</li>
-<li>The first character of the sub-system name shall be capitalized. <br/>
-</li>
-<li>The rest of the function name should not have any under-scores. <br/>
-</li>
-<li>The rest of the function name should describe what the function does.<br/>
-</li>
-<li>The first character of each word should be capitalized. <br/>
-</li>
-<li>Global variables and variables that are static to a module should have their names conform to the same standard as function names. <br/>
-</li>
-<li>Sub-system names aren't required, but use them if you can.<br/>
-<br/>
-</li>
-</ul>
-<p>For example,</p>
-<ul>
-<li>Spi_Init(&amp;Spi_Config), where "Spi_" is the sub-system and "Init" describes the action to be performed.<br/>
-<br/>
-</li>
-</ul>
-<p>Common first words after the sub-system name,</p>
-<ul>
-<li>Init</li>
-<li>Read</li>
-<li>Set</li>
-<li>Write</li>
-</ul>
-<p>For function prototype parameters,</p>
-<ul>
-<li>The sub-system shall not be used.</li>
-<li>The first character of each word shall be capitalized.</li>
-<li>There should be no under-scores in the name.</li>
-</ul>
-<p>For local variables (to a function),</p>
-<ul>
-<li>The sub-system shall not be used.</li>
-<li>The first character of the first word shall not be capitalized.</li>
-<li>If the name contains more than one word, each word after the first shall have its first character capitalized.</li>
-</ul>
-<p>For example,<br/>
-<br/>
-</p>
-<div class="fragment"><div class="line">uint16 Spi_Read(uint8 *Charptr) </div>
-<div class="line">{</div>
-<div class="line">  uint8 i;</div>
-<div class="line">  uint8 myVariable;</div>
-<div class="line">  </div>
-<div class="line">  <span class="comment">// Some code</span></div>
-<div class="line">  statements;</div>
-<div class="line">}</div>
-</div><!-- fragment --><p><br/>
-</p>
-<ul>
-<li>The parameter "Charptr" has the first character capitalized and does not start with a sub-system name because it is a parameter.</li>
-<li>The variable "i" is not capitalized and does not start with a sub-system name because it is a local variable.</li>
-<li>The variable "myVariable" has it's first word un-capitalized, it's second word capitalized, and does not start with a sub-system name because it is a local variable.</li>
-</ul>
-<h2><a class="anchor" id="SSN"></a>
-Sub-System Names</h2>
-<p>Here is a list of sub-system names. More can be added as needed. <br/>
-</p>
-<p>Adc - Analog to Digital Conversion <br/>
- Dio - Digital Input/Output <br/>
- Eep - EEPROM memory <br/>
- Flash - Flash memory <br/>
- Icu - Input Capture Unit <br/>
- Mcu - Micro-Controller Unit <br/>
- Pwm - Pulse Width Modulation <br/>
- Rtc - Real-Time Counter <br/>
- Spi - Serial Peripheral Interface <br/>
- Sys - System Swu - Software UART <br/>
- Tmr - Timer Test - Testing functionality (anything using this sub-system name should be conditionally compiled so that it does not end up in production code). <br/>
- Wdt - Watchdog Timer <br/>
-</p>
-<h2><a class="anchor" id="CF"></a>
-Code Formatting/Style</h2>
-<p>Code formatting and style shall conform to the following guidelines.</p>
-<ul>
-<li>Indentation shall be 2 spaces (not tabs).</li>
-<li>Opening braces shall be placed on separate lines.</li>
-<li>Closing braces shall be placed on separate lines.</li>
-<li>If, for, switch, and while statements shall always use braces.</li>
-<li>A comment block shall be placed before every function definition describing what the function does, any paramaters passed to it, any return value, and anything else that would be relevant or useful to someone that has to maintain it.</li>
-</ul>
-<p>For example, <br/>
- </p>
-<div class="fragment"><div class="line"><span class="comment">// This is correct. </span></div>
-<div class="line"><span class="keywordflow">if</span> (condition) </div>
-<div class="line">{ </div>
-<div class="line">  statement; </div>
-<div class="line">} </div>
-<div class="line"><span class="keywordflow">else</span> </div>
-<div class="line">{ </div>
-<div class="line">  statement2; </div>
-<div class="line">} </div>
-<div class="line"></div>
-<div class="line"><span class="comment">// This is NOT.</span></div>
-<div class="line"><span class="keywordflow">if</span> (condition) { </div>
-<div class="line">  statement;     </div>
-<div class="line">} <span class="keywordflow">else</span> {        </div>
-<div class="line">  statement2;       </div>
-<div class="line">}               </div>
-<div class="line"></div>
-<div class="line"><span class="comment">// Neither is this.</span></div>
-<div class="line"><span class="keywordflow">if</span> (condition) </div>
-<div class="line">  statement; </div>
-<div class="line"><span class="keywordflow">else</span>        </div>
-<div class="line">  statement2; </div>
-</div><!-- fragment --><p><br/>
-<a href="#Contents">Table of Contents</a><br/>
- </p>
-<hr/>
-<p><a class="anchor" id="Documentation"></a></p>
-<h1><a class="anchor" id="Docs"></a>
-Documentation</h1>
-<p>How To Add An Image To This Documentation: You can include images in the documentation by writing "(\image html filename)". If you put it alone on a line it will be embedded in place. Doxygen supports gif, jpg, jpeg, png, and bmp files. Place the images in the "Doc/Images" directory.</p>
-<h2><a class="anchor" id="Gimp"></a>
-Gimp</h2>
-<p>Application "Gimp" can convert a PDF file into a jpeg, png, or bmp. <a href="http://www.gimp.org">http://www.gimp.org</a></p>
-<ul>
-<li>Start Gimp.</li>
-<li>Open your PDF file.</li>
-<li>Click "Import" to import the PDF file.</li>
-<li>From the Menu click "Tools -&gt; Selection Tools -&gt; Rectangle Select".</li>
-<li>Make a box around the area that you want to create an image of using the rectangle select tool.</li>
-<li>From the Menu, click "Image -&gt; Fit Canvas To Selection".</li>
-<li>Again from the Menu, click "Image -&gt; Crop to Selection".</li>
-<li>Finally, from the Menu click "Image -&gt; Autocrop Image".</li>
-<li>If this is the image that you want we just need to save it.</li>
-<li>From the Menu, click "File -&gt; Save As".</li>
-<li>Click on the plus sign next to "Select File Type (By Extension)".</li>
-<li>Go down the list and click on "PNG Image".</li>
-<li>Select the directory (Doc/Images) to save the file to.</li>
-<li>Edit the filename if you want.</li>
-<li>Click "Save" to save the image as a png.</li>
-</ul>
-<p>To combine images that are on 2 different pdf pages:</p>
-<ul>
-<li>Import each page (same as above).</li>
-<li>Use the rectangle tool to remove stuff from the first page.</li>
-<li>Use Image -&gt; Canvas Size to change just the height. Make it big enough (double) so that you will be able to paste page 2 onto it.</li>
-<li>Click on Image -&gt; Flatten Image to change the background of the new part on the bottom to the same as the original page (white from some kind of checkered pattern).</li>
-<li>Use the rectangle tool to select and copy (CTRL-C) the image from the second page.</li>
-<li>Move the rectangle tool cursor back to the first page and paste it.</li>
-</ul>
-<p>When adding pictures from a camara, the resolution is usaully too big. I like to scale it down to 800x600.</p>
-<ul>
-<li>Click Image -&gt; Scale Image...</li>
-<li>Enter 800 for the Width and then hit the Tab key. The Height should scale down automatically (600 for my pictures).</li>
-<li>Click Scale</li>
-<li>Then Save the image.</li>
-</ul>
-<h2><a class="anchor" id="PDFS"></a>
-PDF Split And Merge:</h2>
-<p>Application "PDF Split and Merge" can split a PDF document into single pages. <a href="http://www.pdfsam.org">http://www.pdfsam.org</a></p>
-<h2><a class="anchor" id="PDFE"></a>
-PDF Escape:</h2>
-<p>PDF Escape can be used to edit PDF files. It is web based (nothing to download). You upload a file and can then edit it. I just use it for copying text from datasheets and then pasting it into my documentation. <a href="http://www.pdfescape.com">http://www.pdfescape.com</a></p>
-<h2><a class="anchor" id="Edraw"></a>
-Edraw</h2>
-<p>Edraw is used to generate the architecture and design documents.</p>
-<p>Edraw can be used to draw many different kinds of diagrams. It currently has special objects to help draw entity relationship diagrams, UML diagrams, flowcharts, network diagrams, and many other diagrams.</p>
-<h2><a class="anchor" id="Doxygen"></a>
-Doxygen</h2>
-<p>Doxygen is used to generate all the HTML related documentation directly from the source. Information on how to install it and how to properly document your code can be found at <a href="http://www.stack.nl/~dimitri/doxygen/index.html">http://www.stack.nl/~dimitri/doxygen/index.html</a></p>
-<p><br/>
-<a href="#Contents">Table of Contents</a><br/>
- </p>
-<hr/>
-<p><a class="anchor" id="Requirements"></a></p>
-<h1><a class="anchor" id="Requirements"></a>
-Requirements</h1>
-<p>Refer to the Software Requirements Specification for a detailed view of the requirements for the embedded software. Refer to the quick spec 2 for details on the system requirements.</p>
-<p><br/>
-<a href="#Contents">Table of Contents</a><br/>
- </p>
-<hr/>
-<p><a class="anchor" id="Testing"></a></p>
-<h1><a class="anchor" id="Validation"></a>
-System Testing and Validation</h1>
-<p>This section is where testing and validation is demonstrated and explained. How test cases were developed. How test cases were determined. Estimated number of bugs per 1k of code. Bug tracking. Things to do.</p>
-<h2><a class="anchor" id="Bugs"></a>
-Bug Tracking</h2>
-<p>Currently any bugs which are found in the software are recorded and logged on the Trac website. Reports can be generated on tasks by milestone, user, version etc. Bugs which need to be added to the list can be added by visiting the Trac site at the following link: <br/>
-<br/>
-</p>
-<p>update link</p>
-<h2><a class="anchor" id="ToDo"></a>
-Todo</h2>
-<p>Currently any tasks which resulted from software features that need to be added are stored on the Trac website. Reports can be generated on tasks by milestone, user, version etc. Features which need to be added to the list can be added by visiting the Trac site at the following link: <br/>
-<br/>
-</p>
-<p>update link</p>
-<p><br/>
-<a href="#Contents">Table of Contents</a><br/>
- </p>
-<hr/>
-<p><a class="anchor" id="Tools"></a></p>
-<h1><a class="anchor" id="DevEnviron"></a>
-Tools</h1>
-<p>This section explains a number of software development tools which were instrumental in the development of this firmware. These tools include a source code version repository, compiler and IDE, code metrics tools and static analysis tools. Details on each tool can be found below:</p>
-<h2><a class="anchor" id="subversion"></a>
-Subversion</h2>
-<p>The XXX embedded firmware is stored on the XXX SVN server located at UPDATE LINK. The primary client which was used during development was the Tortoise SVN client which is an open source SVN client.</p>
-<h2><a class="anchor" id="svn1"></a>
-Step 1: Install Tortoise SVN</h2>
-<p>Tortoise can be downloaded from <a href="http://tortoisesvn.net/downloads.html">http://tortoisesvn.net/downloads.html</a>. Once downloaded, intstall by double clicking the executable and follow the on-screen instructions. It will be necessary to restart the computer in order to get the sub menu's available by right clicking in windows explorer.</p>
-<h2><a class="anchor" id="svn2"></a>
-Step 2: Checkout Source</h2>
-<p>In windows explorer, right click in the C:/ path and select SVN Checkout as shown in the image below. </p>
-<div class="image">
-<img src="svn.checkouta.jpg" alt="svn.checkouta.jpg"/>
-</div>
-<p>Enter the following repository information as shown in the image below:</p>
-<div class="image">
-<img src="svn.checkoutb.jpg" alt="svn.checkoutb.jpg"/>
-</div>
-<p>The source can now be accessed from the c:/bears/ directory.</p>
-<h2><a class="anchor" id="CodeWarrior"></a>
-Code Warrior</h2>
-<div class="image">
-<img src="CodeWarrior.jpg" alt="CodeWarrior.jpg"/>
-</div>
-<h2><a class="anchor" id="Compiler"></a>
-Compiler</h2>
-<p>The compiler that was used was the default compiler included in the S12X version of Code Warrior. Production compilation was done with the linker for S12.</p>
-<h2><a class="anchor" id="RSM"></a>
-RSM Code metrics</h2>
-<p>Latest Code Metric Report will go here.</p>
-<h2><a class="anchor" id="Lint"></a>
-Lint</h2>
-<p>Lint is a static analysis tool which was used to analyze the code and check for suspicious and non-portable constructs that were likely to cause bugs. In this case, PCLint from Gimpel. Static analysis performs additional checks that the compiler does not perform. A few examples of these are</p>
-<ul>
-<li>initialization checking</li>
-<li>value tracking</li>
-<li>strong type checking</li>
-<li>macro analysis</li>
-</ul>
-<p>Lint integrates into Code Warrior as a separate linker option. It also includes additional checks that can be enabled such as MISRA standard checks. Lint was used primarily to check for inconsistancies which could cause bugs and duplications that could lead to misunderstanding the code. A complete list of checks that lint performs can be found at <br/>
-</p>
-<p><a href="http://gimpel-online.com/MsgRef.html">http://gimpel-online.com/MsgRef.html</a></p>
-<p><br/>
-<a href="#Contents">Table of Contents</a><br/>
- </p>
-<hr/>
- </div></div><!-- contents -->
+<h1><a class="anchor" id="installing"></a>
+Appliction Installation</h1>
+<h1><a class="anchor" id="running"></a>
+Running the Application</h1>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Sep 8 2017 19:14:15 for TUeLaneTracker by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Sep 8 2017 22:09:43 for TUeLaneTracker by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

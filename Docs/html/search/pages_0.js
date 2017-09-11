@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['welcome_20to_20tuelane_20tracker',['Welcome to TUeLane Tracker',['../index.html',1,'']]]
+  ['process_20view',['Process View',['../process.html',1,'index']]]
 ];
