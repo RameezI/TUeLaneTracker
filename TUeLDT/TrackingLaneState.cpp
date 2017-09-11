@@ -1,6 +1,6 @@
 #include "TrackingLaneState.h"
 
-#ifdef s32v2xx
+#ifdef S32V2XX
      TrackingLaneState::TrackingLaneState(BufferingDAG_s32v&& bufferingGraph)
      :  mRetryGrab(0),
 	mTrackingLaneGraph(std::move(bufferingGraph))
@@ -66,7 +66,7 @@ mProfiler.start("SingleRun_TRACK");
 	{
 		 
 	  mSideExecutor =
-	  #ifdef s32v2xx
+	  #ifdef S32V2XX
 			std::thread(&TrackingLaneDAG_s32v::auxillaryTasks, 	std::ref(mTrackingLaneGraph));
 	  #else
 			std::thread(&TrackingLaneDAG_generic::auxillaryTasks, 	std::ref(mTrackingLaneGraph));

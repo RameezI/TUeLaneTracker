@@ -3,7 +3,7 @@
 #include "State.h"
 #include "opencv2/core/ocl.hpp"
 
-#ifdef s32v2xx
+#ifdef S32V2XX
 #include "BufferingDAG_s32v.h"
 #else
 #include "BufferingDAG_generic.h"
@@ -27,7 +27,7 @@ public:
 	void setupDAG(const Templates& templates);
 	void run();
 	
-	#ifdef s32v2xx	
+	#ifdef S32V2XX	
 	   BufferingDAG_s32v    bufferingGraph;
 	#else
 	   BufferingDAG_generic bufferingGraph;

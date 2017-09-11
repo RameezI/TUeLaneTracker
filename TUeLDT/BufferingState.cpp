@@ -17,7 +17,8 @@ int BufferingState::setSource()
 	#ifdef DIRECTORY_INPUT
 	{
 	   vector< cv::String> lFiles;
-           cv::String lFolder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
+          // cv::String lFolder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
+             cv::String lFolder = "/home/root/data/Eindhoven";
            
 	   glob(lFolder, lFiles);
            const uint lSkipFrames = 0;  
@@ -112,7 +113,7 @@ void BufferingState::run()
 	if (0==bufferingGraph.grabFrame())
 	{
 		mSideExecutor =
-		#ifndef s32v2xx
+		#ifndef S32V2XX
 			std::thread(&BufferingDAG_generic::auxillaryTasks, std::ref(bufferingGraph));
 		#else
 			std::thread(&BufferingDAG_s32v::auxillaryTasks,    std::ref(bufferingGraph));

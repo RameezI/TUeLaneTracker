@@ -2,7 +2,7 @@
 #define TRACKINGLANESTATE_H
 #include "State.h"
 
-#ifdef   s32v2xx
+#ifdef   S32V2XX
  #include "BufferingDAG_s32v.h"
  #include "TrackingLaneDAG_s32v.h"
 #else
@@ -20,7 +20,7 @@ private:
 	uint_fast8_t mRetryGrab;
 	std::thread mSideExecutor;
 
-#ifdef s32v2xx
+#ifdef S32V2XX
 	TrackingLaneDAG_s32v	mTrackingLaneGraph;
 #else
 	TrackingLaneDAG_generic mTrackingLaneGraph;
@@ -31,7 +31,7 @@ public:
 	void setupDAG(LaneFilter* laneFilter, VanishingPtFilter* vpFilter);
 	
 public:	
-#ifdef s32v2xx
+#ifdef S32V2XX
 	TrackingLaneState(BufferingDAG_s32v&& bufferingGraph);
 #else
 	TrackingLaneState(BufferingDAG_generic&& bufferingGraph);
