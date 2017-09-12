@@ -11,10 +11,12 @@ int main() /**
 		- Creates a stateMachine and spins it until user issues a quit signal through the sigInit handler. 		
 	  */
 {
+
+	int lReturn =0;
 	
-#ifdef PROFILER_ENABLED
+	#ifdef PROFILER_ENABLED
 	  Logger::Init();
-#endif	
+	#endif	
 	
 	shared_ptr<SigInit> sigInit= make_shared<SigInit>();
 	
@@ -30,5 +32,6 @@ int main() /**
 
 	StateMachine stateMachine;
 
-	return stateMachine.spin(sigInit);
+	lReturn = stateMachine.spin(sigInit);
+	exit(lReturn);
 }

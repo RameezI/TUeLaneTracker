@@ -59,19 +59,21 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	/* BUFFERING PROCESS */
 	if (sCurrentState == States::BUFFERING)
 	{
-	   BufferingState  bufferingState; 
+	   BufferingState  bufferingState;
 			
 	   if (bufferingState.currentStatus == StateStatus::INACTIVE)
 	   {			
 	   	int lReturn = bufferingState.setSource();
+		
 		if (lReturn != 0)
 		{	
-
 		   #ifdef PROFILER_ENABLED
 		  	LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 		   	<<"******************************"<<endl
-		   	<<  "Failed to Setup the Source.."<<endl;
+		   	<<" Failed to Setup the Source..."<<endl
+			<<"******************************"<<endl;
 		   #endif 
+
 		   bufferingState.dispose();
 		}
 		else
@@ -80,7 +82,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		}
 	   }
 	
-	   while (bufferingState.currentStatus == StateStatus::ACTIVE)
+	   if (bufferingState.currentStatus == StateStatus::ACTIVE)
 	   {	
 		bufferingState.run();
 
@@ -88,8 +90,9 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		{
 		   #ifdef PROFILER_ENABLED
 			LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		   	<<"******************************"<<endl
-		   	<<  "Buffering Process Intrupred by User.."<<endl;
+		   	<<"***************************************"<<endl
+		   	<<" Buffering Process Intrupred by User   "<<endl
+			<<"*************************************"<<endl;
 		   #endif 
 	   	   bufferingState.dispose();
 		}
@@ -103,7 +106,6 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 			
 	   else
 	   {
-	
 		#ifdef PROFILER_ENABLED
 		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 		   <<"******************************"<<endl
@@ -117,7 +119,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		
 		
 	/* Tracking Lanes */
-	if(sCurrentState==States::DETECTING_LANES)
+	if (sCurrentState==States::DETECTING_LANES)
 	{
 
 	   TrackingLaneState& trackingState = *pTrackingState;
@@ -127,7 +129,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		trackingState.setupDAG(pLaneFilter.get(), pVanishingPtFilter.get());
 	   }
 	
-	   while (trackingState.currentStatus == StateStatus::ACTIVE)
+	   if (trackingState.currentStatus == StateStatus::ACTIVE)
 	   {
 		trackingState.run();
 		

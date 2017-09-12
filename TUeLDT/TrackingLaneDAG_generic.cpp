@@ -567,8 +567,8 @@ mProfiler.start("Display");
 		 CvScalar(0,255,0),
 		 3
 	   	);
-	    imshow( "Display window", mFrameRGB);
-	    waitKey(10);
+	//    imshow( "Display window", mFrameRGB);
+	//    waitKey(10);
 
 	    //mOutputVideo<<mFrameRGB;
 	}

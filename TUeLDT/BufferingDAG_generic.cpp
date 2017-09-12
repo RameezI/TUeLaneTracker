@@ -25,13 +25,14 @@ void BufferingDAG_generic::buffer()
 
 #ifdef PROFILER_ENABLED
 mProfiler.start("GRAY_FRAME_CONVERSION");
-#endif				
-
-	cvtColor(mFrameRGB, mFrameGRAY, cv::COLOR_BGR2GRAY);
+#endif
+				
+	cvtColor(mFrameRGB, mFrameGRAY, CV_BGR2GRAY);
 	int rowIndex= mCAMERA.RES_VH(0) - mSpan;
 	Rect ROI;
 	ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mSpan);	
 	mFrameGRAY_ROI = mFrameGRAY(ROI);
+
 			 
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -149,12 +150,13 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 #endif 		
 
 	//GrayChannel Probabilities
-	subtract(mFrameGRAY_ROI, mLaneMembership.TIPPING_POINT_GRAY, mTempProbMat, noArray(), CV_16S);
+	subtract(mFrameGRAY_ROI, mLaneMembership.TIPPING_POINT_GRAY, mTempProbMat, noArray(), CV_32S);
 	mMask = mTempProbMat <0 ;
 	mTempProbMat.setTo(0,mMask);
 	mTempProbMat.copyTo(mProbMap_Gray);
 	mTempProbMat = mTempProbMat + 10;
-	divide(mProbMap_Gray, mTempProbMat, mProbMap_Gray, 255, CV_32S);
+	
+	divide(mProbMap_Gray, mTempProbMat, mProbMap_Gray, 255, -1);
 	
 
 	//GradientMag Probabilities
