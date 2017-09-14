@@ -99,7 +99,7 @@ public:
 	int  init_DAG();		// For initialising DAG ONE TIME EXECUTION
 
 	int  grabFrame(); 		// Grab Frame from the Source
-	void auxillaryTasks();          // Perform assitve tasks for buffering from seperate executor
+	void runAuxillaryTasks();       // Perform assitve tasks for buffering from seperate executor
 	void buffer();   		// Perform tasks for buffering from main Thread
 	
 	

@@ -19,9 +19,8 @@ int BufferingDAG_generic::init_DAG()
 }
 
 
-void BufferingDAG_generic::buffer()
+void BufferingDAG_generic::buffer( )
 {
-
 
 #ifdef PROFILER_ENABLED
 mProfiler.start("GRAY_FRAME_CONVERSION");
@@ -42,9 +41,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<  "Conversion Time: " << mProfiler.getAvgTime("GRAY_FRAME_CONVERSION")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
-
-
-
 
 
 
@@ -203,12 +199,14 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 }
 
 
+
+
+
 /** 
 Parallel Execution Path for Buffering Graph.
 Description of Modes:
 */
-
-void BufferingDAG_generic::auxillaryTasks()
+void BufferingDAG_generic::runAuxillaryTasks()
 {
 	const int OFFSET =  mCAMERA.RES_VH(0)-mSpan;
 	int rowIndex= mCAMERA.RES_VH(0) - mCAMERA.FRAME_CENTER(0) -mVanishPt.V + OFFSET ;
@@ -247,14 +245,16 @@ void BufferingDAG_generic::auxillaryTasks()
 
 
 
-/*^TODO: Define Grabing mechanism in case of camera */
 int BufferingDAG_generic::grabFrame()	
-{		
+{
 
+	int lReturn = 0;
+		
 #ifdef PROFILER_ENABLED
 mProfiler.start("IMAGE_READ");
 #endif 
-	cout << "reading";
+
+
 	#ifdef DIRECTORY_INPUT
 		mFrameRGB = imread(mFiles[mFrameCount]);
 		cout<<"Processing Frame: "<<mFrameCount<<endl;
@@ -265,23 +265,23 @@ mProfiler.start("IMAGE_READ");
 
 				
 	if (mFrameCount+1 < mFiles.size())
-		 mFrameCount ++;
+	   mFrameCount ++;
 
 	if(!mFrameRGB.data)
-	   return -1;
-	else	
-	   return 0;
+	   lReturn = -1;
+
+
+
 
 #ifdef PROFILER_ENABLED
+std::string str = mFiles[mFrameCount];
 mProfiler.end();
-const std::string str = mFiles[mFrameCount];	
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
-				<<  "Reading frame from directory." <<endl <<str<<endl
+				<<  "Reading frame from the directory."<<endl<<str<<endl
 				<<  "Read time: " << mProfiler.getAvgTime("IMAGE_READ")<<endl
 				<<"******************************"<<endl<<endl;
 				#endif
+
+	return lReturn;
 }
-
-
-

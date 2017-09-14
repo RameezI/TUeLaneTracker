@@ -48,8 +48,8 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	   {
 		#ifdef PROFILER_ENABLED
 		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		   <<"******************************"<<endl
-		   <<  "Failed to Complete the Booting Process"<<endl
+		   <<"****************************************"<<endl
+		   <<  "[Failed to Complete the Booting Process]"<<endl
 		   <<  "Shutting Down the State-Machine."<<endl
 		   <<"******************************"<<endl<<endl;
 		#endif
@@ -72,11 +72,13 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		{	
 		   #ifdef PROFILER_ENABLED
 		  	LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		   	<<"******************************"<<endl
-		   	<<  "Failed to Setup the Source.."<<endl
+		   	<<"*********************************"<<endl
+		   	<<  "[Failed to Setup the Source]"<<endl
+			<<  "Shutting Down the State-Machine"<<endl
 			<<"******************************"<<endl;
 		   #endif 
-
+		
+		   bufferingState.dispose();
 		}
 		else
 		{
@@ -84,17 +86,18 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		}
 	   }
 	
-	   if (bufferingState.currentStatus == StateStatus::ACTIVE)
+	   while (bufferingState.currentStatus == StateStatus::ACTIVE)
 	   {	
 		bufferingState.run();
-		bufferingState.currentStatus = StateStatus::ACTIVE;
+	//	bufferingState.currentStatus = StateStatus::ACTIVE;
 
 		if (sigInit->sStatus==SigStatus::STOP)
 		{
 		   #ifdef PROFILER_ENABLED
 			LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 		   	<<"***************************************"<<endl
-		   	<<  "Buffering Process Intrupred by User. "<<endl
+		   	<<  "[Buffering Process Intrupred by User]"<<endl
+			<<  "Shutting Down the State-Machine"	   <<endl
 			<<"***************************************"<<endl;
 		   #endif 
 	   	   
@@ -135,7 +138,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		trackingState.setupDAG(pLaneFilter.get(), pVanishingPtFilter.get());
 	   }
 	
-	   if (trackingState.currentStatus == StateStatus::ACTIVE)
+	   while (trackingState.currentStatus == StateStatus::ACTIVE)
 	   {
 		trackingState.run();
 		
@@ -143,9 +146,10 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		{
 		   #ifdef PROFILER_ENABLED
 			LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		   	<<"***************************************"<<endl
-		   	<<  "Tracking  Process Interrupted by User"<<endl
-			<< "**************************************"<<endl;
+		   	<< "****************************************"<<endl
+		   	<<  "[Tracking  Process Interrupted by User]"<<endl
+			<<  "Shutting Down the State-Machine"	     <<endl
+			<< "***************************************"<<endl;
 		   #endif 
 		   trackingState.dispose();
 		}
@@ -155,10 +159,10 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	   {
 		#ifdef PROFILER_ENABLED
 		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		   <<"******************************"<<endl
-		   <<  "Tracking Finished"           <<endl
+		   <<  "********************************"<<endl
+		   <<  "[Tracking Finished]"<<endl
 		   <<  "Shutting Down the State-Machine."<<endl
-		   <<"******************************"<<endl<<endl;
+		   <<  "********************************"<<endl<<endl;
 		#endif 
 	   	sCurrentState = States::DISPOSING;
 	   }
@@ -166,8 +170,8 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	   {		
 		#ifdef PROFILER_ENABLED
 		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		   <<"******************************"<<endl
-		   <<"[Tracking State Error]"<<endl
+		   <<  "********************************"<<endl
+		   <<  "[Tracking State Error]"<<endl
 		   <<  "Shutting Down the State-Machine."<<endl
 		   <<"******************************"<<endl<<endl;
 		#endif 

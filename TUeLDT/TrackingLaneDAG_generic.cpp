@@ -567,10 +567,9 @@ mProfiler.start("Display");
 		 CvScalar(0,255,0),
 		 3
 	   	);
-	//    imshow( "Display window", mFrameRGB);
-	//    waitKey(10);
-
-	    //mOutputVideo<<mFrameRGB;
+	   imshow( "Display window", mFrameRGB);
+	   waitKey(10);
+	   //mOutputVideo<<mFrameRGB;
 	}
 	#endif
 										
@@ -590,7 +589,7 @@ void TrackingLaneDAG_generic::extractControllerInputs()
 	
 }
 
-void TrackingLaneDAG_generic::auxillaryTasks()
+void TrackingLaneDAG_generic::runAuxillaryTasks()
 {
 
 

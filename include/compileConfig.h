@@ -2,6 +2,5 @@
 #define COMPLIE_CONFIG__H
 #define PROFILER_ENABLED
 #define DIRECTORY_INPUT
-//#define s32v2xx
 #define DISPLAY_GRAPHICS_OPENCV
 #endif

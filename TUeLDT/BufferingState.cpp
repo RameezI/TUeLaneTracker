@@ -98,7 +98,7 @@ void BufferingState::run()
 {
 	
 #ifdef PROFILER_ENABLED
-	mProfiler.start("RUN_BUFFERRING_DAG");
+	mProfiler.start("RUN_BUFFERING_DAG");
 #endif	
 	
 	if (mSideExecutor.joinable())
@@ -109,9 +109,9 @@ void BufferingState::run()
 	{
 		mSideExecutor =
 		#ifndef S32V2XX
-			std::thread(&BufferingDAG_generic::auxillaryTasks, std::ref(bufferingGraph));
+			std::thread(&BufferingDAG_generic::runAuxillaryTasks, std::ref(bufferingGraph));
 		#else
-			std::thread(&BufferingDAG_s32v::auxillaryTasks,    std::ref(bufferingGraph));
+			std::thread(&BufferingDAG_s32v::runAuxillaryTasks,    std::ref(bufferingGraph));
 		#endif
 		
 		bufferingGraph.buffer();
