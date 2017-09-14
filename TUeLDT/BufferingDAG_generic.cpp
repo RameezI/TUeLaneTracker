@@ -254,13 +254,11 @@ int BufferingDAG_generic::grabFrame()
 #ifdef PROFILER_ENABLED
 mProfiler.start("IMAGE_READ");
 #endif 
-	
+	cout << "reading";
 	#ifdef DIRECTORY_INPUT
 		mFrameRGB = imread(mFiles[mFrameCount]);
 		cout<<"Processing Frame: "<<mFrameCount<<endl;
 	#else
-
-
 
 					
 	#endif
@@ -268,6 +266,7 @@ mProfiler.start("IMAGE_READ");
 				
 	if (mFrameCount+1 < mFiles.size())
 		 mFrameCount ++;
+
 	if(!mFrameRGB.data)
 	   return -1;
 	else	
@@ -282,8 +281,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<  "Read time: " << mProfiler.getAvgTime("IMAGE_READ")<<endl
 				<<"******************************"<<endl<<endl;
 				#endif
-
-
 }
 
 
