@@ -24,7 +24,10 @@ StateMachine::StateMachine()
 
 
 int StateMachine::spin(shared_ptr<SigInit> sigInit)
-{	
+{
+
+	int lReturn = 0;
+	
 	// These pointers have life until the Span of this function
 	unique_ptr<LaneFilter>  	pLaneFilter;
 	unique_ptr<VanishingPtFilter>   pVanishingPtFilter;
@@ -50,7 +53,8 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		   <<  "Failed to Complete the Booting Process"<<endl
 		   <<  "Shutting Down the State-Machine."<<endl
 		   <<"******************************"<<endl<<endl;
-		#endif 
+		#endif
+		lReturn =-1; 
 		sCurrentState = States::DISPOSING;
 	   }							
 	} 
@@ -63,33 +67,36 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 			
 	   if (bufferingState.currentStatus == StateStatus::INACTIVE)
 	   {			
-	   	int lReturn = bufferingState.setSource();
+	   	lReturn |= bufferingState.setSource();
 		if (lReturn != 0)
 		{	
-
 		   #ifdef PROFILER_ENABLED
 		  	LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 		   	<<"******************************"<<endl
-		   	<<  "Failed to Setup the Source.."<<endl;
+		   	<<  "Failed to Setup the Source.."<<endl
+			<<"******************************"<<endl;
 		   #endif 
+
 		   bufferingState.dispose();
 		}
 		else
 		{
-		   bufferingState.setupDAG(std::ref(*pTemplates));		
+		   bufferingState.setupDAG(std::ref(*pTemplates));
 		}
 	   }
 	
 	   while (bufferingState.currentStatus == StateStatus::ACTIVE)
 	   {	
 		bufferingState.run();
+		bufferingState.currentStatus = StateStatus::ACTIVE;
 
 		if (sigInit->sStatus==SigStatus::STOP)
 		{
 		   #ifdef PROFILER_ENABLED
 			LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		   	<<"******************************"<<endl
-		   	<<  "Buffering Process Intrupred by User.."<<endl;
+		   	<<"***************************************"<<endl
+		   	<<  "Buffering Process Intrupred by User. "<<endl
+			<<"***************************************"<<endl;
 		   #endif 
 	   	   bufferingState.dispose();
 		}
@@ -103,13 +110,13 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 			
 	   else
 	   {
-	
 		#ifdef PROFILER_ENABLED
 		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 		   <<"******************************"<<endl
 		   <<  "Shutting Down the State-Machine."<<endl
 		   <<"******************************"<<endl<<endl;
-		#endif 
+		#endif
+		lReturn=-1; 
 		sCurrentState = States::DISPOSING;
 	   }	
 		
@@ -135,8 +142,9 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		{
 		   #ifdef PROFILER_ENABLED
 			LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		   	<<"******************************"<<endl
-		   	<<  "Tracking  Process Interrupted by User.."<<endl;
+		   	<<"***************************************"<<endl
+		   	<<  "Tracking  Process Interrupted by User"<<endl
+			<< "**************************************"<<endl;
 		   #endif 
 		   trackingState.dispose();
 		}
@@ -154,14 +162,14 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	   	sCurrentState = States::DISPOSING;
 	   }
 	   else
-	   {
-			
+	   {		
 		#ifdef PROFILER_ENABLED
 		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 		   <<"******************************"<<endl
 		   <<  "Shutting Down the State-Machine."<<endl
 		   <<"******************************"<<endl<<endl;
 		#endif 
+		lReturn = -1;
 		sCurrentState = States::DISPOSING;
 	   }
 
@@ -171,17 +179,15 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	/* Shutting Down */
 	if(sCurrentState==States::DISPOSING)
 	{				
-	   cout<< "State Machine is in Disposed State"<< endl;
-		
+	   
 	   #ifdef PROFILER_ENABLED
+	   	cout<< "State Machine is Disposed"<< endl;
 		cout<< "See the log to inquire what caused this shutdown"<<endl;
 	   #endif 
-
-	   return 0;
 	}
 	
-	else
-	   return 0;
+	
+	return lReturn;
 }
 
 StateMachine::~StateMachine()
