@@ -10,7 +10,7 @@ BufferingState::BufferingState()
 int BufferingState::setSource()
 {
 
-	lReturn=0;
+	int lReturn=0;
 
 	#ifdef DIRECTORY_INPUT
 	{
