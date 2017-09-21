@@ -1,6 +1,4 @@
 /** \file */ 
-#include "opencv2/opencv.hpp"
-#include "opencv2/highgui/highgui.hpp"
 #include "StateMachine.h"
 using namespace std;
 using namespace cv;
@@ -20,11 +18,8 @@ int main() /**
 	
 	shared_ptr<SigInit> sigInit= make_shared<SigInit>();
 	
-	 //Check if Siginit is properly initialised
 	if(sigInit->sStatus == SigStatus::FAILURE) 
-	{
-		return -1;
-	}
+	   lReturn|= -1;
   
 	std::cout<<"******************************"<<std::endl;
 	std::cout<<" Press Ctrl+C to terminate."<<std::endl;
