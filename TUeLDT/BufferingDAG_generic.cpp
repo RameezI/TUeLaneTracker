@@ -258,14 +258,15 @@ mProfiler.start("IMAGE_READ");
 	#ifdef DIRECTORY_INPUT
 		mFrameRGB = imread(mFiles[mFrameCount]);
 		cout<<"Processing Frame: "<<mFrameCount<<endl;
+
+		if (mFrameCount+1 < mFiles.size())
+	   	   mFrameCount ++;
 	#else
 
 					
 	#endif
 
 				
-	if (mFrameCount+1 < mFiles.size())
-	   mFrameCount ++;
 
 	if(!mFrameRGB.data)
 	   lReturn = -1;

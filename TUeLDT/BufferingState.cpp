@@ -15,8 +15,8 @@ int BufferingState::setSource()
 	#ifdef DIRECTORY_INPUT
 	{
 	   vector< cv::String> lFiles;
-           //cv::String lFolder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
-           cv::String lFolder = "/home/root/data/Eindhoven";
+           cv::String lFolder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
+           //cv::String lFolder = "/home/root/data/Eindhoven";
            
 	   try
 	   {
