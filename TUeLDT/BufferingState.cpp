@@ -49,10 +49,21 @@ int BufferingState::setSource()
 	}
 	#else
 	{
-
-
-
-
+		cout<< "RTSP MODE"<<endl;
+		Mat lFrame;
+		try
+		{
+		  
+	   	   bufferingGraph.mFrameCount = 0;
+		   if(!bufferingGraph.mRTSP_CAPTURE.open("rtsp://192.168.8.1:8554/test"))
+		    lReturn |=-1;
+		}
+		catch(...)
+		{
+		    lReturn=-1;
+		}
+		
+		return lReturn;
 
 	}
 	#endif

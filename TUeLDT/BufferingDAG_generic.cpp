@@ -2,7 +2,8 @@
 
 BufferingDAG_generic::BufferingDAG_generic()
 :mTemplatesReady(false),
- mBufferReady(false)
+ mBufferReady(false),
+ mFrameCount(0)
 {
 	
 }
@@ -127,6 +128,7 @@ mProfiler.start("GRADIENT_COMPUTATION");
 	mFrameGradMag.convertTo(mFrameGradMag, CV_8U);
 			
 			
+
  #ifdef PROFILER_ENABLED
  mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
@@ -262,8 +264,9 @@ mProfiler.start("IMAGE_READ");
 		if (mFrameCount+1 < mFiles.size())
 	   	   mFrameCount ++;
 	#else
-
-					
+		mRTSP_CAPTURE >> mFrameRGB;
+	   	mFrameCount ++;
+		cout<<"Processing Frame: "<<mFrameCount<<endl;
 	#endif
 
 				
@@ -275,7 +278,8 @@ mProfiler.start("IMAGE_READ");
 
 
 #ifdef PROFILER_ENABLED
-std::string str = mFiles[mFrameCount];
+//std::string str = mFiles[mFrameCount];
+std::string str = "RTSP";
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
