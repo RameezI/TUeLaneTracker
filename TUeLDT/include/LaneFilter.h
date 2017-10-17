@@ -75,6 +75,6 @@ private:
 public:	
 		LaneFilter(const LaneParameters& LANE,  const Camera& CAMERA);
 	   	~LaneFilter();
-	};
+};
 	
 #endif // LANEFILTER_H

@@ -18,6 +18,8 @@ VanishingPtFilter::VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_B
   VP_BINS_H( VectorXi::LinSpaced(mNb_VP_BINS_H,-VP_RANGE_H, VP_RANGE_H).array()),
   
   OFFSET_V(-120),
+
+ // OFFSET_V(-100),
   
   mVP_LANE_RATIO((float)OFFSET_V / LANE_FILTER_OFFSET_V),
   
@@ -32,6 +34,7 @@ VanishingPtFilter::VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_B
 	createPrior();
 	this->filter = this->prior.clone();
 }
+
 
 void VanishingPtFilter::createPrior()
 {
@@ -54,10 +57,7 @@ void VanishingPtFilter::createPrior()
 	int32_t SUM = cv::sum(this->prior)[0];
 	this->prior.convertTo(this->prior,CV_32SC1,SCALE_FILTER);
 	this->prior = this->prior/(SUM);
-	  
 }
-
-
 
 VanishingPtFilter::~VanishingPtFilter()
 {

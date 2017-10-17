@@ -34,7 +34,7 @@ public:
 				
 		Camera() : RES_VH(Vector2i(480, 640)),
 		
-				   FRAME_CENTER(Vector2i(480/2, 640/2)),
+				   FRAME_CENTER(Vector2i(RES_VH[0]/2, RES_VH[1]/2)),
 		 
 				   FOV(Vector2f(45 , 60)),
 		 

@@ -22,7 +22,6 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
 int TrackingLaneDAG_generic::init_DAG()
 {
 
-
 	mX_VPRS.convertTo(mX_VPRS_SCALED, CV_32S, SCALE_INTSEC );
 	mBaseBinIdx.reserve(mMAX_PIXELS_ROI);
 	mPurviewBinIdx.reserve(mMAX_PIXELS_ROI);
@@ -39,7 +38,6 @@ int TrackingLaneDAG_generic::init_DAG()
 
 void TrackingLaneDAG_generic::extractLanes()
 {
-
 	WriteLock  wrtLock(_mutex, std::defer_lock);
 
 	//Start Filtering
@@ -528,31 +526,22 @@ mProfiler.start("Display");
 
 	   /* Lane Bundaries */
 	   Point  Start_leftLaneInner( mCAMERA.FRAME_CENTER(1) -mLaneModel.leftOffset  + delta,  mCAMERA.RES_VH(0) );
-	
-	   //Point  Start_leftLaneOuter(mCAMERA.FRAME_CENTER(1) -mLaneModel.leftOffset  - delta, mCAMERA.RES_VH(0) );
-	
-	
+	   
 	   Point  Start_rightLaneInner( mCAMERA.FRAME_CENTER(1) + mLaneModel.rightOffset - delta,  mCAMERA.RES_VH(0) );
 	
-	   //Point  Start_rightLaneOuter(mCAMERA.FRAME_CENTER(1) + mLaneModel.rightOffset  + delta, mCAMERA.RES_VH(0) );
  
 	   float slopeLeft =  (float)( VP_V-mCAMERA.RES_VH(0) ) / (VP_H- Start_leftLaneInner.x);
 	   float slopeRight = (float)( VP_V-mCAMERA.RES_VH(0) ) / (VP_H- Start_rightLaneInner.x);
 	
-	
-	   /*Point End_leftLaneOuter = Start_leftLaneOuter;
-	   End_leftLaneOuter.x += - round((mCAMERA.RES_VH(0)*0.35) / slopeLeft);
-	   End_leftLaneOuter.y += - round(mCAMERA.RES_VH(0)*0.35);
-	   */
-	
+
 	   Point End_leftLaneInner = Start_leftLaneInner;
 	   End_leftLaneInner.x 	+= -round((mCAMERA.RES_VH(0)*0.35) / slopeLeft);
 	   End_leftLaneInner.y 	+= -round( (mCAMERA.RES_VH(0)*0.35));
 	
-	
 	   Point End_rightLaneInner = Start_rightLaneInner;
 	   End_rightLaneInner.x += -round ((mCAMERA.RES_VH(0)*0.35) / slopeRight);
 	   End_rightLaneInner.y += -round ((mCAMERA.RES_VH(0)*0.35));
+
 
 	   line(mFrameRGB,
 		 Start_leftLaneInner,
@@ -567,8 +556,66 @@ mProfiler.start("Display");
 		 CvScalar(0,255,0),
 		 3
 	   	);
+	
+	  /* line(mFrameRGB,
+	     cvPoint(0, -mLaneFilter->OFFSET_V + mCAMERA.FRAME_CENTER(0)),
+	     cvPoint(mCAMERA.RES_VH(1), -mLaneFilter->OFFSET_V + mCAMERA.FRAME_CENTER(0)),
+	     CvScalar(0,0,0),
+	     6
+	    );*/	     
+
+
+	line(mFrameRGB,
+	     cvPoint(0, mCAMERA.RES_VH(0)*(1-0.35)),
+	     cvPoint(mCAMERA.RES_VH(1), mCAMERA.RES_VH(0)*(1-0.35)),
+	     CvScalar(0,0,0),
+	     2
+	    );	     
+
+	line(mFrameRGB,
+	     cvPoint(0, mCAMERA.RES_VH(0)*(1-0.35)),
+	     cvPoint(mCAMERA.RES_VH(1), mCAMERA.RES_VH(0)*(1-0.35)),
+	     CvScalar(0,0,0),
+	     2
+	    );	     
+
+	line(mFrameRGB,
+	     (Start_rightLaneInner + Start_leftLaneInner)/2.0,
+	     (End_rightLaneInner + End_leftLaneInner)/2.0,
+	     CvScalar(255,0,0),
+	     2
+	    );
+
+
+	for (int i=0; i<1000; i+=10)
+	{
+		int x = i*mCAMERA.CM_TO_PIXEL; 
+		line(mFrameRGB, cvPoint(x,mCAMERA.RES_VH(0)), cvPoint(x,mCAMERA.RES_VH(0) -30), cvScalar(0,0,0), 2);
+		//putText(mFrameRGB, std::to_string(i), cvPoint(x, mCAMERA.RES_VH(0)-30), FONT_HERSHEY_DUPLEX, 0.1, CvScalar(255,0,0), 2);
+	}
+
+	//putText(mFrameRGB, "Coordinates", cvPoint(340,240), FONT_HERSHEY_COMPLEX, 0.2, CvScalar(255,0,0), 2  );
+
+
+	//circle(mFrameRGB,cvPoint(320,240),3, CvScalar(0,255,0),CV_FILLED); 
+
+/*
+	  Point Start_targetPath = Start_leftLaneInner;
+	  Start_targetPath.x += round((Start_rightLaneInner.x - Start_leftLaneInner.x)/2.0);
+
+	  Point End_targetPath = End_leftLaneInner;
+	  End_targetPath.x += round((End_rightLaneInner.x - End_leftLaneInner.x)/2.0);
+
+	   line(mFrameRGB,
+		 Start_targetPath,
+		 End_targetPath,
+		 CvScalar(0,255,0),
+		 3
+	   	);
+*/
+
 	   imshow( "Display window", mFrameRGB);
-	   waitKey(1);
+	   waitKey(20);
 	   //mOutputVideo<<mFrameRGB;
 	}
 	#endif

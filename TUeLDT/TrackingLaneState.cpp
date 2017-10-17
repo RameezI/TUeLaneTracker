@@ -22,7 +22,6 @@ void TrackingLaneState::setupDAG(LaneFilter* laneFilter, VanishingPtFilter* vpFi
 	 mTrackingLaneGraph.mLaneFilter = laneFilter;
 	 mTrackingLaneGraph.mVpFilter   = vpFilter;
 	 
-	 
 	 mTrackingLaneGraph.mLOWER_LIMIT_IntBase 
 	 = SCALE_INTSEC*laneFilter->HISTOGRAM_BINS(0) - (SCALE_INTSEC*laneFilter->STEP)/2;
 	 
@@ -36,12 +35,10 @@ void TrackingLaneState::setupDAG(LaneFilter* laneFilter, VanishingPtFilter* vpFi
 	 mTrackingLaneGraph.mUPPER_LIMIT_IntPurview = 
 	   SCALE_INTSEC*vpFilter->VP_RANGE_H +  (SCALE_INTSEC*vpFilter->STEP)/2;
 
-
 	 mTrackingLaneGraph.mSCALED_STEP_LANE_FILTER	= laneFilter->STEP*SCALE_INTSEC;
 	 mTrackingLaneGraph.mSCALED_STEP_VP_FILTER      = vpFilter->STEP*SCALE_INTSEC;
 	 mTrackingLaneGraph.mSCALED_START_LANE_FILTER   = laneFilter->HISTOGRAM_BINS(0)*SCALE_INTSEC;
 	 mTrackingLaneGraph.mSCALED_START_VP_FILTER	= vpFilter->HISTOGRAM_BINS(0)*SCALE_INTSEC;
-
 	
 	if (0== mTrackingLaneGraph.init_DAG())
 	 this->currentStatus= StateStatus::ACTIVE;	
@@ -66,10 +63,11 @@ mProfiler.start("SingleRun_TRACK");
 	{
 		 
 	  mSideExecutor =
+	
 	  #ifdef S32V2XX
-			std::thread(&TrackingLaneDAG_s32v::runAuxillaryTasks, 	std::ref(mTrackingLaneGraph));
+			std::thread(&TrackingLaneDAG_s32v::runAuxillaryTasks, 	 std::ref(mTrackingLaneGraph));
 	  #else
-			std::thread(&TrackingLaneDAG_generic::runAuxillaryTasks, 	std::ref(mTrackingLaneGraph));
+			std::thread(&TrackingLaneDAG_generic::runAuxillaryTasks, std::ref(mTrackingLaneGraph));
 	  #endif
 
 	  mTrackingLaneGraph.buffer();
