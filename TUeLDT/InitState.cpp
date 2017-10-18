@@ -52,7 +52,7 @@ unique_ptr<Templates> InitState::createTemplates()
 	VanishingPtFilter vanishingPtFilter(laneFilter.HISTOGRAM_BINS, laneFilter.OFFSET_V);
 	
 	unique_ptr<Templates>
-	templates ( new  Templates (camera.RES_VH(0), camera.RES_VH(1),vanishingPtFilter.VP_RANGE_V) );
+	templates ( new  Templates (camera.RES_VH(0), camera.RES_VH(1), camera.FOV(0), vanishingPtFilter.VP_RANGE_V) );
 	
 	mTemplatesCreated	= true;
 	

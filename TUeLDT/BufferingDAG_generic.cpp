@@ -228,6 +228,7 @@ void BufferingDAG_generic::runAuxillaryTasks()
 		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
 
 		//Extract Depth Template
+		lRowIndex = mCAMERA.RES_VH(0)- mSpan; 
 		ROI = Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
 		mDEPTH_MAP_ROOT(ROI).copyTo(mDepthTemplate);
 

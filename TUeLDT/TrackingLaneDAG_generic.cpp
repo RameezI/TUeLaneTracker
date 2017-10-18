@@ -657,6 +657,7 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
 			
 		// Extract Depth Template
+		lRowIndex = mCAMERA.RES_VH(0)- mSpan; 
 		ROI = Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
 		mDEPTH_MAP_ROOT(ROI).copyTo(mDepthTemplate);
 		
@@ -678,21 +679,18 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 	else
 /* MODE: A ONLY */
 	{
-		lRowIndex =  mCAMERA.RES_VH(0); // - mCAMERA.FRAME_CENTER(0) - mVanishPt.V + OFFSET ;
+		lRowIndex =  mCAMERA.RES_VH(0);
 		lColIndex =  mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) - mVanishPt.H ;
 		Rect ROI = Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
 			
-
-		lRowIndex =  mCAMERA.RES_VH(0); //- mCAMERA.FRAME_CENTER(0) - mVanishPt.V + OFFSET ;
+		lRowIndex = mCAMERA.RES_VH(0)- mSpan; 
 		ROI = Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
 		mDEPTH_MAP_ROOT(ROI).copyTo(mDepthTemplate);
 		
-
 		lRowIndex = mVP_Range_V-mVanishPt.V;
 		ROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 		mFOCUS_MASK_ROOT(ROI).copyTo(mFocusTemplate);
-
 
 		mTemplatesReady= true;		
 	}
