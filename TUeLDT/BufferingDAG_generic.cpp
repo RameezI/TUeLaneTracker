@@ -28,9 +28,9 @@ mProfiler.start("GRAY_FRAME_CONVERSION");
 #endif
 				
 	cvtColor(mFrameRGB, mFrameGRAY, CV_BGR2GRAY);
-	int rowIndex= mCAMERA.RES_VH(0) - mSpan;
+	int lRowIndex= mCAMERA.RES_VH(0) - mSpan;
 	Rect ROI;
-	ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mSpan);	
+	ROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);	
 	mFrameGRAY_ROI = mFrameGRAY(ROI);
 
 			 
@@ -148,13 +148,13 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 #endif 		
 
 	//GrayChannel Probabilities
-	subtract(mFrameGRAY_ROI, mLaneMembership.TIPPING_POINT_GRAY, mTempProbMat, noArray(), CV_16S);
+	subtract(mFrameGRAY_ROI, mLaneMembership.TIPPING_POINT_GRAY, mTempProbMat, noArray(), CV_32S);
 	mMask = mTempProbMat <0 ;
 	mTempProbMat.setTo(0,mMask);
 	mTempProbMat.copyTo(mProbMap_Gray);
 	mTempProbMat = mTempProbMat + 10;
 	
-	divide(mProbMap_Gray, mTempProbMat, mProbMap_Gray, 255, CV_32S);
+	divide(mProbMap_Gray, mTempProbMat, mProbMap_Gray, 255, -1);
 	
 
 	//GradientMag Probabilities
@@ -182,6 +182,7 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 	//Final Probability Map
 	multiply(mBufferPool->Probability[bufferPos], mProbMap_GradDir, mBufferPool->Probability[bufferPos]);
 	mBufferPool->Probability[bufferPos].convertTo(mBufferPool->Probability[bufferPos], CV_8U, 1.0/255, 0);
+
 	
 	mTemplatesReady = false;	
 	mBufferReady    = false;
@@ -210,9 +211,8 @@ Description of Modes:
 */
 void BufferingDAG_generic::runAuxillaryTasks()
 {
-	const int OFFSET =  mCAMERA.RES_VH(0)-mSpan;
-	int rowIndex= mCAMERA.RES_VH(0) - mCAMERA.FRAME_CENTER(0) -mVanishPt.V + OFFSET ;
-	int colIndex= mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
+	int lRowIndex;
+	int lColIndex;
 
 	WriteLock  wrtLock(_mutex, std::defer_lock);	
 
@@ -220,22 +220,29 @@ void BufferingDAG_generic::runAuxillaryTasks()
 
 	wrtLock.lock();
 
-		Rect ROI = Rect(colIndex, rowIndex, mCAMERA.RES_VH(1), mSpan);
+		lRowIndex= mCAMERA.RES_VH(0);
+		lColIndex= mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
+		
+		//Extract Gradient Orientation Template 
+		Rect ROI = Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
 
-		ROI = Rect(0,rowIndex,mCAMERA.RES_VH(1), mSpan);
+		//Extract Depth Template
+		ROI = Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
 		mDEPTH_MAP_ROOT(ROI).copyTo(mDepthTemplate);
 
-		rowIndex = mVP_Range_V-mVanishPt.V;
-		ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mSpan);
+		//Extract Focus Template
+		lRowIndex = mVP_Range_V-mVanishPt.V;
+		ROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 		mFOCUS_MASK_ROOT(ROI).copyTo(mFocusTemplate);	
 
+		// Shift Buffers
 		for ( std::size_t i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
 		{
 			mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
 			mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);
-		}	
-		
+		}
+			
 		mTemplatesReady = true;
 		mBufferReady    = true;
 

@@ -64,8 +64,8 @@ mProfiler.start("TemporalFiltering");
 	    mBufferPool->GradientTangent[i].copyTo(mGradTanFocussed, mMask );
 	}
 	
-	bitwise_and(mProbMapFocussed, mFocusTemplate, mProbMapFocussed);
-	
+	//bitwise_and(mProbMapFocussed, mFocusTemplate, mProbMapFocussed);
+
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
@@ -638,34 +638,32 @@ void TrackingLaneDAG_generic::extractControllerInputs()
 
 void TrackingLaneDAG_generic::runAuxillaryTasks()
 {
-
-
-/* MODE: (A+C) OR A */
 		
-	int offset   =  mCAMERA.RES_VH(0)  -mSpan;
-	int rowIndex =  mCAMERA.RES_VH(0) - mCAMERA.FRAME_CENTER(0) -mVanishPt.V +offset ;
-	int colIndex =  mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
-
+	int lRowIndex;
+	int lColIndex;
 
 	WriteLock  wrtLock(_mutex, std::defer_lock);
-	
 	wrtLock.lock();
+
 
 	if (mBufferReady == false)
 /* MODE: A + C */
 	{
-		
-		Rect ROI = Rect(colIndex, rowIndex, mCAMERA.RES_VH(1), mSpan);
+
+		// Extract Template Orientation
+		lRowIndex =  mCAMERA.RES_VH(0); 
+		lColIndex =  mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) - mVanishPt.H ;
+		Rect ROI  = Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
 			
-		ROI = Rect(0,rowIndex,mCAMERA.RES_VH(1), mSpan);
+		// Extract Depth Template
+		ROI = Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
 		mDEPTH_MAP_ROOT(ROI).copyTo(mDepthTemplate);
 		
-		rowIndex = mVP_Range_V-mVanishPt.V;
-		ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mSpan);
+		// Extract Focus Template
+		lRowIndex = mVP_Range_V - mVanishPt.V;
+		ROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 		mFOCUS_MASK_ROOT(ROI).copyTo(mFocusTemplate);	
-
-	
 
 		for ( std::size_t i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
 		{
@@ -680,15 +678,21 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 	else
 /* MODE: A ONLY */
 	{
-		Rect ROI = Rect(colIndex, rowIndex, mCAMERA.RES_VH(1), mSpan);
+		lRowIndex =  mCAMERA.RES_VH(0); // - mCAMERA.FRAME_CENTER(0) - mVanishPt.V + OFFSET ;
+		lColIndex =  mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) - mVanishPt.H ;
+		Rect ROI = Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
 			
-		ROI = Rect(0,rowIndex,mCAMERA.RES_VH(1), mSpan);
+
+		lRowIndex =  mCAMERA.RES_VH(0); //- mCAMERA.FRAME_CENTER(0) - mVanishPt.V + OFFSET ;
+		ROI = Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
 		mDEPTH_MAP_ROOT(ROI).copyTo(mDepthTemplate);
 		
-		rowIndex = mVP_Range_V-mVanishPt.V;
-		ROI = Rect(0, rowIndex, mCAMERA.RES_VH(1), mSpan);
+
+		lRowIndex = mVP_Range_V-mVanishPt.V;
+		ROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 		mFOCUS_MASK_ROOT(ROI).copyTo(mFocusTemplate);
+
 
 		mTemplatesReady= true;		
 	}
@@ -712,7 +716,7 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 	SUM = sum(mTransitLaneFilter)[0];
 	mTransitLaneFilter= mTransitLaneFilter*SCALE_FILTER;
 	mTransitLaneFilter.convertTo(mTransitLaneFilter, CV_32S, 1.0/SUM);
-	mTransitLaneFilter = 	mTransitLaneFilter + 0.1*mLaneFilter->prior;
+	mTransitLaneFilter = 	mTransitLaneFilter + 0.3*mLaneFilter->prior;
 
 
 	//Predict VP States

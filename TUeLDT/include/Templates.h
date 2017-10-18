@@ -43,8 +43,8 @@ public:
 			for(int n = RES_V; n < 2*RES_V +1; n++)
 			{
 			  float x= 1.75 * tan(angle * M_PI/180.0 );
-					x=x*x;
-			   if( x > 100) x=100;
+			  x = x*x;
+			  if( x > 100) x=100;
 			  DEPTH_ROOT.row(n) = ArrayXf::Constant(RES_H, x);
 			  angle = angle - step;
 			}
