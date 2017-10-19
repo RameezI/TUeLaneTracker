@@ -127,7 +127,6 @@ mProfiler.start("GRADIENT_COMPUTATION");
 	//convertScaleAbs(mFrameGradMag, mFrameGradMag);
 	mFrameGradMag.convertTo(mFrameGradMag, CV_8U);
 			
-			
 
  #ifdef PROFILER_ENABLED
  mProfiler.end();
@@ -183,6 +182,7 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 	multiply(mBufferPool->Probability[bufferPos], mProbMap_GradDir, mBufferPool->Probability[bufferPos]);
 	mBufferPool->Probability[bufferPos].convertTo(mBufferPool->Probability[bufferPos], CV_8U, 1.0/255, 0);
 
+	bitwise_and(mBufferPool->Probability[bufferPos], mFocusTemplate, mBufferPool->Probability[bufferPos]);
 	
 	mTemplatesReady = false;	
 	mBufferReady    = false;
@@ -228,12 +228,12 @@ void BufferingDAG_generic::runAuxillaryTasks()
 		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
 
 		//Extract Depth Template
-		lRowIndex = mCAMERA.RES_VH(0)- mSpan; 
+		lRowIndex = mCAMERA.RES_VH(0) -  mSpan; 
 		ROI = Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
 		mDEPTH_MAP_ROOT(ROI).copyTo(mDepthTemplate);
 
 		//Extract Focus Template
-		lRowIndex = mVP_Range_V-mVanishPt.V;
+		lRowIndex = mVP_Range_V	 - mVanishPt.V;
 		ROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 		mFOCUS_MASK_ROOT(ROI).copyTo(mFocusTemplate);	
 
