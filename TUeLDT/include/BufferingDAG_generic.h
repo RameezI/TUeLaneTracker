@@ -91,6 +91,8 @@ using WriteLock = std::unique_lock<MutexType>;
 	
 	#ifdef DIRECTORY_INPUT	
 	 vector<cv::String>	mFiles;
+	#else
+	   VideoCapture 	mRTSP_CAPTURE;
 	#endif
 
 	
@@ -152,9 +154,11 @@ public:
 	   mY_VPRS			= std::move(bufferingGraph.mY_VPRS);
 		
 	   #ifdef DIRECTORY_INPUT	
-	   mFiles			= std::move(bufferingGraph.mFiles);
+	      mFiles			= std::move(bufferingGraph.mFiles);
+	   #else
+	      mRTSP_CAPTURE 		= std::move(bufferingGraph.mRTSP_CAPTURE);
 	   #endif
-	
+
 	   wrtLock.unlock();
    	}
 

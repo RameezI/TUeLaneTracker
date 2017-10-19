@@ -568,7 +568,7 @@ mProfiler.start("Display");
 		 3
 	   	);
 	   imshow( "Display window", mFrameRGB);
-	   waitKey(10);
+	   waitKey(1);
 	   //mOutputVideo<<mFrameRGB;
 	}
 	#endif
