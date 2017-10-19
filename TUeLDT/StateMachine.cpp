@@ -89,7 +89,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	   while (bufferingState.currentStatus == StateStatus::ACTIVE)
 	   {	
 		bufferingState.run();
-	//	bufferingState.currentStatus = StateStatus::ACTIVE;
+		//bufferingState.currentStatus = StateStatus::ACTIVE;
 
 		if (sigInit->sStatus==SigStatus::STOP)
 		{

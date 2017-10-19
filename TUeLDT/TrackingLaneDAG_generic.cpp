@@ -517,7 +517,8 @@ mProfiler.end();
 #ifdef PROFILER_ENABLED
 mProfiler.start("Display");
 #endif
-	#ifdef DISPLAY_GRAPHICS_OPENCV
+
+	#ifdef DISPLAY_GRAPHICS
 	{
 	   /*  Transform VP to Image Coordianate System */
 	   int VP_V =  mVanishPt.V + mCAMERA.FRAME_CENTER(0);
@@ -612,11 +613,16 @@ mProfiler.start("Display");
 		 3
 	   	);
 */
-
+	#ifdef DISPLAY_GRAPHICS_DCU
+	   mDCU.PutFrame(mFrameRGB.data);
+	#else  
 	   imshow( "Display window", mFrameRGB);
-	   waitKey(20);
+	   waitKey(1);
+	#endif
+	
 	   //mOutputVideo<<mFrameRGB;
 	}
+
 	#endif
 										
 #ifdef PROFILER_ENABLED
@@ -646,6 +652,7 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 
 
 	if (mBufferReady == false)
+
 /* MODE: A + C */
 	{
 
@@ -676,6 +683,7 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 	}
 
 	else
+
 /* MODE: A ONLY */
 	{
 		lRowIndex =  mCAMERA.RES_VH(0);
