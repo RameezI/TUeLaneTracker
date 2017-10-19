@@ -67,9 +67,9 @@ mProfiler.start("SingleRun_TRACK");
 		 
 	  mSideExecutor =
 	  #ifdef S32V2XX
-			std::thread(&TrackingLaneDAG_s32v::runAuxillaryTasks, 	std::ref(mTrackingLaneGraph));
+			std::thread(&TrackingLaneDAG_s32v::runAuxillaryTasks, 	 std::ref(mTrackingLaneGraph));
 	  #else
-			std::thread(&TrackingLaneDAG_generic::runAuxillaryTasks, 	std::ref(mTrackingLaneGraph));
+			std::thread(&TrackingLaneDAG_generic::runAuxillaryTasks, std::ref(mTrackingLaneGraph));
 	  #endif
 
 	  mTrackingLaneGraph.buffer();

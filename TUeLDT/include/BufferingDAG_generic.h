@@ -5,6 +5,11 @@
 #include <mutex>
 #include <condition_variable>
 
+#ifdef DISPLAY_GRAPHICS_DCU
+#include "frame_output_v234fb.h"
+#endif
+
+
 struct BufferPool;
 
 class BufferingDAG_generic
@@ -89,6 +94,13 @@ using WriteLock = std::unique_lock<MutexType>;
 	
 	uint64_t 	mFrameCount;
 	
+
+
+        // Display Control Unit
+        #ifdef DISPLAY_GRAPHICS_DCU
+        io::FrameOutputV234Fb   mDCU;
+	#endif
+
 	#ifdef DIRECTORY_INPUT	
 	 vector<cv::String>	mFiles;
 	#else
@@ -99,7 +111,6 @@ using WriteLock = std::unique_lock<MutexType>;
 public:
 
 	int  init_DAG();		// For initialising DAG ONE TIME EXECUTION
-
 	int  grabFrame(); 		// Grab Frame from the Source
 	void runAuxillaryTasks();       // Perform assitve tasks for buffering from seperate executor
 	void buffer();   		// Perform tasks for buffering from main Thread
@@ -107,7 +118,11 @@ public:
 	
 	
    	BufferingDAG_generic (BufferingDAG_generic && bufferingGraph)
-
+	
+	#ifdef DISPLAY_GRAPHICS_DCU 
+	: mDCU(io::FrameOutputV234Fb(mCAMERA.RES_VH(1), mCAMERA.RES_VH(0), io::IO_DATA_DEPTH_08, io::IO_DATA_CH3))
+	#endif
+	
    	{
 	
 

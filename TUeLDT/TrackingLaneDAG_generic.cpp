@@ -520,7 +520,8 @@ mProfiler.end();
 #ifdef PROFILER_ENABLED
 mProfiler.start("Display");
 #endif
-	#ifdef DISPLAY_GRAPHICS_OPENCV
+
+	#ifdef DISPLAY_GRAPHICS
 	{
 	   /*  Transform VP to Image Coordianate System */
 	   int VP_V =  mVanishPt.V + mCAMERA.FRAME_CENTER(0);
@@ -567,10 +568,18 @@ mProfiler.start("Display");
 		 CvScalar(0,255,0),
 		 3
 	   	);
+
+	
+	#ifdef DISPLAY_GRAPHICS_DCU
+	   mDCU.PutFrame(mFrameRGB.data);
+	#else  
 	   imshow( "Display window", mFrameRGB);
 	   waitKey(1);
+	#endif
+	
 	   //mOutputVideo<<mFrameRGB;
 	}
+
 	#endif
 										
 #ifdef PROFILER_ENABLED
