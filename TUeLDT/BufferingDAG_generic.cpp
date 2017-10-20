@@ -220,10 +220,9 @@ void BufferingDAG_generic::runAuxillaryTasks()
 
 	wrtLock.lock();
 
-		lRowIndex= mCAMERA.RES_VH(0);
-		lColIndex= mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
-		
 		//Extract Gradient Orientation Template 
+		lRowIndex =  mCAMERA.RES_VH(0) + mMargin - mVanishPt.V ; 
+		lColIndex= mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
 		Rect ROI = Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
 

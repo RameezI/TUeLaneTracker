@@ -368,17 +368,18 @@ mProfiler.start("VP_HistogramMatching");
 	const int delta= round(mLaneFilter->STEP/2.0);
 	
 	{	
-	   int   	bestPosteriorProb  = 0;
-	   register int32_t* HistPurviewPTR    =  mHistPurview.ptr<int32_t>(0);
+	   int   		bestPosteriorProb  = 0;
+	   register int32_t* 	HistPurviewPTR     =  mHistPurview.ptr<int32_t>(0);
 
 	
 	   const float left_VP  = ((-mLaneModel.leftOffset  - delta)
-				+(-mLaneModel.leftOffset + delta))
+				  +(-mLaneModel.leftOffset  + delta))
 				/2.0;													
 	
 	   const float right_VP  = ((mLaneModel.rightOffset  - delta)
-				 +(mLaneModel.rightOffset  + delta))
-				 /2.0;				
+				   +(mLaneModel.rightOffset  + delta))
+				/2.0;
+				
 		
 	   const int    FRAME_CENTER_V	= mCAMERA.FRAME_CENTER(0); 
 	   const float  PIXEL_TO_CM     	= 1.0/mCAMERA.CM_TO_PIXEL;
@@ -417,12 +418,16 @@ mProfiler.start("VP_HistogramMatching");
 		
 		   IntSecLeft = ((binH - left_VP)/(float)(binV+FRAME_CENTER_V))
 					 *(VP_FILTER_OFFSET - binV) +binH;
+
+
+		   IntSecRight 	= ((binH - right_VP)/(float)(binV+FRAME_CENTER_V))
+				  *(VP_FILTER_OFFSET - binV) +binH;
+
+
 		   IntSecLeft = VP_HIST_STEP * round(IntSecLeft/VP_HIST_STEP);
 		   LeftIdx= (IntSecLeft - VP_HIST_START)/VP_HIST_STEP;
 		
-		
-		   IntSecRight 	= ((binH - right_VP)/(float)(binV+FRAME_CENTER_V))
-				  *(VP_FILTER_OFFSET - binV) +binH;
+
 		   IntSecRight 	= VP_HIST_STEP * round(IntSecRight/VP_HIST_STEP);
 		   RightIdx 	= (VP_HIST_SIZE-1) - (VP_HIST_END - IntSecRight)/VP_HIST_STEP;
 		
@@ -520,6 +525,11 @@ mProfiler.start("Display");
 
 	#ifdef DISPLAY_GRAPHICS
 	{
+
+
+	   const float lRatioLookAhead = 0.35;
+
+
 	   /*  Transform VP to Image Coordianate System */
 	   int VP_V =  mVanishPt.V + mCAMERA.FRAME_CENTER(0);
 	   int VP_H =  mVanishPt.H + mCAMERA.FRAME_CENTER(1);	
@@ -535,12 +545,12 @@ mProfiler.start("Display");
 	
 
 	   Point End_leftLaneInner = Start_leftLaneInner;
-	   End_leftLaneInner.x 	+= -round((mCAMERA.RES_VH(0)*0.35) / slopeLeft);
-	   End_leftLaneInner.y 	+= -round( (mCAMERA.RES_VH(0)*0.35));
+	   End_leftLaneInner.x 	+= -round((mCAMERA.RES_VH(0)*lRatioLookAhead) / slopeLeft);
+	   End_leftLaneInner.y 	+= -round( (mCAMERA.RES_VH(0)*lRatioLookAhead));
 	
 	   Point End_rightLaneInner = Start_rightLaneInner;
-	   End_rightLaneInner.x += -round ((mCAMERA.RES_VH(0)*0.35) / slopeRight);
-	   End_rightLaneInner.y += -round ((mCAMERA.RES_VH(0)*0.35));
+	   End_rightLaneInner.x += -round ((mCAMERA.RES_VH(0)*lRatioLookAhead) / slopeRight);
+	   End_rightLaneInner.y += -round ((mCAMERA.RES_VH(0)*lRatioLookAhead));
 
 
 	   line(mFrameRGB,
@@ -566,15 +576,15 @@ mProfiler.start("Display");
 
 
 	line(mFrameRGB,
-	     cvPoint(0, mCAMERA.RES_VH(0)*(1-0.35)),
-	     cvPoint(mCAMERA.RES_VH(1), mCAMERA.RES_VH(0)*(1-0.35)),
+	     cvPoint(0, mCAMERA.RES_VH(0)*(1-lRatioLookAhead)),
+	     cvPoint(mCAMERA.RES_VH(1), mCAMERA.RES_VH(0)*(1-lRatioLookAhead)),
 	     CvScalar(0,0,0),
 	     2
 	    );	     
 
 	line(mFrameRGB,
-	     cvPoint(0, mCAMERA.RES_VH(0)*(1-0.35)),
-	     cvPoint(mCAMERA.RES_VH(1), mCAMERA.RES_VH(0)*(1-0.35)),
+	     cvPoint(0, mCAMERA.RES_VH(0)*(1-lRatioLookAhead)),
+	     cvPoint(mCAMERA.RES_VH(1), mCAMERA.RES_VH(0)*(1-lRatioLookAhead)),
 	     CvScalar(0,0,0),
 	     2
 	    );	     
@@ -597,7 +607,6 @@ mProfiler.start("Display");
 	//putText(mFrameRGB, "Coordinates", cvPoint(340,240), FONT_HERSHEY_COMPLEX, 0.2, CvScalar(255,0,0), 2  );
 
 
-	//circle(mFrameRGB,cvPoint(320,240),3, CvScalar(0,255,0),CV_FILLED); 
 
 /*
 	  Point Start_targetPath = Start_leftLaneInner;
@@ -613,11 +622,12 @@ mProfiler.start("Display");
 		 3
 	   	);
 */
+
 	#ifdef DISPLAY_GRAPHICS_DCU
 	   mDCU.PutFrame(mFrameRGB.data);
 	#else  
 	   imshow( "Display window", mFrameRGB);
-	   waitKey(1);
+	   waitKey(20);
 	#endif
 	
 	   //mOutputVideo<<mFrameRGB;
@@ -657,7 +667,7 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 	{
 
 		// Extract Template Orientation
-		lRowIndex =  mCAMERA.RES_VH(0); 
+		lRowIndex =  mCAMERA.RES_VH(0) + mMargin - mVanishPt.V ; 
 		lColIndex =  mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) - mVanishPt.H ;
 		Rect ROI  = Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
@@ -686,7 +696,7 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 
 /* MODE: A ONLY */
 	{
-		lRowIndex =  mCAMERA.RES_VH(0);
+		lRowIndex =  mCAMERA.RES_VH(0) + mMargin - mVanishPt.V;
 		lColIndex =  mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) - mVanishPt.H ;
 		Rect ROI = Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
