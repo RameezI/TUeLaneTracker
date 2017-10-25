@@ -31,13 +31,13 @@ Go to the parent directory of the cloned repository:
 ```
 cd TUeLaneTracker
 ```
-Open main.cpp file in an editor:
+Open TUeLDT/BufferingState.cpp file in an editor:
 ```
-vim  +24 LaneTrackerApp/main.cpp
+vim  +18 LaneTrackerApp/TUeLDT/BufferingState.cpp
 ```
 Update the location or the DataSet<sup>1</sup>. by editing the folllowing lines in main.cpp:
 ```
-cv::String folder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
+cv::String lFolder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
 ```
 Create a build subdirectory and invoke cmake
 ```
