@@ -35,7 +35,7 @@ Open TUeLDT/BufferingState.cpp file in an editor:
 ```
 vim  +18 LaneTrackerApp/TUeLDT/BufferingState.cpp
 ```
-Update the location or the DataSet<sup>1</sup>. by editing the folllowing lines in main.cpp:
+Update the location of the DataSet<sup>1</sup>. by editing the folllowing lines in main.cpp:
 ```
 cv::String lFolder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
 ```
