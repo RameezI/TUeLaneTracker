@@ -33,7 +33,7 @@ cd TUeLaneTracker
 ```
 Open TUeLDT/BufferingState.cpp file in an editor:
 ```
-vim  +18 LaneTrackerApp/TUeLDT/BufferingState.cpp
+vim  +18 TUeLDT/BufferingState.cpp
 ```
 Update the location of the DataSet<sup>1</sup>. by editing the folllowing lines in main.cpp:
 ```
