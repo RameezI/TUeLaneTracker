@@ -6,7 +6,7 @@ VanishingPtFilter::VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_B
   mVP_STEP(10),
   
   VP_RANGE_V(25), 
-  
+ 
   VP_RANGE_H(300),
   
   mNb_VP_BINS_V(floor((2*VP_RANGE_V)/mVP_STEP) +1),
@@ -17,8 +17,6 @@ VanishingPtFilter::VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_B
   
   VP_BINS_H( VectorXi::LinSpaced(mNb_VP_BINS_H,-VP_RANGE_H, VP_RANGE_H).array()),
   
- // OFFSET_V(-120),
-
   OFFSET_V(-120),
   
   mVP_LANE_RATIO((float)OFFSET_V / LANE_FILTER_OFFSET_V),
