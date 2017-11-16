@@ -12,19 +12,26 @@ int BufferingState::setSource()
 
 	int lReturn=0;
 
-	#ifdef DIRECTORY_INPUT
+	//#ifdef DIRECTORY_INPUT
+	
+	//Select Frame Source
+	FrameSource lSource = FrameSource::DIRECTORY;
+	
+
+	if (lSource == FrameSource::DIRECTORY)
 	{
 	   vector< cv::String> lFiles;
-           cv::String lFolder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
-           //cv::String lFolder = "/home/root/data/Eindhoven";
+           //cv::String lFolder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
+           cv::String lFolder = "/home/root/data/Eindhoven";
            
 	   try
 	   {
 		glob(lFolder, lFiles);
 	   }
+
 	   catch(...)
 	   {
-		lReturn|= -1;
+		lReturn = -1;
 	   }
 
            const uint lSkipFrames = 4000;  
@@ -34,8 +41,9 @@ int BufferingState::setSource()
          	cout<<endl;
          	cout<<"Total Number of Image Files to Process : " << 0;
          	cout<<endl;
-         	lReturn |= -1;
+         	lReturn = -1;
            }
+
 	   else
 	   {
      	   	cout<<endl;
@@ -43,30 +51,49 @@ int BufferingState::setSource()
            	cout<<endl;	
 	   }
 
+	   bufferingGraph.mSource = lSource;
 	   bufferingGraph.mFiles = lFiles;
 	   bufferingGraph.mFrameCount =lSkipFrames;
-	   return lReturn;
 	}
-	#else
+
+	else if(lSource == FrameSource::RTSP)
 	{
+
 		cout<< "RTSP MODE"<<endl;
-		Mat lFrame;
+		bufferingGraph.mSource = lSource;
+	   	bufferingGraph.mFrameCount = 0;
+		
 		try
 		{
-		  
-	   	   bufferingGraph.mFrameCount = 0;
 		   if(!bufferingGraph.mRTSP_CAPTURE.open("rtsp://192.168.8.1:8554/test"))
-		    lReturn |=-1;
+		    lReturn =-1;
 		}
+
 		catch(...)
 		{
-		    lReturn=-1;
+		    lReturn =-1;
 		}
-		
-		return lReturn;
-
 	}
-	#endif
+
+	else if (lSource == FrameSource::GMSL)
+	{
+		cout<< "GMSL MODE" << endl;
+
+	
+		cout<< "This Mode is not yet implemented"<< endl;
+		cout<< "Exitting"<<endl;
+		lReturn =-1;
+	}
+
+	else
+	{
+		cout << "The input mode is not recognised" << endl;
+		cout << "Exitting"<<endl;
+		lReturn =-1;
+	}
+
+	return lReturn;
+
 }
 
 

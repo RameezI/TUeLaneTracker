@@ -1,14 +1,13 @@
 #include "TrackingLaneDAG_generic.h"
 
 TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferingGraph)
-
-
 : 
   BufferingDAG_generic(std::move(bufferingGraph)),
   mStartBufferShift(false),
   mStartFiltering(false),
   mFiltersReady(false),
   mMAX_PIXELS_ROI(mFrameGRAY_ROI.size().height * mFrameGRAY_ROI.size().width)
+
 {	
 
 /*
