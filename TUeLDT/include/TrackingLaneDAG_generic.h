@@ -76,10 +76,10 @@ private:
 
 	LaneModel   		mLaneModel;
 	
-/*
+
 	// Only Enable in case of Video Recording
 	VideoWriter mOutputVideo;
-*/
+
 
 
 	

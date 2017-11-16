@@ -9,7 +9,7 @@ LaneFilter::LaneFilter(const LaneParameters& LANE,  const Camera& CAMERA)
 
   mCAMERA(CAMERA),
   
-  mSTEP_CM(5),
+  mSTEP_CM(10),
   
   STEP(ceil((mSTEP_CM*mCAMERA.CM_TO_PIXEL)/10)*10),
   

@@ -10,10 +10,10 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
 
 {	
 
-/*
+
 	//Write Images to a video file
 	mOutputVideo.open("TUeLaneTracker.avi", CV_FOURCC('M','P','4','V'), 30, mFrameRGB.size());
-*/
+
 
 }
 
@@ -534,10 +534,12 @@ mProfiler.start("Display");
 	   int VP_H =  mVanishPt.H + mCAMERA.FRAME_CENTER(1);	
 
 	   /* Lane Bundaries */
-	   Point  Start_leftLaneInner( mCAMERA.FRAME_CENTER(1) -mLaneModel.leftOffset  + delta,  mCAMERA.RES_VH(0) );
+	   Point  Start_leftLaneInner( mCAMERA.FRAME_CENTER(1)  - ((int)(mLaneModel.leftOffset  + delta)/mLaneFilter->STEP)*mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
 	   
-	   Point  Start_rightLaneInner( mCAMERA.FRAME_CENTER(1) + mLaneModel.rightOffset - delta,  mCAMERA.RES_VH(0) );
+	   Point  Start_rightLaneInner( mCAMERA.FRAME_CENTER(1) + ((int)(mLaneModel.rightOffset - delta)/mLaneFilter->STEP)*mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
 	
+	   Point  StartMidLane( ((int)((Start_leftLaneInner.x + Start_rightLaneInner.x)/2.0)/mLaneFilter->STEP)*mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
+
  
 	   float slopeLeft =  (float)( VP_V-mCAMERA.RES_VH(0) ) / (VP_H- Start_leftLaneInner.x);
 	   float slopeRight = (float)( VP_V-mCAMERA.RES_VH(0) ) / (VP_H- Start_rightLaneInner.x);
@@ -571,7 +573,7 @@ mProfiler.start("Display");
 	     cvPoint(mCAMERA.RES_VH(1), -mLaneFilter->OFFSET_V + mCAMERA.FRAME_CENTER(0)),
 	     CvScalar(0,0,0),
 	     6
-	    );*/	     
+	    );
 
 
 	line(mFrameRGB,
@@ -580,26 +582,59 @@ mProfiler.start("Display");
 	     CvScalar(0,0,0),
 	     2
 	    );	     
+	*/
+
 
 	line(mFrameRGB,
-	     cvPoint(0, mCAMERA.RES_VH(0)*(1-lRatioLookAhead)),
-	     cvPoint(mCAMERA.RES_VH(1), mCAMERA.RES_VH(0)*(1-lRatioLookAhead)),
-	     CvScalar(0,0,0),
-	     2
-	    );	     
-
-	line(mFrameRGB,
-	     (Start_rightLaneInner + Start_leftLaneInner)/2.0,
+	     StartMidLane,
 	     (End_rightLaneInner + End_leftLaneInner)/2.0,
 	     CvScalar(255,0,0),
 	     2
 	    );
 
 
-	for (int i=0; i<1000; i+=10)
+
+	line(mFrameRGB,
+	     cvPoint(0, mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V),
+	     cvPoint(mCAMERA.RES_VH(1), mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V),
+	     CvScalar(0,0,0),
+	     1
+	    );
+	
+ 
+	
+	Rect lROI;
+	lROI = Rect(0, mCAMERA.RES_VH(0) - mSpan, mCAMERA.RES_VH(1), mSpan);
+	Mat lYellow(mSpan, mCAMERA.RES_VH(1), CV_8UC3, Scalar(0,125,125));
+
+    	Mat lFrameRGB_mSPAN = mFrameRGB(lROI);
+	cv::addWeighted(lYellow, 0.4, lFrameRGB_mSPAN, 0.6, 0, lFrameRGB_mSPAN);
+	
+
+
+
+	for (int i=0; i< mLaneFilter->HISTOGRAM_BINS.size(); i++)
 	{
-		int x = i*mCAMERA.CM_TO_PIXEL; 
-		line(mFrameRGB, cvPoint(x,mCAMERA.RES_VH(0)), cvPoint(x,mCAMERA.RES_VH(0) -30), cvScalar(0,0,0), 2);
+		int x = mCAMERA.FRAME_CENTER(1)+ mLaneFilter->HISTOGRAM_BINS(i); 
+		if(x !=  StartMidLane.x)
+		line(mFrameRGB, cvPoint(x,mCAMERA.RES_VH(0)), cvPoint(x,mCAMERA.RES_VH(0) -30), cvScalar(0,0,0), 1);
+		else
+		line(mFrameRGB, cvPoint(x,mCAMERA.RES_VH(0)), cvPoint(x,mCAMERA.RES_VH(0) -40), cvScalar(0,0,255), 2);
+
+		//putText(mFrameRGB, std::to_string(i), cvPoint(x, mCAMERA.RES_VH(0)-30), FONT_HERSHEY_DUPLEX, 0.1, CvScalar(255,0,0), 2);
+	}
+
+
+
+	for (int i=0; i< mVpFilter->HISTOGRAM_BINS.size(); i++)
+	{
+
+		int x = mCAMERA.FRAME_CENTER(1)+ mVpFilter->HISTOGRAM_BINS(i);
+		//if(x !=  StartMidLane.x)
+		line(mFrameRGB, cvPoint(x,mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V), cvPoint(x, mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V-30), cvScalar(0,0,0), 1);
+		//else
+		//line(mFrameRGB, cvPoint(x,mCAMERA.RES_VH(0)), cvPoint(x,mCAMERA.RES_VH(0) -40), cvScalar(0,0,255), 2);
+
 		//putText(mFrameRGB, std::to_string(i), cvPoint(x, mCAMERA.RES_VH(0)-30), FONT_HERSHEY_DUPLEX, 0.1, CvScalar(255,0,0), 2);
 	}
 
@@ -623,13 +658,27 @@ mProfiler.start("Display");
 */
 
 	#ifdef DISPLAY_GRAPHICS_DCU
+
 	   mDCU.PutFrame(mFrameRGB.data);
-	#else  
-	   imshow( "Display window", mFrameRGB);
-	   waitKey(20);
-	#endif
 	
-	   //mOutputVideo<<mFrameRGB;
+	#else  
+
+	   imshow( "Display window", mFrameRGB);
+	   
+	   if ( (char)32 == (char) waitKey(10) )
+	   {
+		cout << "Lane Histogram Bins :	"<< mLaneFilter->HISTOGRAM_BINS.transpose() <<endl << endl;
+
+		cout << "VanishingPt Histogram Bins : "<< mVpFilter->HISTOGRAM_BINS.transpose() <<endl << endl;
+
+		while ((char)32 != (char)waitKey(1));
+	   }
+
+	#endif
+
+
+
+	   mOutputVideo<<mFrameRGB;
 	}
 
 	#endif
@@ -741,7 +790,7 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 	SUM = sum(mTransitVpFilter)[0];
 	mTransitVpFilter= mTransitVpFilter*SCALE_FILTER;
 	mTransitVpFilter.convertTo(mTransitVpFilter, CV_32S, 1.0/SUM);	
-	mTransitVpFilter = mTransitVpFilter + 0.5*mVpFilter->prior;
+	mTransitVpFilter = mTransitVpFilter + 0.1*mVpFilter->prior;
 			
 	mFiltersReady   = true;
 	mStartFiltering = false;
