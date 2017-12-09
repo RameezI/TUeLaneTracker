@@ -36,6 +36,7 @@ using WriteLock = std::unique_lock<MutexType>;
 	#ifdef PROFILER_ENABLED
     	 ProfilerLDT         mProfiler;
 	#endif
+
 	
 	/*................................................
 	 Set from outside, before buffering is activated   */ 
@@ -92,20 +93,19 @@ using WriteLock = std::unique_lock<MutexType>;
 	Mat	mProbMap_GradMag;
 	Mat 	mProbMap_GradDir;
 	
-	uint64_t 	mFrameCount;
-	
-
 
         // Display Control Unit
         #ifdef DISPLAY_GRAPHICS_DCU
         io::FrameOutputV234Fb   mDCU;
 	#endif
 
-	#ifdef DIRECTORY_INPUT	
-	 vector<cv::String>	mFiles;
-	#else
-	   VideoCapture 	mRTSP_CAPTURE;
-	#endif
+
+	uint64_t 		mFrameCount;
+
+
+	FrameSource		mSource;
+	vector<cv::String>	mFiles;
+	VideoCapture 		mRTSP_CAPTURE;
 
 	
 public:
@@ -116,7 +116,6 @@ public:
 	void buffer();   		// Perform tasks for buffering from main Thread
 	
 	
-	
    	BufferingDAG_generic (BufferingDAG_generic && bufferingGraph)
 	
 	#ifdef DISPLAY_GRAPHICS_DCU 
@@ -125,7 +124,6 @@ public:
 	
    	{
 	
-
 	WriteLock  wrtLock(_mutex);
 	
 	   mTemplatesReady      	= std::move(bufferingGraph.mTemplatesReady);
@@ -168,13 +166,12 @@ public:
 	   mX_VPRS			= std::move(bufferingGraph.mX_VPRS);
 	   mY_VPRS			= std::move(bufferingGraph.mY_VPRS);
 		
-	   #ifdef DIRECTORY_INPUT	
-	      mFiles			= std::move(bufferingGraph.mFiles);
-	   #else
-	      mRTSP_CAPTURE 		= std::move(bufferingGraph.mRTSP_CAPTURE);
-	   #endif
+	   mSource			= std::move(bufferingGraph.mSource);	
+	   mFiles			= std::move(bufferingGraph.mFiles);
+	   mRTSP_CAPTURE 		= std::move(bufferingGraph.mRTSP_CAPTURE);
 
-	   wrtLock.unlock();
+	wrtLock.unlock();
+
    	}
 
 

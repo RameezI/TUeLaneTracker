@@ -19,7 +19,6 @@ int BufferingDAG_generic::init_DAG()
 	return 0;
 }
 
-
 void BufferingDAG_generic::buffer( )
 {
 
@@ -257,43 +256,70 @@ void BufferingDAG_generic::runAuxillaryTasks()
 int BufferingDAG_generic::grabFrame()	
 {
 
+
 	int lReturn = 0;
 		
-#ifdef PROFILER_ENABLED
-mProfiler.start("IMAGE_READ");
-#endif 
+	#ifdef PROFILER_ENABLED
+	mProfiler.start("IMAGE_READ");
+	#endif 
 
 
-	#ifdef DIRECTORY_INPUT
+	   if(mSource == FrameSource::DIRECTORY)
+	   {
 		mFrameRGB = imread(mFiles[mFrameCount]);
 		cout<<"Processing Frame: "<<mFrameCount<<endl;
-
+		
 		if (mFrameCount+1 < mFiles.size())
 	   	   mFrameCount ++;
-	#else
+	   }
+
+	   else if (mSource == FrameSource::RTSP)
+
+	   {
 		mRTSP_CAPTURE >> mFrameRGB;
-	   	mFrameCount ++;
 		cout<<"Processing Frame: "<<mFrameCount<<endl;
-	#endif
+	   	mFrameCount ++;
+	   }
+
+	   else if (mSource == FrameSource::GMSL)
+	   {
+		cout<<"Undefined Input Mode"<<endl;
+		lReturn = -1;
+	   }
+
+	   else
+	   {
+		cout<<"Undefined Input Mode"<<endl;
+		lReturn =-1;
+	   }
 
 				
+	   if(!mFrameRGB.data)
+	   	lReturn = -1;
 
-	if(!mFrameRGB.data)
-	   lReturn = -1;
+	   std::string str;
+
+	   if (mSource==FrameSource::DIRECTORY)
+	   	str = mFiles[mFrameCount];
+
+	   else if (mSource == FrameSource::RTSP)
+	   	str = "RTSP";
+
+	   else if (mSource == FrameSource::GMSL)
+	   	str = "GMSL";
+
+	   else
+	   	str = "Undefined";
 
 
-
-
-#ifdef PROFILER_ENABLED
-//std::string str = mFiles[mFrameCount];
-std::string str = "RTSP";
-mProfiler.end();
-LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
+	#ifdef PROFILER_ENABLED
+	mProfiler.end();
+	LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
-				<<  "Reading frame from the directory."<<endl<<str<<endl
+				<<  "Frame Source:   "<<endl<<str<<endl
 				<<  "Read time: " << mProfiler.getAvgTime("IMAGE_READ")<<endl
 				<<"******************************"<<endl<<endl;
-				#endif
+				#endif 
 
 	return lReturn;
 }
