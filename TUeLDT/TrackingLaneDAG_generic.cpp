@@ -13,7 +13,7 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
 
 
 	//Write Images to a video file
-	mOutputVideo.open("TUeLaneTracker.avi", CV_FOURCC('M','P','4','V'), 30, mFrameRGB.size());
+//	mOutputVideo.open("TUeLaneTracker.avi", CV_FOURCC('M','P','4','V'), 30, mFrameRGB.size());
 
 
 }
@@ -679,7 +679,7 @@ mProfiler.start("Display");
 
 
 
-	   mOutputVideo<<mFrameRGB;
+	//   mOutputVideo<<mFrameRGB;
 	}
 
 	#endif
