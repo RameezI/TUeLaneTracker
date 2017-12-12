@@ -15,7 +15,7 @@
 
 #include "Camera.h"
 #include "Lane.h"
-#include  "Car.h"
+#include "Car.h"
 #include "LaneFilter.h"
 #include "VanishingPtFilter.h"
 #include "VanishingPtFilter.h"
@@ -39,11 +39,13 @@ using namespace cv;
 
 enum States{BOOTING, BUFFERING, DETECTING_LANES, DISPOSING };
 enum StateStatus {DONE, ACTIVE, INACTIVE, ERROR };
+enum FrameSource {DIRECTORY, RTSP, GMSL};
+
+
 
 
 class State
 {
-
 	
 protected:
 

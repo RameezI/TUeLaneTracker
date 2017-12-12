@@ -14,7 +14,8 @@ struct BufferPool;
 
 class BufferingDAG_generic
 {
-	
+
+template<typename T>
 friend class BufferingState;
 
 public:
@@ -48,8 +49,8 @@ using WriteLock = std::unique_lock<MutexType>;
     	Mat	mFOCUS_MASK_ROOT;
     	Mat	mDEPTH_MAP_ROOT;
 
-	Mat     mX_IRS;
-	Mat     mY_IRS;
+	Mat     mX_ICS;
+	Mat     mY_ICS;
 	
 	unique_ptr<BufferPool>	mBufferPool;
 	/***************************************************/
@@ -137,8 +138,8 @@ public:
 	   mFOCUS_MASK_ROOT   		= std::move(bufferingGraph.mFOCUS_MASK_ROOT);
     	   mDEPTH_MAP_ROOT    		= std::move(bufferingGraph.mDEPTH_MAP_ROOT);
 
-           mX_IRS                       = std::move(bufferingGraph.mX_IRS); 
-           mY_IRS                       = std::move(bufferingGraph.mY_IRS);
+           mX_ICS                       = std::move(bufferingGraph.mX_ICS); 
+           mY_ICS                       = std::move(bufferingGraph.mY_ICS);
 	
 	   mBufferPool   		= std::move(bufferingGraph.mBufferPool);
 	   mVanishPt			= std::move(bufferingGraph.mVanishPt);
@@ -177,6 +178,8 @@ public:
 
 };
 
+
+
 struct BufferPool
 {
         vector<Mat> Probability;
@@ -195,6 +198,5 @@ struct BufferPool
           }
         }
 };
-
 
 #endif // BUFFERINGDAG_GENERIC_H

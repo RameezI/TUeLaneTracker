@@ -1,21 +1,28 @@
 #include "StateMachine.h"
-#include "State.h"
 using namespace std;
 using namespace cv;
+
+
+/********************************************//**
+ * \brief sCurrentState initialisation. 
+ *  The static variable is set initialy to States::Booting
+ * ***********************************************/
 States StateMachine::sCurrentState = States::BOOTING;
 
+
  
-StateMachine::StateMachine() 
+StateMachine::StateMachine(FrameSource lFrameSource, string lSourceStr)
+
+: mFrameSource(lFrameSource),
+  mSourceStr(lSourceStr) 
 {
 	#ifdef PROFILER_ENABLED
-
 		#ifdef DIRECTORY_IPUT
 		LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 		<<"******************************"<<endl
 		<<  "DIRECTORY_INPUT DEFINED."	  <<endl
 		<<"******************************"<<endl<<endl;
 		#endif
-	
 	#endif		
 }
 
@@ -27,7 +34,8 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 
 	int lReturn = 0;
 	
-	// These pointers have life until the Span of this function
+	// The memory allocated by these pointers have life until the span of this function
+	// i.e. until the State Machine is spinning
 	unique_ptr<LaneFilter>  	pLaneFilter;
 	unique_ptr<VanishingPtFilter>   pVanishingPtFilter;
 	unique_ptr<Templates> 		pTemplates;
@@ -36,7 +44,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 
 	/* BOOTING PROCESS */
 	{				
-	   InitState	bootingState;
+	   InitState		bootingState;
 
 	   pLaneFilter 		= bootingState.createLaneFilter();
 	   pVanishingPtFilter	= bootingState.createVanishingPtFilter();
@@ -56,17 +64,17 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		lReturn =-1; 
 		sCurrentState = States::DISPOSING;
 	   }							
-	} 
+	} //booting process block ends
 			
 			
-	/* BUFFERING PROCESS */
+	 /* BUFFERING PROCESS */
 	if (sCurrentState == States::BUFFERING)
 	{
-	   BufferingState  bufferingState;
+	   BufferingState<BufferingDAG_generic>  lBufferingState;
 			
-	   if (bufferingState.currentStatus == StateStatus::INACTIVE)
+	   if (lBufferingState.currentStatus == StateStatus::INACTIVE)
 	   {			
-	   	lReturn |= bufferingState.setSource();
+	   	lReturn |= lBufferingState.setSource(mFrameSource, mSourceStr);
 		
 		if (lReturn != 0)
 		{	
@@ -78,37 +86,36 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 			<<"******************************"<<endl;
 		   #endif 
 		
-		   bufferingState.dispose();
+		   lBufferingState.dispose();
 		}
 		else
 		{
-		   bufferingState.setupDAG(std::ref(*pTemplates));
+		   lBufferingState.setupDAG(std::ref(*pTemplates));
 		}
 	   }
 	
-	   while (bufferingState.currentStatus == StateStatus::ACTIVE)
+	   while (lBufferingState.currentStatus == StateStatus::ACTIVE)
 	   {	
-		bufferingState.run();
-		//bufferingState.currentStatus = StateStatus::ACTIVE;
+		lBufferingState.run();
 
 		if (sigInit->sStatus==SigStatus::STOP)
 		{
 		   #ifdef PROFILER_ENABLED
 			LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 		   	<<"***************************************"<<endl
-		   	<<  "[Buffering Process Intrupred by User]"<<endl
+		   	<<  "[Buffering Process Intrupted by the user]"<<endl
 			<<  "Shutting Down the State-Machine"	   <<endl
 			<<"***************************************"<<endl;
 		   #endif 
 	   	   
-		   bufferingState.dispose();
+		   lBufferingState.dispose();
 		}
 	   }
 			
-	   if( bufferingState.currentStatus == StateStatus::DONE)
+	   if( lBufferingState.currentStatus == StateStatus::DONE)
 	   {
 	   	sCurrentState = States::DETECTING_LANES;
-		pTrackingState.reset(new TrackingLaneState(move(bufferingState.bufferingGraph)));				
+		pTrackingState.reset(new TrackingLaneState(move(lBufferingState.mGraph)));				
 	   }
 			
 	   else
@@ -120,14 +127,14 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		   <<  "Shutting Down the State-Machine."<<endl
 		   <<"******************************"<<endl<<endl;
 		#endif
-		lReturn=-1; 
+		lReturn	= -1; 
 		sCurrentState = States::DISPOSING;
 	   }	
 		
-	} 
+	}// Buffering process block ends
 		
 		
-	/* Tracking Lanes */
+	/* TRACKING LANE PROCESS*/
 	if (sCurrentState==States::DETECTING_LANES)
 	{
 
@@ -179,7 +186,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		sCurrentState = States::DISPOSING;
 	   }
 
-	}	
+	} // TrackingState process block ends	
 		
 		
 	/* Shutting Down */
@@ -191,7 +198,6 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		cout<< "See the log to inquire what caused this shutdown"<<endl;
 	   #endif 
 	}
-	
 	
 	return lReturn;
 }

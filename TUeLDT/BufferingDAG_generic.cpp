@@ -13,8 +13,8 @@ int BufferingDAG_generic::init_DAG()
         int16_t   ORIGIN_Y_CRS   =  mCAMERA.FRAME_CENTER(0) - mSpan;
         int16_t   ORIGIN_X_CRS   = -mCAMERA.FRAME_CENTER(1);
 
-        mY_VPRS   = -(mY_IRS + ORIGIN_Y_CRS);
-        mX_VPRS   =   mX_IRS + ORIGIN_X_CRS;
+        mY_VPRS   = -(mY_ICS + ORIGIN_Y_CRS);
+        mX_VPRS   =   mX_ICS + ORIGIN_X_CRS;
 	
 	return 0;
 }

@@ -1,6 +1,8 @@
 #ifndef COMPLIE_CONFIG__H
 #define COMPLIE_CONFIG__H
+
 #define PROFILER_ENABLED
 #define DIRECTORY_INPUT
 #define DISPLAY_GRAPHICS
+
 #endif

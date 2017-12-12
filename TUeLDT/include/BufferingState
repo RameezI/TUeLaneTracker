@@ -1,28 +1,22 @@
 #include "BufferingState.h"
 
-BufferingState::BufferingState()
+
+template<typename GRAPH>
+BufferingState<GRAPH>::BufferingState()
 :mRetryGrab(0)
 {
 
 }
 
-  
-int BufferingState::setSource()
+template<typename GRAPH>  
+int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
 {
-
 	int lReturn=0;
-
-	//#ifdef DIRECTORY_INPUT
-	
-	//Select Frame Source
-	FrameSource lSource = FrameSource::DIRECTORY;
-	
 
 	if (lSource == FrameSource::DIRECTORY)
 	{
+           cv::String lFolder = lSourceStr;
 	   vector< cv::String> lFiles;
-           //cv::String lFolder = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
-           cv::String lFolder = "/home/root/data/Eindhoven";
            
 	   try
 	   {
@@ -51,27 +45,28 @@ int BufferingState::setSource()
            	cout<<endl;	
 	   }
 
-	   bufferingGraph.mSource = lSource;
-	   bufferingGraph.mFiles = lFiles;
-	   bufferingGraph.mFrameCount =lSkipFrames;
+	   mGraph.mSource = lSource;
+	   mGraph.mFiles = lFiles;
+	   mGraph.mFrameCount =lSkipFrames;
 	}
 
 	else if(lSource == FrameSource::RTSP)
 	{
 
 		cout<< "RTSP MODE"<<endl;
-		bufferingGraph.mSource = lSource;
-	   	bufferingGraph.mFrameCount = 0;
+		mGraph.mSource = lSource;
+	   	mGraph.mFrameCount = 0;
 		
 		try
 		{
-		   if(!bufferingGraph.mRTSP_CAPTURE.open("rtsp://192.168.8.1:8554/test"))
-		    lReturn =-1;
+		   //if(!mGraph.mRTSP_CAPTURE.open("rtsp://192.168.8.1:8554/test"))
+		   if(!mGraph.mRTSP_CAPTURE.open(lSourceStr))
+		   lReturn = -1;
 		}
 
 		catch(...)
 		{
-		    lReturn =-1;
+		    lReturn = -1;
 		}
 	}
 
@@ -99,36 +94,31 @@ int BufferingState::setSource()
 
 
 
-void BufferingState::setupDAG(const Templates& templates)
+template<typename GRAPH>  
+void BufferingState<GRAPH>::setupDAG(const Templates& templates)
 {
 	
 #ifdef PROFILER_ENABLED
 mProfiler.start("SET_UP_BUFFERING_DAG");
 #endif
 
-	const int RES_H 	 	=  bufferingGraph.mCAMERA.RES_VH(1);
-
-	bufferingGraph.mVP_Range_V   	= templates.VP_RANGE_V;
-	bufferingGraph.mSpan		= templates.SPAN;
-	bufferingGraph.mMargin		= templates.MARGIN;
+	const int RES_H 	= mGraph.mCAMERA.RES_VH(1);
 	
-
-	//Allocate Buffers
-	bufferingGraph.mBufferPool.reset(new BufferPool(templates.SPAN, RES_H, sNbBuffer)); 
-
-
-	// Assign Templates
-	bufferingGraph.mGRADIENT_TAN_ROOT = templates.GRADIENT_TAN_ROOT;
-	bufferingGraph.mDEPTH_MAP_ROOT    = templates.DEPTH_MAP_ROOT;
-	bufferingGraph.mFOCUS_MASK_ROOT   = templates.FOCUS_MASK_ROOT;
-
+	mGraph.mVP_Range_V   	= templates.VP_RANGE_V;
+	mGraph.mSpan		= templates.SPAN;
+	mGraph.mMargin		= templates.MARGIN;
 	
-	// Define X and Y coordinates in VP reffernce system
-	bufferingGraph.mY_IRS	 =   templates.Y_IRS;
-	bufferingGraph.mX_IRS   =    templates.X_IRS;
+	//allocate buffers
+	mGraph.mBufferPool.reset(new BufferPool(templates.SPAN, RES_H, sNbBuffer)); 
 
+	// assign templates
+	mGraph.mGRADIENT_TAN_ROOT = templates.GRADIENT_TAN_ROOT;
+	mGraph.mDEPTH_MAP_ROOT    = templates.DEPTH_MAP_ROOT;
+	mGraph.mFOCUS_MASK_ROOT   = templates.FOCUS_MASK_ROOT;
+	mGraph.mY_ICS	 	  = templates.Y_ICS;
+	mGraph.mX_ICS    	  = templates.X_ICS;
 
-	if ( 0 == bufferingGraph.init_DAG() )
+	if ( 0 == mGraph.init_DAG() )
 	this->currentStatus= StateStatus::ACTIVE;
 		
 #ifdef PROFILER_ENABLED
@@ -142,28 +132,33 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 }
 
 
-
-void BufferingState::run()
+template<typename GRAPH>  
+void BufferingState<GRAPH>::run()
 {
 	
 #ifdef PROFILER_ENABLED
 	mProfiler.start("RUN_BUFFERING_DAG");
 #endif	
-	
-	if (mSideExecutor.joinable())
-		mSideExecutor.join();
+
+	//^TODO retun value must be assigned to the run function.
+	//int lReturn = 0;
+		
 	
 
-	if (0==bufferingGraph.grabFrame())
+	if (0==mGraph.grabFrame())
 	{
-		mSideExecutor =
+		/*mSideExecutor =
 		#ifndef S32V2XX
-			std::thread(&BufferingDAG_generic::runAuxillaryTasks, std::ref(bufferingGraph));
+			std::thread(&BufferingDAG_generic::runAuxillaryTasks, std::ref(mGraph));
 		#else
-			std::thread(&BufferingDAG_s32v::runAuxillaryTasks,    std::ref(bufferingGraph));
-		#endif
-		
-		bufferingGraph.buffer();
+			std::thread(&BufferingDAG_s32v::runAuxillaryTasks,    std::ref(mGraph));
+		#endif*/
+
+		if (mSideExecutor.joinable())
+		mSideExecutor.join();
+
+		mSideExecutor = std::thread(&GRAPH::runAuxillaryTasks, std::ref(mGraph));
+		mGraph.buffer();
 		
 		this->StateCounter++;
 		
@@ -177,7 +172,7 @@ void BufferingState::run()
 	{ 	
 		mRetryGrab ++;
 		if(mRetryGrab > 3)
-		currentStatus = StateStatus::ERROR;
+		 currentStatus = StateStatus::ERROR;
 	}
 
 
@@ -191,7 +186,10 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
  				#endif
 }
 
-BufferingState::~BufferingState()
+
+
+template<typename GRAPH>  
+BufferingState<GRAPH>::~BufferingState()
 {
 	if (mSideExecutor.joinable())
 		mSideExecutor.join();	
