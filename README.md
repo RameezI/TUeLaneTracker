@@ -1,6 +1,6 @@
 # TUeLaneTracker
 
-Thiss is a software application that detects and tracks lanes on the road. The underlying algorithm is a probabilistic algorithm which is originally developed at, under the strategic area of Smart Mobility, Eindhoven University of Technology (TU/e). The algorithm exploits the concept of hierarchical classification from deep learning however, unlike deep learning, classification at each hierarchical level is engineered instead of being trained through images. This make it more predictable as well as verifiable. The software application is completely object oriented and follows various software design principles recommended by safety standard ISO26262. 
+This is a software application that detects and tracks lanes on the road. The underlying algorithm is a probabilistic algorithm which is originally developed at, under the strategic area of Smart Mobility, Eindhoven University of Technology (TU/e). The algorithm exploits the concept of hierarchical classification from deep learning however, unlike deep learning, classification at each hierarchical level is engineered instead of being trained through images. This make it more predictable as well as verifiable. The software application is completely object oriented and follows various software design principles recommended by safety standard ISO26262. 
 
 This application provide a loose coupling between the software control flow and actual realisation of the algorithm, making it possible to generate various target specific implementations of the algorithm. Current version of the software applicataion is developed in cooperation with NXP Semiconductors. This repository provides real-time generic implementation of the algorithm using OpenCV library. A real time embedded implementation, using NXP Bluebox, is underdevelopment.
 
@@ -61,7 +61,7 @@ cd ../install/bin
        
 ## Youtube Videos
    These videos showcase the functional performance of the algorithm:
-   * [Eindhoven](https://www.youtube.com/watch?v=u4oVjcPDNfw)
+   * [Eindhoven](https://youtu.be/7D1vBPrcPk0)
 
 
 

@@ -78,7 +78,7 @@ private:
 	
 
 	// Only Enable in case of Video Recording
-	VideoWriter mOutputVideo;
+	//VideoWriter mOutputVideo;
 
 
 
