@@ -1,3 +1,24 @@
+/******************************************************************************
+* NXP Confidential Proprietary
+* 
+* Copyright (c) 2017 NXP Semiconductor;
+* All Rights Reserved
+*
+* AUTHOR : Rameez Ismail
+*
+* THIS SOFTWARE IS PROVIDED BY NXP "AS IS" AND ANY EXPRESSED OR
+* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+* OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL NXP OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+* IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+* THE POSSIBILITY OF SUCH DAMAGE.
+* ****************************************************************************/ 
+
 #include "BufferingDAG_generic.h"
 
 BufferingDAG_generic::BufferingDAG_generic()
@@ -7,6 +28,8 @@ BufferingDAG_generic::BufferingDAG_generic()
 {
 	
 }
+
+
 
 int BufferingDAG_generic::init_DAG()
 {
@@ -19,50 +42,63 @@ int BufferingDAG_generic::init_DAG()
 	return 0;
 }
 
+
+
 void BufferingDAG_generic::buffer( )
 {
+
 
 #ifdef PROFILER_ENABLED
 mProfiler.start("GRAY_FRAME_CONVERSION");
 #endif
 				
 	cvtColor(mFrameRGB, mFrameGRAY, CV_BGR2GRAY);
-	int lRowIndex= mCAMERA.RES_VH(0) - mSpan;
-	Rect ROI;
-	ROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);	
-	mFrameGRAY_ROI = mFrameGRAY(ROI);
 
-			 
+
+
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
 				<<  "GRAY Frame Conversion." <<endl
-				<<  "Conversion Time: " << mProfiler.getAvgTime("GRAY_FRAME_CONVERSION")<<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("GRAY_FRAME_CONVERSION")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("GRAY_FRAME_CONVERSION")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("GRAY_FRAME_CONVERSION")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
-
 
 
 
 #ifdef PROFILER_ENABLED
-mProfiler.start("GAUSSIAN_BLUR");
-#endif 
-	
-	GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, Size( 5, 5 ), 1.5, 1.5, BORDER_REPLICATE);
+mProfiler.start("EXTRACT_ROI");
+#endif
 
-				
- #ifdef PROFILER_ENABLED
+	int lRowIndex= mCAMERA.RES_VH(0) - mSpan;
+	int lColIndex= mCAMERA.RES_VH(1);
+	Rect ROI;
+	 
+	// Extract ROI from the Input Image
+	 ROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);	
+	 mFrameGRAY_ROI = mFrameGRAY(ROI);
+
+				 
+	//Extract Gradient Orientation Template 
+	 lRowIndex =  mCAMERA.RES_VH(0) + mMargin - mVanishPt.V ; 
+	 lColIndex= mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
+	 ROI = Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
+	 mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
+
+
+#ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
-				<<  "Gaussian Filtering." <<endl
-				<<  "Gaussian(5x5) Time: " << mProfiler.getAvgTime("GAUSSIAN_BLUR")<<endl
+				<<  "Extract ROI from Input Image and the Gradient Direction." <<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("EXTRACT_ROI")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("EXTRACT_ROI")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("EXTRACT_ROI")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
-
-
-
 
 
 
@@ -79,16 +115,36 @@ mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				<<"******************************"<<endl
 				<<  "Waiting For Worker thread." <<endl
-				<<  "Wait Time: " << mProfiler.getAvgTime("TEMPLATES_WAIT")<<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("TEMPLATES_WAIT")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("TEMPLATES_WAIT")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("TEMPLATES_WAIT")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif	
 
 
 
 
-
+#ifdef PROFILER_ENABLED
+mProfiler.start("GAUSSIAN_BLUR");
+#endif 
+	
+	GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, Size( 5, 5 ), 1.5, 1.5, BORDER_REPLICATE);
 
 				
+ #ifdef PROFILER_ENABLED
+mProfiler.end();
+LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
+				<<"******************************"<<endl
+				<<  "Gaussian Filtering." <<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("GAUSSIAN_BLUR")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("GAUSSIAN_BLUR")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("GAUSSIAN_BLUR")<<endl
+				<<"******************************"<<endl<<endl;	
+				#endif
+
+
+
+
 #ifdef PROFILER_ENABLED
 mProfiler.start("GRADIENT_COMPUTATION");
 #endif 								
@@ -132,11 +188,11 @@ mProfiler.start("GRADIENT_COMPUTATION");
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
 				<<  "Gradients Computations." <<endl
-				<<  "Gradients compute Time: " << mProfiler.getAvgTime("GRADIENT_COMPUTATION")<<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("GRADIENT_COMPUTATION")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("GRADIENT_COMPUTATION")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("GRADIENT_COMPUTATION")<<endl
 			  	<<"******************************"<<endl<<endl;	
 			 	#endif
-
-
 
 
 
@@ -202,51 +258,51 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
-
-
 /** 
 Parallel Execution Path for Buffering Graph.
 Description of Modes:
 */
 void BufferingDAG_generic::runAuxillaryTasks()
 {
-	int lRowIndex;
-	int lColIndex;
 
+	//Local Variables
 	WriteLock  wrtLock(_mutex, std::defer_lock);	
+	int lRowIndex;
+	Rect lROI;
+
 
 /* MODE: (A + C) */	
 
-	wrtLock.lock();
-
-		//Extract Gradient Orientation Template 
-		lRowIndex =  mCAMERA.RES_VH(0) + mMargin - mVanishPt.V ; 
-		lColIndex= mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
-		Rect ROI = Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
-		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
-
 		//Extract Depth Template
 		lRowIndex = mCAMERA.RES_VH(0) -  mSpan; 
-		ROI = Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
-		mDEPTH_MAP_ROOT(ROI).copyTo(mDepthTemplate);
+		lROI = Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
+		
+		wrtLock.lock();
+		 mDEPTH_MAP_ROOT(lROI).copyTo(mDepthTemplate);
+		wrtLock.unlock();
 
 		//Extract Focus Template
 		lRowIndex = mVP_Range_V	 - mVanishPt.V;
-		ROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
-		mFOCUS_MASK_ROOT(ROI).copyTo(mFocusTemplate);	
+		lROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 
-		// Shift Buffers
-		for ( std::size_t i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
-		{
-			mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
-			mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);
-		}
+		wrtLock.lock();
+		 mFOCUS_MASK_ROOT(lROI).copyTo(mFocusTemplate);	
+		wrtLock.unlock();
+
+
+		wrtLock.lock();
+		  // Shift Buffers
+		  for ( std::size_t i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
+		  {
 			
-		mTemplatesReady = true;
-		mBufferReady    = true;
+		    mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
+		    mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);
+		  }	
+		  mTemplatesReady = true;
+		  mBufferReady    = true;
+		wrtLock.unlock();
 
 
-	wrtLock.unlock();
 	_sateChange.notify_one();
 
 }

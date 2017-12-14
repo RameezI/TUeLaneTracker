@@ -1,8 +1,6 @@
 /** \file */ 
 #include "StateMachine.h"
-#include "State.h"
 using namespace std;
-using namespace cv;
 
 int main() /**  
 		This is the entry point of the application.
@@ -11,7 +9,7 @@ int main() /**
 	  */
 {
 	FrameSource lFrameSource = FrameSource::DIRECTORY;
-	string	    lSourceStr 	 = "";
+	string	    lSourceStr 	 = "/mnt/data0/DataSet/eindhoven/PNG_imgs";
         //string lSourceStr = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
         //string lSourceStr = "/home/root/data/Eindhoven";
         

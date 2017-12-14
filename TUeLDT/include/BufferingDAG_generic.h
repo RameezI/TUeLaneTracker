@@ -1,14 +1,40 @@
 #ifndef BUFFERINGDAG_GENERIC_H
 #define BUFFERINGDAG_GENERIC_H
-#include "State.h"
+
+/******************************************************************************
+* NXP Confidential Proprietary
+* 
+* Copyright (c) 2017 NXP Semiconductor;
+* All Rights Reserved
+*
+* AUTHOR : Rameez Ismail
+*
+* THIS SOFTWARE IS PROVIDED BY NXP "AS IS" AND ANY EXPRESSED OR
+* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+* OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL NXP OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+* IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+* THE POSSIBILITY OF SUCH DAMAGE.
+* ****************************************************************************/ 
+
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include "State.h"		//implicit include of profiling and logging headers
+#include "LaneFilter.h" 	//implicit include of opencv headers
+#include "VanishingPtFilter.h"
 
 #ifdef DISPLAY_GRAPHICS_DCU
 #include "frame_output_v234fb.h"
 #endif
 
+
+using namespace cv;
 
 struct BufferPool;
 
@@ -19,13 +45,13 @@ template<typename T>
 friend class BufferingState;
 
 public:
-BufferingDAG_generic ();
+	BufferingDAG_generic ();
 
 
 protected:
 
-using MutexType = std::mutex;
-using WriteLock = std::unique_lock<MutexType>;
+	using MutexType = std::mutex;
+	using WriteLock = std::unique_lock<MutexType>;
 	
 
 	MutexType 			_mutex;
@@ -41,9 +67,9 @@ using WriteLock = std::unique_lock<MutexType>;
 	
 	/*................................................
 	 Set from outside, before buffering is activated   */ 
-	int mSpan;
-	int mMargin;
-	int mVP_Range_V;
+	int 	mSpan;
+	int	mMargin;
+	int 	mVP_Range_V;
 	
 	Mat 	mGRADIENT_TAN_ROOT;
     	Mat	mFOCUS_MASK_ROOT;

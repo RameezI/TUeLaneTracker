@@ -1,20 +1,34 @@
 #ifndef BUFFERINGSTATE_H
 #define BUFFERINGSTATE_H
 
-#include "State.h"
+/******************************************************************************
+* NXP Confidential Proprietary
+* 
+* Copyright (c) 2017 NXP Semiconductor;
+* All Rights Reserved
+*
+* AUTHOR : Rameez Ismail
+*
+* THIS SOFTWARE IS PROVIDED BY NXP "AS IS" AND ANY EXPRESSED OR
+* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+* OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL NXP OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+* IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+* THE POSSIBILITY OF SUCH DAMAGE.
+* ****************************************************************************/ 
+
 #include <thread>
+#include "State.h"
+#include "BufferingDAG_generic.h"
 
 #ifdef S32V2XX
 #include "BufferingDAG_s32v.h"
-#else
-#include "BufferingDAG_generic.h"
 #endif
-
-
-
-using namespace cv;
-using namespace Eigen;
-using namespace std;
 
 
 template<typename GRAPH>
@@ -210,7 +224,9 @@ mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				<<"******************************"<<endl
 				<<  "Total Time for Buffering Graph." <<endl
-				<<  "Total Graph time : " << mProfiler.getAvgTime("RUN_BUFFERING_DAG")<<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("RUN_BUFFERING_DAG")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("RUN_BUFFERING_DAG")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("RUN_BUFFERING_DAG")<<endl
 				<<"******************************"<<endl<<endl;	
  				#endif
 }

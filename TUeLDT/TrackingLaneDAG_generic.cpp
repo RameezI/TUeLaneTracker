@@ -1,4 +1,26 @@
+/******************************************************************************
+* NXP Confidential Proprietary
+* 
+* Copyright (c) 2017 NXP Semiconductor;
+* All Rights Reserved
+*
+* AUTHOR : Rameez Ismail
+*
+* THIS SOFTWARE IS PROVIDED BY NXP "AS IS" AND ANY EXPRESSED OR
+* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+* OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL NXP OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+* IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+* THE POSSIBILITY OF SUCH DAMAGE.
+* ****************************************************************************/ 
+
 #include "TrackingLaneDAG_generic.h"
+#include "ScalingFactors.h"
 
 TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferingGraph)
 : 
@@ -9,12 +31,8 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
   mMAX_PIXELS_ROI(mFrameGRAY_ROI.size().height * mFrameGRAY_ROI.size().width)
 
 {	
-
-
 	//Write Images to a video file
-//	mOutputVideo.open("TUeLaneTracker.avi", CV_FOURCC('M','P','4','V'), 30, mFrameRGB.size());
-
-
+	//mOutputVideo.open("TUeLaneTracker.avi", CV_FOURCC('M','P','4','V'), 30, mFrameRGB.size());
 }
 
 
@@ -37,6 +55,9 @@ int TrackingLaneDAG_generic::init_DAG()
 
 void TrackingLaneDAG_generic::extractLanes()
 {
+	
+
+
 	WriteLock  wrtLock(_mutex, std::defer_lock);
 
 	//Start Filtering
@@ -48,9 +69,8 @@ void TrackingLaneDAG_generic::extractLanes()
 
 
 
-
 #ifdef PROFILER_ENABLED
-mProfiler.start("TemporalFiltering");
+mProfiler.start("TEMPORAL_FILTERING");
 #endif	
 
 	mProbMapFocussed = mBufferPool->Probability[0];
@@ -68,19 +88,18 @@ mProfiler.start("TemporalFiltering");
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
-				<<  "Filter and Focus Based on Focus Mask." <<endl
-				<<  "Focussing Time: " << mProfiler.getAvgTime("TemporalFiltering")<<endl
+				<<  "Temporal Filtering [Max-Pooling]." <<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("TEMPORAL_FILTERING")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("TEMPORAL_FILTERING")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("TEMPORAL_FILTERING")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
 
 
 
 
-
-
-
 #ifdef PROFILER_ENABLED
-mProfiler.start("ComputeIntersections");
+mProfiler.start("COMPUTE_INTERSECTIONS");
 #endif	
 
 	//Base Intersections
@@ -109,18 +128,17 @@ mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
 				<<  "Compute Intersections with Bottom and Horizon." <<endl
-				<<  "Intersection Compute Time: " << mProfiler.getAvgTime("ComputeIntersections")<<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("COMPUTE_INTERSECTIONS")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("COMPUTE_INTERSECTIONS")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("COMPUTE_INTERSECTIONS")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
 
 		
 
 
-
-
-
 #ifdef PROFILER_ENABLED
-mProfiler.start("ExtractValidBinIds");
+mProfiler.start("EXTRACT_VALID_BIN_IDS");
 #endif
 		
 	// Resize vectors to Maximum Limit
@@ -171,7 +189,9 @@ mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
 				<<  "Extract Valid Intersection Bin IDs." <<endl
-				<<  "Vector Filling Time: " << mProfiler.getAvgTime("ExtractValidBinIds")<<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("EXTRACT_VALID_BIN_IDS")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("EXTRACT_VALID_BIN_IDS")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("EXTRACT_VALID_BIN_IDS")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
 
@@ -182,7 +202,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 #ifdef PROFILER_ENABLED
-mProfiler.start("ComputeHistograms");
+mProfiler.start("COMPUTE_HISTOGRAMS");
 #endif
 
 	{
@@ -212,19 +232,17 @@ mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
 				<<  "Compute Weighted Histograms." <<endl
-				<<  "Histogram Compute Time: " << mProfiler.getAvgTime("ComputeHistograms")<<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("COMPUTE_HISTOGRAMS")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("COMPUTE_HISTOGRAMS")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("COMPUTE_HISTOGRAMS")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
 
 
 
 
-
-
-
-
 #ifdef PROFILER_ENABLED
-mProfiler.start("FiltersWait");
+mProfiler.start("FILTERS_WAIT");
 #endif 				
 		
 	wrtLock.lock();
@@ -237,17 +255,16 @@ mProfiler.start("FiltersWait");
  mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
-				<<  "Waiting For Worker thread to finish Filters." <<endl
-				<<  "Waiting Time: " << mProfiler.getAvgTime("FiltersWait")<<endl
+				<<  "Waiting for worker thread to finish transition filters." <<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("FILTERS_WAIT")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("FILTERS_WAIT")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("FILTERS_WAIT")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif	
 
 
-	
 
 
-
-//^TODO: Confirm with the architecture
 //Start Buffer Shifting
 	wrtLock.lock();
 	this->mStartBufferShift = true;
@@ -257,9 +274,8 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
-
 #ifdef PROFILER_ENABLED
-mProfiler.start("HistogramMatching");
+mProfiler.start("HISTOGRAM_MATCHING");
 #endif
 	
 	{
@@ -281,10 +297,10 @@ mProfiler.start("HistogramMatching");
 		int& RightIdx		= Models[i].binID_rightBoundary;
 
 		int& NegLeftIdx		= Models[i].binID_NegBoundaryLeft;
-		int& NegRightIdx    = Models[i].binID_NegBoundaryRight;
+		int& NegRightIdx    	= Models[i].binID_NegBoundaryRight;
 
-		int& Nleft          = Models[i].nbNonBoundaryBinsLeft;
-		int& Nright		    = Models[i].nbNonBoundaryBinsRight;
+		int& Nleft          	= Models[i].nbNonBoundaryBinsLeft;
+		int& Nright		= Models[i].nbNonBoundaryBinsRight;
 
 		
 
@@ -353,7 +369,9 @@ mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
 				<<  "Histogram Matching MAP Estimate LaneBoundaries." <<endl
-				<<  "Filter Update Time: " << mProfiler.getAvgTime("HistogramMatching")<<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("HISTOGRAM_MATCHING")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("HISTOGRAM_MATCHING")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("HISTOGRAM_MATCHING")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
 
@@ -361,7 +379,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 #ifdef PROFILER_ENABLED
-mProfiler.start("VP_HistogramMatching");
+mProfiler.start("VP_HISTOGRAM_MATCHING");
 #endif
 
 	const int delta= round(mLaneFilter->STEP/2.0);
@@ -504,13 +522,14 @@ mProfiler.start("VP_HistogramMatching");
 		
 #ifdef PROFILER_ENABLED
 mProfiler.end();
-
-		LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
-		  <<"******************************"<<endl
-		  <<  "Histogram Matching MAP Estimate VanishingPt." <<endl
-		  <<  "Filter Update Time: " << mProfiler.getAvgTime("VP_HistogramMatching")<<endl
-		  <<"******************************"<<endl<<endl;	
-		#endif
+LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
+				<<"******************************"<<endl
+				<<  "Histogram Matching MAP Estimate VanishingPt."<<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("VP_HISTOGRAM_MATCHING")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("VP_HISTOGRAM_MATCHING")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("VP_HISTOGRAM_MATCHING")<<endl
+		  		<<"******************************"<<endl<<endl;	
+				#endif
 
 
 
@@ -519,7 +538,7 @@ mProfiler.end();
 
 
 #ifdef PROFILER_ENABLED
-mProfiler.start("Display");
+mProfiler.start("DISPLAY");
 #endif
 
 	#ifdef DISPLAY_GRAPHICS
@@ -534,11 +553,14 @@ mProfiler.start("Display");
 	   int VP_H =  mVanishPt.H + mCAMERA.FRAME_CENTER(1);	
 
 	   /* Lane Bundaries */
-	   Point  Start_leftLaneInner( mCAMERA.FRAME_CENTER(1)  - ((int)(mLaneModel.leftOffset  + delta)/mLaneFilter->STEP)*mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
-	   
-	   Point  Start_rightLaneInner( mCAMERA.FRAME_CENTER(1) + ((int)(mLaneModel.rightOffset - delta)/mLaneFilter->STEP)*mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
+	   Point  Start_leftLaneInner( mCAMERA.FRAME_CENTER(1) -  ((int)(mLaneModel.leftOffset  + delta)/mLaneFilter->STEP)*mLaneFilter->STEP					  ,  mCAMERA.RES_VH(0) );	   
+
+
+	   Point  Start_rightLaneInner( mCAMERA.FRAME_CENTER(1) + ((int)(mLaneModel.rightOffset - delta)/mLaneFilter->STEP)*mLaneFilter->STEP					  ,  mCAMERA.RES_VH(0) );
 	
-	   Point  StartMidLane( ((int)((Start_leftLaneInner.x + Start_rightLaneInner.x)/2.0)/mLaneFilter->STEP)*mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
+
+	   Point  StartMidLane( ((int)((Start_leftLaneInner.x + Start_rightLaneInner.x)/2.0)/mLaneFilter->STEP)*mLaneFilter->STEP
+				     ,  mCAMERA.RES_VH(0) );
 
  
 	   float slopeLeft =  (float)( VP_V-mCAMERA.RES_VH(0) ) / (VP_H- Start_leftLaneInner.x);
@@ -631,7 +653,8 @@ mProfiler.start("Display");
 
 		int x = mCAMERA.FRAME_CENTER(1)+ mVpFilter->HISTOGRAM_BINS(i);
 		//if(x !=  StartMidLane.x)
-		line(mFrameRGB, cvPoint(x,mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V), cvPoint(x, mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V-30), cvScalar(0,0,0), 1);
+		line(mFrameRGB, cvPoint(x,mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V), 
+				cvPoint(x,mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V-30), cvScalar(0,0,0), 1);
 		//else
 		//line(mFrameRGB, cvPoint(x,mCAMERA.RES_VH(0)), cvPoint(x,mCAMERA.RES_VH(0) -40), cvScalar(0,0,255), 2);
 
@@ -675,10 +698,8 @@ mProfiler.start("Display");
 	   }
 
 	#endif
-
-
-
-	//   mOutputVideo<<mFrameRGB;
+		//write the processed frame to the video
+		//   mOutputVideo<<mFrameRGB;
 	}
 
 	#endif
@@ -686,81 +707,88 @@ mProfiler.start("Display");
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
-		  <<"******************************"<<endl
-		  <<  "Screen Display." <<endl
-		  <<  "Display update time: " << mProfiler.getAvgTime("Display")<<endl
-		  <<"******************************"<<endl<<endl;	
-		 #endif	
-		
+		  		<<"******************************"<<endl
+		  		<<  "Screen Display." <<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("DISPLAY")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("DISPLAY")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("DISPLAY")<<endl
+		  		<<"******************************"<<endl<<endl;	
+		 		#endif	
 }
+
+
 
 void TrackingLaneDAG_generic::extractControllerInputs()
 {
 	
 }
 
+
+
 void TrackingLaneDAG_generic::runAuxillaryTasks()
 {
 		
-	int lRowIndex;
-	int lColIndex;
-
+	int  lRowIndex;
+	Rect lROI;
 	WriteLock  wrtLock(_mutex, std::defer_lock);
+
 	wrtLock.lock();
-
-
-	if (mBufferReady == false)
+	 if (mBufferReady == false)
 
 /* MODE: A + C */
 	{
 
-		// Extract Template Orientation
-		lRowIndex =  mCAMERA.RES_VH(0) + mMargin - mVanishPt.V ; 
-		lColIndex =  mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) - mVanishPt.H ;
-		Rect ROI  = Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
-		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
-			
-		// Extract Depth Template
-		lRowIndex = mCAMERA.RES_VH(0)- mSpan; 
-		ROI = Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
-		mDEPTH_MAP_ROOT(ROI).copyTo(mDepthTemplate);
-		
-		// Extract Focus Template
-		lRowIndex = mVP_Range_V - mVanishPt.V;
-		ROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
-		mFOCUS_MASK_ROOT(ROI).copyTo(mFocusTemplate);	
+		wrtLock.unlock();
+		 // Extract Depth Template
+		 lRowIndex = mCAMERA.RES_VH(0)- mSpan; 
+		 lROI = Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
 
-		for ( std::size_t i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
-		{
-			mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
-			mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);		
-		}
+		wrtLock.lock();
+		 mDEPTH_MAP_ROOT(lROI).copyTo(mDepthTemplate);
+		wrtLock.unlock();
+
+		 // Extract Focus Template
+		 lRowIndex = mVP_Range_V - mVanishPt.V;
+		 lROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 		
-		mTemplatesReady = true;
-		mBufferReady    = true;
+		wrtLock.lock();
+		 mFOCUS_MASK_ROOT(lROI).copyTo(mFocusTemplate);	
+		wrtLock.unlock();
+
+		wrtLock.lock();
+		  for ( std::size_t i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
+		  {
+			 mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
+			 mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);		
+		  }
+		
+		  mTemplatesReady = true;
+		  mBufferReady    = true;
+		wrtLock.unlock();
 	}
 
 	else
 
 /* MODE: A ONLY */
 	{
-		lRowIndex =  mCAMERA.RES_VH(0) + mMargin - mVanishPt.V;
-		lColIndex =  mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) - mVanishPt.H ;
-		Rect ROI = Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
-		mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
-			
-		lRowIndex = mCAMERA.RES_VH(0)- mSpan; 
-		ROI = Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
-		mDEPTH_MAP_ROOT(ROI).copyTo(mDepthTemplate);
+		wrtLock.unlock();
+		 lRowIndex = mCAMERA.RES_VH(0)- mSpan; 
+		 lROI = Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
 		
-		lRowIndex = mVP_Range_V-mVanishPt.V;
-		ROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
-		mFOCUS_MASK_ROOT(ROI).copyTo(mFocusTemplate);
+		wrtLock.lock();
+		 mDEPTH_MAP_ROOT(lROI).copyTo(mDepthTemplate);
+		wrtLock.unlock();
 
-		mTemplatesReady= true;		
+		lRowIndex = mVP_Range_V-mVanishPt.V;
+		lROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
+
+
+		wrtLock.lock();
+		 mFOCUS_MASK_ROOT(lROI).copyTo(mFocusTemplate);
+		 mTemplatesReady= true;		
+		wrtLock.unlock();
 	}
 	
-	wrtLock.unlock();
 	_sateChange.notify_one();
 	
 	
@@ -818,10 +846,6 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 
 	 wrtLock.unlock();
 	_sateChange.notify_one();
-
-
-
-
 }
 
 TrackingLaneDAG_generic::~TrackingLaneDAG_generic()

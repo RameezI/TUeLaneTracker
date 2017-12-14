@@ -1,17 +1,40 @@
+/******************************************************************************
+* NXP Confidential Proprietary
+* 
+* Copyright (c) 2017 NXP Semiconductor;
+* All Rights Reserved
+*
+* AUTHOR : Rameez Ismail
+*
+* THIS SOFTWARE IS PROVIDED BY NXP "AS IS" AND ANY EXPRESSED OR
+* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+* OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL NXP OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+* IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+* THE POSSIBILITY OF SUCH DAMAGE.
+* ****************************************************************************/ 
+
 #include "StateMachine.h"
-using namespace std;
-using namespace cv;
+#include "InitState.h"
+#include "BufferingState.h"
+#include "TrackingLaneState.h"
 
+#include "BufferingDAG_generic.h"
+#include "TrackingLaneDAG_generic.h"
 
-/********************************************//**
- * \brief sCurrentState initialisation. 
- *  The static variable is set initialy to States::Booting
- * ***********************************************/
-States StateMachine::sCurrentState = States::BOOTING;
-
-
+#ifdef   S32V2XX
+ #include "BufferingDAG_s32v.h"
+ #include "TrackingLaneDAG_s32v.h"
+#endif
  
-StateMachine::StateMachine(FrameSource lFrameSource, string lSourceStr)
+
+
+StateMachine::StateMachine(FrameSource lFrameSource, std::string lSourceStr)
 
 : mFrameSource(lFrameSource),
   mSourceStr(lSourceStr) 
@@ -39,10 +62,11 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	unique_ptr<LaneFilter>  	pLaneFilter;
 	unique_ptr<VanishingPtFilter>   pVanishingPtFilter;
 	unique_ptr<Templates> 		pTemplates;
-	unique_ptr<TrackingLaneState>   pTrackingState;
+
+	unique_ptr<TrackingLaneState<TrackingLaneDAG_generic>>   pTrackingState;
 
 
-	/* BOOTING PROCESS */
+	// BOOTING PROCESS //
 	{				
 	   InitState		bootingState;
 
@@ -51,7 +75,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	   pTemplates           = bootingState.createTemplates();
 					
 	   if (bootingState.currentStatus == StateStatus::DONE)						
-		sCurrentState = States::BUFFERING;	
+		mCurrentState = States::BUFFERING;	
 	   else 
 	   {
 		#ifdef PROFILER_ENABLED
@@ -62,13 +86,13 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		   <<"******************************"<<endl<<endl;
 		#endif
 		lReturn =-1; 
-		sCurrentState = States::DISPOSING;
+		mCurrentState = States::DISPOSING;
 	   }							
 	} //booting process block ends
 			
 			
-	 /* BUFFERING PROCESS */
-	if (sCurrentState == States::BUFFERING)
+	// BUFFERING PROCESS //
+	if (mCurrentState == States::BUFFERING)
 	{
 	   BufferingState<BufferingDAG_generic>  lBufferingState;
 			
@@ -114,8 +138,10 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 			
 	   if( lBufferingState.currentStatus == StateStatus::DONE)
 	   {
-	   	sCurrentState = States::DETECTING_LANES;
-		pTrackingState.reset(new TrackingLaneState(move(lBufferingState.mGraph)));				
+	   	mCurrentState = States::DETECTING_LANES;
+
+		pTrackingState.reset
+		(new TrackingLaneState<TrackingLaneDAG_generic>(move(lBufferingState.mGraph)));
 	   }
 			
 	   else
@@ -128,26 +154,25 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		   <<"******************************"<<endl<<endl;
 		#endif
 		lReturn	= -1; 
-		sCurrentState = States::DISPOSING;
+		mCurrentState = States::DISPOSING;
 	   }	
 		
 	}// Buffering process block ends
 		
 		
-	/* TRACKING LANE PROCESS*/
-	if (sCurrentState==States::DETECTING_LANES)
+	// TRACKING LANE PROCESS //
+	if (mCurrentState==States::DETECTING_LANES)
 	{
+	   TrackingLaneState<TrackingLaneDAG_generic>& lTrackingState = *pTrackingState;
 
-	   TrackingLaneState& trackingState = *pTrackingState;
-
-	   if (trackingState.currentStatus == StateStatus::INACTIVE)
+	   if (lTrackingState.currentStatus == StateStatus::INACTIVE)
 	   {			
-		trackingState.setupDAG(pLaneFilter.get(), pVanishingPtFilter.get());
+		lTrackingState.setupDAG(pLaneFilter.get(), pVanishingPtFilter.get());
 	   }
 	
-	   while (trackingState.currentStatus == StateStatus::ACTIVE)
+	   while (lTrackingState.currentStatus == StateStatus::ACTIVE)
 	   {
-		trackingState.run();
+		lTrackingState.run();
 		
 		if (sigInit->sStatus==SigStatus::STOP)
 		{
@@ -158,11 +183,11 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 			<<  "Shutting Down the State-Machine"	     <<endl
 			<< "***************************************"<<endl;
 		   #endif 
-		   trackingState.dispose();
+		   lTrackingState.dispose();
 		}
 	   }
 			
-	   if( trackingState.currentStatus == StateStatus::DONE)
+	   if( lTrackingState.currentStatus == StateStatus::DONE)
 	   {
 		#ifdef PROFILER_ENABLED
 		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
@@ -171,7 +196,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		   <<  "Shutting Down the State-Machine."<<endl
 		   <<  "********************************"<<endl<<endl;
 		#endif 
-	   	sCurrentState = States::DISPOSING;
+	   	mCurrentState = States::DISPOSING;
 	   }
 	   else
 	   {		
@@ -183,14 +208,14 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		   <<"******************************"<<endl<<endl;
 		#endif 
 		lReturn = -1;
-		sCurrentState = States::DISPOSING;
+		mCurrentState = States::DISPOSING;
 	   }
-
+	
 	} // TrackingState process block ends	
 		
 		
 	/* Shutting Down */
-	if(sCurrentState==States::DISPOSING)
+	if(mCurrentState==States::DISPOSING)
 	{				
 	   
 	   #ifdef PROFILER_ENABLED

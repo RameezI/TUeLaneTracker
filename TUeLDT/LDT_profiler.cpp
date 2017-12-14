@@ -1,4 +1,24 @@
 
+/******************************************************************************
+* NXP Confidential Proprietary
+* 
+* Copyright (c) 2017 NXP Semiconductor;
+* All Rights Reserved
+*
+* AUTHOR : Rameez Ismail
+*
+* THIS SOFTWARE IS PROVIDED BY NXP "AS IS" AND ANY EXPRESSED OR
+* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+* OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL NXP OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+* IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+* THE POSSIBILITY OF SUCH DAMAGE.
+* ****************************************************************************/ 
 
 #include "LDT_profiler.h"
  
@@ -69,21 +89,9 @@ void ProfilerLDT::blockTime_ms(uint64_t t_start, uint64_t t_finish)
 		   else			
 		   if (mBlockMaxTime[mBlockName.back()] < (mEndTime-mStartTime)*1000)
 		   mBlockMaxTime[mBlockName.back()] = (mEndTime-mStartTime)*1000;							
-
 		}
-
 	}
- 
-   
 }
-
-/*
-void ProfilerLDT::printTiming()
-{
-    for (std::map<string,double>::iterator it=m_block_avgtime.begin(); it!=m_block_avgtime.end(); ++it)
-     std::cout << it->first << " : " << it->second << '\n';
-}
-*/
 
 
 uint64_t ProfilerLDT::getMultiplicity(std::string block)
