@@ -26,10 +26,11 @@
 #include "State.h"
 #include "ScalingFactors.h"
 
-#include "TrackingLaneDAG_generic.h"
 
 #ifdef   S32V2XX
  #include "TrackingLaneDAG_s32v.h"
+#else
+ #include "TrackingLaneDAG_generic.h"
 #endif
 
 

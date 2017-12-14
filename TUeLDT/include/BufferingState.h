@@ -24,10 +24,11 @@
 
 #include <thread>
 #include "State.h"
-#include "BufferingDAG_generic.h"
 
 #ifdef S32V2XX
-#include "BufferingDAG_s32v.h"
+ #include "BufferingDAG_s32v.h"
+#else
+ #include "BufferingDAG_generic.h"
 #endif
 
 
@@ -83,7 +84,7 @@ int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
 		lReturn = -1;
 	   }
 
-           const uint lSkipFrames = 4000;  
+           const uint lSkipFrames = 0;  
          
       	   if (lFiles.size() <= lSkipFrames)
            {

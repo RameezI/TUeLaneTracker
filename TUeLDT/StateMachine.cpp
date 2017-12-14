@@ -24,12 +24,13 @@
 #include "BufferingState.h"
 #include "TrackingLaneState.h"
 
-#include "BufferingDAG_generic.h"
-#include "TrackingLaneDAG_generic.h"
 
 #ifdef   S32V2XX
  #include "BufferingDAG_s32v.h"
  #include "TrackingLaneDAG_s32v.h"
+#else
+ #include "BufferingDAG_generic.h"
+ #include "TrackingLaneDAG_generic.h"
 #endif
  
 
@@ -63,7 +64,12 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	unique_ptr<VanishingPtFilter>   pVanishingPtFilter;
 	unique_ptr<Templates> 		pTemplates;
 
-	unique_ptr<TrackingLaneState<TrackingLaneDAG_generic>>   pTrackingState;
+	#ifdef S32V2XX
+	 unique_ptr<TrackingLaneState<TrackingLaneDAG_s32v>>   	 pTrackingState;
+	#else
+	 unique_ptr<TrackingLaneState<TrackingLaneDAG_generic>>  pTrackingState;
+	#endif
+
 
 
 	// BOOTING PROCESS //
@@ -90,12 +96,20 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	   }							
 	} //booting process block ends
 			
+
+
+
 			
 	// BUFFERING PROCESS //
 	if (mCurrentState == States::BUFFERING)
 	{
-	   BufferingState<BufferingDAG_generic>  lBufferingState;
-			
+
+	   #ifdef S32V2XX
+	    BufferingState<BufferingDAG_s32v>  	 lBufferingState;
+	   #else
+	    BufferingState<BufferingDAG_generic> lBufferingState;
+	   #endif
+	
 	   if (lBufferingState.currentStatus == StateStatus::INACTIVE)
 	   {			
 	   	lReturn |= lBufferingState.setSource(mFrameSource, mSourceStr);
@@ -141,7 +155,11 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	   	mCurrentState = States::DETECTING_LANES;
 
 		pTrackingState.reset
-		(new TrackingLaneState<TrackingLaneDAG_generic>(move(lBufferingState.mGraph)));
+		#ifdef S32V2XX
+		 (new TrackingLaneState<TrackingLaneDAG_s32v>(move(lBufferingState.mGraph)));
+		#else
+		 (new TrackingLaneState<TrackingLaneDAG_generic>(move(lBufferingState.mGraph)));
+		#endif
 	   }
 			
 	   else
@@ -160,11 +178,22 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	}// Buffering process block ends
 		
 		
+
+
+
+
+
 	// TRACKING LANE PROCESS //
 	if (mCurrentState==States::DETECTING_LANES)
 	{
-	   TrackingLaneState<TrackingLaneDAG_generic>& lTrackingState = *pTrackingState;
 
+	   #ifdef S32V2XX
+	    TrackingLaneState<TrackingLaneDAG_s32v>&    lTrackingState 	= *pTrackingState;
+	   #else
+	    TrackingLaneState<TrackingLaneDAG_generic>& lTrackingState 	= *pTrackingState;
+	   #endif
+	
+	  
 	   if (lTrackingState.currentStatus == StateStatus::INACTIVE)
 	   {			
 		lTrackingState.setupDAG(pLaneFilter.get(), pVanishingPtFilter.get());
@@ -211,7 +240,8 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		mCurrentState = States::DISPOSING;
 	   }
 	
-	} // TrackingState process block ends	
+	} // TrackingState process block ends
+
 		
 		
 	/* Shutting Down */

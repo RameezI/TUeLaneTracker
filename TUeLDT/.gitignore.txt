@@ -1,0 +1,12 @@
+*.d
+*.slo
+*.elf
+*.o
+*.obj
+*.so
+*.dll
+*gch
+*.pch
+bin/
+build*/
+
