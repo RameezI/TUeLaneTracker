@@ -209,7 +209,7 @@ void BufferingState<GRAPH>::run()
 		
 		if(this->StateCounter >= sNbBuffer-1)
 		{
-		  this->currentStatus = StateStatus::DONE;
+		  //this->currentStatus = StateStatus::DONE;
 		}
 	}
 		
