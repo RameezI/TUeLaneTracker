@@ -28,7 +28,6 @@
 #include "opencv2/opencv.hpp"
 #include <opencv2/core/eigen.hpp>
 
-using namespace cv;
 using namespace Eigen;
 
 
@@ -55,7 +54,7 @@ public:
 				      /n Automatically calculated from  /em MARGIN and /em VP_RANGE_V */
 
 
-	Mat FOCUS_MASK_ROOT;    /**< /brief ROOT-TEMPLATE for extracting mask to compensate vehicle pitch movements.
+	cv::Mat FOCUS_MASK_ROOT;    /**< /brief ROOT-TEMPLATE for extracting mask to compensate vehicle pitch movements.
 				     /n The size of /em FOCUS ROOT is [SPAN+(2xVP_RANGE_V), RES_H]
 
 				     /n Normal activation all elements in rowrange /em (SPAN-VP_RANGE) = 255
@@ -64,22 +63,22 @@ public:
 				*/
 
 
-	Mat GRADIENT_TAN_ROOT;	/**< ROOT-TEMPLATE for extracting gradient tangents refference.
+	cv::Mat GRADIENT_TAN_ROOT;	/**< ROOT-TEMPLATE for extracting gradient tangents refference.
 				  /n The size of /em GRADIENT_TAN_ROOT is [2xRES_V +1 	, 2xRES_H +1]
 				*/
 
 
-	Mat DEPTH_MAP_ROOT;	/**< ROOT-TEMPLATE for assigning perspective weights to the pixels. 
+	cv::Mat DEPTH_MAP_ROOT;	/**< ROOT-TEMPLATE for assigning perspective weights to the pixels. 
 				     /n The size of /em DEPTH_MAP_ROOT is [RES_V, RES_H]
 				*/
 
 
-	Mat X_ICS;		/**< ROOT-TEMPLATE containing the X pixel indices in Image Coordinate System. 
+	cv::Mat X_ICS;		/**< ROOT-TEMPLATE containing the X pixel indices in Image Coordinate System. 
 				   /n The size of /em X_ICS is [RES_V, RES_H]
 				*/
 
 
-	Mat Y_ICS;		/**< ROOT-TEMPLATE containing the Y pixel indices in Image Coordinate System. 
+	cv::Mat Y_ICS;		/**< ROOT-TEMPLATE containing the Y pixel indices in Image Coordinate System. 
 				   /n The size of /em Y_ICS is [RES_V, RES_H]
 				*/
 
@@ -125,7 +124,7 @@ public:
 			DEPTH_MAP_ROOT.convertTo(DEPTH_MAP_ROOT, CV_16U);
 
 		/* Create X Template */
-			Mat Row = Mat(1, RES_H, CV_16S);
+			cv::Mat Row = cv::Mat(1, RES_H, CV_16S);
 			int16_t* ptr = Row.ptr<int16_t>(0);
 			for (int i=0; i<RES_H; i++)
 			{
@@ -135,7 +134,7 @@ public:
 			X_ICS.convertTo(X_ICS, CV_16S);
 
 		/* Create Y Template */
-			Mat Col = Mat(SPAN, 1, CV_16S);
+			cv::Mat Col = cv::Mat(SPAN, 1, CV_16S);
 			ptr = Col.ptr<int16_t>(0);
 			for (int i=0; i<SPAN; i++)
 			{
@@ -160,7 +159,7 @@ public:
 			}
 			else
 			{
-				FileStorage loadGradientTemplate( templateFile, FileStorage::READ);
+				cv::FileStorage loadGradientTemplate( templateFile, cv::FileStorage::READ);
 				loadGradientTemplate["ROOT_DIR_TEMPLATE"]>> GRADIENT_TAN_ROOT;
 				GRADIENT_TAN_ROOT.convertTo(GRADIENT_TAN_ROOT,CV_16SC1);
 			}		

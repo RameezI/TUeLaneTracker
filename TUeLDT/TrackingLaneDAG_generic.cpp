@@ -44,8 +44,8 @@ int TrackingLaneDAG_generic::init_DAG()
 	mPurviewBinIdx.reserve(mMAX_PIXELS_ROI);
 	mWeightBin.reserve(mMAX_PIXELS_ROI);
 
-        mHistBase      = Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
-        mHistPurview   = Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
+        mHistBase      = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
+        mHistPurview   = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
 
   	return 0;
 }
@@ -103,12 +103,12 @@ mProfiler.start("COMPUTE_INTERSECTIONS");
 #endif	
 
 	//Base Intersections
-	subtract(mLaneFilter->OFFSET_V, mY_VPRS, mIntBase, noArray(), CV_32S);
+	subtract(mLaneFilter->OFFSET_V, mY_VPRS, mIntBase, cv::noArray(), CV_32S);
 	divide(mIntBase, mGradTanFocussed, mIntBase, SCALE_INTSEC_TAN, CV_32S);
 	add(mIntBase, mX_VPRS_SCALED, mIntBase);
 	
 	//Purview Intersections
-	subtract(mVpFilter->OFFSET_V, mY_VPRS, mIntPurview, noArray(), CV_32S);
+	subtract(mVpFilter->OFFSET_V, mY_VPRS, mIntPurview, cv::noArray(), CV_32S);
 	divide(mIntPurview,mGradTanFocussed, mIntPurview, SCALE_INTSEC_TAN, CV_32S);
 	add(mIntPurview, mX_VPRS_SCALED, mIntPurview);
 	
@@ -288,7 +288,7 @@ mProfiler.start("HISTOGRAM_MATCHING");
 		
 	   register int32_t* HistBasePTR    	=  mHistBase.ptr<int32_t>(0);
 	   vector<BaseHistogramModel>& Models= mLaneFilter->baseHistogramModels;
-	   Mat    range;
+	   cv::Mat    range;
 	
 	   for(size_t i=0; i< Models.size(); i++)
 	   {    
@@ -317,10 +317,10 @@ mProfiler.start("HISTOGRAM_MATCHING");
 
 //TODO:	Put on the side thread.(start)
 		NegLaneCorrelation=0;
-		range = mHistBase(Range(NegLeftIdx,  NegLeftIdx  +  Nleft), Range::all());
+		range = mHistBase(cv::Range(NegLeftIdx,  NegLeftIdx  +  Nleft), cv::Range::all());
 		NegLaneCorrelation +=sum(range)[0];
 		
-	    	range = mHistBase(Range(NegRightIdx, NegRightIdx + Nright), Range::all());
+	    	range = mHistBase(cv::Range(NegRightIdx, NegRightIdx + Nright), cv::Range::all());
 		NegLaneCorrelation +=sum(range)[0];
 		
 		x= (float)NegLaneCorrelation / SCALE_FILTER ;
@@ -417,7 +417,7 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 	   int   NbNegLaneLeft, NbNegLaneRight, NegLaneCorrelation;
 	   float x, conditionalProb;
 	
-	   Mat   range;
+	   cv::Mat   range;
 	
 	   float  width_cm;
 	
@@ -480,10 +480,10 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		
 		      /* VP Probability over Negative(NO) Boundary */
 		      NegLaneCorrelation=0;
-		      range = mHistPurview(Range(NegLeftIdx,  NegLeftIdx  +  NbNegLaneLeft), Range::all());
+		      range = mHistPurview(cv::Range(NegLeftIdx,  NegLeftIdx  +  NbNegLaneLeft), cv::Range::all());
 		      NegLaneCorrelation +=sum(range)[0];
 			
-		      range = mHistPurview(Range(NegRightIdx, NegRightIdx + NbNegLaneRight), Range::all());
+		      range = mHistPurview(cv::Range(NegRightIdx, NegRightIdx + NbNegLaneRight), cv::Range::all());
 		      NegLaneCorrelation +=sum(range)[0];
 		
 		      x= (float)NegLaneCorrelation / SCALE_FILTER ;
@@ -544,6 +544,7 @@ mProfiler.start("DISPLAY");
 	#ifdef DISPLAY_GRAPHICS
 	{
 
+	   using namespace cv;
 
 	   const float lRatioLookAhead = 0.35;
 
@@ -625,11 +626,11 @@ mProfiler.start("DISPLAY");
 	
  
 	
-	Rect lROI;
-	lROI = Rect(0, mCAMERA.RES_VH(0) - mSpan, mCAMERA.RES_VH(1), mSpan);
-	Mat lYellow(mSpan, mCAMERA.RES_VH(1), CV_8UC3, Scalar(0,125,125));
+	cv::Rect lROI;
+	lROI = cv::Rect(0, mCAMERA.RES_VH(0) - mSpan, mCAMERA.RES_VH(1), mSpan);
+	cv::Mat lYellow(mSpan, mCAMERA.RES_VH(1), CV_8UC3, Scalar(0,125,125));
 
-    	Mat lFrameRGB_mSPAN = mFrameRGB(lROI);
+    	cv::Mat lFrameRGB_mSPAN = mFrameRGB(lROI);
 	cv::addWeighted(lYellow, 0.4, lFrameRGB_mSPAN, 0.6, 0, lFrameRGB_mSPAN);
 	
 
@@ -729,7 +730,7 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 {
 		
 	int  lRowIndex;
-	Rect lROI;
+	cv::Rect lROI;
 	WriteLock  wrtLock(_mutex, std::defer_lock);
 
 	wrtLock.lock();
@@ -741,7 +742,7 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 		wrtLock.unlock();
 		 // Extract Depth Template
 		 lRowIndex = mCAMERA.RES_VH(0)- mSpan; 
-		 lROI = Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
+		 lROI = cv::Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
 
 		wrtLock.lock();
 		 mDEPTH_MAP_ROOT(lROI).copyTo(mDepthTemplate);
@@ -749,7 +750,7 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 
 		 // Extract Focus Template
 		 lRowIndex = mVP_Range_V - mVanishPt.V;
-		 lROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
+		 lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 		
 		wrtLock.lock();
 		 mFOCUS_MASK_ROOT(lROI).copyTo(mFocusTemplate);	
@@ -773,14 +774,14 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 	{
 		wrtLock.unlock();
 		 lRowIndex = mCAMERA.RES_VH(0)- mSpan; 
-		 lROI = Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
+		 lROI = cv::Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
 		
 		wrtLock.lock();
 		 mDEPTH_MAP_ROOT(lROI).copyTo(mDepthTemplate);
 		wrtLock.unlock();
 
 		lRowIndex = mVP_Range_V-mVanishPt.V;
-		lROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
+		lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 
 
 		wrtLock.lock();
@@ -801,7 +802,7 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 	
 	//Predict Lane States
 	mLaneFilter->filter.convertTo(mLaneFilter->filter, CV_64F);
-	boxFilter(mLaneFilter->filter, mTransitLaneFilter, -1, Size(11,11), Point(-1,-1), false, BORDER_REPLICATE );
+	boxFilter(mLaneFilter->filter, mTransitLaneFilter, -1, cv::Size(11,11), cv::Point(-1,-1), false, cv::BORDER_REPLICATE );
     	mLaneFilter->filter.convertTo(mLaneFilter->filter, CV_32S);
 
 	SUM = sum(mTransitLaneFilter)[0];
@@ -812,7 +813,7 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 
 	//Predict VP States
 	mVpFilter->filter.convertTo(mVpFilter->filter, CV_64F);
-	boxFilter(mVpFilter->filter, mTransitVpFilter, -1, Size(3,3), Point(-1,-1), false, BORDER_REPLICATE );
+	boxFilter(mVpFilter->filter, mTransitVpFilter, -1, cv::Size(3,3), cv::Point(-1,-1), false, cv::BORDER_REPLICATE );
     	mVpFilter->filter.convertTo(mVpFilter->filter, CV_32S);
 	
 	SUM = sum(mTransitVpFilter)[0];

@@ -28,7 +28,6 @@
 #include "Camera.h"
 
 using namespace Eigen;
-using namespace cv;
 
 struct BaseHistogramModel
 {
@@ -83,8 +82,8 @@ public:	 //Public Interface of the class
 		const VectorXi  HISTOGRAM_BINS;    	// -PX_MAX:STEP: PX_MAX
 		const VectorXi  OFFSET_BINS;       	//  0 : STEP : PX_MAX
 		
-		Mat prior;
-		Mat filter;
+		cv::Mat prior;
+		cv::Mat filter;
 
 		std::vector<BaseHistogramModel>  baseHistogramModels; 	
 

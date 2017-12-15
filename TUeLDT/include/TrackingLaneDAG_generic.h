@@ -67,24 +67,24 @@ private:
 	VanishingPtFilter*	mVpFilter;
 	
 	
-	Mat 			mX_VPRS_SCALED;	
-	Mat 			mIntBase;           
-	Mat			mIntPurview;
-	Mat 			mIntWeights;
+	cv::Mat 		mX_VPRS_SCALED;	
+	cv::Mat 		mIntBase;           
+	cv::Mat			mIntPurview;
+	cv::Mat 		mIntWeights;
 	
 
 	vector<uint16_t>	mBaseBinIdx; 	//Only valid list of Intersections IDs
 	vector<uint16_t>	mPurviewBinIdx;	//Only valid list of Intersections IDs
 	vector<int32_t>	        mWeightBin;  	//Only valid list of Weights IDs
 	
-	Mat			mHistBase;
-	Mat			mHistPurview;
+	cv::Mat			mHistBase;
+	cv::Mat			mHistPurview;
 	
-	Mat			mProbMapFocussed;
-	Mat 			mGradTanFocussed;
+	cv::Mat			mProbMapFocussed;
+	cv::Mat 		mGradTanFocussed;
 	
-	Mat 			mTransitLaneFilter;
-	Mat 			mTransitVpFilter;
+	cv::Mat 		mTransitLaneFilter;
+	cv::Mat 		mTransitVpFilter;
 
 	LaneModel   		mLaneModel;
 	

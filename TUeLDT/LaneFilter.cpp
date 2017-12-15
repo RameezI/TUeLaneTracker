@@ -44,9 +44,9 @@ LaneFilter::LaneFilter(const LaneParameters& LANE,  const Camera& CAMERA)
   
   OFFSET_BINS(HISTOGRAM_BINS.tail(mNb_OFFSET_BINS)),
   
-  prior(  Mat::zeros( (int)(mBIN_MAX/this->STEP) +1, (int)(mBIN_MAX/this->STEP) +1 , CV_32SC1) ),
+  prior(  cv::Mat::zeros( (int)(mBIN_MAX/this->STEP) +1, (int)(mBIN_MAX/this->STEP) +1 , CV_32SC1) ),
   
-  filter( Mat::zeros( (int)(mBIN_MAX/this->STEP) +1, (int)(mBIN_MAX/this->STEP) +1 , CV_32SC1) )
+  filter( cv::Mat::zeros( (int)(mBIN_MAX/this->STEP) +1, (int)(mBIN_MAX/this->STEP) +1 , CV_32SC1) )
   
 {
 	
@@ -70,7 +70,7 @@ void LaneFilter::createHistogramModels()
 	
 	float pL, pR, width;
 	
-	//cv::Mat Prior_tmp = Mat::zeros((int)(mBIN_MAX/this->STEP) +1, (int)(mBIN_MAX/this->STEP) +1 , CV_32SC1))
+	//cv::Mat Prior_tmp = cv::Mat::zeros((int)(mBIN_MAX/this->STEP) +1, (int)(mBIN_MAX/this->STEP) +1 , CV_32SC1))
 
 	
 	for (int left = 0; left < bins_cm.size(); left++)

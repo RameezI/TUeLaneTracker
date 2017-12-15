@@ -46,9 +46,9 @@ VanishingPtFilter::VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_B
   
   STEP(HISTOGRAM_BINS(1)- HISTOGRAM_BINS(0)),
   
-  prior(  Mat::zeros( mNb_VP_BINS_V, mNb_VP_BINS_H , CV_32SC1) ),
+  prior(  cv::Mat::zeros( mNb_VP_BINS_V, mNb_VP_BINS_H , CV_32SC1) ),
   
-  filter( Mat::zeros( mNb_VP_BINS_H, mNb_VP_BINS_H,  CV_32SC1) )
+  filter( cv::Mat::zeros( mNb_VP_BINS_H, mNb_VP_BINS_H,  CV_32SC1) )
 {
 	createPrior();
 	this->filter = this->prior.clone();

@@ -96,8 +96,8 @@ public:
 		const VectorXi  HISTOGRAM_BINS;	    //Purview Histogram Bins in Pixels.
 		const int    	STEP;  		    //Purview Histogram STEP
 		      
-	    	Mat  prior;
-	    	Mat  filter;
+	    	cv::Mat  prior;
+	    	cv::Mat  filter;
 
 				  		
 private:		 

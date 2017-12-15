@@ -34,7 +34,6 @@
 #endif
 
 
-using namespace cv;
 
 struct BufferPool;
 
@@ -67,16 +66,17 @@ protected:
 	
 	/*................................................
 	 Set from outside, before buffering is activated   */ 
-	int 	mSpan;
-	int	mMargin;
-	int 	mVP_Range_V;
-	
-	Mat 	mGRADIENT_TAN_ROOT;
-    	Mat	mFOCUS_MASK_ROOT;
-    	Mat	mDEPTH_MAP_ROOT;
 
-	Mat     mX_ICS;
-	Mat     mY_ICS;
+	int 		mSpan;
+	int		mMargin;
+	int 		mVP_Range_V;
+	
+	cv::Mat	 	mGRADIENT_TAN_ROOT;
+    	cv::Mat		mFOCUS_MASK_ROOT;
+    	cv::Mat		mDEPTH_MAP_ROOT;
+
+	cv::Mat     	mX_ICS;
+	cv::Mat     	mY_ICS;
 	
 	unique_ptr<BufferPool>	mBufferPool;
 	/***************************************************/
@@ -89,36 +89,36 @@ protected:
 
 
 	//Image Frames
-	Mat     mFrameRGB;
-	Mat	mFrameGRAY;
-	Mat	mFrameGRAY_ROI;
+	cv::Mat     mFrameRGB;
+	cv::Mat	mFrameGRAY;
+	cv::Mat	mFrameGRAY_ROI;
 
 	
 	//Binary Mask 
-	Mat 	mMask;
+	cv::Mat 	mMask;
 	
 	
 	//Image Gradients
-	Mat     mGradX;
-	Mat     mGradY;
-	Mat     mGradX_abs;
-	Mat     mGradY_abs;
-	Mat     mFrameGradMag;
+	cv::Mat     mGradX;
+	cv::Mat     mGradY;
+	cv::Mat     mGradX_abs;
+	cv::Mat     mGradY_abs;
+	cv::Mat     mFrameGradMag;
 
 
 	// Extracted Templates
-	Mat 	mGradTanTemplate; 
-	Mat 	mDepthTemplate;
-	Mat 	mFocusTemplate;
-	Mat 	mX_VPRS;
-	Mat 	mY_VPRS;
+	cv::Mat 	mGradTanTemplate; 
+	cv::Mat 	mDepthTemplate;
+	cv::Mat 	mFocusTemplate;
+	cv::Mat 	mX_VPRS;
+	cv::Mat 	mY_VPRS;
 
 
 	// Temporary Probability Maps
-	Mat 	mTempProbMat;
-	Mat	mProbMap_Gray;
-	Mat	mProbMap_GradMag;
-	Mat 	mProbMap_GradDir;
+	cv::Mat 	mTempProbMat;
+	cv::Mat		mProbMap_Gray;
+	cv::Mat		mProbMap_GradMag;
+	cv::Mat 	mProbMap_GradDir;
 	
 
         // Display Control Unit
@@ -132,7 +132,7 @@ protected:
 
 	FrameSource		mSource;
 	vector<cv::String>	mFiles;
-	VideoCapture 		mRTSP_CAPTURE;
+	cv::VideoCapture 	mRTSP_CAPTURE;
 
 	
 public:
@@ -208,15 +208,15 @@ public:
 
 struct BufferPool
 {
-        vector<Mat> Probability;
-        vector<Mat> GradientTangent;
+        vector<cv::Mat> Probability;
+        vector<cv::Mat> GradientTangent;
 
         BufferPool(const int RES_V, const int RES_H, std::size_t bufferSize)
         {
           for (std::size_t i=0; i< bufferSize; i++)
           {
-             Mat PROB_MAP( RES_V, RES_H, CV_8UC1  );
-             Mat GRAD_TAN( RES_V, RES_H, CV_16SC1 );
+             cv::Mat PROB_MAP( RES_V, RES_H, CV_8UC1  );
+             cv::Mat GRAD_TAN( RES_V, RES_H, CV_16SC1 );
 
              Probability.push_back(PROB_MAP);
              GradientTangent.push_back(GRAD_TAN);

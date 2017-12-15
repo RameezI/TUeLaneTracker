@@ -75,18 +75,18 @@ mProfiler.start("EXTRACT_ROI");
 
 	int lRowIndex= mCAMERA.RES_VH(0) - mSpan;
 	int lColIndex= mCAMERA.RES_VH(1);
-	Rect ROI;
+	cv::Rect lROI;
 	 
 	// Extract ROI from the Input Image
-	 ROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);	
-	 mFrameGRAY_ROI = mFrameGRAY(ROI);
+	 lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);	
+	 mFrameGRAY_ROI = mFrameGRAY(lROI);
 
 				 
 	//Extract Gradient Orientation Template 
 	 lRowIndex =  mCAMERA.RES_VH(0) + mMargin - mVanishPt.V ; 
 	 lColIndex= mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
-	 ROI = Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
-	 mGRADIENT_TAN_ROOT(ROI).copyTo(mGradTanTemplate);
+	 lROI = cv::Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
+	 mGRADIENT_TAN_ROOT(lROI).copyTo(mGradTanTemplate);
 
 
 #ifdef PROFILER_ENABLED
@@ -128,7 +128,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 mProfiler.start("GAUSSIAN_BLUR");
 #endif 
 	
-	GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, Size( 5, 5 ), 1.5, 1.5, BORDER_REPLICATE);
+	GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, cv::Size( 5, 5 ), 1.5, 1.5, cv::BORDER_REPLICATE);
 
 				
  #ifdef PROFILER_ENABLED
@@ -153,8 +153,8 @@ mProfiler.start("GRADIENT_COMPUTATION");
 	int delta = 0;
 	int ddepth = CV_16S;
 	
-	Sobel( mFrameGRAY_ROI, mGradX, ddepth, 1, 0, 3, scale, delta, BORDER_REPLICATE );
-	Sobel( mFrameGRAY_ROI, mGradY, ddepth, 0, 1, 3, scale, delta, BORDER_REPLICATE );
+	Sobel( mFrameGRAY_ROI, mGradX, ddepth, 1, 0, 3, scale, delta, cv::BORDER_REPLICATE );
+	Sobel( mFrameGRAY_ROI, mGradY, ddepth, 0, 1, 3, scale, delta, cv::BORDER_REPLICATE );
 
 	mMask = mGradX> 255;
 	mGradX.setTo(255, mMask);
@@ -202,7 +202,7 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 #endif 		
 
 	//GrayChannel Probabilities
-	subtract(mFrameGRAY_ROI, mLaneMembership.TIPPING_POINT_GRAY, mTempProbMat, noArray(), CV_32S);
+	subtract(mFrameGRAY_ROI, mLaneMembership.TIPPING_POINT_GRAY, mTempProbMat, cv::noArray(), CV_32S);
 	mMask = mTempProbMat <0 ;
 	mTempProbMat.setTo(0,mMask);
 	mTempProbMat.copyTo(mProbMap_Gray);
@@ -212,7 +212,7 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 	
 
 	//GradientMag Probabilities
-	subtract(mFrameGradMag, mLaneMembership.TIPPING_POINT_GRAD_Mag, mTempProbMat, noArray(), CV_32S);
+	subtract(mFrameGradMag, mLaneMembership.TIPPING_POINT_GRAD_Mag, mTempProbMat, cv::noArray(), CV_32S);
 	mTempProbMat.copyTo(mProbMap_GradMag);
 	mTempProbMat= abs(mTempProbMat) + 10;
 	divide(mProbMap_GradMag, mTempProbMat, mProbMap_GradMag, 255, -1);
@@ -225,12 +225,12 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 
 
 	//Gradient Tangent Probability Map
-	subtract(mGradTanTemplate, mBufferPool->GradientTangent[bufferPos], mTempProbMat, noArray(), CV_32S);
+	subtract(mGradTanTemplate, mBufferPool->GradientTangent[bufferPos], mTempProbMat, cv::noArray(), CV_32S);
 	mTempProbMat= abs(mTempProbMat);
 	mTempProbMat.copyTo(mProbMap_GradDir);
 	mTempProbMat = mTempProbMat + 60;
 	divide(mProbMap_GradDir, mTempProbMat, mProbMap_GradDir, 255, -1);
-	subtract(255, mProbMap_GradDir, mProbMap_GradDir, noArray(), -1);
+	subtract(255, mProbMap_GradDir, mProbMap_GradDir, cv::noArray(), -1);
 
 	
 	//Final Probability Map
@@ -268,14 +268,14 @@ void BufferingDAG_generic::runAuxillaryTasks()
 	//Local Variables
 	WriteLock  wrtLock(_mutex, std::defer_lock);	
 	int lRowIndex;
-	Rect lROI;
+	cv::Rect lROI;
 
 
 /* MODE: (A + C) */	
 
 		//Extract Depth Template
 		lRowIndex = mCAMERA.RES_VH(0) -  mSpan; 
-		lROI = Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
+		lROI = cv::Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
 		
 		wrtLock.lock();
 		 mDEPTH_MAP_ROOT(lROI).copyTo(mDepthTemplate);
@@ -283,7 +283,7 @@ void BufferingDAG_generic::runAuxillaryTasks()
 
 		//Extract Focus Template
 		lRowIndex = mVP_Range_V	 - mVanishPt.V;
-		lROI = Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
+		lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 
 		wrtLock.lock();
 		 mFOCUS_MASK_ROOT(lROI).copyTo(mFocusTemplate);	
