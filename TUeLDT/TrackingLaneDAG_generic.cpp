@@ -28,7 +28,7 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
   mStartBufferShift(false),
   mStartFiltering(false),
   mFiltersReady(false),
-  mMAX_PIXELS_ROI(mFrameGRAY_ROI.size().height * mFrameGRAY_ROI.size().width)
+  mMAX_PIXELS_ROI(mFrameGRAY_ROI.rows * mFrameGRAY_ROI.cols)
 
 {	
 	//Write Images to a video file
@@ -56,7 +56,6 @@ int TrackingLaneDAG_generic::init_DAG()
 void TrackingLaneDAG_generic::extractLanes()
 {
 	
-
 
 	WriteLock  wrtLock(_mutex, std::defer_lock);
 
@@ -112,16 +111,6 @@ mProfiler.start("COMPUTE_INTERSECTIONS");
 	divide(mIntPurview,mGradTanFocussed, mIntPurview, SCALE_INTSEC_TAN, CV_32S);
 	add(mIntPurview, mX_VPRS_SCALED, mIntPurview);
 	
-	//Weights of Intersections
-	multiply(mDepthTemplate, mProbMapFocussed, mIntWeights, 1, CV_32S);	
-	
-	//Build Mask for Valid Intersections
-	bitwise_and(mProbMapFocussed > 0, mGradTanFocussed !=0,    mMask);
-	bitwise_and(mMask, mIntBase    > mLOWER_LIMIT_IntBase,     mMask);
-	bitwise_and(mMask, mIntPurview > mLOWER_LIMIT_IntPurview,  mMask);
-    	bitwise_and(mMask, mIntBase    < mUPPER_LIMIT_IntBase,     mMask);
-    	bitwise_and(mMask, mIntPurview < mUPPER_LIMIT_IntPurview,  mMask);
-	int size= countNonZero(mMask);
 	
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -140,6 +129,18 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("EXTRACT_VALID_BIN_IDS");
 #endif
+
+
+	//Weights of Intersections
+	multiply(mDepthTemplate, mProbMapFocussed, mIntWeights, 1, CV_32S);	
+	
+	//Build Mask for Valid Intersections
+	bitwise_and(mProbMapFocussed > 0, mGradTanFocussed !=0,    mMask);
+	bitwise_and(mMask, mIntBase    > mLOWER_LIMIT_IntBase,     mMask);
+	bitwise_and(mMask, mIntPurview > mLOWER_LIMIT_IntPurview,  mMask);
+    	bitwise_and(mMask, mIntBase    < mUPPER_LIMIT_IntBase,     mMask);
+    	bitwise_and(mMask, mIntPurview < mUPPER_LIMIT_IntPurview,  mMask);
+	int size= countNonZero(mMask);
 		
 	// Resize vectors to Maximum Limit
 	mBaseBinIdx.resize(mMAX_PIXELS_ROI);
@@ -200,15 +201,40 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
+#ifdef PROFILER_ENABLED
+mProfiler.start("FILTERS_WAIT");
+#endif 				
+		
+	wrtLock.lock();
+	_sateChange.wait(wrtLock,[this]{return mFiltersReady;} );
+	mFiltersReady = false; //reset the flag for next loop.
+	wrtLock.unlock();
+
+				
+ #ifdef PROFILER_ENABLED
+ mProfiler.end();
+LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
+				<<"******************************"<<endl
+				<<  "Waiting for worker thread to finish transition filters." <<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("FILTERS_WAIT")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("FILTERS_WAIT")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("FILTERS_WAIT")<<endl
+				<<"******************************"<<endl<<endl;	
+				#endif	
+
+
+
 
 #ifdef PROFILER_ENABLED
 mProfiler.start("COMPUTE_HISTOGRAMS");
 #endif
 
+
 	{
 	   int64_t SUM;
 	   register int32_t* HistBase_pixelPTR    =  mHistBase.ptr<int32_t>(0);
 	   register int32_t* HistPurview_pixelPTR =  mHistPurview.ptr<int32_t>(0);
+
 
 	   for ( std::size_t j = 0; j < mBaseBinIdx.size(); ++j)
 	   {
@@ -239,28 +265,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				#endif
 
 
-
-
-#ifdef PROFILER_ENABLED
-mProfiler.start("FILTERS_WAIT");
-#endif 				
-		
-	wrtLock.lock();
-	_sateChange.wait(wrtLock,[this]{return mFiltersReady;} );
-	mFiltersReady = false; //reset the flag for next loop.
-	wrtLock.unlock();
-
-				
- #ifdef PROFILER_ENABLED
- mProfiler.end();
-LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
-				<<"******************************"<<endl
-				<<  "Waiting for worker thread to finish transition filters." <<endl
-				<<  "Max Time: " << mProfiler.getMaxTime("FILTERS_WAIT")<<endl
-				<<  "Avg Time: " << mProfiler.getAvgTime("FILTERS_WAIT")<<endl
-				<<  "Min Time: " << mProfiler.getMinTime("FILTERS_WAIT")<<endl
-				<<"******************************"<<endl<<endl;	
-				#endif	
 
 
 
@@ -421,7 +425,7 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 	
 	   float  width_cm;
 	
-	   /* Store Previous values of VP */
+	   // Store Previous values of VP 
 	   mVanishPt.V_prev = mVanishPt.V;
 	   mVanishPt.H_prev = mVanishPt.H;
 		
@@ -461,24 +465,24 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		   if (LeftIdx > 0 && RightIdx < VP_HIST_SIZE-2)
 		   {	
 			
-		      /* VP Probability over Lane Width at Offseted-VP */	
+		      // VP Probability over Lane Width at Offseted-VP 
 		      mLikelihoodVP_Width = mLaneMembership.WIDTH_DIFF_NORMA 
 		       * exp( - pow(mLaneModel.laneWidth_cm - width_cm, 2) / mLaneMembership.WIDTH_DIFF_NOMIN );
 				
 				
-		      /* VP Probability over Left LaneBoundary */
+		      // VP Probability over Left LaneBoundary
 		      mLikelihoodVP_LBoundary =  round(HistPurviewPTR[LeftIdx-1]*0.25
 					      + HistPurviewPTR[LeftIdx]
 				  	      + HistPurviewPTR[LeftIdx+1]*0.25);
 												  
-		      /* VP Probability over Right LaneBoundary */				 
+		      // VP Probability over Right LaneBoundary 				 
 		      mLikelihoodVP_RBoundary = round(HistPurviewPTR[RightIdx-1]*0.25
 					      + HistPurviewPTR[RightIdx]
 					      + HistPurviewPTR[RightIdx+1]*0.25);
 					
 		      conditionalProb  =  (mLikelihoodVP_LBoundary*mLikelihoodVP_RBoundary) /(float)SCALE_FILTER;	
 		
-		      /* VP Probability over Negative(NO) Boundary */
+		      //VP Probability over Negative(NO) Boundary
 		      NegLaneCorrelation=0;
 		      range = mHistPurview(cv::Range(NegLeftIdx,  NegLeftIdx  +  NbNegLaneLeft), cv::Range::all());
 		      NegLaneCorrelation +=sum(range)[0];
@@ -490,7 +494,7 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		      mLikelihoodVP_NegBoundary = mLaneMembership.NEG_BOUNDARY_NORMA 
 		       *exp (-pow(x,2)/mLaneMembership.NEG_BOUNDARY_NOMIN);
 											 				 
-		      /* Conditional Probability */							 
+		      //Conditional Probability			 
 		      conditionalProb  =   conditionalProb
 					* mLikelihoodVP_NegBoundary
 					* mLikelihoodVP_Width;
@@ -543,17 +547,16 @@ mProfiler.start("DISPLAY");
 
 	#ifdef DISPLAY_GRAPHICS
 	{
-
-	   using namespace cv;
+	  using namespace cv;
 
 	   const float lRatioLookAhead = 0.35;
 
 
-	   /*  Transform VP to Image Coordianate System */
+	   //Transform VP to Image Coordianate System
 	   int VP_V =  mVanishPt.V + mCAMERA.FRAME_CENTER(0);
 	   int VP_H =  mVanishPt.H + mCAMERA.FRAME_CENTER(1);	
 
-	   /* Lane Bundaries */
+	   //Lane Bundaries
 	   Point  Start_leftLaneInner( mCAMERA.FRAME_CENTER(1) -  ((int)(mLaneModel.leftOffset  + delta)/mLaneFilter->STEP)*mLaneFilter->STEP					  ,  mCAMERA.RES_VH(0) );	   
 
 
@@ -577,38 +580,24 @@ mProfiler.start("DISPLAY");
 	   End_rightLaneInner.y += -round ((mCAMERA.RES_VH(0)*lRatioLookAhead));
 
 
+	   // Draw Left Boundary Line
 	   line(mFrameRGB,
 		 Start_leftLaneInner,
 		 End_leftLaneInner,
 		 CvScalar(0,255,0),
 		 3
 	   	);
-	
+
+	   //Draw Right Boundary Line	
 	   line(mFrameRGB,
 		 Start_rightLaneInner,
 		 End_rightLaneInner,
 		 CvScalar(0,255,0),
 		 3
 	   	);
-	
-	  /* line(mFrameRGB,
-	     cvPoint(0, -mLaneFilter->OFFSET_V + mCAMERA.FRAME_CENTER(0)),
-	     cvPoint(mCAMERA.RES_VH(1), -mLaneFilter->OFFSET_V + mCAMERA.FRAME_CENTER(0)),
-	     CvScalar(0,0,0),
-	     6
-	    );
-
-
-	line(mFrameRGB,
-	     cvPoint(0, mCAMERA.RES_VH(0)*(1-lRatioLookAhead)),
-	     cvPoint(mCAMERA.RES_VH(1), mCAMERA.RES_VH(0)*(1-lRatioLookAhead)),
-	     CvScalar(0,0,0),
-	     2
-	    );	     
-	*/
-
-
-	line(mFrameRGB,
+	   
+	   //Draw Middle Line
+	   line(mFrameRGB,
 	     StartMidLane,
 	     (End_rightLaneInner + End_leftLaneInner)/2.0,
 	     CvScalar(255,0,0),
@@ -616,8 +605,8 @@ mProfiler.start("DISPLAY");
 	    );
 
 
-
-	line(mFrameRGB,
+	   //Draw Purview Line
+	   line(mFrameRGB,
 	     cvPoint(0, mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V),
 	     cvPoint(mCAMERA.RES_VH(1), mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V),
 	     CvScalar(0,0,0),
@@ -625,19 +614,19 @@ mProfiler.start("DISPLAY");
 	    );
 	
  
+	  // Highlight ROI 
+	   Rect lROI;
+	   lROI = Rect(0, mCAMERA.RES_VH(0) - mSpan, mCAMERA.RES_VH(1), mSpan);
+	   cv::Mat lYellow(mSpan, mCAMERA.RES_VH(1), CV_8UC3, Scalar(0,125,125));
+
+    	   cv::Mat lFrameRGB_mSPAN = mFrameRGB(lROI);
+	   cv::addWeighted(lYellow, 0.4, lFrameRGB_mSPAN, 0.6, 0, lFrameRGB_mSPAN);
 	
-	cv::Rect lROI;
-	lROI = cv::Rect(0, mCAMERA.RES_VH(0) - mSpan, mCAMERA.RES_VH(1), mSpan);
-	cv::Mat lYellow(mSpan, mCAMERA.RES_VH(1), CV_8UC3, Scalar(0,125,125));
 
-    	cv::Mat lFrameRGB_mSPAN = mFrameRGB(lROI);
-	cv::addWeighted(lYellow, 0.4, lFrameRGB_mSPAN, 0.6, 0, lFrameRGB_mSPAN);
 	
-
-
-
-	for (int i=0; i< mLaneFilter->HISTOGRAM_BINS.size(); i++)
-	{
+	   // Draw Histogram-Bins at the Base
+	   for (int i=0; i< mLaneFilter->HISTOGRAM_BINS.size(); i++)
+	   {
 		int x = mCAMERA.FRAME_CENTER(1)+ mLaneFilter->HISTOGRAM_BINS(i); 
 		if(x !=  StartMidLane.x)
 		line(mFrameRGB, cvPoint(x,mCAMERA.RES_VH(0)), cvPoint(x,mCAMERA.RES_VH(0) -30), cvScalar(0,0,0), 1);
@@ -645,12 +634,13 @@ mProfiler.start("DISPLAY");
 		line(mFrameRGB, cvPoint(x,mCAMERA.RES_VH(0)), cvPoint(x,mCAMERA.RES_VH(0) -40), cvScalar(0,0,255), 2);
 
 		//putText(mFrameRGB, std::to_string(i), cvPoint(x, mCAMERA.RES_VH(0)-30), FONT_HERSHEY_DUPLEX, 0.1, CvScalar(255,0,0), 2);
-	}
+	   }
 
 
 
-	for (int i=0; i< mVpFilter->HISTOGRAM_BINS.size(); i++)
-	{
+	   // Draw Histogram-Bins at the Purview
+	   for (int i=0; i< mVpFilter->HISTOGRAM_BINS.size(); i++)
+	   {
 
 		int x = mCAMERA.FRAME_CENTER(1)+ mVpFilter->HISTOGRAM_BINS(i);
 		//if(x !=  StartMidLane.x)
@@ -660,32 +650,17 @@ mProfiler.start("DISPLAY");
 		//line(mFrameRGB, cvPoint(x,mCAMERA.RES_VH(0)), cvPoint(x,mCAMERA.RES_VH(0) -40), cvScalar(0,0,255), 2);
 
 		//putText(mFrameRGB, std::to_string(i), cvPoint(x, mCAMERA.RES_VH(0)-30), FONT_HERSHEY_DUPLEX, 0.1, CvScalar(255,0,0), 2);
-	}
+	   }
 
-	//putText(mFrameRGB, "Coordinates", cvPoint(340,240), FONT_HERSHEY_COMPLEX, 0.2, CvScalar(255,0,0), 2  );
+	   //putText(mFrameRGB, "Coordinates", cvPoint(340,240), FONT_HERSHEY_COMPLEX, 0.2, CvScalar(255,0,0), 2  );
 
 
 
-/*
-	  Point Start_targetPath = Start_leftLaneInner;
-	  Start_targetPath.x += round((Start_rightLaneInner.x - Start_leftLaneInner.x)/2.0);
+	   #ifdef DISPLAY_GRAPHICS_DCU
 
-	  Point End_targetPath = End_leftLaneInner;
-	  End_targetPath.x += round((End_rightLaneInner.x - End_leftLaneInner.x)/2.0);
+	   	mDCU.PutFrame(mFrameRGB.data);
 
-	   line(mFrameRGB,
-		 Start_targetPath,
-		 End_targetPath,
-		 CvScalar(0,255,0),
-		 3
-	   	);
-*/
-
-	#ifdef DISPLAY_GRAPHICS_DCU
-
-	   mDCU.PutFrame(mFrameRGB.data);
-	
-	#else  
+	   #else  
 
 	   imshow( "Display window", mFrameRGB);
 	   
@@ -698,13 +673,16 @@ mProfiler.start("DISPLAY");
 		while ((char)32 != (char)waitKey(1));
 	   }
 
-	#endif
-		//write the processed frame to the video
-		//   mOutputVideo<<mFrameRGB;
-	}
+	   #endif
 
-	#endif
-										
+
+
+	   //write the processed frame to the video
+	   //mOutputVideo<<mFrameRGB;
+	}
+	#endif // Display Graphics
+		
+								
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
@@ -714,8 +692,10 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				<<  "Avg Time: " << mProfiler.getAvgTime("DISPLAY")<<endl
 				<<  "Min Time: " << mProfiler.getMinTime("DISPLAY")<<endl
 		  		<<"******************************"<<endl<<endl;	
-		 		#endif	
-}
+		 		#endif
+
+
+}//extractLanes
 
 
 
@@ -736,7 +716,7 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 	wrtLock.lock();
 	 if (mBufferReady == false)
 
-/* MODE: A + C */
+// MODE: A + C 
 	{
 
 		wrtLock.unlock();
@@ -770,7 +750,7 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 
 	else
 
-/* MODE: A ONLY */
+// MODE: A ONLY 
 	{
 		wrtLock.unlock();
 		 lRowIndex = mCAMERA.RES_VH(0)- mSpan; 
@@ -821,6 +801,9 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 	mTransitVpFilter.convertTo(mTransitVpFilter, CV_32S, 1.0/SUM);	
 	mTransitVpFilter = mTransitVpFilter + 0.1*mVpFilter->prior;
 			
+        mHistBase      = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
+        mHistPurview   = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
+
 	mFiltersReady   = true;
 	mStartFiltering = false;
 	
@@ -830,12 +813,11 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 
 
 
-/* MODE: C  */
+// MODE: C  
 
 	wrtLock.lock();
 	_sateChange.wait(wrtLock,[this]{return mStartBufferShift;} );
 	
-
 	   for ( std::size_t i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
 	   {
 	 	mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
@@ -845,8 +827,7 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 	   mBufferReady    = true;
 	   mStartBufferShift=false;
 
-	 wrtLock.unlock();
-	_sateChange.notify_one();
+	wrtLock.unlock();
 }
 
 TrackingLaneDAG_generic::~TrackingLaneDAG_generic()

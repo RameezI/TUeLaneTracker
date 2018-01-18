@@ -63,13 +63,13 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	unique_ptr<LaneFilter>  	pLaneFilter;
 	unique_ptr<VanishingPtFilter>   pVanishingPtFilter;
 	unique_ptr<Templates> 		pTemplates;
-/*
+
+
 	#ifdef S32V2XX
 	 unique_ptr<TrackingLaneState<TrackingLaneDAG_s32v>>   	 pTrackingState;
 	#else
 	 unique_ptr<TrackingLaneState<TrackingLaneDAG_generic>>  pTrackingState;
 	#endif
-*/
 
 
 	// BOOTING PROCESS //
@@ -110,6 +110,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	    BufferingState<BufferingDAG_generic> lBufferingState;
 	   #endif
 	
+
 	   if (lBufferingState.currentStatus == StateStatus::INACTIVE)
 	   {			
 	   	lReturn |= lBufferingState.setSource(mFrameSource, mSourceStr);
@@ -152,7 +153,8 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 			
 	   if( lBufferingState.currentStatus == StateStatus::DONE)
 	   {
-/*	   	mCurrentState = States::DETECTING_LANES;
+		
+	   	mCurrentState = States::DETECTING_LANES;
 
 		pTrackingState.reset
 		#ifdef S32V2XX
@@ -160,7 +162,6 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		#else
 		 (new TrackingLaneState<TrackingLaneDAG_generic>(move(lBufferingState.mGraph)));
 		#endif
-*/
 	   }
 			
 	   else
@@ -178,8 +179,6 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		
 	}// Buffering process block ends
 		
-		
-
 
 
 
@@ -187,7 +186,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	// TRACKING LANE PROCESS //
 	if (mCurrentState==States::DETECTING_LANES)
 	{
-/*
+
 	   #ifdef S32V2XX
 	    TrackingLaneState<TrackingLaneDAG_s32v>&    lTrackingState 	= *pTrackingState;
 	   #else
@@ -240,7 +239,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		lReturn = -1;
 		mCurrentState = States::DISPOSING;
 	   }
-*/
+
 	
 	} // TrackingState process block ends
 
