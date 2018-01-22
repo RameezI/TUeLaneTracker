@@ -110,6 +110,7 @@ mProfiler.start("COMPUTE_INTERSECTIONS");
 	subtract(mVpFilter->OFFSET_V, mY_VPRS, mIntPurview, cv::noArray(), CV_32S);
 	divide(mIntPurview,mGradTanFocussed, mIntPurview, SCALE_INTSEC_TAN, CV_32S);
 	add(mIntPurview, mX_VPRS_SCALED, mIntPurview);
+
 	
 	
 #ifdef PROFILER_ENABLED
@@ -281,7 +282,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("HISTOGRAM_MATCHING");
 #endif
-	
 	{
 		
 	   int   BestModelIdx=-1;
