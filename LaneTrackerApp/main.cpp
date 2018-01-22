@@ -9,8 +9,8 @@ int main() /**
 	  */
 {
 	FrameSource lFrameSource = FrameSource::DIRECTORY;
-	string	    lSourceStr 	 = "/mnt/data0/DataSet/eindhoven/PNG_imgs";
-        //string lSourceStr = "/media/rameez/Linux-Extended/DataSet/eindhoven/PNG_imgs";
+	//string	    lSourceStr 	 = "/mnt/data0/DataSet/eindhoven/PNG_imgs";
+        string lSourceStr = "/media/s32v/LinuxExtended/DataSet/eindhoven/PNG_imgs";
         //string lSourceStr = "/home/root/data/Eindhoven";
         
 
