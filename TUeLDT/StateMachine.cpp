@@ -41,12 +41,15 @@ StateMachine::StateMachine(FrameSource lFrameSource, std::string lSourceStr)
   mSourceStr(lSourceStr) 
 {
 	#ifdef PROFILER_ENABLED
-		#ifdef DIRECTORY_IPUT
+
+		if(lFrameSource == FrameSource::DIRECTORY)
+	{
 		LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 		<<"******************************"<<endl
 		<<  "DIRECTORY_INPUT DEFINED."	  <<endl
 		<<"******************************"<<endl<<endl;
-		#endif
+	}
+
 	#endif		
 }
 

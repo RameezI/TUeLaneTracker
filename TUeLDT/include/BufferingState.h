@@ -84,7 +84,8 @@ int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
 		lReturn = -1;
 	   }
 
-           const uint lSkipFrames = 4000;  
+          // const uint lSkipFrames = 4000;  
+             const uint lSkipFrames = 0;  
          
       	   if (lFiles.size() <= lSkipFrames)
            {
