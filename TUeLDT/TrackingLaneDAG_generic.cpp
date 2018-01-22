@@ -40,9 +40,6 @@ int TrackingLaneDAG_generic::init_DAG()
 {
 
 	mX_VPRS.convertTo(mX_VPRS_SCALED, CV_32S, SCALE_INTSEC );
-	mBaseBinIdx.reserve(mMAX_PIXELS_ROI);
-	mPurviewBinIdx.reserve(mMAX_PIXELS_ROI);
-	mWeightBin.reserve(mMAX_PIXELS_ROI);
 
         mHistBase      = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
         mHistPurview   = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
@@ -97,6 +94,9 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
+
+
+
 #ifdef PROFILER_ENABLED
 mProfiler.start("COMPUTE_INTERSECTIONS");
 #endif	
@@ -127,13 +127,12 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 		
 
 
+
+
 #ifdef PROFILER_ENABLED
-mProfiler.start("EXTRACT_VALID_BIN_IDS");
+mProfiler.start("MASK_INVALID_BIN_IDS");
 #endif
 
-
-	//Weights of Intersections
-	multiply(mDepthTemplate, mProbMapFocussed, mIntWeights, 1, CV_32S);	
 	
 	//Build Mask for Valid Intersections
 	bitwise_and(mProbMapFocussed > 0, mGradTanFocussed !=0,    mMask);
@@ -141,59 +140,20 @@ mProfiler.start("EXTRACT_VALID_BIN_IDS");
 	bitwise_and(mMask, mIntPurview > mLOWER_LIMIT_IntPurview,  mMask);
     	bitwise_and(mMask, mIntBase    < mUPPER_LIMIT_IntBase,     mMask);
     	bitwise_and(mMask, mIntPurview < mUPPER_LIMIT_IntPurview,  mMask);
-	int size= countNonZero(mMask);
-		
-	// Resize vectors to Maximum Limit
-	mBaseBinIdx.resize(mMAX_PIXELS_ROI);
-	mPurviewBinIdx.resize(mMAX_PIXELS_ROI);	
-	mWeightBin.resize(mMAX_PIXELS_ROI);
 
-	{
-	   register int32_t* 	IN_basePTR 	    	= mIntBase.ptr<int32_t>(0);
-	   register int32_t* 	IN_purviewPTR   	= mIntPurview.ptr<int32_t>(0);
-	   register int32_t* 	IN_weightsPTR   	= mIntWeights.ptr<int32_t>(0);
-	   register uint8_t* 	IN_maskPTR   		= mMask.ptr<uint8_t>(0);
-	
-	   register uint16_t*   	OUT_basePTR		= mBaseBinIdx.data();
-	   register uint16_t*   	OUT_purviewPTR		= mPurviewBinIdx.data();
-	   register int32_t*    	OUT_weights		= mWeightBin.data();
 
-	   for (int i = 0; i < mMAX_PIXELS_ROI; i++,IN_basePTR++,IN_purviewPTR++, IN_weightsPTR++ , IN_maskPTR++)
-	   {
-			
-		   if(!(*IN_maskPTR ==0) )
-		   {		
-			*OUT_basePTR=
-				(*IN_basePTR    - mSCALED_START_LANE_FILTER + (mSCALED_STEP_LANE_FILTER/2) )
-				/ mSCALED_STEP_LANE_FILTER;
-			
-			*OUT_purviewPTR=
-				(*IN_purviewPTR -  mSCALED_START_VP_FILTER   + (mSCALED_STEP_VP_FILTER/2)  )
-				/ mSCALED_STEP_VP_FILTER ;
-			
-			*OUT_weights = *IN_weightsPTR;
-			
-			OUT_basePTR++;
-			OUT_purviewPTR++;
-			OUT_weights++;
-		   }	
-				
-	   }
+        mHistBase      = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
+        mHistPurview   = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
 		
-	} //Block-Ends
-	
-	mBaseBinIdx.resize(size);
-	mPurviewBinIdx.resize(size);
-	mWeightBin.resize(size);	
-	
+
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
 				<<  "Extract Valid Intersection Bin IDs." <<endl
-				<<  "Max Time: " << mProfiler.getMaxTime("EXTRACT_VALID_BIN_IDS")<<endl
-				<<  "Avg Time: " << mProfiler.getAvgTime("EXTRACT_VALID_BIN_IDS")<<endl
-				<<  "Min Time: " << mProfiler.getMinTime("EXTRACT_VALID_BIN_IDS")<<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("MASK_INVALID_BIN_IDS")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("MASK_INVALID_BIN_IDS")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("MASK_INVALID_BIN_IDS")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
 
@@ -202,57 +162,50 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
-#ifdef PROFILER_ENABLED
-mProfiler.start("FILTERS_WAIT");
-#endif 				
-		
-	wrtLock.lock();
-	_sateChange.wait(wrtLock,[this]{return mFiltersReady;} );
-	mFiltersReady = false; //reset the flag for next loop.
-	wrtLock.unlock();
-
-				
- #ifdef PROFILER_ENABLED
- mProfiler.end();
-LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
-				<<"******************************"<<endl
-				<<  "Waiting for worker thread to finish transition filters." <<endl
-				<<  "Max Time: " << mProfiler.getMaxTime("FILTERS_WAIT")<<endl
-				<<  "Avg Time: " << mProfiler.getAvgTime("FILTERS_WAIT")<<endl
-				<<  "Min Time: " << mProfiler.getMinTime("FILTERS_WAIT")<<endl
-				<<"******************************"<<endl<<endl;	
-				#endif	
-
-
-
 
 #ifdef PROFILER_ENABLED
 mProfiler.start("COMPUTE_HISTOGRAMS");
 #endif
 
+	//Weights of Intersections
+	multiply(mDepthTemplate, mProbMapFocussed, mIntWeights, 1, CV_32S);	
 
 	{
-	   int64_t SUM;
-	   register int32_t* HistBase_pixelPTR    =  mHistBase.ptr<int32_t>(0);
-	   register int32_t* HistPurview_pixelPTR =  mHistPurview.ptr<int32_t>(0);
+	   register int32_t* 	IN_basePTR 	    	= mIntBase.ptr<int32_t>(0);
+	   register int32_t* 	IN_purviewPTR   	= mIntPurview.ptr<int32_t>(0);
+	   register int32_t* 	IN_weightsPTR   	= mIntWeights.ptr<int32_t>(0);
+	   register uint8_t* 	IN_maskPTR   		= mMask.ptr<uint8_t>(0);
 
+	   register int32_t* 	HistBase_pixelPTR    	=  mHistBase.ptr<int32_t>(0);
+	   register int32_t* 	HistPurview_pixelPTR 	=  mHistPurview.ptr<int32_t>(0);
 
-	   for ( std::size_t j = 0; j < mBaseBinIdx.size(); ++j)
+	   uint16_t   lBaseBinIdx;
+	   uint16_t   lPurviewBinIdx;
+	   int32_t    lWeightBin;
+
+	   for (int i = 0; i < mMAX_PIXELS_ROI; i++,IN_basePTR++,IN_purviewPTR++, IN_weightsPTR++ , IN_maskPTR++)
 	   {
-		*(HistBase_pixelPTR 	+ mBaseBinIdx[j])  += mWeightBin[j];
-		*(HistPurview_pixelPTR  + mPurviewBinIdx[j]) += mWeightBin[j];
-	   }
+			
+		   if(!(*IN_maskPTR ==0) )
+		   {		
+			lBaseBinIdx=
+				(*IN_basePTR    - mSCALED_START_LANE_FILTER + (mSCALED_STEP_LANE_FILTER/2) )
+				/ mSCALED_STEP_LANE_FILTER;
+			
 
-	    //Normalising Base Histogram
-	    SUM = sum(mHistBase)[0];
-	    mHistBase.convertTo(mHistBase, CV_64F, SCALE_FILTER);
-	    mHistBase.convertTo(mHistBase, CV_32S, 1.0/SUM );
-	 
-	    //Normalising Purview Histogram
-	    SUM = sum(mHistPurview)[0];
-	    mHistPurview.convertTo(mHistPurview, CV_64F, SCALE_FILTER);
-	    mHistPurview.convertTo(mHistPurview, CV_32S, 1.0/SUM );
-	}
+			lPurviewBinIdx=
+				(*IN_purviewPTR -  mSCALED_START_VP_FILTER   + (mSCALED_STEP_VP_FILTER/2)  )
+				/ mSCALED_STEP_VP_FILTER ;
+			
+			lWeightBin = *IN_weightsPTR;
+			
+			
+			*(HistBase_pixelPTR 	+ lBaseBinIdx	)  	+= lWeightBin;
+			*(HistPurview_pixelPTR  + lPurviewBinIdx) 	+= lWeightBin;
+		   }	
+	   }
+		
+	}//Block Ends
 	
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -270,11 +223,33 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
-//Start Buffer Shifting
+
+
+#ifdef PROFILER_ENABLED
+mProfiler.start("FILTERS_WAIT");
+#endif 				
+		
 	wrtLock.lock();
+	_sateChange.wait(wrtLock,[this]{return mFiltersReady;} );
+	mFiltersReady = false; //reset the flag for next loop.
 	this->mStartBufferShift = true;
 	wrtLock.unlock();
 	_sateChange.notify_one();
+
+				
+ #ifdef PROFILER_ENABLED
+ mProfiler.end();
+LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
+				<<"******************************"<<endl
+				<<  "Waiting for worker thread to finish transition filters." <<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("FILTERS_WAIT")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("FILTERS_WAIT")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("FILTERS_WAIT")<<endl
+				<<"******************************"<<endl<<endl;	
+				#endif	
+
+
+
 
 
 
@@ -282,7 +257,20 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("HISTOGRAM_MATCHING");
 #endif
+
 	{
+   	    int64_t SUM;
+
+	    //Normalising Base Histogram
+	    SUM = sum(mHistBase)[0];
+	    mHistBase.convertTo(mHistBase, CV_64F, SCALE_FILTER);
+	    mHistBase.convertTo(mHistBase, CV_32S, 1.0/SUM );
+	 
+
+	    //Normalising Purview Histogram
+	    SUM = sum(mHistPurview)[0];
+	    mHistPurview.convertTo(mHistPurview, CV_64F, SCALE_FILTER);
+	    mHistPurview.convertTo(mHistPurview, CV_32S, 1.0/SUM );
 		
 	   int   BestModelIdx=-1;
 	   int   NegLaneCorrelation;
@@ -801,8 +789,6 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 	mTransitVpFilter.convertTo(mTransitVpFilter, CV_32S, 1.0/SUM);	
 	mTransitVpFilter = mTransitVpFilter + 0.1*mVpFilter->prior;
 			
-        mHistBase      = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
-        mHistPurview   = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
 
 	mFiltersReady   = true;
 	mStartFiltering = false;

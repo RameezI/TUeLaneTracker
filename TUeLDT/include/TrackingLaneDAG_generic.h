@@ -72,16 +72,6 @@ private:
 	cv::Mat			mIntPurview;
 	cv::Mat 		mIntWeights;
 	
-
-	vector<uint16_t>	mBaseBinIdx; 	//Only valid list of Intersections IDs
-	vector<uint16_t>	mPurviewBinIdx;	//Only valid list of Intersections IDs
-	vector<int32_t>	        mWeightBin;  	//Only valid list of Weights IDs
-
-
-	cv::Mat			mBaseBinIdx; 	//Only valid list of Intersections IDs
-	cv::Mat			mPurviewBinIdx;	//Only valid list of Intersections IDs
-	cv::Mat	        	mWeightBin;  	//Only valid list of Weights IDs
-	
 	cv::Mat			mHistBase;
 	cv::Mat			mHistPurview;
 	
