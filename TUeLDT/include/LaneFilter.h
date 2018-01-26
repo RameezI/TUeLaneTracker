@@ -67,18 +67,18 @@ class LaneFilter
 	
 private:	
 		const LaneParameters   	mLANE;
-		const Camera 		mCAMERA;
-		const int		mSTEP_CM;     // BaseHistogram Step in cm
+		const Camera 			mCAMERA;
+		const int				mSTEP_CM;     // BaseHistogram Step in cm
 
 public:	 //Public Interface 
-		const int 	STEP;   		// BaseHistogram Step in Pixels 
-		const int 	mBIN_MAX;		// BaseHistogram Max Bin Value
-		const int   	mNb_HISTOGRAM_BINS;    	// number of bins in the Base Histogram.
-		const int   	mNb_OFFSET_BINS;	// number of offset bins on one side.
+		const int 	STEP;   				// BaseHistogram Step in Pixels
+		const int 	mBIN_MAX;				// BaseHistogram Max Bin Value
+		const int   mNb_HISTOGRAM_BINS;    	// number of bins in the Base Histogram.
+		const int   mNb_OFFSET_BINS;		// number of offset bins on one side.
 		
 public:	 //Public Interface of the class	
 
-		const int 	OFFSET_V;   		// Vertical Offset (BaseHistogram) in VP coordinate System
+		const int 		OFFSET_V;   		// Vertical Offset (BaseHistogram) in VP coordinate System
 		const VectorXi  HISTOGRAM_BINS;    	// -PX_MAX:STEP: PX_MAX
 		const VectorXi  OFFSET_BINS;       	//  0 : STEP : PX_MAX
 		
