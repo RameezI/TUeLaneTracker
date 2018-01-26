@@ -93,9 +93,11 @@ Select the desired source and provide it to the *stateMachine* class constructor
 Currently, the callibration is parameterized in the corresponding header files. To callibrate the lane tracker for a new input source,  following hearder files must be updated:
 
 1. Camera intrinsic and extrinsic parameters can be found in *Camera* constructor.
+
    "TUeLaneTracker/TUeLDT/include/Camera.h"
    
 2. The size and location of the region of interest is defined, based on the location of the horizon and the vertical range of vanishing point, in Templates constructor.
+
        "TUeLaneTracker/TUeLDT/include/Templates.h"
        
  3. Furhtermore, the following files provides parameters for the 1D lane filter and the 2D vanishing point filter. The position of the 	  base and purview line is also defined by the constructors of *LaneFilter* and *VanishingPtFilter* class in VP coordinate system.
