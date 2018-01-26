@@ -72,13 +72,13 @@ vim  LaneTrackerApp/main.cpp
 ```
 Pass the desired source and the corresponding settings to the *stateMachine* class constructor.
 
-# Example: Directory Input
+#### Example: Directory Input
 ```
        FrameSource lFrameSource = FrameSource::DIRECTORY;
 	string	     lSourceStr 	 = "/mnt/data0/DataSet/eindhoven/PNG_imgs";
 	StateMachine stateMachine(lFrameSource, lSourceStr);
 ```
-# Example: RTSP Stream Input
+#### Example: RTSP Stream Input
 
 ```
        FrameSource lFrameSource = FrameSource::RTSP;
