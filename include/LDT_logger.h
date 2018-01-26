@@ -26,6 +26,7 @@
 
 enum LDTLog {STATE_MACHINE_LOG=0, TIMING_PROFILE};
 enum ProfilerStatus{NOT_INITIALISED=-1, INITIALISED};
+
 class Logger
 {
 	
