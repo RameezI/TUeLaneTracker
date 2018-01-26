@@ -21,37 +21,38 @@ What things you need to install the software and how to install them
 
 ### Build, Install and Run the Application
 
-A step by step series of examples that tell you have to get the application running
+Follow the following steps to run the software application
 
-clone this repository 
+1. clone this repository 
 
 ```
 git clone https://github.com/RameezI/TUeLaneTracker.git
 ```
 
 
-Go to the parent directory of the cloned repository:
+2. Go to the parent directory of the cloned repository:
 ```
 cd TUeLaneTracker
 ```
 
-Create a build subdirectory and invoke cmake
+3. Create a build subdirectory and invoke cmake
 ```
 mkdir build
 cd build
 cmake ..
 ```
 
-Build and Install the executeable
+4. Build and Install the executeable
 ```
 make install
 ```
 
-Run the executeable <sup>*</sup>. 
+5. Run the executeable <sup>*</sup>. 
 ```
 cd ../install/bin
 ./TUeLaneTracker
 ```
+
 * Executeable must be invoked from within the bin directory.       
 
 
@@ -63,7 +64,6 @@ The TUeLaneDetector has three options for recieving the input frames, defined in
 3. GMSL [IN PROGRESS]
    
 To update the source settings :
-
 
 Open *LaneTrackerApp/main.cpp* file in an editor:
 
