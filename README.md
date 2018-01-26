@@ -75,22 +75,22 @@ Pass the desired source and the corresponding settings to the *stateMachine* cla
 #### Example: Directory Input
 ```
        FrameSource lFrameSource = FrameSource::DIRECTORY;
-	string	     lSourceStr 	 = "/mnt/data0/DataSet/eindhoven/PNG_imgs";
+	string	     lSourceStr = "/mnt/data0/DataSet/eindhoven/PNG_imgs";
 	StateMachine stateMachine(lFrameSource, lSourceStr);
 ```
 #### Example: RTSP Stream Input
 
 ```
-       FrameSource lFrameSource = FrameSource::RTSP;
-	string	     lSourceStr 	 = "rtsp://192.168.8.1:8554/test";
+       FrameSource lFrameSource  = FrameSource::RTSP;
+	string	     lSourceStrr = "rtsp://192.168.8.1:8554/test";
 	StateMachine stateMachine(lFrameSource, lSourceStr);
 ```
 
 
 
-### Callibrarting the input Source for the Lane Detector
+### Callibrarting TUeLaneTracker
 
-Currently, the callibration is parameterized in the corresponding headers.
+Currently, the callibration is parameterized in the corresponding header files. To callibrate the for a new input source following hearder files must be updated:
 
 1. Camera intrinsic and extrinsic parameters can be found in *Camera* constructor.
    "TUeLaneTracker/TUeLDT/include/Camera.h"
@@ -98,9 +98,11 @@ Currently, the callibration is parameterized in the corresponding headers.
 2. The span and location of the region of interest is defined, based on the location of the horizon and the vertical range of vanishing point, in Templates constructor.
        "TUeLaneTracker/TUeLDT/include/Templates.h"
        
-These two files needed to be updated to callibrate the tracker for a new source.
+Furhtermore, the following files provides parameters for the 1D lane filter and the 2D vanishing point filter. The position of the base and purview line is also defined by the constructors of *LaneFilter* and *VanishingPtFilter* class in VP coordinate system.
+
+	TUeLaneTracker/TUeLDT/include/LaneFilter.h 
+	TUeLaneTracker/TUeLDT/include/VanishingPtFilter.h
        
-   
        
 ## Youtube Videos
    These videos showcase the functional performance of the algorithm:
@@ -127,9 +129,9 @@ See also the list of [contributors](https://github.com/RameezI/TUeLaneTracker/gr
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE.md] (LICENSE.md) file for details
 
 
 ## Acknowledgments
 
-This research and design project was supported by NXP Semiconductors and Eindoven University of Technology. I thank everyone who provided insight and expertise that greatly assisted this project ....
+This research and design project was supported by NXP Semiconductors and Eindoven University of Technology. 
