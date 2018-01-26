@@ -70,18 +70,18 @@ Open *LaneTrackerApp/main.cpp* file in an editor:
 ```
 vim  LaneTrackerApp/main.cpp
 ```
-Pass the desired source and the corresponding settings to the *stateMachine* class constructor.
+Select the desired source and provide it to the *stateMachine* class constructor together with a string that contains source configuration.
 
 #### Example: Directory Input
 ```
-       FrameSource lFrameSource = FrameSource::DIRECTORY;
-	string	     lSourceStr = "/mnt/data0/DataSet/eindhoven/PNG_imgs";
-	StateMachine stateMachine(lFrameSource, lSourceStr);
+       FrameSource   lFrameSource = FrameSource::DIRECTORY;
+       string	     lSourceStr = "/mnt/data0/DataSet/eindhoven/PNG_imgs";
+       StateMachine  stateMachine(lFrameSource, lSourceStr);
 ```
 #### Example: RTSP Stream Input
 
 ```
-       FrameSource lFrameSource  = FrameSource::RTSP;
+       FrameSource   lFrameSource  = FrameSource::RTSP;
 	string	     lSourceStrr = "rtsp://192.168.8.1:8554/test";
 	StateMachine stateMachine(lFrameSource, lSourceStr);
 ```
@@ -102,7 +102,7 @@ Furhtermore, the following files provides parameters for the 1D lane filter and 
 
 	TUeLaneTracker/TUeLDT/include/LaneFilter.h 
 	TUeLaneTracker/TUeLDT/include/VanishingPtFilter.h
-       
+  
        
 ## Youtube Videos
    These videos showcase the functional performance of the algorithm:
