@@ -27,6 +27,4 @@
  //#define S32V2XX
  //#define DISPLAY_GRAPHICS_DCU
 
-
-
 #endif
