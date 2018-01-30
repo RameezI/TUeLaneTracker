@@ -21,7 +21,7 @@
 * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
-
+#include "Config.h"
 #include  <memory>
 #include "SigInit.h"
 #include "State.h"
@@ -32,13 +32,11 @@ class StateMachine
 {
 	
 private:
-
-	States mCurrentState;
 	const  FrameSource	mFrameSource;
 	const  string		mSourceStr;
+	 	   States 		mCurrentState;
 
 public:	
-
 	StateMachine(FrameSource lFrameSource, string lSourceString);
 	int spin(shared_ptr<SigInit>);	
 	~StateMachine();

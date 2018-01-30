@@ -23,7 +23,7 @@
 *
 * ****************************************************************************/ 
 
-#include "compileConfig.h"
+#include <Config.h>
 #include "LDT_profiler.h"
 #include "LDT_logger.h"
 
@@ -41,12 +41,10 @@ protected:
 	#endif
 	
 public:
-//^TODO: Move sNbBuffer to Bufferring State
-	static const  int      	sNbBuffer      =  5;
-	int64_t 		StateCounter   =  0;     	
+	int64_t 				StateCounter   =  0;
 	StateStatus 	       	currentStatus  =  StateStatus::INACTIVE;
 	
-	void dispose(){currentStatus = StateStatus::ERROR;}
+	void dispose()			{currentStatus = StateStatus::ERROR;}
 
 	State(){}
 	~State(){}

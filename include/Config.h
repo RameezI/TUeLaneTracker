@@ -1,5 +1,5 @@
-#ifndef COMPLIE_CONFIG__H
-#define COMPLIE_CONFIG__H
+#ifndef CONFIG__H
+#define CONFIG__H
 
 /******************************************************************************
 * NXP Confidential Proprietary
@@ -22,9 +22,30 @@
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/
 
+
+/* The following section provides configuration for compiling the appropriate setup*/
  #define PROFILER_ENABLED
  #define DISPLAY_GRAPHICS
  //#define S32V2XX
- //#define DISPLAY_GRAPHICS_DCU
+ #define DISPLAY_GRAPHICS_DCU
+
+
+/* The following section provides configuration for Frame Input*/
+#define DIRECTORY_PNG_IMAGES	"../../data"
+#define SKIP_FRAMES				0
+
+
+/* The following section provides configuration for  the camera parameters */
+#define CAMERA_RES_H  			640
+#define CAMERA_RES_V			480
+
+#define CAMERA_FOV_H			60
+#define CAMERA_FOV_V			45
+
+#define CAMERA_HEIGHT			1.5
+#define CAMERA_FOCAL_LENGTH		6.0e-3
+
+
+
 
 #endif

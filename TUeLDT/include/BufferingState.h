@@ -37,11 +37,15 @@ class BufferingState : public State
 {
 	
 private:
+
+	const  int   mNbBuffer;
 	uint_fast8_t mRetryGrab;
-	std::thread mSideExecutor;
+	std::thread  mSideExecutor;
+
 
 public:
-	GRAPH 	mGraph;
+	GRAPH 		mGraph;
+
 
 public:		
 	BufferingState();
@@ -54,12 +58,13 @@ public:
 
 //******************************************************************/*
 // Class Definitions
-//Templated class thus declarations and definitions in a single file
+//Template class thus declarations and definitions in a single file
 //******************************************************************/
 
 template<typename GRAPH>
 BufferingState<GRAPH>::BufferingState()
-:mRetryGrab(0)
+: mNbBuffer(5),
+  mRetryGrab(0)
 {
 
 }
@@ -71,7 +76,7 @@ int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
 
 	if (lSource == FrameSource::DIRECTORY)
 	{
-           cv::String lFolder = lSourceStr;
+       cv::String lFolder = lSourceStr;
 	   vector< cv::String> lFiles;
            
 	   try
@@ -84,27 +89,27 @@ int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
 		lReturn = -1;
 	   }
 
-          // const uint lSkipFrames = 4000;  
-             const uint lSkipFrames = 0;  
-         
-      	   if (lFiles.size() <= lSkipFrames)
-           {
-         	cout<<endl;
-         	cout<<"Total Number of Image Files to Process : " << 0;
-         	cout<<endl;
-         	lReturn = -1;
-           }
+	   if (lFiles.size() <= SKIP_FRAMES)
+	   {
+		   cout<<endl;
+		   cout<<"Total Number of Image Files are Less than SKIP_FRAMES' " <<endl;
+		   cout<<"Total Number of Image Files : " << lFiles.size() <<endl;
+		   cout<< "...Skipping All"  <<endl;
+		   lReturn = -1;
+	   }
 
 	   else
 	   {
      	   	cout<<endl;
-           	cout<<"Total Number of Image Files to Process : " << lFiles.size() - lSkipFrames;
-           	cout<<endl;	
+           	cout<<"Total Number of Image Files to Process : " << lFiles.size() - SKIP_FRAMES;
+           	cout<<endl;
+
+            mGraph.mSource 		= lSource;
+           	mGraph.mFiles 		= lFiles;
+           	mGraph.mFrameCount 	= SKIP_FRAMES;
 	   }
 
-	   mGraph.mSource = lSource;
-	   mGraph.mFiles = lFiles;
-	   mGraph.mFrameCount =lSkipFrames;
+
 	}
 
 	else if(lSource == FrameSource::RTSP)
@@ -116,7 +121,6 @@ int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
 		
 		try
 		{
-		   //if(!mGraph.mRTSP_CAPTURE.open("rtsp://192.168.8.1:8554/test"))
 		   if(!mGraph.mRTSP_CAPTURE.open(lSourceStr))
 		   lReturn = -1;
 		}
@@ -133,14 +137,14 @@ int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
 
 	
 		cout<< "This Mode is not yet implemented"<< endl;
-		cout<< "Exitting"<<endl;
+		cout<< "Exiting"<<endl;
 		lReturn =-1;
 	}
 
 	else
 	{
-		cout << "The input mode is not recognised" << endl;
-		cout << "Exitting"<<endl;
+		cout << "The input mode is not recognized" << endl;
+		cout << "Exiting"<<endl;
 		lReturn =-1;
 	}
 
@@ -159,24 +163,26 @@ void BufferingState<GRAPH>::setupDAG(const Templates& templates)
 mProfiler.start("SET_UP_BUFFERING_DAG");
 #endif
 
-	const int RES_H 	= mGraph.mCAMERA.RES_VH(1);
+	const int RES_H 		= mGraph.mCAMERA.RES_VH(1);
 	
 	mGraph.mVP_Range_V   	= templates.VP_RANGE_V;
-	mGraph.mSpan		= templates.SPAN;
-	mGraph.mMargin		= templates.MARGIN;
+	mGraph.mSpan			= templates.SPAN;
+	mGraph.mMargin			= templates.MARGIN;
 	
 	//allocate buffers
-	mGraph.mBufferPool.reset(new BufferPool(templates.SPAN, RES_H, sNbBuffer)); 
+	mGraph.mBufferPool.reset(new BufferPool(templates.SPAN, RES_H, mNbBuffer));
 
 	// assign templates
 	mGraph.mGRADIENT_TAN_ROOT = templates.GRADIENT_TAN_ROOT;
 	mGraph.mDEPTH_MAP_ROOT    = templates.DEPTH_MAP_ROOT;
 	mGraph.mFOCUS_MASK_ROOT   = templates.FOCUS_MASK_ROOT;
-	mGraph.mY_ICS	 	  = templates.Y_ICS;
-	mGraph.mX_ICS    	  = templates.X_ICS;
+	mGraph.mY_ICS	 	  	  = templates.Y_ICS;
+	mGraph.mX_ICS    	  	  = templates.X_ICS;
 
 	if ( 0 == mGraph.init_DAG() )
 	this->currentStatus= StateStatus::ACTIVE;
+
+
 		
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -197,6 +203,8 @@ void BufferingState<GRAPH>::run()
 #ifdef PROFILER_ENABLED
 	mProfiler.start("RUN_BUFFERING_DAG");
 #endif	
+
+
 	
 	if (0==mGraph.grabFrame())
 	{
@@ -208,7 +216,7 @@ void BufferingState<GRAPH>::run()
 		
 		this->StateCounter++;
 		
-		if(this->StateCounter >= sNbBuffer-1)
+		if(this->StateCounter >= mNbBuffer-1)
 		{
 		  this->currentStatus = StateStatus::DONE;
 		}
@@ -221,13 +229,14 @@ void BufferingState<GRAPH>::run()
 		 currentStatus = StateStatus::ERROR;
 	}
 
+
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				<<"******************************"<<endl
 				<<  "Total Time for Buffering Graph." <<endl
 				<<  "Max Time: " << mProfiler.getMaxTime("RUN_BUFFERING_DAG")<<endl
-				<<  "Avg Time: " << mProfiler.getAvgTime("RUN_BUFFERING_DAG")<<endl
+				<<  "Avg. Time: " << mProfiler.getAvgTime("RUN_BUFFERING_DAG")<<endl
 				<<  "Min Time: " << mProfiler.getMinTime("RUN_BUFFERING_DAG")<<endl
 				<<"******************************"<<endl<<endl;	
  				#endif

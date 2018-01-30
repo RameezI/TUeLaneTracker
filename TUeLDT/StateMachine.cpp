@@ -38,7 +38,9 @@
 StateMachine::StateMachine(FrameSource lFrameSource, std::string lSourceStr)
 
 : mFrameSource(lFrameSource),
-  mSourceStr(lSourceStr) 
+  mSourceStr(lSourceStr),
+  mCurrentState(States::BOOTING)
+
 {
 	#ifdef PROFILER_ENABLED
 
@@ -54,8 +56,6 @@ StateMachine::StateMachine(FrameSource lFrameSource, std::string lSourceStr)
 }
 
 
-
-
 int StateMachine::spin(shared_ptr<SigInit> sigInit)
 {
 
@@ -63,9 +63,9 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	
 	// The memory allocated by these pointers have life until the span of this function
 	// i.e. until the State Machine is spinning
-	unique_ptr<LaneFilter>  	pLaneFilter;
+	unique_ptr<LaneFilter>  		pLaneFilter;
 	unique_ptr<VanishingPtFilter>   pVanishingPtFilter;
-	unique_ptr<Templates> 		pTemplates;
+	unique_ptr<Templates> 			pTemplates;
 
 
 	#ifdef S32V2XX
@@ -79,7 +79,7 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	{				
 	   InitState		bootingState;
 
-	   pLaneFilter 		= bootingState.createLaneFilter();
+	   pLaneFilter 			= bootingState.createLaneFilter();
 	   pVanishingPtFilter	= bootingState.createVanishingPtFilter();
 	   pTemplates           = bootingState.createTemplates();
 					
@@ -100,8 +100,6 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	} //booting process block ends
 			
 
-
-
 			
 	// BUFFERING PROCESS //
 	if (mCurrentState == States::BUFFERING)
@@ -115,11 +113,11 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	
 
 	   if (lBufferingState.currentStatus == StateStatus::INACTIVE)
-	   {			
-	   	lReturn |= lBufferingState.setSource(mFrameSource, mSourceStr);
+	   {
+	     lReturn |= lBufferingState.setSource(mFrameSource, mSourceStr);
 		
-		if (lReturn != 0)
-		{	
+		 if (lReturn != 0)
+		 {
 		   #ifdef PROFILER_ENABLED
 		  	LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 		   	<<"*********************************"<<endl
@@ -129,67 +127,65 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 		   #endif 
 		
 		   lBufferingState.dispose();
-		}
-		else
-		{
+		 }
+		 else
+		 {
 		   lBufferingState.setupDAG(std::ref(*pTemplates));
-		}
+		 }
 	   }
 	
 	   while (lBufferingState.currentStatus == StateStatus::ACTIVE)
 	   {	
-		lBufferingState.run();
+		 lBufferingState.run();
 
-		if (sigInit->sStatus==SigStatus::STOP)
-		{
+		 if (sigInit->sStatus==SigStatus::STOP)
+		 {
 		   #ifdef PROFILER_ENABLED
 			LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 		   	<<"***************************************"<<endl
-		   	<<  "[Buffering Process Intrupted by the user]"<<endl
+		   	<<  "[Buffering Process Interrupted by the user]"<<endl
 			<<  "Shutting Down the State-Machine"	   <<endl
 			<<"***************************************"<<endl;
 		   #endif 
 	   	   
 		   lBufferingState.dispose();
-		}
+		 }
 	   }
 			
 	   if( lBufferingState.currentStatus == StateStatus::DONE)
 	   {
 		
-	   	mCurrentState = States::DETECTING_LANES;
+	   	 mCurrentState = States::DETECTING_LANES;
 
-		pTrackingState.reset
-		#ifdef S32V2XX
-		 (new TrackingLaneState<TrackingLaneDAG_s32v>(move(lBufferingState.mGraph)));
-		#else
+		 pTrackingState.reset
+		 #ifdef S32V2XX
+		  (new TrackingLaneState<TrackingLaneDAG_s32v>(move(lBufferingState.mGraph)));
+		 #else
 		 (new TrackingLaneState<TrackingLaneDAG_generic>(move(lBufferingState.mGraph)));
-		#endif
+		 #endif
 	   }
 			
 	   else
 	   {
-		#ifdef PROFILER_ENABLED
+		 #ifdef PROFILER_ENABLED
 		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 		   <<"******************************"<<endl
 		   << "[Buffering State Error]"<<endl
 		   <<  "Shutting Down the State-Machine."<<endl
 		   <<"******************************"<<endl<<endl;
-		#endif
-		lReturn	= -1; 
-		mCurrentState = States::DISPOSING;
+		 #endif
+
+		 lReturn	= -1;
+		 mCurrentState = States::DISPOSING;
 	   }	
 		
 	}// Buffering process block ends
 		
 
 
-
-
 	// TRACKING LANE PROCESS //
 	if (mCurrentState==States::DETECTING_LANES)
 	{
-
 	   #ifdef S32V2XX
 	    TrackingLaneState<TrackingLaneDAG_s32v>&    lTrackingState 	= *pTrackingState;
 	   #else
