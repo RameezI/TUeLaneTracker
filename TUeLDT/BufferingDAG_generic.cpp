@@ -248,7 +248,7 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
-				<<  "Compute total LaneMarker Proability ." <<endl
+				<<  "Compute total LaneMarker Probability ." <<endl
 				<<  "Max Time: " << mProfiler.getMaxTime("COMPUTE_PROBABILITIES")<<endl
 				<<  "Avg Time: " << mProfiler.getAvgTime("COMPUTE_PROBABILITIES")<<endl
 				<<  "Min Time: " << mProfiler.getMinTime("COMPUTE_PROBABILITIES")<<endl
