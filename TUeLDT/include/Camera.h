@@ -44,7 +44,7 @@ private:
 		   const	VectorXd DEPTH_P 	= HEIGHT * tan( (90 - PX_ANG.array()) * M_PI/180.0 );
 	
 		  //The horizontal pixel to cm ratio at the bottom
-		  return 	H_RES_H/(100*tan(H_FOV_H * M_PI /180.0)*DEPTH_P(H_RES_V-1)); 
+		   return 	H_RES_H/(100*tan(H_FOV_H * M_PI /180.0)*DEPTH_P(H_RES_V-1));
 
 	   }
 	

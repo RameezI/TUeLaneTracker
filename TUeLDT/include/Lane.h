@@ -80,7 +80,7 @@ struct LaneMembership
 		const float NEG_BOUNDARY_NORMA;
 		const float NEG_BOUNDARY_NOMIN;
 		
-		LaneMembership() //Initialisation of  members through initialisation list
+		LaneMembership() //Initialization of  members through initialization list
 		:TIPPING_POINT_GRAY(100),
 		 TIPPING_POINT_GRAD_Mag(40),
 		 
