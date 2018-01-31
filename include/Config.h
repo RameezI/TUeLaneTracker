@@ -26,7 +26,7 @@
 /* The following section provides configuration for compiling the appropriate setup*/
  #define PROFILER_ENABLED
  #define DISPLAY_GRAPHICS
- //#define S32V2XX
+ #define S32V2XX
  #define DISPLAY_GRAPHICS_DCU
 
 
@@ -44,8 +44,5 @@
 
 #define CAMERA_HEIGHT			1.5
 #define CAMERA_FOCAL_LENGTH		6.0e-3
-
-
-
 
 #endif
