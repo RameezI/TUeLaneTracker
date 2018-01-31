@@ -91,10 +91,18 @@ int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
 
 	   if (lFiles.size() <= SKIP_FRAMES)
 	   {
+
+		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+		   		<<"******************************"<<endl
+		   		<< "Total Number of Image Files are Less than SKIP_FRAMES."<<endl
+				<< "Total Number of Image Files : " << lFiles.size()<<endl
+		   	   	<< "...Skipping All"<<endl
+		   		<<"******************************"<<endl<<endl;
+
 		   cout<<endl;
-		   cout<<"Total Number of Image Files are Less than SKIP_FRAMES' " <<endl;
-		   cout<<"Total Number of Image Files : " << lFiles.size() <<endl;
-		   cout<< "...Skipping All"  <<endl;
+		   cout<<"Total Number of Image Files to Process : " << 0;
+		   cout<<endl;
+
 		   lReturn = -1;
 	   }
 
@@ -170,7 +178,7 @@ mProfiler.start("SET_UP_BUFFERING_DAG");
 	mGraph.mMargin			= templates.MARGIN;
 	
 	//allocate buffers
-	mGraph.mBufferPool.reset(new BufferPool(templates.SPAN, RES_H, mNbBuffer));
+	mGraph.mBufferPool.reset(new BufferPool<GRAPH>(templates.SPAN, RES_H, mNbBuffer));
 
 	// assign templates
 	mGraph.mGRADIENT_TAN_ROOT = templates.GRADIENT_TAN_ROOT;

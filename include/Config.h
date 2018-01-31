@@ -26,7 +26,7 @@
 /* The following section provides configuration for compiling the appropriate setup*/
  #define PROFILER_ENABLED
  #define DISPLAY_GRAPHICS
- #define S32V2XX
+ //#define S32V2XX
  #define DISPLAY_GRAPHICS_DCU
 
 
