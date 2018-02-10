@@ -27,7 +27,7 @@
  #define PROFILER_ENABLED
  #define DISPLAY_GRAPHICS
 //#define S32V2XX
- #define DISPLAY_GRAPHICS_DCU
+// #define DISPLAY_GRAPHICS_DCU
 
 
 /* The following section provides configuration for Frame Input*/
