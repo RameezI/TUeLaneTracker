@@ -44,10 +44,9 @@ private:
 
 
 public:
+
 	GRAPH 		mGraph;
 
-
-public:		
 	BufferingState();
 	int  setSource(FrameSource, string);
 	void setupDAG(const Templates& templates);

@@ -67,24 +67,22 @@ int StateMachine::spin(shared_ptr<SigInit> sigInit)
 	unique_ptr<VanishingPtFilter>   pVanishingPtFilter;
 	unique_ptr<Templates> 			pTemplates;
 
-
 	#ifdef S32V2XX
 	 unique_ptr<TrackingLaneState<TrackingLaneDAG_s32v>>   	 pTrackingState;
 	#else
 	 unique_ptr<TrackingLaneState<TrackingLaneDAG_generic>>  pTrackingState;
 	#endif
 
-
 	// BOOTING PROCESS //
 	{				
-	   InitState		bootingState;
+	   InitState	lBootingState;
 
-	   pLaneFilter 			= bootingState.createLaneFilter();
-	   pVanishingPtFilter	= bootingState.createVanishingPtFilter();
-	   pTemplates           = bootingState.createTemplates();
+	   pLaneFilter 			= lBootingState.createLaneFilter();
+	   pVanishingPtFilter	= lBootingState.createVanishingPtFilter();
+	   pTemplates           = lBootingState.createTemplates();
 					
-	   if (bootingState.currentStatus == StateStatus::DONE)						
-		mCurrentState = States::BUFFERING;	
+	   if (lBootingState.currentStatus == StateStatus::DONE)
+		   mCurrentState = States::BUFFERING;
 	   else 
 	   {
 		#ifdef PROFILER_ENABLED

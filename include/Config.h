@@ -26,13 +26,13 @@
 /* The following section provides configuration for compiling the appropriate setup*/
  #define PROFILER_ENABLED
  #define DISPLAY_GRAPHICS
-// #define S32V2XX
-// #define DISPLAY_GRAPHICS_DCU
+//#define S32V2XX
+ #define DISPLAY_GRAPHICS_DCU
 
 
 /* The following section provides configuration for Frame Input*/
 #define DIRECTORY_PNG_IMAGES	"../../DataSet"
-#define SKIP_FRAMES		0
+#define SKIP_FRAMES				0
 
 
 /* The following section provides configuration for  the camera parameters */
@@ -45,4 +45,9 @@
 #define CAMERA_HEIGHT			1.5
 #define CAMERA_FOCAL_LENGTH		6.0e-3
 
+
+
+
+
 #endif
+

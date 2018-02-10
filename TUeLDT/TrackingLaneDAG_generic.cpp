@@ -645,9 +645,7 @@ mProfiler.start("DISPLAY");
 
 
 	   #ifdef DISPLAY_GRAPHICS_DCU
-
 	   	mDCU.PutFrame(mFrameRGB.data);
-
 	   #else  
 
 	   imshow( "Display window", mFrameRGB);

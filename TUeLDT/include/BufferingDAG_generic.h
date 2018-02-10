@@ -28,6 +28,7 @@
 #include "State.h"		//implicit include of profiling and logging headers
 #include "LaneFilter.h" 	//implicit include of opencv headers
 #include "VanishingPtFilter.h"
+#include "gmock/gmock.h"
 
 #ifdef DISPLAY_GRAPHICS_DCU
 #include "frame_output_v234fb.h"
@@ -43,11 +44,16 @@ class BufferingDAG_generic
 template<typename T>
 friend class BufferingState;
 
+FRIEND_TEST(BufferingTest, RGB_IMAGE);
+FRIEND_TEST(BufferingTest, GRAY_IMAGE);
+
 public:
 	BufferingDAG_generic ();
 
 
+
 protected:
+
 
 	using MutexType = std::mutex;
 	using WriteLock = std::unique_lock<MutexType>;
@@ -67,16 +73,16 @@ protected:
 	/*................................................
 	 Set from outside, before buffering is activated   */ 
 
-	int 			mSpan;
-	int				mMargin;
-	int 			mVP_Range_V;
+	int 					mSpan;
+	int						mMargin;
+	int 					mVP_Range_V;
 	
-	cv::Mat	 		mGRADIENT_TAN_ROOT;
-    cv::Mat			mFOCUS_MASK_ROOT;
-    cv::Mat			mDEPTH_MAP_ROOT;
+	cv::Mat	 				mGRADIENT_TAN_ROOT;
+    cv::Mat					mFOCUS_MASK_ROOT;
+    cv::Mat					mDEPTH_MAP_ROOT;
 
-	cv::Mat     	mX_ICS;
-	cv::Mat     	mY_ICS;
+	cv::Mat     			mX_ICS;
+	cv::Mat     			mY_ICS;
 	
 
 	unique_ptr<BufferPool<BufferingDAG_generic>>	mBufferPool;

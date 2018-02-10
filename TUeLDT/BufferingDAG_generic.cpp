@@ -54,8 +54,6 @@ mProfiler.start("GRAY_FRAME_CONVERSION");
 				
 	cvtColor(mFrameRGB, mFrameGRAY, CV_BGR2GRAY);
 
-
-
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
