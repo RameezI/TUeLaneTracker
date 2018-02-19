@@ -26,9 +26,11 @@
 /* The following section provides configuration for compiling the appropriate setup*/
  #define PROFILER_ENABLED
  #define DISPLAY_GRAPHICS
-//#define S32V2XX
-// #define DISPLAY_GRAPHICS_DCU
 
+
+//S32V234 specific flgs
+ //#define DISPLAY_GRAPHICS_DCU
+ #define TEST_APEX_CODE
 
 /* The following section provides configuration for Frame Input*/
 #define DIRECTORY_PNG_IMAGES	"../../DataSet"
