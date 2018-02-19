@@ -46,6 +46,8 @@ friend class BufferingState;
 
 FRIEND_TEST(BufferingTest, RGB_IMAGE);
 FRIEND_TEST(BufferingTest, GRAY_IMAGE);
+FRIEND_TEST(BufferingTest, PROB_MAP);
+FRIEND_TEST(BufferingTest, GRAD_TAN);
 
 public:
 	BufferingDAG_generic ();

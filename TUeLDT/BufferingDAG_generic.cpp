@@ -72,20 +72,19 @@ mProfiler.start("EXTRACT_ROI");
 #endif
 
 	int lRowIndex= mCAMERA.RES_VH(0) - mSpan;
-	int lColIndex= mCAMERA.RES_VH(1);
+	int lColIndex;
 	cv::Rect lROI;
-	 
-	// Extract ROI from the Input Image
-	 lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);	
+
+	 //Define ROI from the Input Image
+	 lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 	 mFrameGRAY_ROI = mFrameGRAY(lROI);
 
-				 
-	//Extract Gradient Orientation Template 
-	 lRowIndex =  mCAMERA.RES_VH(0) + mMargin - mVanishPt.V ; 
-	 lColIndex= mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
+	 lRowIndex 	=  mCAMERA.RES_VH(0) + mMargin - mVanishPt.V ;
+	 lColIndex	=  mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
+
+	 //Extract Gradient Orientation Template
 	 lROI = cv::Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 	 mGRADIENT_TAN_ROOT(lROI).copyTo(mGradTanTemplate);
-
 
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -126,7 +125,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 mProfiler.start("GAUSSIAN_BLUR");
 #endif 
 	
-	GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, cv::Size( 5, 5 ), 1.5, 1.5, cv::BORDER_REPLICATE);
+	 GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, cv::Size( 5, 5 ), 2, 2, cv::BORDER_REPLICATE | cv::BORDER_ISOLATED);
 
 				
  #ifdef PROFILER_ENABLED
@@ -151,8 +150,9 @@ mProfiler.start("GRADIENT_COMPUTATION");
 	int delta = 0;
 	int ddepth = CV_16S;
 	
-	Sobel( mFrameGRAY_ROI, mGradX, ddepth, 1, 0, 3, scale, delta, cv::BORDER_REPLICATE );
-	Sobel( mFrameGRAY_ROI, mGradY, ddepth, 0, 1, 3, scale, delta, cv::BORDER_REPLICATE );
+	Sobel( mFrameGRAY_ROI, mGradX, ddepth, 1, 0, 3, scale, delta, cv::BORDER_REPLICATE | cv::BORDER_ISOLATED);
+	Sobel( mFrameGRAY_ROI, mGradY, ddepth, 0, 1, 3, scale, delta, cv::BORDER_REPLICATE | cv::BORDER_ISOLATED);
+
 
 	mMask = mGradX> 255;
 	mGradX.setTo(255, mMask);
@@ -166,8 +166,6 @@ mProfiler.start("GRADIENT_COMPUTATION");
 	mMask = mGradY ==0;
 	mGradY.setTo(1, mMask);
 			
-	int bufferPos = mBufferPool->GradientTangent.size()-1;
-	cv::divide(mGradX, mGradY, mBufferPool->GradientTangent[bufferPos], 128, -1);
 							
 	//convert to absolute scale and add weighted absolute gradients 
 	mGradX_abs = abs(mGradX);
@@ -176,10 +174,11 @@ mProfiler.start("GRADIENT_COMPUTATION");
 	//addWeighted( mGradX_abs, 0.5, mGradY_abs, 0.5, 0, mFrameGradMag );
 	mFrameGradMag = mGradX_abs + mGradY_abs;
 
-			
 	//convertScaleAbs(mFrameGradMag, mFrameGradMag);
 	mFrameGradMag.convertTo(mFrameGradMag, CV_8U);
-			
+
+	int bufferPos = mBufferPool->GradientTangent.size()-1;
+	cv::divide(mGradX, mGradY, mBufferPool->GradientTangent[bufferPos], 128, -1);
 
  #ifdef PROFILER_ENABLED
  mProfiler.end();
@@ -199,6 +198,8 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 mProfiler.start("COMPUTE_PROBABILITIES");
 #endif 		
 
+
+
 	//GrayChannel Probabilities
 	subtract(mFrameGRAY_ROI, mLaneMembership.TIPPING_POINT_GRAY, mTempProbMat, cv::noArray(), CV_32S);
 	mMask = mTempProbMat <0 ;
@@ -207,7 +208,7 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 	mTempProbMat = mTempProbMat + 10;
 	
 	divide(mProbMap_Gray, mTempProbMat, mProbMap_Gray, 255, -1);
-	
+
 
 	//GradientMag Probabilities
 	subtract(mFrameGradMag, mLaneMembership.TIPPING_POINT_GRAD_Mag, mTempProbMat, cv::noArray(), CV_32S);
@@ -235,8 +236,9 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 	multiply(mBufferPool->Probability[bufferPos], mProbMap_GradDir, mBufferPool->Probability[bufferPos]);
 	mBufferPool->Probability[bufferPos].convertTo(mBufferPool->Probability[bufferPos], CV_8U, 1.0/255, 0);
 
-	bitwise_and(mBufferPool->Probability[bufferPos], mFocusTemplate, mBufferPool->Probability[bufferPos]);
-	
+	//bitwise_and(mBufferPool->Probability[bufferPos], mFocusTemplate, mBufferPool->Probability[bufferPos]);
+
+
 	mTemplatesReady = false;	
 	mBufferReady    = false;
 	
