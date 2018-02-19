@@ -127,6 +127,7 @@ mProfiler.start("GAUSSIAN_BLUR");
 	
 	 GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, cv::Size( 5, 5 ), 2, 2, cv::BORDER_REPLICATE | cv::BORDER_ISOLATED);
 
+
 				
  #ifdef PROFILER_ENABLED
 mProfiler.end();

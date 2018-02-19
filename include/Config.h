@@ -28,11 +28,9 @@
  #define DISPLAY_GRAPHICS
 
 
-//S32V234 specific flags
-//#define S32V2XX
+//S32V234 specific flgs
  //#define DISPLAY_GRAPHICS_DCU
  #define TEST_APEX_CODE
-
 
 /* The following section provides configuration for Frame Input*/
 #define DIRECTORY_PNG_IMAGES	"../../DataSet"
