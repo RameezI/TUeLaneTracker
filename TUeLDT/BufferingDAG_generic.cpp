@@ -30,7 +30,6 @@ BufferingDAG_generic::BufferingDAG_generic()
 }
 
 
-
 int BufferingDAG_generic::init_DAG()
 {
         int16_t   ORIGIN_Y_CRS   =  mCAMERA.FRAME_CENTER(0) - mSpan;
@@ -41,7 +40,6 @@ int BufferingDAG_generic::init_DAG()
 	
 	return 0;
 }
-
 
 
 void BufferingDAG_generic::buffer( )
