@@ -144,10 +144,24 @@ public:
 
 	 	/* Load Gradient Tangent Template */
 			std::stringstream formattedString;
-			string templateFile, prefix, format;
-			prefix= "../../Templates/GradientTangent_";
+			string templateFile, path, prefix, format;
+			char lBuff[65536];
+			ssize_t len = :: readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
+			if (len!=-1)
+			{
+				path = std::string(lBuff);
+				std::string::size_type Idx = path.find_last_of("/");
+				path =	path.substr(0,Idx);
+			}
+			else
+			{
+				cout << "Unable to find the path to the Templates: "<< endl;
+				exit(-2);
+			}
 
-			formattedString<<prefix<<std::to_string(RES_H)<<"x"<<std::to_string(RES_V);
+			prefix= "GradientTangent_";
+
+			formattedString<<path<<"/Templates/"<<prefix<<std::to_string(RES_H)<<"x"<<std::to_string(RES_V);
 			templateFile = formattedString.str();
 
 			struct stat buf;
