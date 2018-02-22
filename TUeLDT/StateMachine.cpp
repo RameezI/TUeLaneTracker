@@ -63,17 +63,18 @@ StateMachine::StateMachine(FrameSource lFrameSource, std::string lSourceStr)
 		ACF_Init();
 	#endif
 
-
-	#ifdef PROFILER_ENABLED
-		LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
- 		<<  "********************************"<<endl
-		<<  "[Failed to Start the Booting Process]"<<endl
-		<<  "Shutting Down the State-Machine."<<endl
-		<<"******************************"<<endl<<endl;
-	#endif
+	if(lReturn!=0)
+	{
+		#ifdef PROFILER_ENABLED
+		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+ 		 <<  "********************************"<<endl
+		 <<  "[Failed to Start the Booting Process]"<<endl
+		 <<  "Shutting Down the State-Machine."<<endl
+		 <<"******************************"<<endl<<endl;
+		#endif
+	}
 
 	mInitialized = (lReturn==0) ? true : false ;
-
 }
 
 
@@ -166,7 +167,7 @@ int StateMachine::spin()
 
 			mPtrTrackingState.reset
 			#ifdef S32V2XX
-			 (new TrackingLaneState<TrackingLaneDAG_s32v>(move(lBufferingState.mGraph)));
+			 (new TrackingLaneState<TrackingLaneDAG_s32v>(move(mBufferingState.mGraph)));
 			#else
 			 (new TrackingLaneState<TrackingLaneDAG_generic>(move(mBufferingState.mGraph)));
 			#endif
@@ -192,6 +193,7 @@ int StateMachine::spin()
 
 	case States::DETECTING_LANES :
 	{
+
 		#ifdef S32V2XX
 		 TrackingLaneState<TrackingLaneDAG_s32v>&    lTrackingState 	= *mPtrTrackingState;
 		#else
@@ -219,7 +221,7 @@ int StateMachine::spin()
 			#endif
 			mCurrentState = States::DISPOSED;
 		}
-		else
+		if (lTrackingState.currentStatus == StateStatus::ERROR)
 		{
 			#ifdef PROFILER_ENABLED
 			LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
