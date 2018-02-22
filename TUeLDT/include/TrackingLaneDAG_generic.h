@@ -81,7 +81,7 @@ private:
 	cv::Mat 		mTransitLaneFilter;
 	cv::Mat 		mTransitVpFilter;
 
-	LaneModel   		mLaneModel;
+	LaneModel   	mLaneModel;
 	
 
 	// Only Enable in case of Video Recording

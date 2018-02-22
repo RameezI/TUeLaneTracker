@@ -27,7 +27,7 @@
 #include "LDT_profiler.h"
 #include "LDT_logger.h"
 
-enum States{BOOTING, BUFFERING, DETECTING_LANES, DISPOSING };
+enum States{BOOTING, BUFFERING, DETECTING_LANES, DISPOSED };
 enum StateStatus {DONE, ACTIVE, INACTIVE, ERROR };
 enum FrameSource {DIRECTORY, RTSP, GMSL};
 

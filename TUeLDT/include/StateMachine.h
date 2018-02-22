@@ -23,8 +23,10 @@
 * ****************************************************************************/ 
 #include "Config.h"
 #include  <memory>
-#include "SigInit.h"
 #include "State.h"
+#include "InitState.h"
+#include "BufferingState.h"
+#include "TrackingLaneState.h"
 
 using namespace std;
 
@@ -32,13 +34,35 @@ class StateMachine
 {
 	
 private:
-	const  FrameSource	mFrameSource;
-	const  string		mSourceStr;
-	 	   States 		mCurrentState;
 
-public:	
+	bool 							mInitialized;
+	bool							mQuitRequest;
+	const  FrameSource				mFrameSource;
+	const  string					mSourceStr;
+	 	   States 					mCurrentState;
+
+	unique_ptr<LaneFilter>  		mPtrLaneFilter;
+	unique_ptr<VanishingPtFilter>  	mPtrVanishingPtFilter;
+	unique_ptr<Templates> 			mPtrTemplates;
+
+
+	#ifdef S32V2XX
+	 BufferingState<BufferingDAG_s32v>  	 		 				mBufferingState;
+	 unique_ptr<TrackingLaneState<TrackingLaneDAG_s32v>>  	 		mPtrTrackingState;
+	#else
+	 BufferingState<BufferingDAG_generic>  	 		 				mBufferingState;
+	 unique_ptr<TrackingLaneState<TrackingLaneDAG_generic>>   	 	mPtrTrackingState;
+	#endif
+
+
+public:
+
+	bool	isInitialized();
+	States	getCurrentState();
+	void 	quit();
+
 	StateMachine(FrameSource lFrameSource, string lSourceString);
-	int spin(shared_ptr<SigInit>);	
+	int spin();
 	~StateMachine();
 };
 

@@ -78,8 +78,9 @@ void LaneFilter::createHistogramModels()
 	  for (int right = 0; right < bins_cm.size(); right++)
 	  {  
             	// prior on location
-		pL = (exp( -pow(hmean-bins_cm(left), 2) / (2*pow(8*sigmaL,2)) ) / ( sqrt(2*M_PI)*8*sigmaL ) )*65536;     
-            	pR = (exp( -pow(hmean-bins_cm(right), 2) / (2*pow(8*sigmaL,2)) ) / ( sqrt(2*M_PI)*8*sigmaL ))*65536;     
+		pL = (exp( -pow(hmean-bins_cm(left), 2) / (2*pow(8*sigmaL,2)) ) / ( sqrt(2*M_PI)*8*sigmaL ) )*65536;
+
+        pR = (exp( -pow(hmean-bins_cm(right), 2) / (2*pow(8*sigmaL,2)) ) / ( sqrt(2*M_PI)*8*sigmaL ))*65536;
 	   
 	    	//prior on lane width
             	width = bins_cm(left)+bins_cm(right);
@@ -114,8 +115,8 @@ void LaneFilter::createHistogramModels()
 				baseHistogramModels.back().binID_NegBoundaryLeft  = idxL+2;
 				baseHistogramModels.back().nbNonBoundaryBinsLeft  = nbLeftNonBoundaryBins;
 				
-				baseHistogramModels.back().binID_NegBoundaryRight  = idxM+4;
-				baseHistogramModels.back().nbNonBoundaryBinsRight = nbRightNonBoundaryBins;
+				baseHistogramModels.back().binID_NegBoundaryRight  	= idxM+4;
+				baseHistogramModels.back().nbNonBoundaryBinsRight 	= nbRightNonBoundaryBins;
 				
 				baseHistogramModels.back().width_cm	= width;
 										
@@ -130,7 +131,7 @@ void LaneFilter::createHistogramModels()
     // Normalize
 	int32_t SUM = cv::sum(this->prior)[0];
 	this->prior.convertTo(this->prior,CV_32SC1,SCALE_FILTER);
-    	this->prior = this->prior/(SUM);
+    this->prior = this->prior/(SUM);
 
 
 }

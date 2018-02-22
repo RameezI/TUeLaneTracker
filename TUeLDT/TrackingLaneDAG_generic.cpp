@@ -345,14 +345,14 @@ mProfiler.start("HISTOGRAM_MATCHING");
 	   if (bestPosteriorProb == 0)
 	   return;
 		  
-	   mLaneModel.leftOffset 	= Models[BestModelIdx].leftOffset;
-	   mLaneModel.rightOffset	= Models[BestModelIdx].rightOffset;
-	   mLaneModel.centerLane       	= round((mLaneModel.leftOffset + mLaneModel.rightOffset)/2.0);
+	   mLaneModel.leftOffset 		= Models[BestModelIdx].leftOffset;
+	   mLaneModel.rightOffset		= Models[BestModelIdx].rightOffset;
+	   mLaneModel.centerLane    	= round((mLaneModel.leftOffset + mLaneModel.rightOffset)/2.0);
 		
-	   mLaneModel.laneWidth_cm     = Models[BestModelIdx].width_cm;
+	   mLaneModel.laneWidth_cm     	= Models[BestModelIdx].width_cm;
 	 
-	   mLaneModel.confidenceLeft  =  round(100* mLaneModel.confidenceLeft/(float)SCALE_FILTER);
-	   mLaneModel.confidenceRight  = round(100* mLaneModel.confidenceRight/(float)SCALE_FILTER);
+	   mLaneModel.confidenceLeft  	= round(100* mLaneModel.confidenceLeft/(float)SCALE_FILTER);
+	   mLaneModel.confidenceRight  	= round(100* mLaneModel.confidenceRight/(float)SCALE_FILTER);
 		
 	}//Scope End
 		
@@ -390,14 +390,14 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 				/2.0;
 				
 		
-	   const int    FRAME_CENTER_V	= mCAMERA.FRAME_CENTER(0); 
+	   const int    FRAME_CENTER_V		= mCAMERA.FRAME_CENTER(0);
 	   const float  PIXEL_TO_CM     	= 1.0/mCAMERA.CM_TO_PIXEL;
 
 	   const int    VP_FILTER_OFFSET = mVpFilter->OFFSET_V;
 	   const int    VP_HIST_STEP	 = mVpFilter->STEP;
 	   const int    VP_HIST_START	 = mVpFilter->HISTOGRAM_BINS(0);
 	   const int    VP_HIST_SIZE	 = mVpFilter->HISTOGRAM_BINS.size();
-	   const int    VP_HIST_END	 = mVpFilter->HISTOGRAM_BINS(VP_HIST_SIZE-1);
+	   const int    VP_HIST_END	 	 = mVpFilter->HISTOGRAM_BINS(VP_HIST_SIZE-1);
 	   const float  VP_HIST_RATIO  	 = mVpFilter->mVP_LANE_RATIO;
 	   const float  WIDTH_FACTOR   	 = PIXEL_TO_CM* 1.0/VP_HIST_RATIO;
 		
@@ -539,21 +539,17 @@ mProfiler.start("DISPLAY");
 
 	   const float lRatioLookAhead = 0.35;
 
-
 	   //Transform VP to Image Coordianate System
 	   int VP_V =  mVanishPt.V + mCAMERA.FRAME_CENTER(0);
 	   int VP_H =  mVanishPt.H + mCAMERA.FRAME_CENTER(1);	
 
 	   //Lane Bundaries
-	   Point  Start_leftLaneInner( mCAMERA.FRAME_CENTER(1) -  ((int)(mLaneModel.leftOffset  + delta)/mLaneFilter->STEP)*mLaneFilter->STEP					  ,  mCAMERA.RES_VH(0) );	   
+	   Point  Start_leftLaneInner( mCAMERA.FRAME_CENTER(1) 	-  ((int)( mLaneModel.leftOffset  + delta)/mLaneFilter->STEP)*mLaneFilter->STEP					  ,  mCAMERA.RES_VH(0) );
 
-
-	   Point  Start_rightLaneInner( mCAMERA.FRAME_CENTER(1) + ((int)(mLaneModel.rightOffset - delta)/mLaneFilter->STEP)*mLaneFilter->STEP					  ,  mCAMERA.RES_VH(0) );
+	   Point  Start_rightLaneInner( mCAMERA.FRAME_CENTER(1) +  ((int)( mLaneModel.rightOffset - delta)/mLaneFilter->STEP)*mLaneFilter->STEP					  ,  mCAMERA.RES_VH(0) );
 	
-
 	   Point  StartMidLane( ((int)((Start_leftLaneInner.x + Start_rightLaneInner.x)/2.0)/mLaneFilter->STEP)*mLaneFilter->STEP
 				     ,  mCAMERA.RES_VH(0) );
-
  
 	   float slopeLeft =  (float)( VP_V-mCAMERA.RES_VH(0) ) / (VP_H- Start_leftLaneInner.x);
 	   float slopeRight = (float)( VP_V-mCAMERA.RES_VH(0) ) / (VP_H- Start_rightLaneInner.x);
