@@ -321,55 +321,53 @@ int BufferingDAG_generic::grabFrame()
 
 	   if(mSource == FrameSource::DIRECTORY)
 	   {
-		mFrameRGB = imread(mFiles[mFrameCount]);
+		 mFrameRGB = imread(mFiles[mFrameCount]);
 		
-		#ifdef PROFILER_ENABLED
-		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		 <<"Processing Frame: "<<mFrameCount<<endl;
-		#endif
+		 #ifdef PROFILER_ENABLED
+		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		  <<"Processing Frame: "<<mFrameCount<<endl;
+		 #endif
 
-		if (mFrameCount+1 < mFiles.size())
-	   	   mFrameCount ++;
+		 if (mFrameCount+1 < mFiles.size())
+	   	  mFrameCount ++;
 	   }
 
 	   else if (mSource == FrameSource::STREAM)
 	   {
-		mCAPTURE >> mFrameRGB;
+		 mCAPTURE >> mFrameRGB;
 
-		#ifdef PROFILER_ENABLED
-		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		 <<"Processing Frame: "<<mFrameCount<<endl;
-		#endif
+		 #ifdef PROFILER_ENABLED
+		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		  <<"Processing Frame: "<<mFrameCount<<endl;
+		 #endif
 
-	   	mFrameCount ++;
+	   	 mFrameCount ++;
 	   }
 
 	   else if (mSource == FrameSource::GMSL)
 	   {
-
-		#ifdef PROFILER_ENABLED
-		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		 <<"Undefined Input Mode: "<<mFrameCount<<endl;
-		#endif
+		 #ifdef PROFILER_ENABLED
+		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		  <<"Undefined Input Mode: "<<endl;
+		 #endif
 
 		lReturn = -1;
 	   }
 
 	   else
 	   {
+		 #ifdef PROFILER_ENABLED
+		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		  <<"Undefined Input Mode: "<<endl;
+		 #endif
 
-
-		#ifdef PROFILER_ENABLED
-		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		 <<"Undefined Input Mode: "<<mFrameCount<<endl;
-		#endif
-
-		lReturn =-1;
+		 lReturn =-1;
 	   }
-
 				
+
 	   if(!mFrameRGB.data)
 	   	lReturn = -1;
+
 
 	#ifdef PROFILER_ENABLED
 	mProfiler.end();
