@@ -67,7 +67,7 @@ The TUeLaneDetector has three options for recieving the input frames, defined in
 3. GMSL [IN PROGRESS]
    
 To update the frame source use the command line arguments, for available command line options use the *--help* switch
-````
+```
 ./TUeLanetracker --help
 ```
 
