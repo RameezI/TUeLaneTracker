@@ -171,13 +171,13 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 	multiply(mDepthTemplate, mProbMapFocussed, mIntWeights, 1, CV_32S);	
 
 	{
-	   register int32_t* 	IN_basePTR 	    	= mIntBase.ptr<int32_t>(0);
-	   register int32_t* 	IN_purviewPTR   	= mIntPurview.ptr<int32_t>(0);
-	   register int32_t* 	IN_weightsPTR   	= mIntWeights.ptr<int32_t>(0);
-	   register uint8_t* 	IN_maskPTR   		= mMask.ptr<uint8_t>(0);
+	   int32_t* 	IN_basePTR 	    	= mIntBase.ptr<int32_t>(0);
+	   int32_t* 	IN_purviewPTR   	= mIntPurview.ptr<int32_t>(0);
+	   int32_t* 	IN_weightsPTR   	= mIntWeights.ptr<int32_t>(0);
+	   uint8_t* 	IN_maskPTR   		= mMask.ptr<uint8_t>(0);
 
-	   register int32_t* 	HistBase_pixelPTR    	=  mHistBase.ptr<int32_t>(0);
-	   register int32_t* 	HistPurview_pixelPTR 	=  mHistPurview.ptr<int32_t>(0);
+	   int32_t* 	HistBase_pixelPTR    	=  mHistBase.ptr<int32_t>(0);
+	   int32_t* 	HistPurview_pixelPTR 	=  mHistPurview.ptr<int32_t>(0);
 
 	   uint16_t   lBaseBinIdx;
 	   uint16_t   lPurviewBinIdx;
@@ -277,7 +277,7 @@ mProfiler.start("HISTOGRAM_MATCHING");
 	   int   bestPosteriorProb  = 0;
 	   float conditionalProb;
 		
-	   register int32_t* HistBasePTR    	=  mHistBase.ptr<int32_t>(0);
+	   int32_t* HistBasePTR    	=  mHistBase.ptr<int32_t>(0);
 	   vector<BaseHistogramModel>& Models= mLaneFilter->baseHistogramModels;
 	   cv::Mat    range;
 	
@@ -377,7 +377,7 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 	
 	{	
 	   int   		bestPosteriorProb  = 0;
-	   register int32_t* 	HistPurviewPTR     =  mHistPurview.ptr<int32_t>(0);
+	   int32_t* 	HistPurviewPTR     =  mHistPurview.ptr<int32_t>(0);
 
 	
 	   const float left_VP  = ((-mLaneModel.leftOffset  - delta)
