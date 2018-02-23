@@ -56,32 +56,31 @@ public:
 
 protected:
 
-
 	using MutexType = std::mutex;
 	using WriteLock = std::unique_lock<MutexType>;
 	
 
-	MutexType 				_mutex;
-	condition_variable  	_sateChange;
-	bool 					mTemplatesReady;
-	bool 					mBufferReady;
+	MutexType 			_mutex;
+	condition_variable  		_sateChange;
+	bool 				mTemplatesReady;
+	bool 				mBufferReady;
 
 
 	#ifdef PROFILER_ENABLED
-    	 ProfilerLDT         mProfiler;
+    	 ProfilerLDT         		mProfiler;
 	#endif
 
 	
 	/*................................................
 	 Set from outside, before buffering is activated   */ 
 
-	int 					mSpan;
-	int						mMargin;
-	int 					mVP_Range_V;
+	int 				mSpan;
+	int				mMargin;
+	int 				mVP_Range_V;
 	
-	cv::Mat	 				mGRADIENT_TAN_ROOT;
-    cv::Mat					mFOCUS_MASK_ROOT;
-    cv::Mat					mDEPTH_MAP_ROOT;
+	cv::Mat	 			mGRADIENT_TAN_ROOT;
+   	cv::Mat				mFOCUS_MASK_ROOT;
+    	cv::Mat				mDEPTH_MAP_ROOT;
 
 	cv::Mat     			mX_ICS;
 	cv::Mat     			mY_ICS;
@@ -93,18 +92,18 @@ protected:
 
 	// Needed for graph computations
 	const Camera 			mCAMERA;
-	const LaneMembership    mLaneMembership;
+	const LaneMembership    	mLaneMembership;
 	VanishingPt 			mVanishPt;
 
 
 	//Image Frames
 	cv::Mat     			mFrameRGB;
-	cv::Mat					mFrameGRAY;
-	cv::Mat					mFrameGRAY_ROI;
+	cv::Mat				mFrameGRAY;
+	cv::Mat				mFrameGRAY_ROI;
 
 	
 	//Binary Mask 
-	cv::Mat 				mMask;
+	cv::Mat 			mMask;
 	
 	
 	//Image Gradients
@@ -116,40 +115,40 @@ protected:
 
 
 	// Extracted Templates
-	cv::Mat 				mGradTanTemplate;
-	cv::Mat 				mDepthTemplate;
-	cv::Mat 				mFocusTemplate;
-	cv::Mat 				mX_VPRS;
-	cv::Mat 				mY_VPRS;
+	cv::Mat 			mGradTanTemplate;
+	cv::Mat 			mDepthTemplate;
+	cv::Mat 			mFocusTemplate;
+	cv::Mat 			mX_VPRS;
+	cv::Mat 			mY_VPRS;
 
 
 	// Temporary Probability Maps
-	cv::Mat 				mTempProbMat;
-	cv::Mat					mProbMap_Gray;
-	cv::Mat					mProbMap_GradMag;
-	cv::Mat 				mProbMap_GradDir;
+	cv::Mat 			mTempProbMat;
+	cv::Mat				mProbMap_Gray;
+	cv::Mat				mProbMap_GradMag;
+	cv::Mat 			mProbMap_GradDir;
 	
 
-    // Display Control Unit
-    #ifdef DISPLAY_GRAPHICS_DCU
-     io::FrameOutputV234Fb   mDCU;
+    	// Display Control Unit
+    	#ifdef DISPLAY_GRAPHICS_DCU
+     	 io::FrameOutputV234Fb   mDCU;
 	#endif
 
 
-	uint64_t 					mFrameCount;
+	uint64_t 			mFrameCount;
 
 
-	FrameSource					mSource;
-	vector<cv::String>			mFiles;
-	cv::VideoCapture 			mRTSP_CAPTURE;
+	FrameSource			mSource;
+	vector<cv::String>		mFiles;
+	cv::VideoCapture 		mCAPTURE;
 
 	
 public:
 
-	int  init_DAG();			// For initialising DAG ONE TIME EXECUTION
-	int  grabFrame(); 			// Grab Frame from the Source
+	int  init_DAG();		// For initialising DAG ONE TIME EXECUTION
+	int  grabFrame(); 		// Grab Frame from the Source
 	void runAuxillaryTasks(); 	// Perform assitve tasks for buffering from seperate executor
-	void buffer();   			// Perform tasks for buffering from main Thread
+	void buffer();   		// Perform tasks for buffering from main Thread
 	
 	
    	BufferingDAG_generic (BufferingDAG_generic && bufferingGraph)
@@ -163,48 +162,48 @@ public:
 	WriteLock  wrtLock(_mutex);
 	
 	   mTemplatesReady      	= std::move(bufferingGraph.mTemplatesReady);
-       mBufferReady             = std::move(bufferingGraph.mBufferReady);
+       	   mBufferReady             	= std::move(bufferingGraph.mBufferReady);
 
-	   mSpan 					= std::move(bufferingGraph.mSpan);
-	   mMargin					= std::move(bufferingGraph.mMargin);
-	   mVP_Range_V				= std::move(bufferingGraph.mVP_Range_V);
+	   mSpan 			= std::move(bufferingGraph.mSpan);
+	   mMargin			= std::move(bufferingGraph.mMargin);
+	   mVP_Range_V			= std::move(bufferingGraph.mVP_Range_V);
 		
 	   mGRADIENT_TAN_ROOT 		= std::move(bufferingGraph.mGRADIENT_TAN_ROOT);
 	   mFOCUS_MASK_ROOT   		= std::move(bufferingGraph.mFOCUS_MASK_ROOT);
 	   mDEPTH_MAP_ROOT    		= std::move(bufferingGraph.mDEPTH_MAP_ROOT);
 
-       mX_ICS                   = std::move(bufferingGraph.mX_ICS);
-       mY_ICS                   = std::move(bufferingGraph.mY_ICS);
+       	   mX_ICS                   	= std::move(bufferingGraph.mX_ICS);
+           mY_ICS                   	= std::move(bufferingGraph.mY_ICS);
 	
-	   mBufferPool   			= std::move(bufferingGraph.mBufferPool);
-	   mVanishPt				= std::move(bufferingGraph.mVanishPt);
+	   mBufferPool   		= std::move(bufferingGraph.mBufferPool);
+	   mVanishPt			= std::move(bufferingGraph.mVanishPt);
 	
-	   mFrameRGB				= std::move(bufferingGraph.mFrameRGB);
-	   mFrameGRAY				= std::move(bufferingGraph.mFrameGRAY);
-	   mFrameGRAY_ROI			= std::move(bufferingGraph.mFrameGRAY_ROI);
+	   mFrameRGB			= std::move(bufferingGraph.mFrameRGB);
+	   mFrameGRAY			= std::move(bufferingGraph.mFrameGRAY);
+	   mFrameGRAY_ROI		= std::move(bufferingGraph.mFrameGRAY_ROI);
 
-	   mMask 					= std::move(bufferingGraph.mMask);
+	   mMask 			= std::move(bufferingGraph.mMask);
 	
-	   mGradX					= std::move(bufferingGraph.mGradX);
-	   mGradY					= std::move(bufferingGraph.mGradY);
-	   mFrameGradMag			= std::move(bufferingGraph.mFrameGradMag);
+	   mGradX			= std::move(bufferingGraph.mGradX);
+	   mGradY			= std::move(bufferingGraph.mGradY);
+	   mFrameGradMag		= std::move(bufferingGraph.mFrameGradMag);
 	
-	   mGradTanTemplate			= std::move(bufferingGraph.mGradTanTemplate);
-	   mDepthTemplate			= std::move(bufferingGraph.mDepthTemplate);
-	   mFocusTemplate			= std::move(bufferingGraph.mFocusTemplate);
+	   mGradTanTemplate		= std::move(bufferingGraph.mGradTanTemplate);
+	   mDepthTemplate		= std::move(bufferingGraph.mDepthTemplate);
+	   mFocusTemplate		= std::move(bufferingGraph.mFocusTemplate);
 	
-	   mTempProbMat				= std::move(bufferingGraph.mTempProbMat);
-	   mProbMap_Gray			= std::move(bufferingGraph.mProbMap_Gray);
-	   mProbMap_GradMag			= std::move(bufferingGraph.mProbMap_GradMag);
-	   mProbMap_GradDir			= std::move(bufferingGraph.mProbMap_GradDir);
+	   mTempProbMat			= std::move(bufferingGraph.mTempProbMat);
+	   mProbMap_Gray		= std::move(bufferingGraph.mProbMap_Gray);
+	   mProbMap_GradMag		= std::move(bufferingGraph.mProbMap_GradMag);
+	   mProbMap_GradDir		= std::move(bufferingGraph.mProbMap_GradDir);
 	
-	   mFrameCount				= std::move(bufferingGraph.mFrameCount);
-	   mX_VPRS					= std::move(bufferingGraph.mX_VPRS);
-	   mY_VPRS					= std::move(bufferingGraph.mY_VPRS);
+	   mFrameCount			= std::move(bufferingGraph.mFrameCount);
+	   mX_VPRS			= std::move(bufferingGraph.mX_VPRS);
+	   mY_VPRS			= std::move(bufferingGraph.mY_VPRS);
 		
-	   mSource					= std::move(bufferingGraph.mSource);
-	   mFiles					= std::move(bufferingGraph.mFiles);
-	   mRTSP_CAPTURE 			= std::move(bufferingGraph.mRTSP_CAPTURE);
+	   mSource			= std::move(bufferingGraph.mSource);
+	   mFiles			= std::move(bufferingGraph.mFiles);
+	   mCAPTURE 			= std::move(bufferingGraph.mCAPTURE);
 
 	wrtLock.unlock();
 

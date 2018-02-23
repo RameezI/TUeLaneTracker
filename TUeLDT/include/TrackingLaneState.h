@@ -120,8 +120,8 @@ mProfiler.start("SingleRun_TRACK");
 	if (0==mGraph.grabFrame())
 	{
 
-	   if (mSideExecutor.joinable())
-		mSideExecutor.join();
+	  if (mSideExecutor.joinable())
+	     mSideExecutor.join();
 		 
 	  mSideExecutor = std::thread(&GRAPH::runAuxillaryTasks, std::ref(mGraph));
 	  mGraph.buffer();

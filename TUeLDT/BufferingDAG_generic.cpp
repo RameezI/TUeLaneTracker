@@ -181,7 +181,7 @@ mProfiler.start("GRADIENT_COMPUTATION");
 
  #ifdef PROFILER_ENABLED
  mProfiler.end();
-LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
+ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
 				<<  "Gradients Computations." <<endl
 				<<  "Max Time: " << mProfiler.getMaxTime("GRADIENT_COMPUTATION")<<endl
@@ -322,29 +322,48 @@ int BufferingDAG_generic::grabFrame()
 	   if(mSource == FrameSource::DIRECTORY)
 	   {
 		mFrameRGB = imread(mFiles[mFrameCount]);
-		cout<<"Processing Frame: "<<mFrameCount<<endl;
 		
+		#ifdef PROFILER_ENABLED
+		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		 <<"Processing Frame: "<<mFrameCount<<endl;
+		#endif
+
 		if (mFrameCount+1 < mFiles.size())
 	   	   mFrameCount ++;
 	   }
 
-	   else if (mSource == FrameSource::RTSP)
-
+	   else if (mSource == FrameSource::STREAM)
 	   {
-		mRTSP_CAPTURE >> mFrameRGB;
-		cout<<"Processing Frame: "<<mFrameCount<<endl;
+		mCAPTURE >> mFrameRGB;
+
+		#ifdef PROFILER_ENABLED
+		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		 <<"Processing Frame: "<<mFrameCount<<endl;
+		#endif
+
 	   	mFrameCount ++;
 	   }
 
 	   else if (mSource == FrameSource::GMSL)
 	   {
-		cout<<"Undefined Input Mode"<<endl;
+
+		#ifdef PROFILER_ENABLED
+		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		 <<"Undefined Input Mode: "<<mFrameCount<<endl;
+		#endif
+
 		lReturn = -1;
 	   }
 
 	   else
 	   {
-		cout<<"Undefined Input Mode"<<endl;
+
+
+		#ifdef PROFILER_ENABLED
+		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		 <<"Undefined Input Mode: "<<mFrameCount<<endl;
+		#endif
+
 		lReturn =-1;
 	   }
 
@@ -352,26 +371,11 @@ int BufferingDAG_generic::grabFrame()
 	   if(!mFrameRGB.data)
 	   	lReturn = -1;
 
-	   std::string str;
-
-	   if (mSource==FrameSource::DIRECTORY)
-	   	str = mFiles[mFrameCount];
-
-	   else if (mSource == FrameSource::RTSP)
-	   	str = "RTSP";
-
-	   else if (mSource == FrameSource::GMSL)
-	   	str = "GMSL";
-
-	   else
-	   	str = "Undefined";
-
-
 	#ifdef PROFILER_ENABLED
 	mProfiler.end();
 	LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
-				<<  "Frame Source:   "<<endl<<str<<endl
+				<<  "Frame Source:   "<<endl<<mSource<<endl
 				<<  "Read time: " << mProfiler.getAvgTime("IMAGE_READ")<<endl
 				<<"******************************"<<endl<<endl;
 				#endif 

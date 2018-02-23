@@ -27,9 +27,63 @@
 #include "LDT_profiler.h"
 #include "LDT_logger.h"
 
+
+
 enum States{BOOTING, BUFFERING, DETECTING_LANES, DISPOSED };
 enum StateStatus {DONE, ACTIVE, INACTIVE, ERROR };
-enum FrameSource {DIRECTORY, RTSP, GMSL};
+enum FrameSource {DIRECTORY, STREAM, GMSL};
+
+
+inline std::ostream& operator<<(std::ostream& out, const States& state)
+{
+	if(state == States::BOOTING)
+	  out<<"[BOOTING]	";
+	else if (state == States::BUFFERING)
+	  out<<"[BUFFERING]	";
+	else if (state == States::DETECTING_LANES)
+	  out<<"[TRACKING]	";
+	else if (state == States::DISPOSED)
+	  out<<"[DISPOSED]	";
+	else
+	  out << "[UNKNOWN] 	";
+	return out;	
+}
+
+
+inline std::istream& operator>>(std::istream& in, FrameSource& frameSource)
+{
+	std::string token;
+	in >> token;
+	
+	if (token.compare("imgstore")==0)
+	  frameSource = FrameSource::DIRECTORY;
+
+	else if (token.compare("stream")==0)
+	  frameSource = FrameSource::STREAM;
+
+	else if (token.compare("gmsl")==0)
+	  frameSource = FrameSource::GMSL;
+
+	else
+	  in.setstate(std::ios_base::failbit);
+	
+	return in;
+}
+ 
+inline std::ostream& operator<<(std::ostream& out, const FrameSource& frameSource)
+{
+	if(frameSource == FrameSource::DIRECTORY)
+	  out<<"imgstore";
+	else if (frameSource == FrameSource::STREAM)
+	  out<<"stream";
+	else if (frameSource == FrameSource::GMSL)
+	  out<<"gmsl";
+	else
+	  out << "unknown-source";
+	
+	return out;	
+}
+
 
 class State
 {
@@ -41,10 +95,10 @@ protected:
 	#endif
 	
 public:
-	int64_t 				StateCounter   =  0;
+	int64_t 		StateCounter   =  0;
 	StateStatus 	       	currentStatus  =  StateStatus::INACTIVE;
 	
-	void dispose()			{currentStatus = StateStatus::ERROR;}
+	void preDispose()	{currentStatus = StateStatus::ERROR;}
 
 	State(){}
 	~State(){}

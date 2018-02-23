@@ -31,6 +31,11 @@
  #include "BufferingDAG_generic.h"
 #endif
 
+class NotImplemented : public std::logic_error
+{
+public:
+    NotImplemented() : std::logic_error("Function not yet implemented") { };
+};
 
 template<typename GRAPH>
 class BufferingState : public State
@@ -75,7 +80,7 @@ int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
 
 	if (lSource == FrameSource::DIRECTORY)
 	{
-       cv::String lFolder = lSourceStr;
+       	   cv::String lFolder = lSourceStr;
 	   vector< cv::String> lFiles;
            
 	   try
@@ -90,28 +95,32 @@ int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
 
 	   if (lFiles.size() <= SKIP_FRAMES)
 	   {
+		
+		#ifdef PROFILER_ENABLED
+		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+		 <<"******************************"<<endl
+		 << "Setting up the Frame Source"
+		 << "Total Number of Image Files are Less than SKIP_FRAMES."<<endl
+		 << "Total Number of Image Files : " << lFiles.size()<<endl
+		 << "...Skipping All"<<endl
+		 <<"******************************"<<endl<<endl;
+		#endif
 
-		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		   		<<"******************************"<<endl
-		   		<< "Total Number of Image Files are Less than SKIP_FRAMES."<<endl
-				<< "Total Number of Image Files : " << lFiles.size()<<endl
-		   	   	<< "...Skipping All"<<endl
-		   		<<"******************************"<<endl<<endl;
-
-		   cout<<endl;
-		   cout<<"Total Number of Image Files to Process : " << 0;
-		   cout<<endl;
-
-		   lReturn = -1;
+		lReturn = -1;
 	   }
 
 	   else
 	   {
-     	   	cout<<endl;
-           	cout<<"Total Number of Image Files to Process : " << lFiles.size() - SKIP_FRAMES;
-           	cout<<endl;
+		#ifdef PROFILER_ENABLED
+		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+		 <<"******************************"<<endl
+		 << "Setting up the Frame Source."<<endl
+		 << "Total Number of Image Files to Process: " << lFiles.size() - SKIP_FRAMES<<endl
+		 << "MODE: "<< FrameSource::DIRECTORY<<endl
+		 <<"******************************"<<endl<<endl;
+		#endif
 
-            mGraph.mSource 		= lSource;
+            	mGraph.mSource 		= lSource;
            	mGraph.mFiles 		= lFiles;
            	mGraph.mFrameCount 	= SKIP_FRAMES;
 	   }
@@ -119,16 +128,24 @@ int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
 
 	}
 
-	else if(lSource == FrameSource::RTSP)
+	else if(lSource == FrameSource::STREAM)
 	{
 
-		cout<< "RTSP MODE"<<endl;
+
+		#ifdef PROFILER_ENABLED
+		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+		 <<"******************************"<<endl
+		 << "Setting up the Frame Source" <<endl
+		 << "MODE: "<< FrameSource::STREAM<<endl
+		 <<"******************************"<<endl<<endl;
+		#endif
+
 		mGraph.mSource = lSource;
 	   	mGraph.mFrameCount = 0;
 		
 		try
 		{
-		   if(!mGraph.mRTSP_CAPTURE.open(lSourceStr))
+		   if(!mGraph.mCAPTURE.open(lSourceStr))
 		   lReturn = -1;
 		}
 
@@ -140,18 +157,34 @@ int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
 
 	else if (lSource == FrameSource::GMSL)
 	{
-		cout<< "GMSL MODE" << endl;
 
+		#ifdef PROFILER_ENABLED
+		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+		 <<"******************************"<<endl
+		 << "Setting up the Frame Source" <<endl
+		 << "MODE: "<< FrameSource::GMSL<<endl
+		 <<"******************************"<<endl<<endl;
+		#endif
+
+		mGraph.mSource = lSource;
+	   	mGraph.mFrameCount = 0;
 	
-		cout<< "This Mode is not yet implemented"<< endl;
-		cout<< "Exiting"<<endl;
+		throw NotImplemented();
 		lReturn =-1;
 	}
 
 	else
 	{
-		cout << "The input mode is not recognized" << endl;
-		cout << "Exiting"<<endl;
+
+		#ifdef PROFILER_ENABLED
+		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+		 <<"******************************"<<endl
+		 << "Setting up the Frame Source" <<endl
+		 << "MODE: NOT RECOGNIZED"<<endl
+		 << "Exiting"<<endl
+		 <<"******************************"<<endl<<endl;
+		#endif
+
 		lReturn =-1;
 	}
 
@@ -172,7 +205,7 @@ mProfiler.start("SET_UP_BUFFERING_DAG");
 
 	const int RES_H 		= mGraph.mCAMERA.RES_VH(1);
 	
-	mGraph.mVP_Range_V   	= templates.VP_RANGE_V;
+	mGraph.mVP_Range_V   		= templates.VP_RANGE_V;
 	mGraph.mSpan			= templates.SPAN;
 	mGraph.mMargin			= templates.MARGIN;
 	

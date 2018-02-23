@@ -32,6 +32,7 @@
 #endif
 
  
+
 StateMachine::StateMachine(FrameSource lFrameSource, std::string lSourceStr)
 
 : mInitialized(false),
@@ -102,16 +103,16 @@ int StateMachine::spin()
 
 	case States::BOOTING :
 	{
-		InitState				lBootingState;
+		InitState		lBootingState;
 
-		mPtrLaneFilter 			= lBootingState.createLaneFilter();
+		mPtrLaneFilter 		= lBootingState.createLaneFilter();
 		mPtrVanishingPtFilter	= lBootingState.createVanishingPtFilter();
 		mPtrTemplates           = lBootingState.createTemplates();
 
 		if (lBootingState.currentStatus == StateStatus::DONE)
 		{
 			mCurrentState = States::BUFFERING;
-			cout<< "\t\t Booting Completed" <<endl;
+			cout<< "Completed!" <<endl;
 		}
 		else
 		{
@@ -148,7 +149,7 @@ int StateMachine::spin()
 			   <<"******************************"<<endl;
 			  #endif
 
-			  mBufferingState.dispose();
+			  mBufferingState.preDispose();
 			}
 		    else
 		    {
@@ -171,6 +172,7 @@ int StateMachine::spin()
 			#else
 			 (new TrackingLaneState<TrackingLaneDAG_generic>(move(mBufferingState.mGraph)));
 			#endif
+			cout<<"Completed!"<<endl;
 		}
 
 		if( mBufferingState.currentStatus == StateStatus::ERROR)
@@ -214,21 +216,21 @@ int StateMachine::spin()
 		{
 			 #ifdef PROFILER_ENABLED
 			  LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-			 <<  "********************************"<<endl
-			 <<  "[Tracking Finished]"<<endl
-			 <<  "Shutting Down the State-Machine."<<endl
-			 <<  "********************************"<<endl<<endl;
+			  <<  "********************************"<<endl
+			  <<  "[Tracking Finished]"<<endl
+			  <<  "Shutting Down the State-Machine."<<endl
+			  <<  "********************************"<<endl<<endl;
 			#endif
 			mCurrentState = States::DISPOSED;
 		}
 		if (lTrackingState.currentStatus == StateStatus::ERROR)
 		{
 			#ifdef PROFILER_ENABLED
-			LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-			<<  "********************************"<<endl
-			<<  "[Tracking State Error]"<<endl
-			<<  "Shutting Down the State-Machine."<<endl
-			<<"******************************"<<endl<<endl;
+			 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+			 <<  "********************************"<<endl
+			 <<  "[Tracking State Error]"<<endl
+			 <<  "Shutting Down the State-Machine."<<endl
+			 <<"******************************"<<endl<<endl;
 			#endif
 
 			lReturn |= -1;
@@ -247,9 +249,11 @@ int StateMachine::spin()
 		#endif
 
 		#ifdef PROFILER_ENABLED
-		 cout<< "State Machine is Disposed"<< endl;
-		 cout<< "See the log to inquire what caused this shutdown"<<endl;
+		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+		 << "State Machine is Disposed"<< endl;
 		#endif
+
+		cout<<endl<<"Ended..." <<endl;
 	}
 	break; } // END SWITCH
 

@@ -7,32 +7,7 @@ using namespace std;
 namespace po = boost::program_options;
 
 
-std::istream& operator>>(std::istream& in, FrameSource& frameSource)
-{
-	std::string token;
-	in >> token;
-	
-	if (token.compare("imgstore")==0)
-	  frameSource = FrameSource::DIRECTORY;
-	else
-	  in.setstate(std::ios_base::failbit);
-	
-	return in;
-}
- 
-std::ostream& operator<<(std::ostream& out, const FrameSource& frameSource)
-{
-	if(frameSource == FrameSource::DIRECTORY)
-	  out<<"imgstore";
-	else if (frameSource == FrameSource::RTSP)
-	  out<<"rtsp";
-	else if (frameSource == FrameSource::GMSL)
-	  out<<"gmsl";
-	else
-	  out << "unknown-source";
-	
-	return out;	
-}
+
 
 
 int main(int argc, char* argv[]) /**  
@@ -42,7 +17,7 @@ int main(int argc, char* argv[]) /**
 	*/
 
 {
-	int lReturn = 0;
+	int lReturn 	= 0;
 
 	FrameSource 	lFrameSource;
 	string 		lSourceStr;	
@@ -70,7 +45,7 @@ int main(int argc, char* argv[]) /**
  	  cout << lDesc <<endl;
 	  cout << "	Valid arguments for 'Mode': ";
 	  cout << "["<<FrameSource::DIRECTORY<<" ";
-	  cout <<FrameSource::RTSP<<" ";
+	  cout <<FrameSource::STREAM<<" ";
 	  cout <<FrameSource::GMSL<<"]";
 
 	  cout <<endl<<endl<< "	Examples:"<<endl;
@@ -91,7 +66,13 @@ int main(int argc, char* argv[]) /**
 		std::cout<<" Press Ctrl + c to terminate."<<std::endl;
 		std::cout<<"******************************"<<std::endl;
 
+		uint64_t nbCycles = 0;
+
 		StateMachine stateMachine(lFrameSource, lSourceStr);
+	
+
+		cout<<stateMachine.getCurrentState();
+		States lPreviousState = stateMachine.getCurrentState();
 
 		while (stateMachine.getCurrentState() != States::DISPOSED)
 		{
@@ -99,10 +80,27 @@ int main(int argc, char* argv[]) /**
 			stateMachine.quit();
 
 			lReturn = stateMachine.spin();
+			nbCycles ++;
+			
+			if(lPreviousState != stateMachine.getCurrentState())
+			{
+			  cout<<endl;	
+			  cout<<stateMachine.getCurrentState();
+			  lPreviousState = stateMachine.getCurrentState();
+
+			  std::cout.flush();
+			}
+			else if (nbCycles%100==0)
+			{
+			  cout <<endl;
+			  cout <<stateMachine.getCurrentState();
+			  cout <<"state cycle-count = " << nbCycles;
+			}
+
 		}
 	}
 
-	cout<<"program ended with exit code " <<lReturn<<endl;
+	cout<<"Completed!"<<endl<<"program ended with exit code " <<lReturn<<endl;
 	return(lReturn);
 	
 }

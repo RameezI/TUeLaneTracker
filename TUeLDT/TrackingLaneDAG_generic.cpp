@@ -224,7 +224,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
-
 #ifdef PROFILER_ENABLED
 mProfiler.start("FILTERS_WAIT");
 #endif 				
@@ -544,24 +543,26 @@ mProfiler.start("DISPLAY");
 	   int VP_H =  mVanishPt.H + mCAMERA.FRAME_CENTER(1);	
 
 	   //Lane Bundaries
-	   Point  Start_leftLaneInner( mCAMERA.FRAME_CENTER(1) 	-  ((int)( mLaneModel.leftOffset  + delta)/mLaneFilter->STEP)*mLaneFilter->STEP					  ,  mCAMERA.RES_VH(0) );
+	   Point  Start_leftLaneInner( mCAMERA.FRAME_CENTER(1) 	-  
+		((int)( mLaneModel.leftOffset  + delta)/mLaneFilter->STEP)*mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
 
-	   Point  Start_rightLaneInner( mCAMERA.FRAME_CENTER(1) +  ((int)( mLaneModel.rightOffset - delta)/mLaneFilter->STEP)*mLaneFilter->STEP					  ,  mCAMERA.RES_VH(0) );
+	   Point  Start_rightLaneInner( mCAMERA.FRAME_CENTER(1) +  
+		((int)( mLaneModel.rightOffset - delta)/mLaneFilter->STEP)*mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
 	
-	   Point  StartMidLane( ((int)((Start_leftLaneInner.x + Start_rightLaneInner.x)/2.0)/mLaneFilter->STEP)*mLaneFilter->STEP
-				     ,  mCAMERA.RES_VH(0) );
+	   Point  StartMidLane( ((int)((Start_leftLaneInner.x + Start_rightLaneInner.x)/2.0)/ mLaneFilter->STEP)* 
+		  mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
  
 	   float slopeLeft =  (float)( VP_V-mCAMERA.RES_VH(0) ) / (VP_H- Start_leftLaneInner.x);
 	   float slopeRight = (float)( VP_V-mCAMERA.RES_VH(0) ) / (VP_H- Start_rightLaneInner.x);
 	
 
-	   Point End_leftLaneInner = Start_leftLaneInner;
-	   End_leftLaneInner.x 	+= -round((mCAMERA.RES_VH(0)*lRatioLookAhead) / slopeLeft);
-	   End_leftLaneInner.y 	+= -round( (mCAMERA.RES_VH(0)*lRatioLookAhead));
+	   Point End_leftLaneInner 	= Start_leftLaneInner;
+	   End_leftLaneInner.x 		+= -round((mCAMERA.RES_VH(0)*lRatioLookAhead) / slopeLeft);
+	   End_leftLaneInner.y 		+= -round( (mCAMERA.RES_VH(0)*lRatioLookAhead));
 	
-	   Point End_rightLaneInner = Start_rightLaneInner;
-	   End_rightLaneInner.x += -round ((mCAMERA.RES_VH(0)*lRatioLookAhead) / slopeRight);
-	   End_rightLaneInner.y += -round ((mCAMERA.RES_VH(0)*lRatioLookAhead));
+	   Point End_rightLaneInner 	= Start_rightLaneInner;
+	   End_rightLaneInner.x 	+= -round ((mCAMERA.RES_VH(0)*lRatioLookAhead) / slopeRight);
+	   End_rightLaneInner.y 	+= -round ((mCAMERA.RES_VH(0)*lRatioLookAhead));
 
 
 	   // Draw Left Boundary Line
@@ -616,8 +617,6 @@ mProfiler.start("DISPLAY");
 		line(mFrameRGB, cvPoint(x,mCAMERA.RES_VH(0)), cvPoint(x,mCAMERA.RES_VH(0) -30), cvScalar(0,0,0), 1);
 		else
 		line(mFrameRGB, cvPoint(x,mCAMERA.RES_VH(0)), cvPoint(x,mCAMERA.RES_VH(0) -40), cvScalar(0,0,255), 2);
-
-		//putText(mFrameRGB, std::to_string(i), cvPoint(x, mCAMERA.RES_VH(0)-30), FONT_HERSHEY_DUPLEX, 0.1, CvScalar(255,0,0), 2);
 	   }
 
 
@@ -630,14 +629,7 @@ mProfiler.start("DISPLAY");
 		//if(x !=  StartMidLane.x)
 		line(mFrameRGB, cvPoint(x,mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V), 
 				cvPoint(x,mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V-30), cvScalar(0,0,0), 1);
-		//else
-		//line(mFrameRGB, cvPoint(x,mCAMERA.RES_VH(0)), cvPoint(x,mCAMERA.RES_VH(0) -40), cvScalar(0,0,255), 2);
-
-		//putText(mFrameRGB, std::to_string(i), cvPoint(x, mCAMERA.RES_VH(0)-30), FONT_HERSHEY_DUPLEX, 0.1, CvScalar(255,0,0), 2);
 	   }
-
-	   //putText(mFrameRGB, "Coordinates", cvPoint(340,240), FONT_HERSHEY_COMPLEX, 0.2, CvScalar(255,0,0), 2  );
-
 
 
 	   #ifdef DISPLAY_GRAPHICS_DCU
@@ -648,9 +640,9 @@ mProfiler.start("DISPLAY");
 	   
 	   if ( (char)32 == (char) waitKey(10) )
 	   {
-		cout << "Lane Histogram Bins :	"<< mLaneFilter->HISTOGRAM_BINS.transpose() <<endl << endl;
+		cout << "Lane Histogram Bins :		"<< mLaneFilter->HISTOGRAM_BINS.transpose() <<endl << endl;
 
-		cout << "VanishingPt Histogram Bins : "<< mVpFilter->HISTOGRAM_BINS.transpose() <<endl << endl;
+		cout << "VanishingPt Histogram Bins : 	"<< mVpFilter->HISTOGRAM_BINS.transpose() <<endl << endl;
 
 		while ((char)32 != (char)waitKey(1));
 	   }
