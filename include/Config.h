@@ -29,6 +29,7 @@
 
 
 //S32V234 specific flgs
+
  //#define DISPLAY_GRAPHICS_DCU
  #define TEST_APEX_CODE
 

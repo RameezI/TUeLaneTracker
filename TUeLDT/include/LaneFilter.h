@@ -79,7 +79,7 @@ public:	 //Public Interface
 		
 public:	 //Public Interface of the class	
 
-		const int 				OFFSET_V;   				/*< Vertical Offset of BaseHistogram in Image-Center coordinate System */
+		const int 				OFFSET_V;   				/*< Vertical Offset of BaseHistogram in VP coordinate System */
 		const VectorXi  		HISTOGRAM_BINS;    			/*< -PX_MAX	:	STEP	: PX_MAX 	*/
 		const VectorXi  		OFFSET_BINS;       			/*<  0 		: 	STEP 	: PX_MAX	*/
 		

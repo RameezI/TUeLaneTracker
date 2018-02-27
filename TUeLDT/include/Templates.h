@@ -44,43 +44,43 @@ struct Templates
 	
 public:
 
-	const int MARGIN;  	/**< /brief Vertical margin between the image center and ROI [pixels]
-				 	/n +ve Margin implies the ROI is below the center line.
-					/n -ve Margin implies the ROI is above the center line. */ 
+	const int MARGIN;  			/**< /brief Vertical margin between the image center and ROI [pixels]
+				 				/n +ve Margin implies the ROI is below the center line.
+								/n -ve Margin implies the ROI is above the center line. */
 
 
-	const int VP_RANGE_V;   /**< Vertical range of the vanishing-point in each direction [pixels] */
-	const int SPAN;		/**< Vertical size  of the ROI [pixels] 
-				      /n Automatically calculated from  /em MARGIN and /em VP_RANGE_V */
+	const int VP_RANGE_V;   	/**< Vertical range of the vanishing-point in each direction [pixels] */
+	const int SPAN;				/**< Vertical size  of the ROI [pixels]
+				      	   	    /n Automatically calculated from  /em MARGIN and /em VP_RANGE_V */
 
 
 	cv::Mat FOCUS_MASK_ROOT;    /**< /brief ROOT-TEMPLATE for extracting mask to compensate vehicle pitch movements.
-				     /n The size of /em FOCUS ROOT is [SPAN+(2xVP_RANGE_V), RES_H]
+				     	 	 	/n The size of /em FOCUS ROOT is [SPAN+(2xVP_RANGE_V), RES_H]
 
-				     /n Normal activation all elements in rowrange /em (SPAN-VP_RANGE) = 255
- 				     /n Best   activation all elements in /em SPAN = 255
-				     /n Worst  activation all elements in rowrange /em (SPAN-2*VP_RANGE) = 255
-				*/
-
-
-	cv::Mat GRADIENT_TAN_ROOT;	/**< ROOT-TEMPLATE for extracting gradient tangents refference.
-				  /n The size of /em GRADIENT_TAN_ROOT is [2xRES_V +1 	, 2xRES_H +1]
-				*/
+				     	 	 	/n Normal activation all elements in rowrange /em (SPAN-VP_RANGE) = 255
+ 				     	 	 	/n Best   activation all elements in /em SPAN = 255
+				     	 	 	/n Worst  activation all elements in rowrange /em (SPAN-2*VP_RANGE) = 255
+								*/
 
 
-	cv::Mat DEPTH_MAP_ROOT;	/**< ROOT-TEMPLATE for assigning perspective weights to the pixels. 
-				     /n The size of /em DEPTH_MAP_ROOT is [RES_V, RES_H]
-				*/
+	cv::Mat GRADIENT_TAN_ROOT;	/**< ROOT-TEMPLATE for extracting gradient tangents reference.
+				  	  	  	  	/n The size of /em GRADIENT_TAN_ROOT is [2xRES_V +1 	, 2xRES_H +1]
+								*/
 
 
-	cv::Mat X_ICS;		/**< ROOT-TEMPLATE containing the X pixel indices in Image Coordinate System. 
-				   /n The size of /em X_ICS is [RES_V, RES_H]
-				*/
+	cv::Mat DEPTH_MAP_ROOT;		/**< ROOT-TEMPLATE for assigning perspective weights to the pixels.
+				     	 	 	/n The size of /em DEPTH_MAP_ROOT is [RES_V, RES_H]
+								*/
 
 
-	cv::Mat Y_ICS;		/**< ROOT-TEMPLATE containing the Y pixel indices in Image Coordinate System. 
-				   /n The size of /em Y_ICS is [RES_V, RES_H]
-				*/
+	cv::Mat X_ICS;				/**< ROOT-TEMPLATE containing the X pixel indices in Image Coordinate System.
+				   	   	   	    /n The size of /em X_ICS is [RES_V, RES_H]
+								*/
+
+
+	cv::Mat Y_ICS;				/**< ROOT-TEMPLATE containing the Y pixel indices in Image Coordinate System.
+				   	   	   	    /n The size of /em Y_ICS is [RES_V, RES_H]
+								*/
 
 
 
@@ -99,6 +99,9 @@ public:
 	  SPAN((RES_V/2)-MARGIN + VP_RANGE_ROWS) 
 
 	{
+
+
+
 		/* Create Focus Template */
 			MatrixXi FOCUS_ROOT   = MatrixXi::Zero(SPAN + 2*VP_RANGE_V, RES_H);
 			FOCUS_ROOT.block(2*VP_RANGE_V, 0, SPAN, RES_H) = MatrixXi::Constant(SPAN, RES_H, 255);
@@ -146,7 +149,8 @@ public:
 			std::stringstream formattedString;
 			string templateFile, path, prefix, format;
 			char lBuff[65536];
-			ssize_t len = :: readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
+
+			ssize_t len = ::readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
 			if (len!=-1)
 			{
 				path = std::string(lBuff);
@@ -155,7 +159,10 @@ public:
 			}
 			else
 			{
-				cout << "Unable to find the path to the Templates: "<< endl;
+				#ifdef PROFILER_ENABLED
+				 LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+				 <<"Unable to find the path to binary [searching for Template]: "<<endl;
+				#endif
 				exit(-2);
 			}
 

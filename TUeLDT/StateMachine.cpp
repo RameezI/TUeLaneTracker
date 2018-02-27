@@ -105,7 +105,7 @@ int StateMachine::spin()
 	{
 		InitState		lBootingState;
 
-		mPtrLaneFilter 		= lBootingState.createLaneFilter();
+		mPtrLaneFilter 			= lBootingState.createLaneFilter();
 		mPtrVanishingPtFilter	= lBootingState.createVanishingPtFilter();
 		mPtrTemplates           = lBootingState.createTemplates();
 
