@@ -123,7 +123,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 mProfiler.start("GAUSSIAN_BLUR");
 #endif 
 	
-	 GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, cv::Size( 5, 5 ), 2, 2, cv::BORDER_REPLICATE | cv::BORDER_ISOLATED);
+	 GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, cv::Size( 5, 5 ), 2, 2, cv::BORDER_REPLICATE | cv::BORDER_ISOLATED  );
 
 
 				

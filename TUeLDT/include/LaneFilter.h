@@ -31,19 +31,20 @@ using namespace Eigen;
 
 struct BaseHistogramModel
 {
-	int   leftOffsetIdx;
-	int   rightOffsetIdx;
-	int   leftOffset;
-	int   rightOffset;
-	float width_cm;
+	int   	leftOffsetIdx;				/**<Offset Index containing distance to left  boundary given the current model [index]*/
+	int   	rightOffsetIdx;				/**<Offset Index containing distance to right boundary given the current model [index]*/
+	int   	leftOffset;					/**< Distance to the left boundary given the current Model [pixels] */
+	int   	rightOffset;				/**< Distance to the right boundary given the current Model [pixels] */
+
+	float 	width_cm;					/**< Width of the Lane given the current model [cm] */
 		
-	int  binID_leftBoundary;
-	int  binID_rightBoundary;
+	int  	binID_leftBoundary;			/**<Histogram Index representing left left boundary given the current model [index]*/
+	int  	binID_rightBoundary;		/**<Histogram Index representing left left boundary given the current model [index]*/
 	
-	int  binID_NegBoundaryLeft;
-	int  nbNonBoundaryBinsLeft;
-	int  binID_NegBoundaryRight;
-	int  nbNonBoundaryBinsRight;
+	int  	binID_NegBoundaryLeft;		/**<Histogram Index representing left bin of non-boundary region */
+	int  	nbNonBoundaryBinsLeft;		/**<Number of non-boundary bins to the left of the center-line */
+	int  	binID_NegBoundaryRight;		/**<Histogram Index representing right bin of non-boundary region */
+	int  	nbNonBoundaryBinsRight;		/**<Number of non-boundary bins to the right of the center-line*/
 		
 	
 	BaseHistogramModel()
@@ -66,21 +67,21 @@ class LaneFilter
 {
 	
 private:	
-		const LaneParameters   	mLANE;
-		const Camera 			mCAMERA;
-		const int				mSTEP_CM;     // BaseHistogram Step in cm
+		const LaneParameters   	mLANE;						/*< Describes Lane properties for example average lane widths and its standard deviation*/
+		const Camera 			mCAMERA;					/*< Describes Camera properties and configuration */
+		const int				mSTEP_CM;     				/*< BaseHistogram step size [cm] */
 
 public:	 //Public Interface 
-		const int 	STEP;   				// BaseHistogram Step in Pixels
-		const int 	mBIN_MAX;				// BaseHistogram Max Bin Value
-		const int   mNb_HISTOGRAM_BINS;    	// number of bins in the Base Histogram.
-		const int   mNb_OFFSET_BINS;		// number of offset bins on one side.
+		const int 				STEP;   					/*< BaseHistogram step [Pixels] */
+		const int 				mBIN_MAX;					/*< BaseHistogram max bin value [Pixels] */
+		const int   			mNb_HISTOGRAM_BINS;    		/*< Number of bins in the base Histogram */
+		const int   			mNb_OFFSET_BINS;			/*< Number of bins in offsets vector [Half of the mNb_HISTOGRAM_BINS] */
 		
 public:	 //Public Interface of the class	
 
-		const int 		OFFSET_V;   		// Vertical Offset (BaseHistogram) in VP coordinate System
-		const VectorXi  HISTOGRAM_BINS;    	// -PX_MAX:STEP: PX_MAX
-		const VectorXi  OFFSET_BINS;       	//  0 : STEP : PX_MAX
+		const int 				OFFSET_V;   				/*< Vertical Offset of BaseHistogram in Image-Center coordinate System */
+		const VectorXi  		HISTOGRAM_BINS;    			/*< -PX_MAX	:	STEP	: PX_MAX 	*/
+		const VectorXi  		OFFSET_BINS;       			/*<  0 		: 	STEP 	: PX_MAX	*/
 		
 		cv::Mat prior;
 		cv::Mat filter;

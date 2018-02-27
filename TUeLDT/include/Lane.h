@@ -26,34 +26,30 @@ struct LaneParameters
 {
 
 public:
-	const float AVG_WIDTH;
-	const float STD_WIDTH;
-	const float MIN_WIDTH;
-	const float MAX_WIDTH;
+	const float AVG_WIDTH;	/*< Average with of a Lane [cm]	*/
+	const float STD_WIDTH;	/*< Standard deviation in Lane width [cm] */
+	const float MIN_WIDTH;	/*< Minimum width of a Lane [cm] */
+	const float MAX_WIDTH;  /*< Maximum width of a Lane [cm] */
 	
 	LaneParameters() //Lane Widths in cm
-	: AVG_WIDTH(300),STD_WIDTH(50),MIN_WIDTH(250),MAX_WIDTH(500) 
-	{
-		//Default Constructor
-	}
+	: AVG_WIDTH(300),STD_WIDTH(50),MIN_WIDTH(250),MAX_WIDTH(500) {}
 };
 
 struct LaneModel
 {
 public:
-	    	int 	leftOffset;
-		int 	rightOffset;
+	    int 	leftOffset;			/*< Distance to left boundary 	[cm] */
+		int 	rightOffset;		/*< Distance to right boundary	[cm] */
+		int     centerLane;			/*< Distance to center-Line 	[cm] */
 		
-		int     centerLane;
-		
-		int 	confidenceLeft;
-		int     confidenceRight;
+		int 	confidenceLeft; 	/*< Confidence in left boundary */
+		int     confidenceRight;  	/*< Confidence in right boundary */
 
-		float   laneWidth_cm;
+		float   laneWidth;		/* Width of the lane [cm] */
 
 		
 		LaneModel()
-		: leftOffset(0),rightOffset(0),confidenceLeft(0), confidenceRight(0), laneWidth_cm(0)
+		: leftOffset(0),rightOffset(0),confidenceLeft(0), confidenceRight(0), laneWidth(0)
 		{
 			
 		}

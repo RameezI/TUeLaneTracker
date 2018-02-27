@@ -348,7 +348,7 @@ mProfiler.start("HISTOGRAM_MATCHING");
 	   mLaneModel.rightOffset		= Models[BestModelIdx].rightOffset;
 	   mLaneModel.centerLane    	= round((mLaneModel.leftOffset + mLaneModel.rightOffset)/2.0);
 		
-	   mLaneModel.laneWidth_cm     	= Models[BestModelIdx].width_cm;
+	   mLaneModel.laneWidth     	= Models[BestModelIdx].width_cm;
 	 
 	   mLaneModel.confidenceLeft  	= round(100* mLaneModel.confidenceLeft/(float)SCALE_FILTER);
 	   mLaneModel.confidenceRight  	= round(100* mLaneModel.confidenceRight/(float)SCALE_FILTER);
@@ -454,7 +454,7 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 			
 		      // VP Probability over Lane Width at Offseted-VP 
 		      mLikelihoodVP_Width = mLaneMembership.WIDTH_DIFF_NORMA 
-		       * exp( - pow(mLaneModel.laneWidth_cm - width_cm, 2) / mLaneMembership.WIDTH_DIFF_NOMIN );
+		       * exp( - pow(mLaneModel.laneWidth - width_cm, 2) / mLaneMembership.WIDTH_DIFF_NOMIN );
 				
 				
 		      // VP Probability over Left LaneBoundary

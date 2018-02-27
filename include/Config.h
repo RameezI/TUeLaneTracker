@@ -34,7 +34,7 @@
 
 /* The following section provides configuration for Frame Input*/
 #define DIRECTORY_PNG_IMAGES	"../../DataSet"
-#define SKIP_FRAMES		0
+#define SKIP_FRAMES				0
 
 
 /* The following section provides configuration for  the camera parameters */
