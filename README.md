@@ -15,8 +15,11 @@ What things you need to install the software and how to install them
 
 ```
 * OpenCv-3.1.0
+* Boostv-1.62.0
 ```
 [OpenCV Installaion Guide](http://docs.opencv.org/3.1.0/d7/d9f/tutorial_linux_install.html)
+[Boost Library Sources](http://www.boost.org/users/history/version_1_62_0.html)
+
 
 
 ### Build, Install and Run the Application
@@ -60,33 +63,13 @@ cd ../install/bin
 
 The TUeLaneDetector has three options for recieving the input frames, defined in the header *TUeLDT/include/State.h* :
 1. DIRECTORY [Default]
-2. RTSP
+2. STREAM
 3. GMSL [IN PROGRESS]
    
-To update the source settings :
-
-Open *LaneTrackerApp/main.cpp* file in an editor:
-
+To update the frame source use the command line arguments, for available command line options use the *--help* switch
 ```
-vim  LaneTrackerApp/main.cpp
+./TUeLanetracker --help
 ```
-Select the desired source and provide it to the *stateMachine* class constructor together with a string that contains source configuration.
-
-#### Example: Directory Input
-```
-       FrameSource   lFrameSource = FrameSource::DIRECTORY;
-       string	     lSourceStr = "/mnt/data0/DataSet/eindhoven/PNG_imgs";
-       StateMachine  stateMachine(lFrameSource, lSourceStr);
-```
-#### Example: RTSP Stream Input
-
-```
-       FrameSource   lFrameSource  = FrameSource::RTSP;
-	string	     lSourceStrr = "rtsp://192.168.8.1:8554/test";
-	StateMachine stateMachine(lFrameSource, lSourceStr);
-```
-
-
 
 ### Callibrarting TUeLaneTracker
 
@@ -118,6 +101,7 @@ Currently, the callibration is parameterized in the corresponding header files. 
 * [OpenCV3.1](http://docs.opencv.org/3.1.0/index.html) - Copmputer vision library
 * [CMake](https://maven.apache.org/) - Dependency management and makefiles generation
 * [Eigen 3.3.3](http://eigen.tuxfamily.org/index.php?title=Main_Page) - Linear Algebra  library
+* [Boost 1.62.0]((http://www.boost.org/users/history/version_1_62_0.html) - Provides Program Options
 
 
 ## Contributing
