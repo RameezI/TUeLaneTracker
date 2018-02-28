@@ -158,7 +158,7 @@ public:
 
 			prefix= "GradientTangent_";
 
-			formattedString<<path<<"/ConfigFiles/Templates/"<<prefix<<std::to_string(RES_H)<<"x"<<std::to_string(RES_V);
+			formattedString<<path<<"/ConfigFiles/Templates/"<<prefix<<std::to_string(RES_H)<<"x"<<std::to_string(RES_V)<<".yaml";
 			templateFile = formattedString.str();
 
 			struct stat buf;

@@ -59,7 +59,7 @@ private:
 		cv::Mat 	lCAMERA_MATRIX;
 
 		stringstream 	formattedString;
-		string 		file, prefix, path;
+		string 		file, path;
 
 
 		// Read location of Binary
@@ -82,9 +82,8 @@ private:
 		  lSuccess =-1;
 		}
 
-		prefix= "CONFIG_";
 
-		formattedString<<path<<"/ConfigFiles/CAMERA/"<<prefix<<CAMERA_NAME;
+		formattedString<<path<<"/ConfigFiles/Camera/"<<CAMERA_NAME<<".yaml";
 		file = formattedString.str();
 
 		struct 	stat  	buf;
@@ -116,7 +115,7 @@ public:
 		const double 	FOCAL_LENGTH;    		/*<  Camera focal length in meters		*/
 		const double    CM_TO_PIXEL;			/*<  Conversion ratio at the base line		*/
 		const string	CAMERA_NAME;			/*<  Camera Identifier				*/
-		const cv::Mat	CAMERA_MATRIX_INTRINSIC;	/*<  Camera Intrinsic Parameters 4x4 		*/
+		const cv::Mat	CAMERA_MATRIX_INTRINSIC;	/*<  Camera Intrinsic Parameters 3x4 		*/
 		const cv::Mat	CAMERA_MATRIX_EXTRINSIC;	/*<  Camera Extrinsic Parameters 4x4		*/
 
 		Camera() :
@@ -140,7 +139,6 @@ public:
 		  if (CAMERA_MATRIX_INTRINSIC.empty() | CAMERA_MATRIX_EXTRINSIC.empty() )
 		   throw "Camera Instantiation Failed" ;
 		}
-		cl
 	   	~Camera(){}
 };
 #endif // CAMERA_H

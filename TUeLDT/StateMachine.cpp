@@ -185,14 +185,14 @@ int StateMachine::spin()
 		   #else
 		    (new TrackingLaneState<TrackingLaneDAG_generic>( move(mPtrBufferingState->mGraph) ) );
 		   #endif
-		
+
 		   mCurrentState 	= States::DETECTING_LANES;
 		   mPtrBufferingState 	= nullptr;
 
 		   cout<<"Completed!"<<endl;
 		}
 
-		if( mPtrBufferingState->currentStatus == StateStatus::ERROR)
+		else if( mPtrBufferingState->currentStatus == StateStatus::ERROR)
 		{
 		   #ifdef PROFILER_ENABLED
 		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
@@ -213,11 +213,13 @@ int StateMachine::spin()
 
 	case States::DETECTING_LANES :
 	{
+
 		if (mPtrTrackingState->currentStatus == StateStatus::INACTIVE)
 		{
-		   mPtrTrackingState->setupDAG(mPtrLaneFilter.get(), mPtrVanishingPtFilter.get());
-		}
 
+		   mPtrTrackingState->setupDAG(mPtrLaneFilter.get(), mPtrVanishingPtFilter.get());
+
+		}
 		if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
 		{
 		   mPtrTrackingState->run();
@@ -236,7 +238,7 @@ int StateMachine::spin()
 		   mCurrentState 	= States::DISPOSED;
 		   mPtrTrackingState 	= nullptr;
 		}
-		if (mPtrTrackingState->currentStatus == StateStatus::ERROR)
+		else if(mPtrTrackingState->currentStatus == StateStatus::ERROR)
 		{
 		   #ifdef PROFILER_ENABLED
 		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
