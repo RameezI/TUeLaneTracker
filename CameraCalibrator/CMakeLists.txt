@@ -3,7 +3,7 @@ project(CAMERA_CALLIBRATOR )
 find_package( OpenCV REQUIRED )
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 
-set (BINARY cameraCallibrator)
+set (BINARY cameraCalibrator)
 add_executable(${BINARY} main.cpp )
 target_link_libraries( ${BINARY} ${OpenCV_LIBS} )
 

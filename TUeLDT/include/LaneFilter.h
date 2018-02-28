@@ -31,12 +31,12 @@ using namespace Eigen;
 
 struct BaseHistogramModel
 {
-	int   	leftOffsetIdx;	 /**<Offset Index containing distance to left  boundary given the current model [index]*/
-	int   	rightOffsetIdx;	 /**<Offset Index containing distance to right boundary given the current model [index]*/
-	int   	leftOffset;	 /**< Distance to the left boundary given the current Model [pixels] */
-	int   	rightOffset;	 /**< Distance to the right boundary given the current Model [pixels] */
+	int   	leftOffsetIdx;	 	/**<Offset Index containing distance to left  boundary given the current model [index]*/
+	int   	rightOffsetIdx;	 	/**<Offset Index containing distance to right boundary given the current model [index]*/
+	int   	leftOffset;	 	/**< Distance to the left boundary given the current Model [pixels] */
+	int   	rightOffset;	 	/**< Distance to the right boundary given the current Model [pixels] */
 
-	float 	width_cm;	/**< Width of the Lane given the current model [cm] */
+	float 	width_cm;		/**< Width of the Lane given the current model [cm] */
 		
 	int  	binID_leftBoundary;	/**<Histogram Index representing left left boundary given the current model [index]*/
 	int  	binID_rightBoundary;	/**<Histogram Index representing left left boundary given the current model [index]*/
@@ -69,7 +69,7 @@ class LaneFilter
 private:	
 		const LaneParameters   	mLANE;	  /*< Describes Lane properties for example average lane widths and its standard deviation*/
 		const Camera 		mCAMERA;  /*< Describes Camera properties and configuration */
-		const int		mSTEP_CM; /*< BaseHistogram step size [cm] */
+		const int		mSTEP_CM; /*< BaseHistogram and PurviewHistogram step size [cm] */
 
 public:	 //Public Interface 
 		const int 		STEP;   		/*< BaseHistogram step [Pixels] */
