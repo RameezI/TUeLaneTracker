@@ -22,7 +22,7 @@
 #include "LaneFilter.h"
 #include "ScalingFactors.h"
 
-LaneFilter::LaneFilter(const LaneParameters& LANE,  const Camera& CAMERA)
+LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
 
 : mLANE(LANE),
 

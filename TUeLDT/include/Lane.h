@@ -22,7 +22,10 @@
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
 	
-struct LaneParameters
+/**
+Describes Lane Properties
+*/
+struct LaneProperties
 {
 
 public:
@@ -31,16 +34,20 @@ public:
 	const float MIN_WIDTH;	/*< Minimum width of a Lane [cm] */
 	const float MAX_WIDTH;  /*< Maximum width of a Lane [cm] */
 	
-	LaneParameters() //Lane Widths in cm
+	LaneProperties() //Lane Widths in cm
 	: AVG_WIDTH(300),STD_WIDTH(50),MIN_WIDTH(250),MAX_WIDTH(500) {}
 };
 
+
+/**
+Describes the Lane model in the Vehicle-Symmetry-Plane coordinate system.
+*/
 struct LaneModel
 {
 public:
-	    int 	leftOffset;			/*< Distance to left boundary 	[cm] */
-		int 	rightOffset;		/*< Distance to right boundary	[cm] */
-		int     centerLane;			/*< Distance to center-Line 	[cm] */
+	    	int 	leftOffset;	/*< Distance to left  boundary, at look-ahead-distance, in vehicle-symmetry-plane CS [cm] */
+		int 	rightOffset;	/*< Distance to right boundary, at look-ahead-distance,	in vehicle-symmetry-plane CS [cm] */
+		int     centerLane;	/*< Distance to center-Line, at look-ahhead-distance,  	in vehicle-symmetry-plane CS [cm] */
 		
 		int 	confidenceLeft; 	/*< Confidence in left boundary */
 		int     confidenceRight;  	/*< Confidence in right boundary */
@@ -55,26 +62,29 @@ public:
 		}
 };
 
+/**
+Describes pixel chracteristics for assigning their membership to Lane-Boundary or Non-Boundary regions 
+
+*/
 struct LaneMembership 
 	{
-		
 		public:
-		const uint8_t   TIPPING_POINT_GRAY; 
-		const uint8_t   TIPPING_POINT_GRAD_Mag;
+		const uint8_t   TIPPING_POINT_GRAY; 	/*< Tipping point of gray shade fitness for a lane bounday */
+		const uint8_t   TIPPING_POINT_GRAD_Mag; /*< Tipping point of gradient magnitude fitness for a lane boundary */ 
 		
 		private:
-		const float WIDTH_STD;
+		const float 	WIDTH_STD;		
 		
 		public:
-		const float WIDTH_DIFF_NORMA;
-		const float WIDTH_DIFF_NOMIN;
+		const float 	WIDTH_DIFF_NORMA;
+		const float 	WIDTH_DIFF_NOMIN;
 		
 		private:
-		const float NEG_BOUNDARY_STD;
+		const float 	NEG_BOUNDARY_STD;
 		
 		public:
-		const float NEG_BOUNDARY_NORMA;
-		const float NEG_BOUNDARY_NOMIN;
+		const float 	NEG_BOUNDARY_NORMA;
+		const float 	NEG_BOUNDARY_NOMIN;
 		
 		LaneMembership() //Initialization of  members through initialization list
 		:TIPPING_POINT_GRAY(100),

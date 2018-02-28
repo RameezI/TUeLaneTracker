@@ -67,7 +67,7 @@ class LaneFilter
 {
 	
 private:	
-		const LaneParameters   	mLANE;	  /*< Describes Lane properties for example average lane widths and its standard deviation*/
+		const LaneProperties   	mLANE;	  /*< Describes Lane properties for example average lane widths and its standard deviation*/
 		const Camera 		mCAMERA;  /*< Describes Camera properties and configuration */
 		const int		mSTEP_CM; /*< BaseHistogram and PurviewHistogram step size [cm] */
 
@@ -92,7 +92,7 @@ private:
 		void  createHistogramModels();	
 
 public:	
-		LaneFilter(const LaneParameters& LANE,  const Camera& CAMERA);
+		LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA);
 	   	~LaneFilter();
 };
 	

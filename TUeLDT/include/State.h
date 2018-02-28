@@ -46,6 +46,21 @@ inline std::ostream& operator<<(std::ostream& out, const States& state)
 	return out;	
 }
 
+inline std::ostream& operator<<(std::ostream& out, const StateStatus& stateStatus)
+{
+	if(stateStatus == StateStatus::DONE)
+	  out<<"DONE!";
+	else if (stateStatus == StateStatus::ACTIVE)
+	  out<<"ACTIVE";
+	else if (stateStatus == StateStatus::INACTIVE)
+	  out<<"INACTIVE";
+	else if (stateStatus == StateStatus::ERROR)
+	  out<<"ERROR!";
+	else
+	  out <<"UNKNOWN!";
+	return out;	
+}
+
 
 inline std::istream& operator>>(std::istream& in, FrameSource& frameSource)
 {

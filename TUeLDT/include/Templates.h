@@ -32,22 +32,23 @@
 using namespace Eigen;
 
 
-/*****************************************************//**
+/*************************************************************************//**
 *  This structure contains following root templates for the TUeLaneTracker
 *  /n /emp FOCUS_MASK_ROOT 
 *  /n /emp GRADIENT_TAN_ROOT
 *  /n /emp DEPTH_MAP_ROOT
 *  /n /emp X_ICS
 *  /n /emp Y_ICS 
-*   ****************************************************/
+*   ************************************************************************/
+
 struct Templates
 {
 	
 public:
 
 	const int MARGIN;  		/**< /brief Vertical margin between the image center and ROI [pixels]
-					/n +ve Margin implies the ROI is below the center line.
-					/n -ve Margin implies the ROI is above the center line. */
+					/n +ve Margin implies that the ROI is below the center line.
+					/n -ve Margin implies that the ROI is above the center line. */
 
 
 	const int VP_RANGE_V;   	/**< Vertical range of the vanishing-point in each direction [pixels] */
@@ -63,7 +64,7 @@ public:
 
 
 	cv::Mat GRADIENT_TAN_ROOT;	/**< ROOT-TEMPLATE for extracting gradient tangents reference.
-				  	/n The size of /em GRADIENT_TAN_ROOT is [2xRES_V +1 	, 2xRES_H +1] */
+				  	/n The size of /em GRADIENT_TAN_ROOT is [2xRES_V +1 , 2xRES_H +1] */
 
 
 	cv::Mat DEPTH_MAP_ROOT;		/**< ROOT-TEMPLATE for assigning perspective weights to the pixels.
@@ -151,9 +152,9 @@ public:
 			{
 				#ifdef PROFILER_ENABLED
 				 LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-				 <<"Unable to find the path to binary [searching for Template]: "<<endl;
+				 <<"Unable to find the path to binary"<<endl
+				 <<"[searching for Template]"<<endl;
 				#endif
-				exit(-2);
 			}
 
 			prefix= "GradientTangent_";
@@ -165,15 +166,26 @@ public:
 			int statResult = stat(templateFile.c_str(),&buf);
 			if (statResult != 0) 
 			{
-				cout << "File not found: " << templateFile.c_str() << endl;
-				exit(-2);
+				
+				#ifdef PROFILER_ENABLED
+				 LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+				 <<"File not found: "<<templateFile.c_str()<<endl;
+				#endif
 			}
 			else
 			{
 				cv::FileStorage loadGradientTemplate( templateFile, cv::FileStorage::READ);
 				loadGradientTemplate["ROOT_DIR_TEMPLATE"]>> GRADIENT_TAN_ROOT;
 				GRADIENT_TAN_ROOT.convertTo(GRADIENT_TAN_ROOT,CV_16SC1);
-			}		
+			}
+
+			//Check if every template is non-empty and throw an exception if not.
+			if (GRADIENT_TAN_ROOT.empty() | 
+			      FOCUS_MASK_ROOT.empty() | 
+                               DEPTH_MAP_ROOT.empty() | 
+                                        X_ICS.empty() | 
+                                        Y_ICS.empty() ) throw "Templates Instatiation Failed" ;
+					
 	}	
 }; 
 #endif
