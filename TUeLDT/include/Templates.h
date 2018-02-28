@@ -25,6 +25,7 @@
 
 #include <sys/stat.h>
 #include <Eigen/Dense>
+#include "State.h"
 #include "opencv2/opencv.hpp"
 #include <opencv2/core/eigen.hpp>
 
@@ -44,45 +45,37 @@ struct Templates
 	
 public:
 
-	const int MARGIN;  			/**< /brief Vertical margin between the image center and ROI [pixels]
-				 				/n +ve Margin implies the ROI is below the center line.
-								/n -ve Margin implies the ROI is above the center line. */
+	const int MARGIN;  		/**< /brief Vertical margin between the image center and ROI [pixels]
+					/n +ve Margin implies the ROI is below the center line.
+					/n -ve Margin implies the ROI is above the center line. */
 
 
 	const int VP_RANGE_V;   	/**< Vertical range of the vanishing-point in each direction [pixels] */
-	const int SPAN;				/**< Vertical size  of the ROI [pixels]
-				      	   	    /n Automatically calculated from  /em MARGIN and /em VP_RANGE_V */
+	const int SPAN;			/**< Vertical size  of the ROI [pixels]
+					/n Automatically calculated from  /em MARGIN and /em VP_RANGE_V */
 
 
-	cv::Mat FOCUS_MASK_ROOT;    /**< /brief ROOT-TEMPLATE for extracting mask to compensate vehicle pitch movements.
-				     	 	 	/n The size of /em FOCUS ROOT is [SPAN+(2xVP_RANGE_V), RES_H]
-
-				     	 	 	/n Normal activation all elements in rowrange /em (SPAN-VP_RANGE) = 255
- 				     	 	 	/n Best   activation all elements in /em SPAN = 255
-				     	 	 	/n Worst  activation all elements in rowrange /em (SPAN-2*VP_RANGE) = 255
-								*/
+	cv::Mat FOCUS_MASK_ROOT;    	/**< /brief ROOT-TEMPLATE for extracting mask to compensate vehicle pitch movements.
+					/n The size of /em FOCUS ROOT is [SPAN+(2xVP_RANGE_V), RES_H]
+				     	/n Normal activation all elements in rowrange /em (SPAN-VP_RANGE) = 255
+ 				     	/n Best   activation all elements in /em SPAN = 255
+				     	/n Worst  activation all elements in rowrange /em (SPAN-2*VP_RANGE) = 255 */
 
 
 	cv::Mat GRADIENT_TAN_ROOT;	/**< ROOT-TEMPLATE for extracting gradient tangents reference.
-				  	  	  	  	/n The size of /em GRADIENT_TAN_ROOT is [2xRES_V +1 	, 2xRES_H +1]
-								*/
+				  	/n The size of /em GRADIENT_TAN_ROOT is [2xRES_V +1 	, 2xRES_H +1] */
 
 
 	cv::Mat DEPTH_MAP_ROOT;		/**< ROOT-TEMPLATE for assigning perspective weights to the pixels.
-				     	 	 	/n The size of /em DEPTH_MAP_ROOT is [RES_V, RES_H]
-								*/
+				     	/n The size of /em DEPTH_MAP_ROOT is [RES_V, RES_H] */
 
 
-	cv::Mat X_ICS;				/**< ROOT-TEMPLATE containing the X pixel indices in Image Coordinate System.
-				   	   	   	    /n The size of /em X_ICS is [RES_V, RES_H]
-								*/
+	cv::Mat X_ICS;			/**< ROOT-TEMPLATE containing the X pixel indices in Image Coordinate System.
+				   	/n The size of /em X_ICS is [RES_V, RES_H] */
 
 
-	cv::Mat Y_ICS;				/**< ROOT-TEMPLATE containing the Y pixel indices in Image Coordinate System.
-				   	   	   	    /n The size of /em Y_ICS is [RES_V, RES_H]
-								*/
-
-
+	cv::Mat Y_ICS;			/**< ROOT-TEMPLATE containing the Y pixel indices in Image Coordinate System.
+				   	/n The size of /em Y_ICS is [RES_V, RES_H] */
 
 
 
@@ -99,15 +92,12 @@ public:
 	  SPAN((RES_V/2)-MARGIN + VP_RANGE_ROWS) 
 
 	{
-
-
-
 		/* Create Focus Template */
 			MatrixXi FOCUS_ROOT   = MatrixXi::Zero(SPAN + 2*VP_RANGE_V, RES_H);
 			FOCUS_ROOT.block(2*VP_RANGE_V, 0, SPAN, RES_H) = MatrixXi::Constant(SPAN, RES_H, 255);
 			eigen2cv(FOCUS_ROOT, FOCUS_MASK_ROOT);
-			FOCUS_MASK_ROOT.convertTo(FOCUS_MASK_ROOT, CV_8U);
-			
+			FOCUS_MASK_ROOT.convertTo(FOCUS_MASK_ROOT, CV_8U);	
+	
 		/* Create Depth Template */
 			MatrixXf DEPTH_ROOT  = MatrixXf::Zero(RES_V, RES_H);			
 			const float step     = FOV_V/RES_V;
@@ -168,7 +158,7 @@ public:
 
 			prefix= "GradientTangent_";
 
-			formattedString<<path<<"/Templates/"<<prefix<<std::to_string(RES_H)<<"x"<<std::to_string(RES_V);
+			formattedString<<path<<"/ConfigFiles/Templates/"<<prefix<<std::to_string(RES_H)<<"x"<<std::to_string(RES_V);
 			templateFile = formattedString.str();
 
 			struct stat buf;

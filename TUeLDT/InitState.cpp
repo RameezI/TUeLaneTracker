@@ -22,65 +22,121 @@
 
 #include "InitState.h"
 
-InitState::InitState()
-: mLaneFilterCreated(false),
-  mVpFilterCreated  (false),
-  mTemplatesCreated (false)
-{	
-	this->currentStatus = StateStatus::ACTIVE;
-}
+// Class Implementation
+
 
 
 unique_ptr<LaneFilter> InitState::createLaneFilter()
 {
-	
-	Camera 			camera;
-	LaneParameters		lane;
 
-	unique_ptr<LaneFilter> 	laneFilter( new LaneFilter (lane, camera) );
-	mLaneFilterCreated 	= true;
+	unique_ptr<LaneFilter> 	lLaneFilter;
 
-	if (checkCreationStatus())
-	currentStatus= StateStatus::DONE;
+	try
+	{
+	  Camera 			lCamera;
+	  LaneParameters		lLane;
 
-	return laneFilter;	
+	  lLaneFilter =	unique_ptr<LaneFilter>(new LaneFilter(lLane, lCamera));
+
+	  mLaneFilterCreated 	= true;
+
+	  if (checkCreationStatus())
+	   currentStatus= StateStatus::DONE;
+
+	}
+	catch(const char* msg)
+	{
+	   #ifdef PROFILER_ENABLED
+	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	    <<"******************************"<<endl
+	    <<  "EXCEPTION CAUGHT: "<<endl
+	    << msg <<endl
+	    <<"******************************"<<endl<<endl;
+	   #endif
+	   lLaneFilter.reset(nullptr);				
+	   mLaneFilterCreated = false;
+	   currentStatus= StateStatus::ERROR;
+	}
+
+	return lLaneFilter;	
 }
 
 
 unique_ptr<VanishingPtFilter> InitState::createVanishingPtFilter()
 {
-	Camera 			camera;
-	LaneParameters   	lane;
-	LaneFilter 		laneFilter(lane, camera);
+
+	unique_ptr<VanishingPtFilter> lVanishingPtFilter;
+
+	try
+	{
+	  Camera 		lCamera;
+	  LaneParameters   	lLane;
+	  LaneFilter 		lLaneFilter(lLane, lCamera);
 	
-	unique_ptr<VanishingPtFilter> 
-	vanishingPtFilter(new VanishingPtFilter (laneFilter.HISTOGRAM_BINS, laneFilter.OFFSET_V) ); 
+	  lVanishingPtFilter 	= unique_ptr<VanishingPtFilter>
+				  (new VanishingPtFilter (lLaneFilter.HISTOGRAM_BINS, lLaneFilter.OFFSET_V) ); 
 	   
-	mVpFilterCreated 	=true;
-		
-	if (checkCreationStatus())
-	currentStatus= StateStatus::DONE;
+	  mVpFilterCreated 	= true;
 	
-	return vanishingPtFilter; 	
+	  if (checkCreationStatus())
+	   currentStatus	= StateStatus::DONE;
+
+	 }
+	catch(const char* msg)
+	{
+	   #ifdef PROFILER_ENABLED
+	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	    <<"******************************"<<endl
+	    <<  "EXCEPTION CAUGHT: "<<endl
+	    << msg <<endl
+	    <<"******************************"<<endl<<endl;
+	   #endif
+
+	  lVanishingPtFilter.reset(nullptr);
+	  mVpFilterCreated	= false;
+	  currentStatus		= StateStatus::ERROR;
+	}
+
+	return lVanishingPtFilter; 	
 }
 
 
 unique_ptr<Templates> InitState::createTemplates()
 {
-	Camera 			camera;
-	LaneParameters    	lane;
-	LaneFilter 		laneFilter(lane, camera);
-	VanishingPtFilter 	vanishingPtFilter(laneFilter.HISTOGRAM_BINS, laneFilter.OFFSET_V);
+
+	unique_ptr<Templates> lTemplates;
+
+	try
+	{
+	  Camera 		lCamera;
+	  LaneParameters    	lLane;
+	  LaneFilter 		lLaneFilter(lLane, lCamera);
+	  VanishingPtFilter 	lVanishingPtFilter(lLaneFilter.HISTOGRAM_BINS, lLaneFilter.OFFSET_V);
 	
-	unique_ptr<Templates>
-	templates ( new  Templates (camera.RES_VH(0), camera.RES_VH(1), camera.FOV(0), vanishingPtFilter.VP_RANGE_V) );
+	  lTemplates	 = unique_ptr<Templates>
+	  		   ( new  Templates (lCamera.RES_VH(0), lCamera.RES_VH(1), lCamera.FOV(0), lVanishingPtFilter.VP_RANGE_V) );
 	
-	mTemplatesCreated	= true;
+	  mTemplatesCreated	= true;
 	
-	if (checkCreationStatus())
-	currentStatus= StateStatus::DONE;		
-	
-	return templates;
+	  if (checkCreationStatus())
+	  currentStatus		= StateStatus::DONE;		
+	}
+	catch(const char* msg)
+	{
+	   #ifdef PROFILER_ENABLED
+	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	    <<"******************************"<<endl
+	    <<  "EXCEPTION CAUGHT: "<<endl
+	    << msg <<endl
+	    <<"******************************"<<endl<<endl;
+	   #endif
+
+	   lTemplates.reset(nullptr);
+	   mTemplatesCreated	= false;
+	   currentStatus	= StateStatus::ERROR;
+	}
+
+	return lTemplates;
 }
 
 
@@ -91,10 +147,4 @@ bool InitState::checkCreationStatus()
 	
 	else
 	return false;
-}
-
-InitState::~InitState()
-{	
-
-	
 }

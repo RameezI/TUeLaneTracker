@@ -27,12 +27,9 @@
 #include "LDT_profiler.h"
 #include "LDT_logger.h"
 
-
-
 enum States{BOOTING, BUFFERING, DETECTING_LANES, DISPOSED };
 enum StateStatus {DONE, ACTIVE, INACTIVE, ERROR };
 enum FrameSource {DIRECTORY, STREAM, GMSL};
-
 
 inline std::ostream& operator<<(std::ostream& out, const States& state)
 {

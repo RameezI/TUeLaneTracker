@@ -35,23 +35,26 @@ class StateMachine
 	
 private:
 
-	bool 							mInitialized;
-	bool							mQuitRequest;
-	const  FrameSource				mFrameSource;
-	const  string					mSourceStr;
-	 	   States 					mCurrentState;
+	bool 	mInitialized;
+	bool	mQuitRequest;
+
+	const  	FrameSource	mFrameSource;
+	const  	string		mSourceStr;
+
+	States 	mCurrentState;
 
 	unique_ptr<LaneFilter>  		mPtrLaneFilter;
-	unique_ptr<VanishingPtFilter>  	mPtrVanishingPtFilter;
+	unique_ptr<VanishingPtFilter>  		mPtrVanishingPtFilter;
 	unique_ptr<Templates> 			mPtrTemplates;
 
+	unique_ptr<InitState>			mPtrBootingState;
 
 	#ifdef S32V2XX
-	 BufferingState<BufferingDAG_s32v>  	 		 				mBufferingState;
-	 unique_ptr<TrackingLaneState<TrackingLaneDAG_s32v>>  	 		mPtrTrackingState;
+	 unique_ptr<BufferingState<BufferingDAG_s32v>>  	 	mPtrBufferingState;
+	 unique_ptr<TrackingLaneState<TrackingLaneDAG_s32v>>  	 	mPtrTrackingState;
 	#else
-	 BufferingState<BufferingDAG_generic>  	 		 				mBufferingState;
-	 unique_ptr<TrackingLaneState<TrackingLaneDAG_generic>>   	 	mPtrTrackingState;
+	 unique_ptr<BufferingState<BufferingDAG_generic>>  	 	mPtrBufferingState;
+	 unique_ptr<TrackingLaneState<TrackingLaneDAG_generic>>   	mPtrTrackingState;
 	#endif
 
 

@@ -31,11 +31,6 @@
  #include "BufferingDAG_generic.h"
 #endif
 
-class NotImplemented : public std::logic_error
-{
-public:
-    NotImplemented() : std::logic_error("Function not yet implemented") { };
-};
 
 template<typename GRAPH>
 class BufferingState : public State
@@ -169,7 +164,7 @@ int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
 		mGraph.mSource = lSource;
 	   	mGraph.mFrameCount = 0;
 	
-		throw NotImplemented();
+		throw "GMSL function not implemented";
 		lReturn =-1;
 	}
 
