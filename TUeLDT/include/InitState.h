@@ -25,7 +25,7 @@
 
 #include <memory>
 #include "State.h"
-#include "LaneFilter.h"
+#include "LaneFilters.h"
 #include "VanishingPtFilter.h"
 #include "Templates.h"
 
@@ -45,7 +45,7 @@ public	:
 		/* These methods create instances and also keep record of the already created objects
 		 * Make sure all objects are created before indicating "StateStatus::DONE". */
 		 
-		unique_ptr<LaneFilter> 			createLaneFilter();
+		unique_ptr<LaneFilters> 		createLaneFilter();
 		unique_ptr<VanishingPtFilter> 		createVanishingPtFilter();
 		unique_ptr<Templates> 			createTemplates();
 		

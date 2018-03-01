@@ -211,8 +211,8 @@ mProfiler.start("SET_UP_BUFFERING_DAG");
 	mGraph.mGRADIENT_TAN_ROOT = templates.GRADIENT_TAN_ROOT;
 	mGraph.mDEPTH_MAP_ROOT    = templates.DEPTH_MAP_ROOT;
 	mGraph.mFOCUS_MASK_ROOT   = templates.FOCUS_MASK_ROOT;
-	mGraph.mY_ICS	 	  	  = templates.Y_ICS;
-	mGraph.mX_ICS    	  	  = templates.X_ICS;
+	mGraph.mY_ICS	 	  = templates.Y_ICS;
+	mGraph.mX_ICS    	  = templates.X_ICS;
 
 	if ( 0 == mGraph.init_DAG() )
 	this->currentStatus= StateStatus::ACTIVE;

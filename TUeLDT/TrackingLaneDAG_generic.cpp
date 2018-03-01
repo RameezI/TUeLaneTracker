@@ -277,33 +277,33 @@ mProfiler.start("HISTOGRAM_MATCHING");
 	   int   bestPosteriorProb  = 0;
 	   float conditionalProb;
 		
-	   int32_t* HistBasePTR    	=  mHistBase.ptr<int32_t>(0);
-	   vector<BaseHistogramModel>& Models= mLaneFilter->baseHistogramModels;
+	   int32_t* HistBasePTR    		=  mHistBase.ptr<int32_t>(0);
+	   vector<BaseHistogramModel>& Models	= mLaneFilter->baseHistogramModels;
 	   cv::Mat    range;
 	
 	   for(size_t i=0; i< Models.size(); i++)
 	   {    
 			
-		int& LeftIdx    	= Models[i].binID_leftBoundary;
-		int& RightIdx		= Models[i].binID_rightBoundary;
+		int& LeftIdx    	 = Models[i].binID_leftBoundary;
+		int& RightIdx		 = Models[i].binID_rightBoundary;
 
-		int& NegLeftIdx		= Models[i].binID_NegBoundaryLeft;
-		int& NegRightIdx    	= Models[i].binID_NegBoundaryRight;
+		int& NegLeftIdx		 = Models[i].binID_NegBoundaryLeft;
+		int& NegRightIdx    	 = Models[i].binID_NegBoundaryRight;
 
-		int& Nleft          	= Models[i].nbNonBoundaryBinsLeft;
-		int& Nright		= Models[i].nbNonBoundaryBinsRight;
+		int& Nleft          	 = Models[i].nbNonBoundaryBinsLeft;
+		int& Nright		 = Models[i].nbNonBoundaryBinsRight;
 
 		
 
-		mLikelihoodLeftBoundary =  round(HistBasePTR[LeftIdx-1]*0.25
+		mLikelihoodLeftBoundary  =  round(HistBasePTR[LeftIdx-1]*0.25
 						+HistBasePTR[LeftIdx]
 						+HistBasePTR[LeftIdx+1]*0.25);
 										 
-		mLikelihoodRightBoundary = round( HistBasePTR[RightIdx-1]*0.25
+		mLikelihoodRightBoundary =  round( HistBasePTR[RightIdx-1]*0.25
 						+HistBasePTR[RightIdx]
 						+HistBasePTR[RightIdx+1]*0.25);
 	
-		conditionalProb  =  (mLikelihoodLeftBoundary*mLikelihoodRightBoundary)/(float)SCALE_FILTER;
+		conditionalProb  	 =  (mLikelihoodLeftBoundary*mLikelihoodRightBoundary)/(float)SCALE_FILTER;
 
 
 //TODO:	Put on the side thread.(start)
@@ -346,12 +346,12 @@ mProfiler.start("HISTOGRAM_MATCHING");
 		  
 	   mLaneModel.leftOffset 		= Models[BestModelIdx].leftOffset;
 	   mLaneModel.rightOffset		= Models[BestModelIdx].rightOffset;
-	   mLaneModel.centerLane    	= round((mLaneModel.leftOffset + mLaneModel.rightOffset)/2.0);
+	   mLaneModel.centerLane    		= round((mLaneModel.leftOffset + mLaneModel.rightOffset)/2.0);
 		
-	   mLaneModel.laneWidth     	= Models[BestModelIdx].width_cm;
+	   mLaneModel.laneWidth     		= Models[BestModelIdx].width_cm;
 	 
-	   mLaneModel.confidenceLeft  	= round(100* mLaneModel.confidenceLeft/(float)SCALE_FILTER);
-	   mLaneModel.confidenceRight  	= round(100* mLaneModel.confidenceRight/(float)SCALE_FILTER);
+	   mLaneModel.confidenceLeft  		= round(100* mLaneModel.confidenceLeft/(float)SCALE_FILTER);
+	   mLaneModel.confidenceRight  		= round(100* mLaneModel.confidenceRight/(float)SCALE_FILTER);
 		
 	}//Scope End
 		
@@ -377,16 +377,16 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 	
 	{	
 	   int   		bestPosteriorProb  = 0;
-	   int32_t* 	HistPurviewPTR     =  mHistPurview.ptr<int32_t>(0);
+	   int32_t* 		HistPurviewPTR     =  mHistPurview.ptr<int32_t>(0);
 
 	
-	   const float left_VP  = ((-mLaneModel.leftOffset  - delta)
-				  +(-mLaneModel.leftOffset  + delta))
-				/2.0;													
+	   const float left_VP  = ((mLaneModel.leftOffset  - delta)
+				  +(mLaneModel.leftOffset  + delta))
+				  /2.0;													
 	
 	   const float right_VP  = ((mLaneModel.rightOffset  - delta)
 				   +(mLaneModel.rightOffset  + delta))
-				/2.0;
+				   /2.0;
 				
 		
 	   const int    FRAME_CENTER_V		= mCAMERA.FRAME_CENTER(0);
@@ -543,7 +543,7 @@ mProfiler.start("DISPLAY");
 	   int VP_H =  mVanishPt.H + mCAMERA.FRAME_CENTER(1);	
 
 	   //Lane Bundaries
-	   Point  Start_leftLaneInner( mCAMERA.FRAME_CENTER(1) 	-  
+	   Point  Start_leftLaneInner( mCAMERA.FRAME_CENTER(1) 	+  
 		((int)( mLaneModel.leftOffset  + delta)/mLaneFilter->STEP)*mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
 
 	   Point  Start_rightLaneInner( mCAMERA.FRAME_CENTER(1) +  

@@ -22,29 +22,21 @@
 #include "VanishingPtFilter.h"
 #include "ScalingFactors.h"
 
-VanishingPtFilter::VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_BINS, const int&  LANE_FILTER_OFFSET_V)
+VanishingPtFilter::VanishingPtFilter()
 : 
-  mVP_STEP(10),
+  mSTEP(10),
   
-  VP_RANGE_V(25), 
+  RANGE_V(25), 
  
-  VP_RANGE_H(300),
+  RANGE_H(300),
   
-  mNb_VP_BINS_V(floor((2*VP_RANGE_V)/mVP_STEP) +1),
+  mCount_BINS_V(floor((2*VP_RANGE_V)/mVP_STEP) +1),
   
-  mNb_VP_BINS_H(floor((2*VP_RANGE_H)/mVP_STEP) +1),
+  mCount_BINS_H(floor((2*VP_RANGE_H)/mVP_STEP) +1),
   
-  VP_BINS_V( VectorXi::LinSpaced(mNb_VP_BINS_V,-VP_RANGE_V, VP_RANGE_V).array()),
+  BINS_V( VectorXi::LinSpaced(mNb_VP_BINS_V,-VP_RANGE_V, VP_RANGE_V).array()),
   
-  VP_BINS_H( VectorXi::LinSpaced(mNb_VP_BINS_H,-VP_RANGE_H, VP_RANGE_H).array()),
-  
-  OFFSET_V(-120),
-  
-  mVP_LANE_RATIO((float)OFFSET_V / LANE_FILTER_OFFSET_V),
-  
-  HISTOGRAM_BINS( round((LANE_HISTOGRAM_BINS.cast<float>()*(mVP_LANE_RATIO)).array()).cast<int>() ),
-  
-  STEP(HISTOGRAM_BINS(1)- HISTOGRAM_BINS(0)),
+  BINS_H( VectorXi::LinSpaced(mNb_VP_BINS_H,-VP_RANGE_H, VP_RANGE_H).array()),
   
   prior(  cv::Mat::zeros( mNb_VP_BINS_V, mNb_VP_BINS_H , CV_32SC1) ),
   

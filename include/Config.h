@@ -48,6 +48,9 @@
 #define CAMERA_HEIGHT			1.5
 #define CAMERA_FOCAL_LENGTH		6.0e-3
 
+#define BASE_LINE_IBCS			0      /*< Describes base line in Image-Bottom-Coordinate-System */
+#define PURVIEW_LINE_IBCS		10     /*< Describes purview line in Image-Bottom-Coordinate-System */
+
 
 
 

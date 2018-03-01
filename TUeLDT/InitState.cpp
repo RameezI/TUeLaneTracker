@@ -26,17 +26,17 @@
 
 
 
-unique_ptr<LaneFilter> InitState::createLaneFilter()
+unique_ptr<LaneFilters> InitState::createLaneFilter()
 {
 
-	unique_ptr<LaneFilter> 	lLaneFilter;
+	unique_ptr<LaneFilters> 	lLaneFilters;
 
 	try
 	{
 	  Camera 			lCamera;
 	  LaneProperties		lLane;
 
-	  lLaneFilter =	unique_ptr<LaneFilter>(new LaneFilter(lLane, lCamera));
+	  lLaneFilters =	unique_ptr<LaneFilters>(new LaneFilters(lLane, lCamera));
 
 	  mLaneFilterCreated 	= true;
 
@@ -53,12 +53,12 @@ unique_ptr<LaneFilter> InitState::createLaneFilter()
 	    << msg <<endl
 	    <<"******************************"<<endl<<endl;
 	   #endif
-	   lLaneFilter.reset(nullptr);				
+	   lLaneFilters.reset(nullptr);				
 	   mLaneFilterCreated = false;
 	   currentStatus= StateStatus::ERROR;
 	}
 
-	return lLaneFilter;	
+	return lLaneFilters;	
 }
 
 
@@ -71,10 +71,10 @@ unique_ptr<VanishingPtFilter> InitState::createVanishingPtFilter()
 	{
 	  Camera 		lCamera;
 	  LaneProperties   	lLane;
-	  LaneFilter 		lLaneFilter(lLane, lCamera);
+	  LaneFilters 		lLaneFilters(lLane, lCamera);
 	
 	  lVanishingPtFilter 	= unique_ptr<VanishingPtFilter>
-				  (new VanishingPtFilter (lLaneFilter.HISTOGRAM_BINS, lLaneFilter.OFFSET_V) ); 
+				  (new VanishingPtFilter (lLaneFilters.HISTOGRAM_BINS, lLaneFilters.OFFSET_V) ); 
 	   
 	  mVpFilterCreated 	= true;
 	
@@ -110,8 +110,8 @@ unique_ptr<Templates> InitState::createTemplates()
 	{
 	  Camera 		lCamera;
 	  LaneProperties    	lLane;
-	  LaneFilter 		lLaneFilter(lLane, lCamera);
-	  VanishingPtFilter 	lVanishingPtFilter(lLaneFilter.HISTOGRAM_BINS, lLaneFilter.OFFSET_V);
+	  LaneFilters 		lLaneFilters(lLane, lCamera);
+	  VanishingPtFilter 	lVanishingPtFilter(lLaneFilters.HISTOGRAM_BINS, lLaneFilters.OFFSET_V);
 	
 	  lTemplates	 = unique_ptr<Templates>
 	  		   ( new  Templates (lCamera.RES_VH(0), lCamera.RES_VH(1), lCamera.FOV(0), lVanishingPtFilter.VP_RANGE_V) );

@@ -1,5 +1,5 @@
-#ifndef VANSIHINGPOINFILTER_H
-#define VANSIHINGPOINFILTER_H
+#ifndef VANSIHING_POINT_FILTER_H__
+#define VANSIHING_POINT_FILTER_H__
 
 /******************************************************************************
 * NXP Confidential Proprietary
@@ -22,7 +22,7 @@
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
 
-#include  "LaneFilter.h"
+#include  "LaneFilters.h"
 #include <Eigen/Dense>
 
 using namespace Eigen;
@@ -39,33 +39,12 @@ struct VanishingPt
   : V(0),H(0),V_prev(0),H_prev(0){}
 };
 
-struct PurviewHistogramModel
-{
-	int  binID_leftBoundary;
-	int  binID_rightBoundary;
-	
-	int  binID_NegBoundaryLeft;
-	int  binID_NegBoundaryRight;
-	int  nbNonBoundaryBinsLeft;
-	int  nbNonBoundaryBinsRight;
-	
-	PurviewHistogramModel()
-	: binID_leftBoundary(-1),binID_rightBoundary(-1),
-	 binID_NegBoundaryLeft(-1),binID_NegBoundaryRight(-1),
-	 nbNonBoundaryBinsLeft(0), nbNonBoundaryBinsRight(0)
-	{
-
-	}
-	
-};
-
 
 
 
 class VanishingPtFilter
 {
 
-		
 public:
 
 	VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_BINS, const int&  LANE_FILTER_OFFSET_V);
