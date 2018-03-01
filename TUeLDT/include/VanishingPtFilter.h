@@ -29,6 +29,7 @@ using namespace Eigen;
 typedef Matrix<int, 6, 1> Vector6i;
 
 
+///This Data structure current and previous values of the Vanishing Point in Image-Center-Coordinate-System
 struct VanishingPt
 {
   int  V;
@@ -40,47 +41,38 @@ struct VanishingPt
 };
 
 
+///This class represents ad 2D-Filter expressed in Image-Center-Coordiante-System
+/*
 
-
+*/
 class VanishingPtFilter
 {
 
+private:
+		void  createPrior();
+
 public:
 
-	VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_BINS, const int&  LANE_FILTER_OFFSET_V);
-	~VanishingPtFilter();
+		VanishingPtFilter();
 
+        	const int       STEP;         	/*< Step for VanishinPtFilter [pixels] */
 
+		const int 	RANGE_V;  	/*< Vertical   range of the VanishingPtFilter [pixels] */
+		const int 	RANGE_H;	/*< Horizental range of the VanishingPtFilter [pixels] */
 
-
-private: 
-        	const int       mVP_STEP;         // Step for VP Bins
-
-public: 
-		const int 	VP_RANGE_V;
-		const int 	VP_RANGE_H;
 					
-		const int    	mNb_VP_BINS_V;    // number of bins in the  vertical   direction.
-		const int    	mNb_VP_BINS_H;    // number of bins in the horizental direction.
+		const int    	COUNT_BINS_V;    /*< Number of bins in the  vertical   direction of VanishinPtFilter */
+		const int    	COUNT_BINS_H;    /*< Number of bins in the  horizental direction of VanishinPtFilter */
 
-		const VectorXi 	VP_BINS_V;	 //Histogram Bins in Pixels.
-		const VectorXi 	VP_BINS_H;     	 //Histogram Bins in Pixels.
-		const int  	OFFSET_V;
-		
-		const float     mVP_LANE_RATIO;			
-
-
-public:			
+		const VectorXi 	BINS_V;	 	/*< Horizental  bins of the VanishinPtFiltere [pixels].*/
+		const VectorXi 	BINS_H;     	/*< Vertical    bins of the VanishinPtFilter  [pixels].*/
 			
-		const VectorXi  HISTOGRAM_BINS;	    //Purview Histogram Bins in Pixels.
-		const int    	STEP;  		    //Purview Histogram STEP
 		      
-	    	cv::Mat  prior;
-	    	cv::Mat  filter;
+	    	cv::Mat  prior;			/*< prior probabilities of the 2D VanishinPtFilter */
+	    	cv::Mat  filter;		/*< posterior probabilities of the 2D VanishinPtFilter */
 
 				  		
-private:		 
-		void  createPrior();
+		~VanishingPtFilter();
 
 };
 	

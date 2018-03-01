@@ -63,7 +63,7 @@ private:
     	float		mLikelihoodVP_Width;
 	int       	mPosteriorProbVP;
 	
-	LaneFilter* 		mLaneFilter;
+	LaneFilters* 		mLaneFilters;
 	VanishingPtFilter*	mVpFilter;
 	
 	

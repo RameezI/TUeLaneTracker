@@ -24,15 +24,15 @@
 
 VanishingPtFilter::VanishingPtFilter()
 : 
-  mSTEP(10),
+  STEP(10),
   
   RANGE_V(25), 
  
   RANGE_H(300),
   
-  mCount_BINS_V(floor((2*VP_RANGE_V)/mVP_STEP) +1),
+  COUNT_BINS_V(floor((2*VP_RANGE_V)/mVP_STEP) +1),
   
-  mCount_BINS_H(floor((2*VP_RANGE_H)/mVP_STEP) +1),
+  COUNT_BINS_H(floor((2*VP_RANGE_H)/mVP_STEP) +1),
   
   BINS_V( VectorXi::LinSpaced(mNb_VP_BINS_V,-VP_RANGE_V, VP_RANGE_V).array()),
   
@@ -50,15 +50,15 @@ VanishingPtFilter::VanishingPtFilter()
 void VanishingPtFilter::createPrior()
 {
 	
-	float  sigma = 5.0*VP_RANGE_V/mVP_STEP;
+	float  sigma = 5.0*RANGE_V/STEP;
 	double pv,ph;
 	
-	for (int v = 1; v <= mNb_VP_BINS_V; v++)
+	for (int v = 1; v <= COUNT_BINS_V; v++)
    	{
-           for (int h = 1; h <= mNb_VP_BINS_H; h++)
+           for (int h = 1; h <= COUNT_BINS_H; h++)
 	   {  
-            pv = exp( -pow(v-mNb_VP_BINS_V/2.0,2)  / pow(sigma,2) ) *128 ;     
-            ph = exp( -pow(h-mNb_VP_BINS_H/2.0,2)  / pow(sigma,2) ) *128;  
+            pv = exp( -pow(v-COUNT_BINS_V/2.0,2)  / pow(sigma,2) ) *128 ;     
+            ph = exp( -pow(h-COUNT_BINS_H/2.0,2)  / pow(sigma,2) ) *128;  
 			
 	    this->prior.at<int>(v-1,h-1) = (int)(std::round(pv*ph));                
 	   }    

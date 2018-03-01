@@ -26,7 +26,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "State.h"		//implicit include of profiling and logging headers
-#include "LaneFilter.h" 	//implicit include of opencv headers
+#include "LaneFilters.h" 	//implicit include of opencv headers
 #include "VanishingPtFilter.h"
 #include "gmock/gmock.h"
 

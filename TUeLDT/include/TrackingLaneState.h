@@ -48,7 +48,7 @@ public:
 
 public:	
 	void run();
-	void setupDAG(LaneFilter* laneFilter, VanishingPtFilter* vpFilter);
+	void setupDAG(LaneFilterss* laneFilterss, VanishingPtFilter* vpFilter);
 	
 	template<typename GRAPH_BASE>
 	TrackingLaneState(GRAPH_BASE&& lBaseGraph);
@@ -76,33 +76,19 @@ TrackingLaneState<GRAPH>::TrackingLaneState(GRAPH_BASE&& lBaseGraph)
 
 
 template<typename GRAPH>
-void TrackingLaneState<GRAPH>::setupDAG(LaneFilter* laneFilter, VanishingPtFilter* vpFilter)
+void TrackingLaneState<GRAPH>::setupDAG(LaneFilters* laneFilters, VanishingPtFilter* vpFilter)
 {
-	//Setting Up observing Filters for the Graph	
-	 mGraph.mLaneFilter = laneFilter;
-	 mGraph.mVpFilter   = vpFilter;
+	//Setting up the  filters for the Graph	[observing pointers]
+	mGraph.mLaneFilters = laneFilters;
+	mGraph.mVpFilter    = vpFilter;
 	 
-	mGraph.mLOWER_LIMIT_IntBase = 
-		SCALE_INTSEC*laneFilter->HISTOGRAM_BINS(0) - (SCALE_INTSEC*laneFilter->STEP)/2;
+	mGraph.mLOWER_LIMIT_IntBase 	=  SCALE_INTSEC*laneFilters->BASE_BINS(0);
+	mGraph.mUPPER_LIMIT_IntBase 	=  SCALE_INTSEC*laneFilters->BASE_BINS(laneFilters->COUNT_BINS-1) ;
 	
  
-	mGraph.mUPPER_LIMIT_IntBase = 
-	   	SCALE_INTSEC*laneFilter->HISTOGRAM_BINS(laneFilter->mNb_HISTOGRAM_BINS-1) +
-		(SCALE_INTSEC*laneFilter->STEP)/2;
-	
- 
-	mGraph.mLOWER_LIMIT_IntPurview = 
-	   	-SCALE_INTSEC*vpFilter->VP_RANGE_H - (SCALE_INTSEC*vpFilter->STEP)/2;
-	 
+	mGraph.mLOWER_LIMIT_IntPurview 	=  SCALE_INTSEC*laneFilter->PURVIEW_BINS(0);
+	mGraph.mUPPER_LIMIT_IntPurview 	=  SCALE_INTSEC*laneFilter->PURVIEW_BINS(laneFilters->COUNT_BINS-1);
 
-	mGraph.mUPPER_LIMIT_IntPurview = 
-	   	SCALE_INTSEC*vpFilter->VP_RANGE_H  +  (SCALE_INTSEC*vpFilter->STEP)/2;
-
-
-	mGraph.mSCALED_STEP_LANE_FILTER		= laneFilter->STEP*SCALE_INTSEC;
-	mGraph.mSCALED_STEP_VP_FILTER      	= vpFilter->STEP*SCALE_INTSEC;
-	mGraph.mSCALED_START_LANE_FILTER   	= laneFilter->HISTOGRAM_BINS(0)*SCALE_INTSEC;
-	mGraph.mSCALED_START_VP_FILTER		= vpFilter->HISTOGRAM_BINS(0)*SCALE_INTSEC;
 	
 	if (0== mGraph.init_DAG())
 	 this->currentStatus= StateStatus::ACTIVE;	
