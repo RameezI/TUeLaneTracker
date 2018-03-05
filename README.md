@@ -101,7 +101,7 @@ Currently, the callibration is parameterized in the corresponding header files. 
 * [OpenCV3.1](http://docs.opencv.org/3.1.0/index.html) - Copmputer vision library
 * [CMake](https://maven.apache.org/) - Dependency management and makefiles generation
 * [Eigen 3.3.3](http://eigen.tuxfamily.org/index.php?title=Main_Page) - Linear Algebra  library
-* [Boost 1.62.0]((http://www.boost.org/users/history/version_1_62_0.html) - Provides Program Options
+* [Boost 1.62.0](http://www.boost.org/users/history/version_1_62_0.html) - Provides Program Options
 
 
 ## Contributing
