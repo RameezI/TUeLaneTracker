@@ -46,37 +46,36 @@ struct Templates
 	
 public:
 
-	const int MARGIN;  		/**< /brief Vertical margin between the image center and ROI [pixels]
-					/n +ve Margin implies that the ROI is below the center line.
-					/n -ve Margin implies that the ROI is above the center line. */
+	const int HORIZON_ICCS;  	/**< /brief Position of Horizon in the Image-Center-CS [pixels]
+				 	  *  /n +ve value implies that the ROI is below the center line.
+					  *  /n -ve value implies that the ROI is above the center line. */
 
+	const int VP_RANGE_V;   	/**< Vertical range of the vanishing-point in either direction [pixels] */
 
-	const int VP_RANGE_V;   	/**< Vertical range of the vanishing-point in each direction [pixels] */
 	const int SPAN;			/**< Vertical size  of the ROI [pixels]
-					/n Automatically calculated from  /em MARGIN and /em VP_RANGE_V */
+					/n Automatically calculated from  #HORIZON_ICCS and #VP_RANGE_V */
 
-
-	cv::Mat FOCUS_MASK_ROOT;    	/**< /brief ROOT-TEMPLATE for extracting mask to compensate vehicle pitch movements.
-					/n The size of /em FOCUS ROOT is [SPAN+(2xVP_RANGE_V), RES_H]
-				     	/n Normal activation all elements in rowrange /em (SPAN-VP_RANGE) = 255
- 				     	/n Best   activation all elements in /em SPAN = 255
-				     	/n Worst  activation all elements in rowrange /em (SPAN-2*VP_RANGE) = 255 */
+	cv::Mat FOCUS_MASK_ROOT;  	/**< /brief ROOT-TEMPLATE for extracting mask to compensate vehicle pitch movements.
+					/n The size of /em FOCUS ROOT is [#SPAN + (2x#VP_RANGE_V), #RES_H]
+				     	/n Normal activation all elements in rowrange (#SPAN - #VP_RANGE) = 255
+ 				     	/n Best   activation all elements in #SPAN = 255
+				     	/n Worst  activation all elements in rowrange (#SPAN - 2x#VP_RANGE) = 255 */
 
 
 	cv::Mat GRADIENT_TAN_ROOT;	/**< ROOT-TEMPLATE for extracting gradient tangents reference.
-				  	/n The size of /em GRADIENT_TAN_ROOT is [2xRES_V +1 , 2xRES_H +1] */
+				  	/n The size of /em GRADIENT_TAN_ROOT is [2x#RES_V +1 , 2x#RES_H +1] */
 
 
 	cv::Mat DEPTH_MAP_ROOT;		/**< ROOT-TEMPLATE for assigning perspective weights to the pixels.
-				     	/n The size of /em DEPTH_MAP_ROOT is [RES_V, RES_H] */
+				     	/n The size of /em DEPTH_MAP_ROOT is [#RES_V, #RES_H] */
 
 
-	cv::Mat X_ICS;			/**< ROOT-TEMPLATE containing the X pixel indices in Image Coordinate System.
-				   	/n The size of /em X_ICS is [RES_V, RES_H] */
+	cv::Mat X_ICS;			/**< X-Coordinates of the ROI in the Image-Coordinate-System.
+				   	/n The size of /em X_ICS is [#SPAN, #RES_H] */
 
 
-	cv::Mat Y_ICS;			/**< ROOT-TEMPLATE containing the Y pixel indices in Image Coordinate System.
-				   	/n The size of /em Y_ICS is [RES_V, RES_H] */
+	cv::Mat Y_ICS;			/**< Y-Coordinates of the ROI in the Image-Coordinate-System.
+				   	/n The size of /em Y_ICS is [#SPAN, #RES_H] */
 
 
 
@@ -88,9 +87,9 @@ public:
  	*  /parame VP_RANGE_ROWS is an integer argument representing vertical range of the vanishing-point. [pixels]
  	*   ****************************************************/
 	Templates(const int RES_V, const int RES_H, const float FOV_V, const int VP_RANGE_ROWS)
-	: MARGIN(78), 
+	: HORIZON_ICCS(78), 
 	  VP_RANGE_V(VP_RANGE_ROWS), 
-	  SPAN((RES_V/2)-MARGIN + VP_RANGE_ROWS) 
+	  SPAN((RES_V/2)-HORIZON_ICCS + VP_RANGE_ROWS) 
 
 	{
 		/* Create Focus Template */
@@ -132,7 +131,7 @@ public:
 			ptr = Col.ptr<int16_t>(0);
 			for (int i=0; i<SPAN; i++)
 			{
-				ptr[i]= i;			
+				ptr[i]= (RES_V-SPAN) + i;			
 			}
 			repeat(Col,1, RES_H ,Y_ICS);
 

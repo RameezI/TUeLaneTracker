@@ -32,10 +32,13 @@ friend class TrackingLaneState;
 	
 private:
 
+	LaneFilter* 		mLaneFilter;
+	VanishingPtFilter*	mVpFilter;
+	LaneModel   		mLaneModel;
+
 	bool            mStartBufferShift;
 	bool    	mStartFiltering;
-	bool 		mFiltersReady;
-	
+	bool 		mFiltersReady;	
 	
 	const int	mMAX_PIXELS_ROI;
 
@@ -45,15 +48,11 @@ private:
 	int  		mLOWER_LIMIT_IntPurview;
 	int 		mUPPER_LIMIT_IntPurview;
 	
-	int		mSCALED_STEP_LANE_FILTER;
-	int 		mSCALED_STEP_VP_FILTER;
-	int 		mSCALED_START_LANE_FILTER;
-	int 		mSCALED_START_VP_FILTER;
 	
 	
-	int   		mLikelihoodLeftBoundary;
-	int 		mLikelihoodRightBoundary;
-	float        	mLikelihoodNegBoundary;
+	int   		mLikelihood_LB;
+	int 		mLikelihood_RB;
+	float        	mLikelihood_NB;
 	int        	mPosteriorProbBase;
 	
 	
@@ -63,25 +62,23 @@ private:
     	float		mLikelihoodVP_Width;
 	int       	mPosteriorProbVP;
 	
-	LaneFilters* 		mLaneFilters;
-	VanishingPtFilter*	mVpFilter;
-	
-	
-	cv::Mat 		mX_VPRS_SCALED;	
-	cv::Mat 		mIntBase;           
-	cv::Mat			mIntPurview;
-	cv::Mat 		mIntWeights;
-	
-	cv::Mat			mHistBase;
-	cv::Mat			mHistPurview;
-	
-	cv::Mat			mProbMapFocussed;
-	cv::Mat 		mGradTanFocussed;
-	
-	cv::Mat 		mTransitLaneFilter;
-	cv::Mat 		mTransitVpFilter;
+	cv::Mat		mBASE_BINS_SCALED;
+	cv::Mat		mPURVIEW_BINS_SCALED;
+	cv::Mat 	mX_ICCS_SCALED;	
 
-	LaneModel   		mLaneModel;
+	cv::Mat 	mIntBase;           
+	cv::Mat		mIntPurview;
+	cv::Mat 	mIntWeights;
+	
+	cv::Mat		mHistBase;
+	cv::Mat		mHistPurview;
+	
+	cv::Mat		mProbMapFocussed;
+	cv::Mat 	mGradTanFocussed;
+	
+	cv::Mat 	mTransitLaneFilter;
+	cv::Mat 	mTransitVpFilter;
+
 	
 
 	// Only Enable in case of Video Recording

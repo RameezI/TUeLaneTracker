@@ -32,12 +32,9 @@ BufferingDAG_generic::BufferingDAG_generic()
 
 int BufferingDAG_generic::init_DAG()
 {
-        int16_t   ORIGIN_Y_CRS   =  mCAMERA.FRAME_CENTER(0) - mSpan;
-        int16_t   ORIGIN_X_CRS   = -mCAMERA.FRAME_CENTER(1);
+        mY_ICCS   = mX_ICS + mCAMERA.O_ICS_ICCS.x;
+        mX_ICCS   = mY_ICS + mCAMERA.O_ICS_ICCS.y;
 
-        mY_VPRS   = -(mY_ICS + ORIGIN_Y_CRS);
-        mX_VPRS   =   mX_ICS + ORIGIN_X_CRS;
-	
 	return 0;
 }
 
@@ -69,7 +66,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 mProfiler.start("EXTRACT_ROI");
 #endif
 
-	int lRowIndex= mCAMERA.RES_VH(0) - mSpan;
+	int lRowIndex	= mHorizon_ICCS + mCAMERA.O_ICCS_ICS; 	//Horizon in Image-CS
 	int lColIndex;
 	cv::Rect lROI;
 

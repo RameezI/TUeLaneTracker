@@ -25,7 +25,7 @@
 
 #include <memory>
 #include "State.h"
-#include "LaneFilters.h"
+#include "LaneFilter.h"
 #include "VanishingPtFilter.h"
 #include "Templates.h"
 
@@ -45,14 +45,14 @@ public	:
 		/* These methods create instances and also keep record of the already created objects
 		 * Make sure all objects are created before indicating "StateStatus::DONE". */
 		 
-		unique_ptr<LaneFilters> 		createLaneFilter();
+		unique_ptr<LaneFilter> 			createLaneFilter();
 		unique_ptr<VanishingPtFilter> 		createVanishingPtFilter();
 		unique_ptr<Templates> 			createTemplates();
 		
-		InitState()
-		: mLaneFilterCreated(false),
-  		  mVpFilterCreated  (false),
-  		  mTemplatesCreated (false)
+		InitState():
+			    mLaneFilterCreated(false),
+  		  	    mVpFilterCreated  (false),
+  		  	    mTemplatesCreated (false)
 		{	
 		  this->currentStatus = StateStatus::ACTIVE;
 		}

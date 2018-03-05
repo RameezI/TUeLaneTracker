@@ -31,7 +31,6 @@
  #include "BufferingDAG_generic.h"
 #endif
 
-
 template<typename GRAPH>
 class BufferingState : public State
 {
@@ -44,13 +43,13 @@ private:
 
 
 public:
-
-	GRAPH 		mGraph;
-
 	BufferingState();
-	int  setSource(FrameSource, string);
-	void setupDAG(const Templates& templates);
-	void run();
+
+	GRAPH 	mGraph;
+	int  	setSource(FrameSource, string);
+	void 	setupDAG(const Templates& templates);
+	void 	run();
+
 	~BufferingState();
 };
 
@@ -193,7 +192,7 @@ int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
 template<typename GRAPH>  
 void BufferingState<GRAPH>::setupDAG(const Templates& templates)
 {
-	
+
 #ifdef PROFILER_ENABLED
 mProfiler.start("SET_UP_BUFFERING_DAG");
 #endif
@@ -202,7 +201,7 @@ mProfiler.start("SET_UP_BUFFERING_DAG");
 	
 	mGraph.mVP_Range_V   		= templates.VP_RANGE_V;
 	mGraph.mSpan			= templates.SPAN;
-	mGraph.mMargin			= templates.MARGIN;
+	mGraph.mHorizon_ICCS		= templates.HORIZON_ICCS;
 	
 	//allocate buffers
 	mGraph.mBufferPool.reset(new BufferPool<GRAPH>(templates.SPAN, RES_H, mNbBuffer));
@@ -234,7 +233,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 template<typename GRAPH>  
 void BufferingState<GRAPH>::run()
 {
-	
+
 #ifdef PROFILER_ENABLED
 	mProfiler.start("RUN_BUFFERING_DAG");
 #endif	

@@ -31,38 +31,50 @@
 using namespace Eigen;
 
 /* This class provides Base and Purview Histograms expressed in Image-Center-Coordinate-System. */
-class LaneFilters
+class LaneFilter
 {
 	
 private:	
 		const LaneProperties   	mLANE;	  /*< Describes Lane properties for example average lane widths and its standard deviation*/
 		const Camera 		mCAMERA;  /*< Describes Camera properties and configuration */
 
+		void  createPrior();	
+
+
 public:	 	//Public Interface 
 
-  		const int 	BASE_LINE_ICCS;		/*< Base line in Image-Center-CS [pixel-lines] */
-  		const int 	PURVIEW_LINE_ICCS;	/*< Base line in Image-Center-CS [pixel-lines] */
 
-		const int	BINS_STEP_CM;  		/*< Step size for the Histogram BINS [cm] */
+		/** Constructs LaneFilter from Camera and LaneProperties */
+		LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA);
+	
+		const cv::Point O_ICCS_ICS;		/** Origin of Image-Center-CS in the Image-CS*/
+		const cv::Point O_ICS_ICCS;		/** Origin of Image-CS in the Image-Center-CS*/
+		const cv::Point O_IBCS_ICS;		/** Origin of Image-Base-CS in the Image-CS*/
+		
+
+  		const int 	BASE_LINE_ICCS;		/**< Base line in Image-Center-CS [pixel-lines] */
+  		const int 	PURVIEW_LINE_ICCS;	/**< Base line in Image-Center-CS [pixel-lines] */
+
+		const int	BINS_STEP_cm;  		/**< Step size for the Histogram BINS [cm] */
 		const int   	BINS_COUNT;   		/*< Number of bins in each Histogram */
 
-		const VectorXi	BINS_CM;		/*<Describes the Histogram BINS in the Vehicle-Symmetry-CS [cm] */
-		const VectorXi  BASE_BINS_ICCS;    	/*<Describes the Histogram BINS, in Image-Center-CS, at BASE line [pixels] */
-		const VectorXi	PURVIEW_BINS_ICCS; 	/*<Describes the Histogram BINS, in Image-Center-CS, at PURVIEW line [pixels] */
+		const VectorXi	BINS_cm;		/**<Describes the Histogram BINS in the Vehicle-Symmetry-CS [cm] */
+
+		const cv::Mat   BASE_BINS;    		/**<Describes the Histogram BINS, in Image-Center-CS, at BASE line [pixels] */
+		const cv::Mat   PURVIEW_BINS; 		/**<Describes the Histogram BINS, in Image-Center-CS, at PURVIEW line [pixels] */
 
 
-		cv::Mat 	priorBaseHistogram;	/*< \brief This 2D-filter provides prior prbobility for a certain 
-							     combination of left and right offsets representing the Lane.
+		cv::Mat 	prior;			/**< \brief This 2D-filter provides prior prbobility for a certain 
+							combination of left and right offsets representing the Lane.
      
  							rowIndex: Offset of left  boundary, in #BINS_STEPS_cm,
 						   		  from Vehicle-Symmetry-CS Origin.
 
 							colIndex: Offset of right boundary, in #BINS_STEPS_cm,
-								   from Vehicle-Symmetry-CS Origin.
-							*/
+								   from Vehicle-Symmetry-CS Origin.*/
 
 
-		cv::Mat 	filterBaseHistogram;	/*< \brief This 2D-filter provides posterior prbobility for a certain
+		cv::Mat 	filter;			/**< \brief This 2D-filter provides posterior prbobility for a certain
 							 combination of left and right offsets representing the Lane.
 								
  							rowIndex: Offset of left  boundary, in #BINS_STEPS_cm,
@@ -73,16 +85,10 @@ public:	 	//Public Interface
 							*/
 
 
-		std::vector<BaseHistogramModel>  baseHistogramModels; /* <Provides a filtered list of Lane models 
-									  constructed from a multimodal base histogram.*/
+		std::vector<BaseHistogramModel>  	baseHistogramModels; /** <Provides a filtered list of Lane models 
+									  	constructed from a multimodal base histogram.*/
 
 
-private:	
-		void  createPriorBaseHistogram();	
-
-public:	
-		LaneFilters(const LaneProperties& LANE,  const Camera& CAMERA);
-	   	~LaneFilters();
 };
 	
 #endif // LANEFILTER_H

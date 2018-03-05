@@ -48,7 +48,7 @@ public:
 
 public:	
 	void run();
-	void setupDAG(LaneFilterss* laneFilterss, VanishingPtFilter* vpFilter);
+	void setupDAG(LaneFilter* laneFilters, VanishingPtFilter* vpFilter);
 	
 	template<typename GRAPH_BASE>
 	TrackingLaneState(GRAPH_BASE&& lBaseGraph);
@@ -76,19 +76,17 @@ TrackingLaneState<GRAPH>::TrackingLaneState(GRAPH_BASE&& lBaseGraph)
 
 
 template<typename GRAPH>
-void TrackingLaneState<GRAPH>::setupDAG(LaneFilters* laneFilters, VanishingPtFilter* vpFilter)
+void TrackingLaneState<GRAPH>::setupDAG(LaneFilter* laneFilter, VanishingPtFilter* vpFilter)
 {
 	//Setting up the  filters for the Graph	[observing pointers]
-	mGraph.mLaneFilters = laneFilters;
+	mGraph.mLaneFilter = laneFilter;
 	mGraph.mVpFilter    = vpFilter;
 	 
-	mGraph.mLOWER_LIMIT_IntBase 	=  SCALE_INTSEC*laneFilters->BASE_BINS(0);
-	mGraph.mUPPER_LIMIT_IntBase 	=  SCALE_INTSEC*laneFilters->BASE_BINS(laneFilters->COUNT_BINS-1) ;
+	mGraph.mLOWER_LIMIT_IntBase 		=  SCALE_INTSEC*laneFilter->BASE_BINS.at<int32_t>(0,0);
+	mGraph.mUPPER_LIMIT_IntBase 		=  SCALE_INTSEC*laneFilter->BASE_BINS.at<int32_t>(laneFilter->BINS_COUNT-1, 0) ;
 	
- 
-	mGraph.mLOWER_LIMIT_IntPurview 	=  SCALE_INTSEC*laneFilter->PURVIEW_BINS(0);
-	mGraph.mUPPER_LIMIT_IntPurview 	=  SCALE_INTSEC*laneFilter->PURVIEW_BINS(laneFilters->COUNT_BINS-1);
-
+	mGraph.mLOWER_LIMIT_IntPurview 		=  SCALE_INTSEC*laneFilter->PURVIEW_BINS.at<int32_t>(0,0);
+	mGraph.mUPPER_LIMIT_IntPurview 		=  SCALE_INTSEC*laneFilter->PURVIEW_BINS.at<int32_t>(laneFilter->BINS_COUNT-1, 0);
 	
 	if (0== mGraph.init_DAG())
 	 this->currentStatus= StateStatus::ACTIVE;	

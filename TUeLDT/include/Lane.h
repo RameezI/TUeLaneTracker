@@ -21,10 +21,8 @@
 * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
-	
-/**
-Describes Lane Properties
-*/
+
+/**Describes Lane Properties*/
 struct LaneProperties
 {
 
@@ -39,28 +37,6 @@ public:
 };
 
 
-/**
-Describes the Lane model in the Vehicle-Symmetry-Plane coordinate system.
-*/
-struct LaneModel
-{
-public:
-	    	int 	leftOffset;	/*< Distance to left  boundary, at look-ahead-distance, in vehicle-symmetry-plane CS [cm] */
-		int 	rightOffset;	/*< Distance to right boundary, at look-ahead-distance,	in vehicle-symmetry-plane CS [cm] */
-		int     centerLane;	/*< Distance to center-Line, at look-ahhead-distance,  	in vehicle-symmetry-plane CS [cm] */
-		
-		int 	confidenceLeft; 	/*< Confidence in left boundary */
-		int     confidenceRight;  	/*< Confidence in right boundary */
-
-		float   laneWidth;		/* Width of the lane [cm] */
-
-		
-		LaneModel()
-		: leftOffset(0),rightOffset(0),confidenceLeft(0), confidenceRight(0), laneWidth(0)
-		{
-			
-		}
-};
 
 /**
 Describes pixel chracteristics for assigning their membership to Lane-Boundary or Non-Boundary regions 
@@ -96,10 +72,7 @@ struct LaneMembership
 		 
 		 NEG_BOUNDARY_STD(0.2),
 		 NEG_BOUNDARY_NORMA( (2/sqrt(2*M_PI*pow(NEG_BOUNDARY_STD,2)))),
-		 NEG_BOUNDARY_NOMIN(2*pow(NEG_BOUNDARY_STD,2))	 
-		{
-			//Default Constructor
-		}
+		 NEG_BOUNDARY_NOMIN(2*pow(NEG_BOUNDARY_STD,2)){}
 	};
 
 #endif // LANE_H

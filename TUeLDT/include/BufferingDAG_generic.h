@@ -25,10 +25,10 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+
 #include "State.h"		//implicit include of profiling and logging headers
-#include "LaneFilters.h" 	//implicit include of opencv headers
-#include "VanishingPtFilter.h"
-#include "gmock/gmock.h"
+#include "LaneModel.h"		//implicit include of LaneFilter and VanishingPtFilter
+#include "gmock/gmock.h"	//google-testing framework includes
 
 #ifdef DISPLAY_GRAPHICS_DCU
 #include "frame_output_v234fb.h"
@@ -52,8 +52,6 @@ FRIEND_TEST(BufferingTest, GRAD_TAN);
 public:
 	BufferingDAG_generic ();
 
-
-
 protected:
 
 	using MutexType = std::mutex;
@@ -74,9 +72,9 @@ protected:
 	/*................................................
 	 Set from outside, before buffering is activated   */ 
 
-	int 				mSpan;
-	int				mMargin;
+	int				mHorizon_ICCS;
 	int 				mVP_Range_V;
+	int 				mSpan;
 	
 	cv::Mat	 			mGRADIENT_TAN_ROOT;
    	cv::Mat				mFOCUS_MASK_ROOT;
@@ -85,7 +83,6 @@ protected:
 	cv::Mat     			mX_ICS;
 	cv::Mat     			mY_ICS;
 	
-
 	unique_ptr<BufferPool<BufferingDAG_generic>>	mBufferPool;
 	/***************************************************/
 
@@ -118,8 +115,8 @@ protected:
 	cv::Mat 			mGradTanTemplate;
 	cv::Mat 			mDepthTemplate;
 	cv::Mat 			mFocusTemplate;
-	cv::Mat 			mX_VPRS;
-	cv::Mat 			mY_VPRS;
+	cv::Mat 			mX_ICCS;
+	cv::Mat 			mY_ICCS;
 
 
 	// Temporary Probability Maps
@@ -134,9 +131,7 @@ protected:
      	 io::FrameOutputV234Fb   mDCU;
 	#endif
 
-
 	uint64_t 			mFrameCount;
-
 
 	FrameSource			mSource;
 	vector<cv::String>		mFiles;
@@ -152,11 +147,9 @@ public:
 	
 	
    	BufferingDAG_generic (BufferingDAG_generic && bufferingGraph)
-	
 	#ifdef DISPLAY_GRAPHICS_DCU 
 	: mDCU(io::FrameOutputV234Fb(mCAMERA.RES_VH(1), mCAMERA.RES_VH(0), io::IO_DATA_DEPTH_08, io::IO_DATA_CH3))
 	#endif
-	
    	{
 	
 	WriteLock  wrtLock(_mutex);
@@ -164,9 +157,9 @@ public:
 	   mTemplatesReady      	= std::move(bufferingGraph.mTemplatesReady);
        	   mBufferReady             	= std::move(bufferingGraph.mBufferReady);
 
-	   mSpan 			= std::move(bufferingGraph.mSpan);
-	   mMargin			= std::move(bufferingGraph.mMargin);
+	   mHorizon_ICCS		= std::move(bufferingGraph.mHorizon_ICCS);
 	   mVP_Range_V			= std::move(bufferingGraph.mVP_Range_V);
+	   mSpan 			= std::move(bufferingGraph.mSpan);
 		
 	   mGRADIENT_TAN_ROOT 		= std::move(bufferingGraph.mGRADIENT_TAN_ROOT);
 	   mFOCUS_MASK_ROOT   		= std::move(bufferingGraph.mFOCUS_MASK_ROOT);
@@ -198,8 +191,8 @@ public:
 	   mProbMap_GradDir		= std::move(bufferingGraph.mProbMap_GradDir);
 	
 	   mFrameCount			= std::move(bufferingGraph.mFrameCount);
-	   mX_VPRS			= std::move(bufferingGraph.mX_VPRS);
-	   mY_VPRS			= std::move(bufferingGraph.mY_VPRS);
+	   mX_ICCS			= std::move(bufferingGraph.mX_ICCS);
+	   mY_ICCS			= std::move(bufferingGraph.mY_ICCS);
 		
 	   mSource			= std::move(bufferingGraph.mSource);
 	   mFiles			= std::move(bufferingGraph.mFiles);

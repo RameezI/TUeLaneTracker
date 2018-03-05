@@ -31,26 +31,35 @@ using namespace std;
 
 struct Camera
 {
-	
+
+public:
+
+		const string	CAMERA_NAME;			/**<  Camera Identifier */
+
+		const Vector2i	RES_VH; 	    		/**< Resolution of the camera image */
+		const Vector2f  FOV_VH;				/**  Field-of-View of the camera */
+
+		const cv::Point O_ICCS_ICS;			/**< Origin of Image-Center-CS in Image-CS*/
+		const cv::Point O_ICS_ICCS;			/**< Origin of Image-CS in Image-Center-CS*/
+
+		const cv::Mat	CAMERA_MATRIX_INTRINSIC;	/**<  Camera Intrinsic Parameters 3x4 */
+		const cv::Mat	CAMERA_MATRIX_EXTRINSIC;	/**<  Camera Extrinsic Parameters 4x4 */
+
+
+		Camera():
+			 CAMERA_NAME ("BUMBLEBEE_640x480"), 
+			 RES_VH(Vector2i(CAMERA_RES_V, CAMERA_RES_H)),
+			 FOV_VH(Vector2f(CAMERA_FOV_V, CAMERA_FOV_H)), 
+			 O_ICCS_ICS( cv::Point( RES_VH[1]/2,  RES_VH[0]/2) ), 
+			 O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) ),
+			 CAMERA_MATRIX_INTRINSIC(getCameraMatrix("CAMERA_MATRIX_INTRINSIC")),
+			 CAMERA_MATRIX_EXTRINSIC(getCameraMatrix("CAMERA_MATRIX_EXTRINSIC")) 
+		{
+		   	if (CAMERA_MATRIX_INTRINSIC.empty() | CAMERA_MATRIX_EXTRINSIC.empty() )
+		   	   throw "Camera Instantiation Failed" ;
+		}
+
 private:
-
-	   double getCM_TO_PIXEL()
-	   {
-	   	float 	H_FOV_V     	 	= FOV[0]/2;
-	   	int 	H_RES_V     	 	= RES_VH[0]/2;  
-	   	float 	H_FOV_H     	 	= FOV[1]/2;    
-	   	int 	H_RES_H     	 	= RES_VH[1]/2;
-
-	   	double  PX_SIZE     	 	= tan(H_FOV_V * M_PI /180.0)*FOCAL_LENGTH/H_RES_V;
-
-	   	const 	VectorXd vRows 	 	= VectorXd::LinSpaced(H_RES_V,1,H_RES_V);
-	   	const   VectorXd PX_ANG  	= atan( PX_SIZE * (vRows.array()/FOCAL_LENGTH) ) * 180.0 /M_PI ;
-	   	const	VectorXd DEPTH_P 	= HEIGHT * tan( (90 - PX_ANG.array()) * M_PI/180.0 );
-	
-		//The horizontal pixel to cm ratio at the bottom
-		return 	H_RES_H/(100*tan(H_FOV_H * M_PI /180.0)*DEPTH_P(H_RES_V-1));
-
-	   }
 
 	   cv::Mat getCameraMatrix(std::string Mat_name)
 	   {
@@ -60,7 +69,6 @@ private:
 
 		stringstream 	formattedString;
 		string 		file, path;
-
 
 		// Read location of Binary
 		char lBuff[65536];
@@ -81,7 +89,6 @@ private:
 		  #endif
 		  lSuccess =-1;
 		}
-
 
 		formattedString<<path<<"/ConfigFiles/Camera/"<<CAMERA_NAME<<".yaml";
 		file = formattedString.str();
@@ -106,40 +113,6 @@ private:
 		return lCAMERA_MATRIX;
 
 	   }
-	
-public:
-		const Vector2i	RES_VH; 	    		/*<  Resolution of camera 			*/
-		const Vector2i  FRAME_CENTER;			/*<  Frame center in the image coordinate system*/		
-		const Vector2f  FOV;				/*<  Field of view of camera VH			*/
-		const float  	HEIGHT;		    		/*<  Camera height in meters			*/
-		const double 	FOCAL_LENGTH;    		/*<  Camera focal length in meters		*/
-		const double    CM_TO_PIXEL;			/*<  Conversion ratio at the base line		*/
-		const string	CAMERA_NAME;			/*<  Camera Identifier				*/
-		const cv::Mat	CAMERA_MATRIX_INTRINSIC;	/*<  Camera Intrinsic Parameters 3x4 		*/
-		const cv::Mat	CAMERA_MATRIX_EXTRINSIC;	/*<  Camera Extrinsic Parameters 4x4		*/
-
-		Camera() :
-
-		RES_VH(Vector2i(CAMERA_RES_V, CAMERA_RES_H)),
-
-		FRAME_CENTER(Vector2i(RES_VH[0]/2, RES_VH[1]/2)),
-
-		FOV(Vector2f(CAMERA_FOV_V , CAMERA_FOV_H)),	// Field of View of the camera [V H] degrees
-
-		HEIGHT(CAMERA_HEIGHT),				// Height of the camera in meters
-
-		FOCAL_LENGTH(CAMERA_FOCAL_LENGTH), 		// Focal length in meters
-
-		CM_TO_PIXEL(getCM_TO_PIXEL()),
-		
-		CAMERA_NAME ("BUMBLEBEE_640x480"),
-		CAMERA_MATRIX_INTRINSIC(getCameraMatrix("CAMERA_MATRIX_INTRINSIC")),
-		CAMERA_MATRIX_EXTRINSIC(getCameraMatrix("CAMERA_MATRIX_EXTRINSIC"))
-		{
-		  if (CAMERA_MATRIX_INTRINSIC.empty() | CAMERA_MATRIX_EXTRINSIC.empty() )
-		   throw "Camera Instantiation Failed" ;
-		}
-	   	~Camera(){}
 };
 #endif // CAMERA_H
 

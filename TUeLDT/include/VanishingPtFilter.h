@@ -22,23 +22,12 @@
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
 
-#include  "LaneFilters.h"
 #include <Eigen/Dense>
 
 using namespace Eigen;
 typedef Matrix<int, 6, 1> Vector6i;
 
 
-///This Data structure current and previous values of the Vanishing Point in Image-Center-Coordinate-System
-struct VanishingPt
-{
-  int  V;
-  int  H;
-  int  V_prev;
-  int  H_prev;
-  VanishingPt()
-  : V(0),H(0),V_prev(0),H_prev(0){}
-};
 
 
 ///This class represents ad 2D-Filter expressed in Image-Center-Coordiante-System
