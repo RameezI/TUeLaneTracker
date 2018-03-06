@@ -65,6 +65,8 @@ struct BaseHistogramModel
 /* This class provides LaneFilter expressed in Vanishing point coordinate system. */
 class LaneFilter
 {
+
+friend ostream& operator<<(ostream& os, const LaneFilter& laneFilter);
 	
 private:	
 		const LaneProperties   	mLANE;	  /*< Describes Lane properties for example average lane widths and its standard deviation*/

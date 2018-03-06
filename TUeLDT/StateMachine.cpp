@@ -128,6 +128,15 @@ int StateMachine::spin()
 		  mCurrentState 	= States::BUFFERING;
 		  mPtrBootingState 	= nullptr;
 		  cout<< "Completed!" <<endl;
+
+		   #ifdef PROFILER_ENABLED
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+		    <<"****************************************"<<endl
+		    <<  "[Sucessfully Completed the Booting Process]"<<endl
+		    << *mPtrLaneFilter<<endl
+		    <<"****************************************"<<endl<<endl;
+		  #endif
+
 		}
 		else
 		{

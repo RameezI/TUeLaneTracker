@@ -124,6 +124,17 @@ void LaneFilter::createHistogramModels()
     this->prior = this->prior/(SUM);
 }
 
+ostream& operator<<(ostream& os, const LaneFilter& laneFilter)
+{
+  os<<endl<<"LaneFilter Cofiguration:"<<endl;
+  os << "STEP size in cm: "<< laneFilter.mSTEP_CM<<endl;
+
+  return os;
+
+}
+
+
+
 LaneFilter::~LaneFilter()
 {
 	
