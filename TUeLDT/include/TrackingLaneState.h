@@ -79,16 +79,10 @@ template<typename GRAPH>
 void TrackingLaneState<GRAPH>::setupDAG(LaneFilter* laneFilter, VanishingPtFilter* vpFilter)
 {
 	//Setting up the  filters for the Graph	[observing pointers]
-	mGraph.mLaneFilter = laneFilter;
-	mGraph.mVpFilter    = vpFilter;
-	 
-	mGraph.mLOWER_LIMIT_IntBase 		=  SCALE_INTSEC*laneFilter->BASE_BINS.at<int32_t>(0,0);
-	mGraph.mUPPER_LIMIT_IntBase 		=  SCALE_INTSEC*laneFilter->BASE_BINS.at<int32_t>(laneFilter->BINS_COUNT-1, 0) ;
+	mGraph.mLaneFilter 	= laneFilter;
+	mGraph.mVpFilter    	= vpFilter; 
 	
-	mGraph.mLOWER_LIMIT_IntPurview 		=  SCALE_INTSEC*laneFilter->PURVIEW_BINS.at<int32_t>(0,0);
-	mGraph.mUPPER_LIMIT_IntPurview 		=  SCALE_INTSEC*laneFilter->PURVIEW_BINS.at<int32_t>(laneFilter->BINS_COUNT-1, 0);
-	
-	if (0== mGraph.init_DAG())
+	if (0 == mGraph.init_DAG())
 	 this->currentStatus= StateStatus::ACTIVE;	
 }
 

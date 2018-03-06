@@ -23,7 +23,7 @@
 * ****************************************************************************/ 
 
 /// This model provides an efficient way to store a set of feasible points in the multimodal base histogram.
-/**The complete histogram is filtered into a list of these models, 
+/** The complete histogram is filtered into a list of these models, 
 where each element in the list represents a possible Lane model at the base line.*/
 
 struct BaseHistogramModel

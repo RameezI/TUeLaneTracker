@@ -48,20 +48,27 @@ class  LaneModel
 {
 
 private:
-	int 	mBoundary_left;	  /*< Selected, according to max-posterior, distance to left boundary in Image-Center-CS [pixel] */
-	int 	mBoundary_right;  /*< Selected, according to max-posterior, distance to left boundary in Image-Center-CS [pixel] */
+	int 	mBoundaryLeft;	  	/*< Selected, according to max-posterior, distance to left boundary in Image-Center-CS [pixel] */
+	int 	mBoundaryRight;  	/*< Selected, according to max-posterior, distance to left boundary in Image-Center-CS [pixel] */
 
-	VanishingPt mVanishingPt; /*< Selected, according to max-posterior, distance to VanishingPoint in Image-Center-CS [pixel] */
+	int 	mBoundaryLeft_cm;	/*< Selected, according to max-posterior, distance to left boundary in Vehicle-Symmetry-CS [cm] */
+	int 	mBoundaryRight_cm;  	/*< Selected, according to max-posterior, distance to left boundary in Vehicle-Symmetry-CS [cm] */
+
+	VanishingPt mVanishingPt; 	/*< Selected, according to max-posterior, distance to VanishingPoint in Image-Center-CS [pixel] */
 	
-	float mLookAheadError_m; /*< Look-ahead-Error of center-line in Vehicle-Symmetry-CS [m] */
+	float mLookAheadError_m; 	/*< Look-ahead-Error of center-line in Vehicle-Symmetry-CS [m] */
 
 
 public:
-	void setLaneModel(int boundary_L, int boundary_R, VanishingPt vanishPt)
+	void setModel(int boundaryL, int boundaryL_cm, int boundaryR, int boundaryR_cm, VanishingPt vanishPt)
 	{
-	  mBoundary_left  = boundary_L;
-	  mBoundary_right = boundary_R;
-	  mVanishingPt	  = vanishPt;
+	  mBoundaryLeft  	= boundaryL;
+	  mBoundaryLeft_cm  	= boundaryL_cm;
+
+	  mBoundaryRight 	= boundaryR;
+	  mBoundaryRight_cm 	= boundaryR_cm;
+
+	  mVanishingPt	  	= vanishPt;
 	}
 
 	float getLateralError(float look_ahead_distance)
@@ -77,9 +84,10 @@ public:
 	}
 	#endif
 	LaneModel():
-		   //^TODO: Change intial value to nan
-		   mBoundary_left(-1),
-		   mBoundary_right(-1),
+		   mBoundaryLeft(-1),
+		   mBoundaryRight(-1),
+		   mBoundaryLeft_cm(-1),
+		   mBoundaryRight_cm(-1),
 		   mLookAheadError_m(-1){}
 };
 

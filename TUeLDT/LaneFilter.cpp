@@ -20,16 +20,16 @@
 * ****************************************************************************/ 
 
 #include "LaneFilter.h"
-#include "ScalingFactors.h"
-#include <opencv2/core/eigen.hpp>
 
+//#include <Eigen/Dense>
+//#include "opencv2/opencv.hpp"
+//#include <opencv2/core/eigen.hpp>
 
 using namespace Eigen;
 
 ///cm to pixel conversion, for a particular row in the image, of the #BINS_cm [Vehicle-Symmetry-CS <---> Image-Center-CS]
 cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const int Y_ICS )
 {
-
 	cv::Mat  lBINS_pixel;
 	{
 	   VectorXi lPixelBins;
@@ -103,18 +103,18 @@ void LaneFilter::createPrior()
 	     lProb_right = (exp( -pow(lMean-lBINS_RHP_cm(right), 2) / (2*pow(8*lSigma,2)) ) / ( sqrt(2*M_PI)*8*lSigma ) )*SCALE_FILTER;
 
  	    //prior on lane width
-	    lWidth_cm = lBINS_RHP_cm(left)+lBINS_RHP_cm(right);
+	     lWidth_cm = lBINS_RHP_cm(left)+lBINS_RHP_cm(right);
 
 	    if (mLANE.MIN_WIDTH <= lWidth_cm && lWidth_cm <= mLANE.MAX_WIDTH)
 	    {
 	       /* To Histogram Bins-IDs*/
-	       int idxL = (lBINS_RHP_cm.size()  -1) - left;
-	       int idxR = (lBINS_RHP_cm.size()  -1) + right;
+	       size_t idxL = (lBINS_RHP_cm.size()  -1) - left;
+	       size_t idxR = (lBINS_RHP_cm.size()  -1) + right;
 
-	       int idxM = round((idxL+idxR)/2.0);
+	       size_t idxM = round((idxL+idxR)/2.0);
 
-	       int lNonBoundaryBinsCount_left  = (idxM-3) - (idxL +2);
-	       int lNonBoundaryBinsCount_right = (idxR-2) - (idxM +3);
+	       size_t lNonBoundaryBinsCount_left  = (idxM-3) - (idxL +2);
+	       size_t lNonBoundaryBinsCount_right = (idxR-2) - (idxM +3);
 
 	       if( 0 < idxL && idxR < BINS_COUNT )
 	       {

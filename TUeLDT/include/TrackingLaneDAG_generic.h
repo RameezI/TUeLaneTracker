@@ -32,39 +32,35 @@ friend class TrackingLaneState;
 	
 private:
 
+	/***********************************/
+	// Set from setupDAG()
 	LaneFilter* 		mLaneFilter;
 	VanishingPtFilter*	mVpFilter;
-	LaneModel   		mLaneModel;
+	/***********************************/
 
-	bool            mStartBufferShift;
+	bool  		mStartBufferShift;
 	bool    	mStartFiltering;
 	bool 		mFiltersReady;	
 	
-	const int	mMAX_PIXELS_ROI;
+	int 		mBINS_COUNT;	
+	int		mMAX_PIXELS_ROI;
+	
+	float   	mLikelihood_LB;
+	float 		mLikelihood_RB;
+	float   	mLikelihood_NB;
+    	float		mLikelihood_W;
 
-	int  		mLOWER_LIMIT_IntBase;
-	int 		mUPPER_LIMIT_IntBase;
-	
-	int  		mLOWER_LIMIT_IntPurview;
-	int 		mUPPER_LIMIT_IntPurview;
-	
-	
-	
-	int   		mLikelihood_LB;
-	int 		mLikelihood_RB;
-	float        	mLikelihood_NB;
-	int        	mPosteriorProbBase;
-	
-	
-	int   		mLikelihoodVP_LBoundary;
-	int   		mLikelihoodVP_RBoundary;
-	float     	mLikelihoodVP_NegBoundary;
-    	float		mLikelihoodVP_Width;
-	int       	mPosteriorProbVP;
-	
+	float 		mConditionalProb;
+	float		mPosterior;
+	float		mMaxPosterior;
+	int		mCorrelationNB;
+
 	cv::Mat		mBASE_BINS_SCALED;
 	cv::Mat		mPURVIEW_BINS_SCALED;
 	cv::Mat 	mX_ICCS_SCALED;	
+
+	cv::Mat		mProbMapFocussed;
+	cv::Mat 	mGradTanFocussed;
 
 	cv::Mat 	mIntBase;           
 	cv::Mat		mIntPurview;
@@ -73,13 +69,11 @@ private:
 	cv::Mat		mHistBase;
 	cv::Mat		mHistPurview;
 	
-	cv::Mat		mProbMapFocussed;
-	cv::Mat 	mGradTanFocussed;
-	
 	cv::Mat 	mTransitLaneFilter;
 	cv::Mat 	mTransitVpFilter;
 
-	
+	BaseHistogramModel	mBaseHistModel;  	/**< Selected Base-Histogram Model */
+	LaneModel   		mLaneModel;		/**< The detected Lane-Model */
 
 	// Only Enable in case of Video Recording
 	//VideoWriter mOutputVideo;

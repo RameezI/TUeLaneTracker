@@ -25,8 +25,7 @@
 
 #include <memory>
 #include "State.h"
-#include "LaneFilter.h"
-#include "VanishingPtFilter.h"
+#include "LaneModel.h"
 #include "Templates.h"
 
 using namespace std;

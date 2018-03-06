@@ -1,5 +1,5 @@
-#ifndef LANE_FILTERS_H__
-#define LANE_FILTERS_H__
+#ifndef LANE_FILTER_H__
+#define LANE_FILTER_H__
 
 /******************************************************************************
 * NXP Confidential Proprietary
@@ -22,18 +22,17 @@
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
 
-#include <Eigen/Dense>
-#include "opencv2/opencv.hpp"
 #include "Lane.h"
 #include "Camera.h"
 #include "HistogramModels.h"
+#include "ScalingFactors.h"
 
 using namespace Eigen;
 
 /* This class provides Base and Purview Histograms expressed in Image-Center-Coordinate-System. */
 class LaneFilter
 {
-	
+
 private:	
 		const LaneProperties   	mLANE;	  /*< Describes Lane properties for example average lane widths and its standard deviation*/
 		const Camera 		mCAMERA;  /*< Describes Camera properties and configuration */
@@ -55,8 +54,8 @@ public:	 	//Public Interface
   		const int 	BASE_LINE_ICCS;		/**< Base line in Image-Center-CS [pixel-lines] */
   		const int 	PURVIEW_LINE_ICCS;	/**< Base line in Image-Center-CS [pixel-lines] */
 
-		const int	BINS_STEP_cm;  		/**< Step size for the Histogram BINS [cm] */
-		const int   	BINS_COUNT;   		/*< Number of bins in each Histogram */
+		const size_t	BINS_STEP_cm;  		/**< Step size for the Histogram BINS [cm] */
+		const size_t   	BINS_COUNT;   		/*< Number of bins in each Histogram */
 
 		const VectorXi	BINS_cm;		/**<Describes the Histogram BINS in the Vehicle-Symmetry-CS [cm] */
 
@@ -91,4 +90,4 @@ public:	 	//Public Interface
 
 };
 	
-#endif // LANEFILTER_H
+#endif // LANE_FILTER_H

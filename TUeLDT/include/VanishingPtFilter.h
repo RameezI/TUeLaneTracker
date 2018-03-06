@@ -27,9 +27,6 @@
 using namespace Eigen;
 typedef Matrix<int, 6, 1> Vector6i;
 
-
-
-
 ///This class represents ad 2D-Filter expressed in Image-Center-Coordiante-System
 /*
 
