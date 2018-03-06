@@ -68,17 +68,16 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("EXTRACT_ROI");
 #endif
-
-	int lRowIndex= mCAMERA.RES_VH(0) - mSpan;
-	int lColIndex;
-	cv::Rect lROI;
+	 int lRowIndex= mCAMERA.RES_VH(0) - mSpan;
+	 int lColIndex;
+	 cv::Rect lROI;
 
 	 //Define ROI from the Input Image
 	 lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
 	 mFrameGRAY_ROI = mFrameGRAY(lROI);
 
-	 lRowIndex 	=  mCAMERA.RES_VH(0) + mMargin - mVanishPt.V ;
-	 lColIndex	=  mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
+	 lRowIndex 	=  mCAMERA.RES_VH(0) - (mVP_Range_V + mVanishPt.V);
+	 lColIndex	=  mCAMERA.RES_VH(1) - (mCAMERA.FRAME_CENTER(1) - mVanishPt.H) ;
 
 	 //Extract Gradient Orientation Template
 	 lROI = cv::Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
@@ -125,7 +124,6 @@ mProfiler.start("GAUSSIAN_BLUR");
 	
 	 GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, cv::Size( 5, 5 ), 2, 2, cv::BORDER_REPLICATE | cv::BORDER_ISOLATED  );
 
-
 				
  #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -165,7 +163,6 @@ mProfiler.start("GRADIENT_COMPUTATION");
 	mMask = mGradY ==0;
 	mGradY.setTo(1, mMask);
 			
-							
 	//convert to absolute scale and add weighted absolute gradients 
 	mGradX_abs = abs(mGradX);
 	mGradY_abs = abs(mGradY );
@@ -196,8 +193,6 @@ mProfiler.start("GRADIENT_COMPUTATION");
 #ifdef PROFILER_ENABLED
 mProfiler.start("COMPUTE_PROBABILITIES");
 #endif 		
-
-
 
 	//GrayChannel Probabilities
 	subtract(mFrameGRAY_ROI, mLaneMembership.TIPPING_POINT_GRAY, mTempProbMat, cv::noArray(), CV_32S);
@@ -235,7 +230,7 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 	multiply(mBufferPool->Probability[bufferPos], mProbMap_GradDir, mBufferPool->Probability[bufferPos]);
 	mBufferPool->Probability[bufferPos].convertTo(mBufferPool->Probability[bufferPos], CV_8U, 1.0/255, 0);
 
-	//bitwise_and(mBufferPool->Probability[bufferPos], mFocusTemplate, mBufferPool->Probability[bufferPos]);
+	bitwise_and(mBufferPool->Probability[bufferPos], mFocusTemplate, mBufferPool->Probability[bufferPos]);
 
 
 	mTemplatesReady = false;	
