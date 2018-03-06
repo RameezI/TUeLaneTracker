@@ -1,6 +1,5 @@
 #ifndef LANE_H
 #define LANE_H
-
 /******************************************************************************
 * NXP Confidential Proprietary
 * 
@@ -22,9 +21,15 @@
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
 
+
+#include <iostream>
+using namespace std;
+
 /**Describes Lane Properties*/
 struct LaneProperties
 {
+
+friend ostream& operator<<(ostream& os, const LaneProperties& laneProperties);
 
 public:
 	const float AVG_WIDTH;	/*< Average with of a Lane [cm]	*/
@@ -74,5 +79,17 @@ struct LaneMembership
 		 NEG_BOUNDARY_NORMA( (2/sqrt(2*M_PI*pow(NEG_BOUNDARY_STD,2)))),
 		 NEG_BOUNDARY_NOMIN(2*pow(NEG_BOUNDARY_STD,2)){}
 	};
+
+
+
+	inline ostream& operator<<(ostream& os, const LaneProperties& laneProperties)
+	{
+	  os<<endl<<"Lane Propoerties:"<<endl;
+	  os<<"Average Width		: "<< laneProperties.AVG_WIDTH<<endl;
+	  os<<"Standard Deviaion 	: "<< laneProperties.STD_WIDTH<<endl;
+	  os<<"Minimum  Width 	  	: "<< laneProperties.MIN_WIDTH<<endl;
+	  os<<"Maximum  Width 		: "<< laneProperties.MAX_WIDTH<<endl;
+	  return os;
+	}
 
 #endif // LANE_H

@@ -26,15 +26,18 @@
 #include <Eigen/Dense>
 #include "opencv2/opencv.hpp"
 
+
 using namespace Eigen;
 using namespace std;
 
 struct Camera
 {
 
+friend ostream& operator<<(ostream& os, const Camera& lCamera);
+
 public:
 
-		const string	CAMERA_NAME;			/**<  Camera Identifier */
+		const string	NAME;				/**<  Camera Identifier */
 
 		const Vector2i	RES_VH; 	    		/**< Resolution of the camera image */
 		const Vector2f  FOV_VH;				/**  Field-of-View of the camera */
@@ -42,20 +45,20 @@ public:
 		const cv::Point O_ICCS_ICS;			/**< Origin of Image-Center-CS in Image-CS*/
 		const cv::Point O_ICS_ICCS;			/**< Origin of Image-CS in Image-Center-CS*/
 
-		const cv::Mat	CAMERA_MATRIX_INTRINSIC;	/**<  Camera Intrinsic Parameters 3x4 */
-		const cv::Mat	CAMERA_MATRIX_EXTRINSIC;	/**<  Camera Extrinsic Parameters 4x4 */
+		const cv::Mat	MATRIX_INTRINSIC;	/**<  Camera Intrinsic Parameters 3x4 */
+		const cv::Mat	MATRIX_EXTRINSIC;	/**<  Camera Extrinsic Parameters 4x4 */
 
 
 		Camera():
-			 CAMERA_NAME ("BUMBLEBEE_640x480"), 
+			 NAME ("BUMBLEBEE_640x480"), 
 			 RES_VH(Vector2i(CAMERA_RES_V, CAMERA_RES_H)),
 			 FOV_VH(Vector2f(CAMERA_FOV_V, CAMERA_FOV_H)), 
 			 O_ICCS_ICS( cv::Point( RES_VH[1]/2,  RES_VH[0]/2) ), 
 			 O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) ),
-			 CAMERA_MATRIX_INTRINSIC(getCameraMatrix("CAMERA_MATRIX_INTRINSIC")),
-			 CAMERA_MATRIX_EXTRINSIC(getCameraMatrix("CAMERA_MATRIX_EXTRINSIC")) 
+			 MATRIX_INTRINSIC(getCameraMatrix("CAMERA_MATRIX_INTRINSIC")),
+			 MATRIX_EXTRINSIC(getCameraMatrix("CAMERA_MATRIX_EXTRINSIC")) 
 		{
-		   	if (CAMERA_MATRIX_INTRINSIC.empty() | CAMERA_MATRIX_EXTRINSIC.empty() )
+		   	if (MATRIX_INTRINSIC.empty() | MATRIX_EXTRINSIC.empty() )
 		   	   throw "Camera Instantiation Failed" ;
 		}
 
@@ -90,7 +93,7 @@ private:
 		  lSuccess =-1;
 		}
 
-		formattedString<<path<<"/ConfigFiles/Camera/"<<CAMERA_NAME<<".yaml";
+		formattedString<<path<<"/ConfigFiles/Camera/"<<NAME<<".yaml";
 		file = formattedString.str();
 
 		struct 	stat  	buf;
@@ -114,5 +117,19 @@ private:
 
 	   }
 };
+
+	inline ostream& operator<<(ostream& os, const Camera& lCamera)
+	{
+	  os<<endl<<"Camera Propoerties:"<<endl;
+	  os<<"Name			: "<< lCamera.NAME<<endl;
+	  os<<"Resolution [VxH]		: "<< "[ "<<lCamera.RES_VH[0]<<" x "<<lCamera.RES_VH[1]<<" ]"<<endl;
+	  os<<"Field-of-View [V, H]	: "<< "[ "<<lCamera.FOV_VH[0]<<" , "<<lCamera.FOV_VH[1]<<" ]"<<endl;
+	  os<<"Origin-ICCS-ICS 		: "<< lCamera.O_ICCS_ICS<<endl;
+	  os<<"Origin-ICS-ICCS 		: "<< lCamera.O_ICS_ICCS<<endl;
+	  os<<"Extrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_EXTRINSIC<<endl;
+	  os<<"Intrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_INTRINSIC<<endl;
+	  return os;
+	}
+
 #endif // CAMERA_H
 
