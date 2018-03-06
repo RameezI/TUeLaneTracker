@@ -72,9 +72,9 @@ protected:
 	/*................................................
 	 Set from outside, before buffering is activated   */ 
 
-	int				mHorizon_ICCS;
-	int 				mVP_Range_V;
-	int 				mSpan;
+	int				mHORIZON_ICCS;
+	int 				mVP_RANGE_V;
+	int 				mSPAN;
 	
 	cv::Mat	 			mGRADIENT_TAN_ROOT;
    	cv::Mat				mFOCUS_MASK_ROOT;
@@ -157,9 +157,9 @@ public:
 	   mTemplatesReady      	= std::move(bufferingGraph.mTemplatesReady);
        	   mBufferReady             	= std::move(bufferingGraph.mBufferReady);
 
-	   mHorizon_ICCS		= std::move(bufferingGraph.mHorizon_ICCS);
-	   mVP_Range_V			= std::move(bufferingGraph.mVP_Range_V);
-	   mSpan 			= std::move(bufferingGraph.mSpan);
+	   mHORIZON_ICCS		= std::move(bufferingGraph.mHORIZON_ICCS);
+	   mVP_RANGE_V			= std::move(bufferingGraph.mVP_RANGE_V);
+	   mSPAN 			= std::move(bufferingGraph.mSPAN);
 		
 	   mGRADIENT_TAN_ROOT 		= std::move(bufferingGraph.mGRADIENT_TAN_ROOT);
 	   mFOCUS_MASK_ROOT   		= std::move(bufferingGraph.mFOCUS_MASK_ROOT);

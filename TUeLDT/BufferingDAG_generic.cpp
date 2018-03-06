@@ -66,19 +66,18 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 mProfiler.start("EXTRACT_ROI");
 #endif
 
-	int lRowIndex	= mHorizon_ICCS + mCAMERA.O_ICCS_ICS; 	//Horizon in Image-CS
-	int lColIndex;
-	cv::Rect lROI;
+	 int lRowIndex	= mHORIZON_ICCS + mCAMERA.O_ICCS_ICS.y; //Horizon in Image-CS
+	 int lColIndex;
+	 cv::Rect lROI;
 
 	 //Define ROI from the Input Image
-	 lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
+	 lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
 	 mFrameGRAY_ROI = mFrameGRAY(lROI);
 
-	 lRowIndex 	=  mCAMERA.RES_VH(0) + mMargin - mVanishPt.V ;
-	 lColIndex	=  mCAMERA.RES_VH(1) - mCAMERA.FRAME_CENTER(1) -mVanishPt.H ;
-
-	 //Extract Gradient Orientation Template
-	 lROI = cv::Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
+	 //Extract Correponding Gradient Orientation Template
+	 lRowIndex =  mCAMERA.RES_VH(0) - (mVP_RANGE_V + mVanishPt.V);
+	 lColIndex =  mCAMERA.RES_VH(1) - (mCAMERA.O_ICCS_ICS.y - mVanishPt.H) ;
+	 lROI	   =  cv::Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
 	 mGRADIENT_TAN_ROOT(lROI).copyTo(mGradTanTemplate);
 
 #ifdef PROFILER_ENABLED
@@ -123,7 +122,6 @@ mProfiler.start("GAUSSIAN_BLUR");
 	 GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, cv::Size( 5, 5 ), 2, 2, cv::BORDER_REPLICATE | cv::BORDER_ISOLATED  );
 
 
-				
  #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
@@ -194,8 +192,6 @@ mProfiler.start("GRADIENT_COMPUTATION");
 mProfiler.start("COMPUTE_PROBABILITIES");
 #endif 		
 
-
-
 	//GrayChannel Probabilities
 	subtract(mFrameGRAY_ROI, mLaneMembership.TIPPING_POINT_GRAY, mTempProbMat, cv::noArray(), CV_32S);
 	mMask = mTempProbMat <0 ;
@@ -232,7 +228,7 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 	multiply(mBufferPool->Probability[bufferPos], mProbMap_GradDir, mBufferPool->Probability[bufferPos]);
 	mBufferPool->Probability[bufferPos].convertTo(mBufferPool->Probability[bufferPos], CV_8U, 1.0/255, 0);
 
-	//bitwise_and(mBufferPool->Probability[bufferPos], mFocusTemplate, mBufferPool->Probability[bufferPos]);
+	bitwise_and(mBufferPool->Probability[bufferPos], mFocusTemplate, mBufferPool->Probability[bufferPos]);
 
 
 	mTemplatesReady = false;	
@@ -270,16 +266,16 @@ void BufferingDAG_generic::runAuxillaryTasks()
 /* MODE: (A + C) */	
 
 		//Extract Depth Template
-		lRowIndex = mCAMERA.RES_VH(0) -  mSpan; 
-		lROI = cv::Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
+		lRowIndex = mCAMERA.RES_VH(0) -  mSPAN; 
+		lROI = cv::Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSPAN);
 		
 		wrtLock.lock();
 		 mDEPTH_MAP_ROOT(lROI).copyTo(mDepthTemplate);
 		wrtLock.unlock();
 
 		//Extract Focus Template
-		lRowIndex = mVP_Range_V	 - mVanishPt.V;
-		lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
+		lRowIndex = mVP_RANGE_V	 - mVanishPt.V;
+		lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
 
 		wrtLock.lock();
 		 mFOCUS_MASK_ROOT(lROI).copyTo(mFocusTemplate);	
@@ -287,10 +283,8 @@ void BufferingDAG_generic::runAuxillaryTasks()
 
 
 		wrtLock.lock();
-		  // Shift Buffers
 		  for ( std::size_t i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
 		  {
-			
 		    mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
 		    mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);
 		  }	
@@ -304,11 +298,9 @@ void BufferingDAG_generic::runAuxillaryTasks()
 }
 
 
-
+//^TODO: Move to BuffeingState.h -> Localise Frame Input Code
 int BufferingDAG_generic::grabFrame()	
 {
-
-
 	int lReturn = 0;
 		
 	#ifdef PROFILER_ENABLED
@@ -374,6 +366,5 @@ int BufferingDAG_generic::grabFrame()
 				<<  "Read time: " << mProfiler.getAvgTime("IMAGE_READ")<<endl
 				<<"******************************"<<endl<<endl;
 				#endif 
-
 	return lReturn;
 }

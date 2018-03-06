@@ -30,17 +30,17 @@ VanishingPtFilter::VanishingPtFilter()
  
   RANGE_H(300),
   
-  COUNT_BINS_V(floor((2*VP_RANGE_V)/mVP_STEP) +1),
+  COUNT_BINS_V(floor((2*RANGE_V)/STEP) +1),
   
-  COUNT_BINS_H(floor((2*VP_RANGE_H)/mVP_STEP) +1),
+  COUNT_BINS_H(floor((2*RANGE_H)/STEP) +1),
   
-  BINS_V( VectorXi::LinSpaced(mNb_VP_BINS_V,-VP_RANGE_V, VP_RANGE_V).array()),
+  BINS_V( VectorXi::LinSpaced(COUNT_BINS_V,-RANGE_V, RANGE_V).array()),
   
-  BINS_H( VectorXi::LinSpaced(mNb_VP_BINS_H,-VP_RANGE_H, VP_RANGE_H).array()),
+  BINS_H( VectorXi::LinSpaced(COUNT_BINS_H,-RANGE_H, RANGE_H).array()),
   
-  prior(  cv::Mat::zeros( mNb_VP_BINS_V, mNb_VP_BINS_H , CV_32SC1) ),
+  prior(  cv::Mat::zeros( COUNT_BINS_V, COUNT_BINS_H , CV_32SC1) ),
   
-  filter( cv::Mat::zeros( mNb_VP_BINS_H, mNb_VP_BINS_H,  CV_32SC1) )
+  filter( cv::Mat::zeros( COUNT_BINS_H, COUNT_BINS_H,  CV_32SC1) )
 {
 	createPrior();
 	this->filter = this->prior.clone();

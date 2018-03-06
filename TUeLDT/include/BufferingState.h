@@ -199,9 +199,9 @@ mProfiler.start("SET_UP_BUFFERING_DAG");
 
 	const int RES_H 		= mGraph.mCAMERA.RES_VH(1);
 	
-	mGraph.mVP_Range_V   		= templates.VP_RANGE_V;
-	mGraph.mSpan			= templates.SPAN;
-	mGraph.mHorizon_ICCS		= templates.HORIZON_ICCS;
+	mGraph.mVP_RANGE_V   		= templates.VP_RANGE_V;
+	mGraph.mSPAN			= templates.SPAN;
+	mGraph.mHORIZON_ICCS		= templates.HORIZON_ICCS;
 	
 	//allocate buffers
 	mGraph.mBufferPool.reset(new BufferPool<GRAPH>(templates.SPAN, RES_H, mNbBuffer));

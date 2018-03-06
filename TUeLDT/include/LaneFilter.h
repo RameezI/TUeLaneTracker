@@ -22,10 +22,11 @@
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
 
+#include <Eigen/Dense>
 #include "Lane.h"
 #include "Camera.h"
 #include "HistogramModels.h"
-#include "ScalingFactors.h"
+
 
 using namespace Eigen;
 
@@ -55,7 +56,7 @@ public:	 	//Public Interface
   		const int 	PURVIEW_LINE_ICCS;	/**< Base line in Image-Center-CS [pixel-lines] */
 
 		const size_t	BINS_STEP_cm;  		/**< Step size for the Histogram BINS [cm] */
-		const size_t   	BINS_COUNT;   		/*< Number of bins in each Histogram */
+		const size_t   	COUNT_BINS;   		/*< Number of bins in each Histogram */
 
 		const VectorXi	BINS_cm;		/**<Describes the Histogram BINS in the Vehicle-Symmetry-CS [cm] */
 

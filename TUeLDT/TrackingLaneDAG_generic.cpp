@@ -28,7 +28,15 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
   mStartBufferShift(false),
   mStartFiltering(false),
   mFiltersReady(false),
-  mMAX_PIXELS_ROI(mFrameGRAY_ROI.rows * mFrameGRAY_ROI.cols)
+  mMAX_PIXELS_ROI(mFrameGRAY_ROI.rows * mFrameGRAY_ROI.cols),
+  mLikelihood_LB(0),
+  mLikelihood_RB(0),
+  mLikelihood_NB(0),
+  mLikelihood_W(0),
+  mConditionalProb(0),
+  mCorrelationNB(0),
+  mPosterior(0),
+  mMaxPosterior(0)
 {	
 	//Write Images to a video file
 	//mOutputVideo.open("TUeLaneTracker.avi", CV_FOURCC('M','P','4','V'), 30, mFrameRGB.size());
@@ -37,14 +45,12 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
 
 int TrackingLaneDAG_generic::init_DAG()
 {
-	mBINS_COUNT		= mLaneFilter->BINS_COUNT;
-
 	mX_ICCS_SCALED		=  SCALE_INTSEC*mX_ICCS;
 	mBASE_BINS_SCALED  	=  SCALE_INTSEC*mLaneFilter->BASE_BINS;
 	mPURVIEW_BINS_SCALED	=  SCALE_INTSEC*mLaneFilter->PURVIEW_BINS;
 
-        mHistBase      		= cv::Mat::zeros(mBINS_COUNT,  1 ,  CV_32S);
-        mHistPurview   		= cv::Mat::zeros(mBINS_COUNT,  1 ,  CV_32S);
+        mHistBase      		= cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
+        mHistPurview   		= cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
 
   	return 0;
 }
@@ -127,20 +133,23 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("MASK_INVALID_BIN_IDS");
 #endif
-	
+
+     {
+	const size_t& lCOUNT = mLaneFilter->COUNT_BINS;
+
 	//Build Mask for Valid Intersections
-	bitwise_and(mProbMapFocussed > 0, mGradTanFocussed !=0,    				mMask);
+	bitwise_and(mProbMapFocussed > 0, mGradTanFocussed !=0, mMask);
 
-	bitwise_and(mMask, mIntBase    >  mBASE_BINS_SCALED.at<int32_t>(0,0),     		mMask);
-	bitwise_and(mMask, mIntPurview >  mPURVIEW_BINS_SCALED.at<int32_t>(0,0),  		mMask);
+	bitwise_and(mMask, mIntBase    >  mBASE_BINS_SCALED.at<int32_t>(0,0),    mMask);
+	bitwise_and(mMask, mIntPurview >  mPURVIEW_BINS_SCALED.at<int32_t>(0,0), mMask);
 
-    	bitwise_and(mMask, mIntBase    <  mBASE_BINS_SCALED.at<int32_t>(mBINS_COUNT-1, 0),     	mMask);
-    	bitwise_and(mMask, mIntPurview <  mPURVIEW_BINS_SCALED.at<int32_t>(mBINS_COUNT-1, 0),  	mMask);
+    	bitwise_and(mMask, mIntBase    <  mBASE_BINS_SCALED.at<int32_t>(lCOUNT-1 , 0), mMask);
+    	bitwise_and(mMask, mIntPurview <  mPURVIEW_BINS_SCALED.at<int32_t>(lCOUNT-1 , 0),mMask);
 
 	//^TODO: Put on the side thread
-        mHistBase      = cv::Mat::zeros(mLaneFilter->BINS_COUNT,  1 ,  CV_32S);
-        mHistPurview   = cv::Mat::zeros(mLaneFilter->BINS_COUNT,  1 ,  CV_32S);
-		
+        mHistBase      = cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
+        mHistPurview   = cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
+     }		
 
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -405,7 +414,7 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 
 		   lWidth_cm= mLaneFilter->BINS_cm(lIdx_BR) - mLaneFilter->BINS_cm(lIdx_BL);
 					   
-		   if (lIdx_BL > 0 && lIdx_BR < mLaneFilter->BINS_COUNT -2 )
+		   if (lIdx_BL > 0 && lIdx_BR < mLaneFilter->COUNT_BINS -2 )
 		   {			
 		      // VP Probability over lane width difference between base and purview line
 		      mLikelihood_W  	= mLaneMembership.WIDTH_DIFF_NORMA;
@@ -569,8 +578,8 @@ mProfiler.start("DISPLAY");
  
 	  // Highlight ROI 
 	   Rect lROI;
-	   lROI = Rect(0, mCAMERA.RES_VH(0) - mSpan, mCAMERA.RES_VH(1), mSpan);
-	   cv::Mat lYellow(mSpan, mCAMERA.RES_VH(1), CV_8UC3, Scalar(0,125,125));
+	   lROI = Rect(0, mCAMERA.RES_VH(0) - mSPAN, mCAMERA.RES_VH(1), mSPAN);
+	   cv::Mat lYellow(mSPAN, mCAMERA.RES_VH(1), CV_8UC3, Scalar(0,125,125));
 
     	   cv::Mat lFrameRGB_mSPAN = mFrameRGB(lROI);
 	   cv::addWeighted(lYellow, 0.4, lFrameRGB_mSPAN, 0.6, 0, lFrameRGB_mSPAN);
@@ -659,16 +668,16 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 	{
 		wrtLock.unlock();
 		 // Extract Depth Template
-		 lRowIndex = mCAMERA.RES_VH(0)- mSpan; 
-		 lROI = cv::Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
+		 lRowIndex = mCAMERA.RES_VH(0)- mSPAN; 
+		 lROI = cv::Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSPAN);
 
 		wrtLock.lock();
 		 mDEPTH_MAP_ROOT(lROI).copyTo(mDepthTemplate);
 		wrtLock.unlock();
 
 		 // Extract Focus Template
-		 lRowIndex = mVP_Range_V - mVanishPt.V;
-		 lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
+		 lRowIndex = mVP_RANGE_V - mVanishPt.V;
+		 lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
 		
 		wrtLock.lock();
 		 mFOCUS_MASK_ROOT(lROI).copyTo(mFocusTemplate);	
@@ -691,15 +700,15 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 // MODE: A ONLY 
 	{
 		wrtLock.unlock();
-		 lRowIndex = mCAMERA.RES_VH(0)- mSpan; 
-		 lROI = cv::Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
+		 lRowIndex = mCAMERA.RES_VH(0)- mSPAN; 
+		 lROI = cv::Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSPAN);
 		
 		wrtLock.lock();
 		 mDEPTH_MAP_ROOT(lROI).copyTo(mDepthTemplate);
 		wrtLock.unlock();
 
-		lRowIndex = mVP_Range_V-mVanishPt.V;
-		lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
+		lRowIndex = mVP_RANGE_V-mVanishPt.V;
+		lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
 
 
 		wrtLock.lock();

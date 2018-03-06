@@ -42,7 +42,6 @@ private:
 	bool    	mStartFiltering;
 	bool 		mFiltersReady;	
 	
-	int 		mBINS_COUNT;	
 	int		mMAX_PIXELS_ROI;
 	
 	float   	mLikelihood_LB;
@@ -51,9 +50,9 @@ private:
     	float		mLikelihood_W;
 
 	float 		mConditionalProb;
+	int		mCorrelationNB;
 	float		mPosterior;
 	float		mMaxPosterior;
-	int		mCorrelationNB;
 
 	cv::Mat		mBASE_BINS_SCALED;
 	cv::Mat		mPURVIEW_BINS_SCALED;

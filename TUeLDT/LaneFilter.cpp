@@ -20,12 +20,8 @@
 * ****************************************************************************/ 
 
 #include "LaneFilter.h"
-
-//#include <Eigen/Dense>
-//#include "opencv2/opencv.hpp"
-//#include <opencv2/core/eigen.hpp>
-
-using namespace Eigen;
+#include "ScalingFactors.h"
+#include <opencv2/core/eigen.hpp>
 
 ///cm to pixel conversion, for a particular row in the image, of the #BINS_cm [Vehicle-Symmetry-CS <---> Image-Center-CS]
 cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const int Y_ICS )
@@ -61,9 +57,9 @@ LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
   
   BINS_STEP_cm(10),
 
-  BINS_COUNT( (int)( (2*mLANE.MAX_WIDTH)/BINS_STEP_cm ) + 1),
+  COUNT_BINS( (int)( (2*mLANE.MAX_WIDTH)/BINS_STEP_cm ) + 1),
 
-  BINS_cm( VectorXi::LinSpaced( BINS_COUNT, -mLANE.MAX_WIDTH, mLANE.MAX_WIDTH) ),
+  BINS_cm( VectorXi::LinSpaced( COUNT_BINS, -mLANE.MAX_WIDTH, mLANE.MAX_WIDTH) ),
   
   BASE_BINS(toPixelBINS(BINS_cm, mCAMERA, BASE_LINE_ICCS)),
 
@@ -116,7 +112,7 @@ void LaneFilter::createPrior()
 	       size_t lNonBoundaryBinsCount_left  = (idxM-3) - (idxL +2);
 	       size_t lNonBoundaryBinsCount_right = (idxR-2) - (idxM +3);
 
-	       if( 0 < idxL && idxR < BINS_COUNT )
+	       if( 0 < idxL && idxR < COUNT_BINS )
 	       {
 		   baseHistogramModels.push_back( BaseHistogramModel());
 

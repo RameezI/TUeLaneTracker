@@ -23,6 +23,7 @@
 * ****************************************************************************/ 
 
 #include <Eigen/Dense>
+#include "opencv2/opencv.hpp"
 
 using namespace Eigen;
 typedef Matrix<int, 6, 1> Vector6i;
