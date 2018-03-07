@@ -115,8 +115,8 @@ public:
 		const double 	FOCAL_LENGTH;    		/*<  Camera focal length in meters		*/
 		const double    CM_TO_PIXEL;			/*<  Conversion ratio at the base line		*/
 		const string	CAMERA_NAME;			/*<  Camera Identifier				*/
-		const cv::Mat	CAMERA_MATRIX_INTRINSIC;	/*<  Camera Intrinsic Parameters 3x4 		*/
-		const cv::Mat	CAMERA_MATRIX_EXTRINSIC;	/*<  Camera Extrinsic Parameters 4x4		*/
+		const cv::Mat	CAMERA_MATRIX_INTRINSIC;	/*<  Camera Intrinsic Parameters 3x3 		*/
+		const cv::Mat	CAMERA_MATRIX_EXTRINSIC;	/*<  Camera Extrinsic Parameters 3x4		*/
 
 		Camera() :
 

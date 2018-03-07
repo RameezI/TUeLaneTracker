@@ -17,10 +17,9 @@ int main( int argc, char** argv )
     fs<< "callibrationDate" << asctime(localtime(&rawtime));
 
     // 3x4 Intrinsic Parameters
-    Mat CameraMatrixIntrinsic = (Mat_<float>(3,4) << 0,  0,  0,  0,
-						     0,  0,  0,  0,
-						     0,  0,  0,  0,
-						     0,  0,  0,  0);
+    Mat CameraMatrixIntrinsic = (Mat_<float>(3,3) << 0,  0,  0,
+						     0,  0,  0,
+						     0,  0,  0);
 
     // 4x4  Extrinsic Parameters
     Mat CameraMatrixExtrinsic = (Mat_<float>(4,4)<< 0,  0,  0,  0,
@@ -40,7 +39,7 @@ int main( int argc, char** argv )
     cout<< "Missing Command Line Options" <<endl<<endl;
 
     cout<< "Usage:"<<endl;
-    cout<< "	cameraCallibrator <char*> NAME_OF_THE_CALLIBRAION FILE " <<endl;
+    cout<< "	cameraCallibrator <char*> NAME_OF_THE_CALLIBRAION_FILE " <<endl;
     
     lReturn = -1;
 
