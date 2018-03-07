@@ -118,18 +118,18 @@ private:
 	   }
 };
 
-	inline ostream& operator<<(ostream& os, const Camera& lCamera)
-	{
-	  os<<endl<<"Camera Propoerties:"<<endl;
-	  os<<"Name			: "<< lCamera.NAME<<endl;
-	  os<<"Resolution [VxH]		: "<< "[ "<<lCamera.RES_VH[0]<<" x "<<lCamera.RES_VH[1]<<" ]"<<endl;
-	  os<<"Field-of-View [V, H]	: "<< "[ "<<lCamera.FOV_VH[0]<<" , "<<lCamera.FOV_VH[1]<<" ]"<<endl;
-	  os<<"Origin-ICCS-ICS 		: "<< lCamera.O_ICCS_ICS<<endl;
-	  os<<"Origin-ICS-ICCS 		: "<< lCamera.O_ICS_ICCS<<endl;
-	  os<<"Extrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_EXTRINSIC<<endl;
-	  os<<"Intrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_INTRINSIC<<endl;
-	  return os;
-	}
+inline ostream& operator<<(ostream& os, const Camera& lCamera)
+{
+  os<<endl<<"[Camera Propoerties]"<<endl;
+  os<<"Name			: "<<lCamera.NAME<<endl;
+  os<<"Resolution[VxH]		: "<<"[ "<<lCamera.RES_VH[0]<<" x "<<lCamera.RES_VH[1]<<" ]"<<endl;
+  os<<"Field-of-View [V, H]	: "<<"[ "<<lCamera.FOV_VH[0]<<" , "<<lCamera.FOV_VH[1]<<" ]"<<endl;
+  os<<"Origin-ICCS-ICS		: "<<lCamera.O_ICCS_ICS<<endl;
+  os<<"Origin-ICS-ICCS		: "<<lCamera.O_ICS_ICCS<<endl;
+  os<<"Extrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_EXTRINSIC<<endl;
+  os<<"Intrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_INTRINSIC;
+
+  return os;
+}
 
 #endif // CAMERA_H
-

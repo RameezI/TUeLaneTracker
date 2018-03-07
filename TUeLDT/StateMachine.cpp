@@ -124,14 +124,24 @@ int StateMachine::spin()
 		  #else
 		   (new BufferingState<BufferingDAG_generic>());
 		  #endif
-		
-		  mCurrentState 	= States::BUFFERING;
+	
+		  //For Testing Dispose the STATE_MACHINE when Booting is DONE!	
+		  mCurrentState 	= States::DISPOSED;
 		  mPtrBootingState 	= nullptr;
 		  cout<< "Completed!" <<endl;
+
+		 #ifdef PROFILER_ENABLED
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+		    <<"****************************************"<<endl
+		    << "Printing Booting Configuration"<<endl
+		    <<  *(mPtrLaneFilter)<<endl
+		    <<"****************************************"<<endl<<endl;
+		  #endif
+		
 		}
 		else
 		{
-		   #ifdef PROFILER_ENABLED
+		 #ifdef PROFILER_ENABLED
 		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 		    <<"****************************************"<<endl
 		    <<  "[Failed to Complete the Booting Process]"<<endl
