@@ -45,8 +45,8 @@ public:
 		const cv::Point O_ICCS_ICS;			/**< Origin of Image-Center-CS in Image-CS*/
 		const cv::Point O_ICS_ICCS;			/**< Origin of Image-CS in Image-Center-CS*/
 
-		const cv::Mat	MATRIX_INTRINSIC;	/**<  Camera Intrinsic Parameters 3x4 */
-		const cv::Mat	MATRIX_EXTRINSIC;	/**<  Camera Extrinsic Parameters 4x4 */
+		const cv::Mat	MATRIX_INTRINSIC;		/**<  Camera Intrinsic Parameters 3x4 */
+		const cv::Mat	MATRIX_EXTRINSIC;		/**<  Camera Extrinsic Parameters 4x4 */
 
 
 		Camera():
@@ -57,10 +57,10 @@ public:
 			 O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) ),
 			 MATRIX_INTRINSIC(getCameraMatrix("CAMERA_MATRIX_INTRINSIC")),
 			 MATRIX_EXTRINSIC(getCameraMatrix("CAMERA_MATRIX_EXTRINSIC")) 
-		{
-		   	if (MATRIX_INTRINSIC.empty() | MATRIX_EXTRINSIC.empty() )
-		   	   throw "Camera Instantiation Failed" ;
-		}
+			{
+		   	   if (MATRIX_INTRINSIC.empty() | MATRIX_EXTRINSIC.empty() )
+		   	    throw "Camera Instantiation Failed" ;
+			}
 
 private:
 
