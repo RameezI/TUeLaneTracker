@@ -23,37 +23,22 @@
 * ****************************************************************************/
 
 
-/* The following section provides configuration for compiling the appropriate setup*/
- #define PROFILER_ENABLED
- #define DISPLAY_GRAPHICS
+ #define PROFILER_ENABLED 	/**< If program is compiled with this defined, the program logs and profiles its execution*/
+ #define DISPLAY_GRAPHICS 	/**< If program is compiled with this degined, the program renders the results on to a selected display */  
 
+//#define DISPLAY_GRAPHICS_DCU /**< Define this when the graphics need to be rendered on the s32v23 DCU*/
+#define TEST_APEX_CODE	       /**< S32V234 test specific flags */
 
-//S32V234 specific flgs
+/** Provide target camera and resolution [Required for loading corresponding callibration file] */
+#define CAMERA_NAME "BUMBLE_BEE_640x480"
 
- //#define DISPLAY_GRAPHICS_DCU
- #define TEST_APEX_CODE
+//^TODO: Move it to string setting
+/** Skip frames in case of directory input */
+#define SKIP_FRAMES 0
 
-/* The following section provides configuration for Frame Input*/
-#define DIRECTORY_PNG_IMAGES	"../../DataSet"
-#define SKIP_FRAMES				0
-
-
-/* The following section provides configuration for  the camera parameters */
-#define CAMERA_RES_H  			640
-#define CAMERA_RES_V			480
-
-#define CAMERA_FOV_H			60
-#define CAMERA_FOV_V			45
-
-#define CAMERA_HEIGHT			1.5
-#define CAMERA_FOCAL_LENGTH		6.0e-3
-
-#define BASE_LINE_IBCS			0      /*< Describes base line in Image-Bottom-Coordinate-System */
-#define PURVIEW_LINE_IBCS		10     /*< Describes purview line in Image-Bottom-Coordinate-System */
-
-
-
-
+/* The following section provides configuration for LaneFilter*/
+#define BASE_LINE_IBCS		0      /*< Describes base line in Image-Bottom-Coordinate-System */
+#define PURVIEW_LINE_IBCS	10     /*< Describes purview line in Image-Bottom-Coordinate-System */
 
 #endif
 

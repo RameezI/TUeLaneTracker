@@ -26,18 +26,19 @@
 ///cm to pixel conversion, for a particular row in the image, of the #BINS_cm [Vehicle-Symmetry-CS <---> Image-Center-CS]
 cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const int Y_ICS )
 {
-	cv::Mat  lBINS_pixel;
+	cv::Mat  lMat;
 	{
 	   VectorXi lPixelBins;
 
 	   //perform computations
 	   lPixelBins = BINS_cm;
-	   eigen2cv(lPixelBins, lBINS_pixel);
+	   eigen2cv(lPixelBins, lMat);
 	}
 
-	lBINS_pixel.convertTo(lBINS_pixel, CV_32S);
-	return lBINS_pixel;
+	lMat.convertTo(lMat, CV_32S);
+	return lMat;
 }
+
 
 LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
 
@@ -56,18 +57,20 @@ LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
   PURVIEW_LINE_ICCS(PURVIEW_LINE_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),
   
   BINS_STEP_cm(10),
+  
+  BINS_MAX_cm(round(mLANE.MAX_WIDTH/BINS_STEP_cm)*BINS_STEP_cm),
 
-  COUNT_BINS( (int)( (2*mLANE.MAX_WIDTH)/BINS_STEP_cm ) + 1),
+  COUNT_BINS( (int)( (2*BINS_MAX_cm)/BINS_STEP_cm ) + 1),
 
-  BINS_cm( VectorXi::LinSpaced( COUNT_BINS, -mLANE.MAX_WIDTH, mLANE.MAX_WIDTH) ),
+  BINS_cm( VectorXi::LinSpaced( COUNT_BINS, -BINS_MAX_cm, BINS_MAX_cm) ),
   
   BASE_BINS(toPixelBINS(BINS_cm, mCAMERA, BASE_LINE_ICCS)),
 
   PURVIEW_BINS(toPixelBINS(BINS_cm, mCAMERA, PURVIEW_LINE_ICCS)),
   
-  prior( cv::Mat::zeros( (int)(mLANE.MAX_WIDTH/BINS_STEP_cm) +1, (int)(mLANE.MAX_WIDTH/BINS_STEP_cm) +1 , CV_32SC1) ),
+  prior( cv::Mat::zeros( (int)(BINS_MAX_cm/BINS_STEP_cm) +1, (int)(BINS_MAX_cm/BINS_STEP_cm) +1 , CV_32SC1) ),
   
-  filter(cv::Mat::zeros( (int)(mLANE.MAX_WIDTH/BINS_STEP_cm) +1, (int)(mLANE.MAX_WIDTH/BINS_STEP_cm) +1 , CV_32SC1) )
+  filter(cv::Mat::zeros( (int)(BINS_MAX_cm/BINS_STEP_cm) +1, (int)(BINS_MAX_cm/BINS_STEP_cm) +1 , CV_32SC1) )
   
   {
 	createPrior();

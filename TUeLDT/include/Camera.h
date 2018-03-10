@@ -38,6 +38,8 @@ friend ostream& operator<<(ostream& os, const Camera& lCamera);
 public:
 
 		const string	NAME;				/**<  Camera Identifier */
+		const cv::Mat	MATRIX_INTRINSIC;		/**<  Camera Intrinsic Parameters 3x3 */
+		const cv::Mat	MATRIX_EXTRINSIC;		/**<  Camera Extrinsic Parameters 4x4 */
 
 		const Vector2i	RES_VH; 	    		/**< Resolution of the camera image */
 		const Vector2f  FOV_VH;				/**  Field-of-View of the camera */
@@ -45,25 +47,26 @@ public:
 		const cv::Point O_ICCS_ICS;			/**< Origin of Image-Center-CS in Image-CS*/
 		const cv::Point O_ICS_ICCS;			/**< Origin of Image-CS in Image-Center-CS*/
 
-		const cv::Mat	MATRIX_INTRINSIC;		/**<  Camera Intrinsic Parameters 3x4 */
-		const cv::Mat	MATRIX_EXTRINSIC;		/**<  Camera Extrinsic Parameters 4x4 */
-
 
 		Camera():
-			 NAME ("BUMBLEBEE_640x480"), 
-			 RES_VH(Vector2i(CAMERA_RES_V, CAMERA_RES_H)),
-			 FOV_VH(Vector2f(CAMERA_FOV_V, CAMERA_FOV_H)), 
-			 O_ICCS_ICS( cv::Point( RES_VH[1]/2,  RES_VH[0]/2) ), 
-			 O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) ),
+			 NAME (CAMERA_NAME), 
 			 MATRIX_INTRINSIC(getCameraMatrix("CAMERA_MATRIX_INTRINSIC")),
-			 MATRIX_EXTRINSIC(getCameraMatrix("CAMERA_MATRIX_EXTRINSIC")) 
+			 MATRIX_EXTRINSIC(getCameraMatrix("CAMERA_MATRIX_EXTRINSIC")), 
+			 RES_VH(getCameraRES("CAMERA_RES")),
+			 FOV_VH(Vector2f(45, 60)),
+			/* FOV_VH(Vector2f(2*atan(( (RES_VH(0)/2.0) / (MATRIX_INTRINSIC.at<float>(1,1)) )*180/M_PI),
+					 2*atan(( (RES_VH(1)/2.0) / (MATRIX_INTRINSIC.at<float>(0,0)) )*180/M_PI))), */
+			 O_ICCS_ICS( cv::Point( RES_VH[1]/2,  RES_VH[0]/2) ), 
+			 O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) )
 			{
-		   	   if (MATRIX_INTRINSIC.empty() | MATRIX_EXTRINSIC.empty() )
+		   	   if (MATRIX_INTRINSIC.empty() || MATRIX_EXTRINSIC.empty() || !( RES_VH(0)>0 && RES_VH(1)>0 ))
 		   	    throw "Camera Instantiation Failed" ;
 			}
 
 private:
 
+	   std::string 	mFile; 
+		
 	   cv::Mat getCameraMatrix(std::string Mat_name)
 	   {
 		int lSuccess = 0;
@@ -71,7 +74,7 @@ private:
 		cv::Mat 	lCAMERA_MATRIX;
 
 		stringstream 	formattedString;
-		string 		file, path;
+		string 		path;
 
 		// Read location of Binary
 		char lBuff[65536];
@@ -94,40 +97,66 @@ private:
 		}
 
 		formattedString<<path<<"/ConfigFiles/Camera/"<<NAME<<".yaml";
-		file = formattedString.str();
+		mFile = formattedString.str();
 
-		struct 	stat  	buf;
-		int 	statResult = stat(file.c_str(),&buf);
+		struct 	stat  lBufStat;
+		lSuccess |= stat(mFile.c_str(),&lBufStat);
 
-		if ( (statResult != 0) | (lSuccess !=0) )
+		if ( lSuccess !=0 )
 		{
 		  #ifdef PROFILER_ENABLED
 		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
 		   <<"Unable to load camera configuration: "<<endl
-		   << "File not found: " << file.c_str() << endl;
+		   << "File not found: " << mFile.c_str() << endl;
 		  #endif
 		}
 		else
 		{
-		  cv::FileStorage loadFile( file, cv::FileStorage::READ);
+		  cv::FileStorage loadFile( mFile, cv::FileStorage::READ);
 		  loadFile[Mat_name]>> lCAMERA_MATRIX;
 		}
-		
-		return lCAMERA_MATRIX;
 
+		return lCAMERA_MATRIX;
 	   }
+
+
+
+	  Vector2i getCameraRES(std::string Mat_name)
+	  {
+	     cv::Size	lRES(0,0);
+	     int 	lSuccess = 0; 
+	     struct 	stat  lBufStat;
+
+	     
+	     lSuccess |= stat(mFile.c_str(),&lBufStat);
+
+	    if ( lSuccess != 0 )
+	    {
+	       #ifdef PROFILER_ENABLED
+	        LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+	        <<"Unable to load camera configuration: "<<endl
+	        << "File not found: " << mFile.c_str() << endl;
+	       #endif
+  	    }
+	    else
+	    {
+	     	 cv::FileStorage loadFile( mFile, cv::FileStorage::READ);
+	     	 loadFile[Mat_name]>> lRES;
+	    }
+	    return Vector2i(lRES.height, lRES.width);
+	 }
 };
 
 inline ostream& operator<<(ostream& os, const Camera& lCamera)
 {
   os<<endl<<"[Camera Propoerties]"<<endl;
   os<<"Name			: "<<lCamera.NAME<<endl;
+  os<<"Extrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_EXTRINSIC<<endl;
+  os<<"Intrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_INTRINSIC<<endl;
   os<<"Resolution[VxH]		: "<<"[ "<<lCamera.RES_VH[0]<<" x "<<lCamera.RES_VH[1]<<" ]"<<endl;
   os<<"Field-of-View [V, H]	: "<<"[ "<<lCamera.FOV_VH[0]<<" , "<<lCamera.FOV_VH[1]<<" ]"<<endl;
   os<<"Origin-ICCS-ICS		: "<<lCamera.O_ICCS_ICS<<endl;
-  os<<"Origin-ICS-ICCS		: "<<lCamera.O_ICS_ICCS<<endl;
-  os<<"Extrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_EXTRINSIC<<endl;
-  os<<"Intrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_INTRINSIC;
+  os<<"Origin-ICS-ICCS		: "<<lCamera.O_ICS_ICCS;
 
   return os;
 }

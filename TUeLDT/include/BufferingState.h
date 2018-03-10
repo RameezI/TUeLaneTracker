@@ -76,6 +76,7 @@ int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
 	{
        	   cv::String lFolder = lSourceStr;
 	   vector< cv::String> lFiles;
+	  
            
 	   try
 	   {

@@ -58,6 +58,7 @@ unique_ptr<LaneFilter> InitState::createLaneFilter()
 	   currentStatus= StateStatus::ERROR;
 	}
 
+	cout << "FOV" << flush;
 	return lLaneFilter;	
 }
 
@@ -105,12 +106,14 @@ unique_ptr<Templates> InitState::createTemplates()
 
 	unique_ptr<Templates> lTemplates;
 
+
 	try
 	{
 	  Camera 		lCamera;
 	  LaneProperties    	lLane;
 	  LaneFilter 		lLaneFilter(lLane, lCamera);
 	  VanishingPtFilter 	lVanishingPtFilter;
+
 	
 	  lTemplates	 = unique_ptr<Templates>
 	  		   ( new  Templates (lCamera.RES_VH(0), lCamera.RES_VH(1), lCamera.FOV_VH(0), lVanishingPtFilter.RANGE_V) );
