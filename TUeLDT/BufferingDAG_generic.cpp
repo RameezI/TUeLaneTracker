@@ -66,7 +66,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 mProfiler.start("EXTRACT_ROI");
 #endif
 
-	 int lRowIndex	= mHORIZON_ICCS + mCAMERA.O_ICCS_ICS.y; //Horizon in Image-CS
+	 int lRowIndex	= mCAMERA.RES_VH(0) -mSPAN;
 	 int lColIndex;
 	 cv::Rect lROI;
 
@@ -74,7 +74,7 @@ mProfiler.start("EXTRACT_ROI");
 	 lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
 	 mFrameGRAY_ROI = mFrameGRAY(lROI);
 
-	 //Extract Correponding Gradient Orientation Template
+	 //Extract Corrseponding Gradient Orientation Template
 	 lRowIndex =  mCAMERA.RES_VH(0) - (mVP_RANGE_V + mVanishPt.V);
 	 lColIndex =  mCAMERA.RES_VH(1) - (mCAMERA.O_ICCS_ICS.y - mVanishPt.H) ;
 	 lROI	   =  cv::Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSPAN);

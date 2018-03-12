@@ -125,8 +125,8 @@ int StateMachine::spin()
 		   (new BufferingState<BufferingDAG_generic>());
 		  #endif
 	
-		  //For Testing Dispose the STATE_MACHINE when Booting is DONE!	
-		  mCurrentState 	= States::DISPOSED;
+		
+		  mCurrentState 	= States::BUFFERING;
 		  mPtrBootingState 	= nullptr;
 		  cout<< "Completed!" <<endl;
 
@@ -196,7 +196,8 @@ int StateMachine::spin()
 		    (new TrackingLaneState<TrackingLaneDAG_generic>( move(mPtrBufferingState->mGraph) ) );
 		   #endif
 
-		   mCurrentState 	= States::DETECTING_LANES;
+		   //^TODO: CHANGE DISPOSED TO TRACKING [DISPOSED IS FOR TESTING ONLY]
+		   mCurrentState 	= States::DISPOSED;
 		   mPtrBufferingState 	= nullptr;
 
 		   cout<<"Completed!"<<endl;
