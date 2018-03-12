@@ -30,15 +30,14 @@
 #define TEST_APEX_CODE	       /**< S32V234 test specific flags */
 
 /** Provide target camera and resolution [Required for loading corresponding callibration file] */
-#define CAMERA_NAME "BUMBLE_BEE_640x480"
+#define CAMERA_NAME "BUMBLEBEE_640x480"
 
-//^TODO: Move it to string setting
-/** Skip frames in case of directory input */
-#define SKIP_FRAMES 0
+//^TODO: Move it to sourceString
+#define SKIP_FRAMES 0 			//Skip frames in case of directory input
 
-/* The following section provides configuration for LaneFilter*/
+//Configuration for LaneFilter
 #define BASE_LINE_IBCS		0      /*< Describes base line in Image-Bottom-Coordinate-System */
-#define PURVIEW_LINE_IBCS	10     /*< Describes purview line in Image-Bottom-Coordinate-System */
+#define PURVIEW_LINE_IBCS	120     /*< Describes purview line in Image-Bottom-Coordinate-System */
 
 #endif
 

@@ -26,16 +26,44 @@
 ///cm to pixel conversion, for a particular row in the image, of the #BINS_cm [Vehicle-Symmetry-CS <---> Image-Center-CS]
 cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const int Y_ICS )
 {
-	cv::Mat  lMat;
-	{
-	   VectorXi lPixelBins;
 
-	   //perform computations
+	cv::Mat  lMat = cv::Mat(BINS_cm.size(),1,CV_32S);
+
+	{
+	   cv::Mat  lIMG_TO_W;	//Image-Center-CS to Vehicle-Symmetry-CS tranformation, planar homography
+	   cv::Mat  lW_TO_IMG;	//Vehicle-Symmetry-CS to Image-Center-CS transformation 
+
+	   cv::Mat  lImgPt	= cv::Mat(3,1, CV_32F);
+	   cv::Mat  lWorldPt	= cv::Mat(3,1, CV_32F);
+
+
+	   // 3x3 Planar-Homography from the 4x4 Extrinsic Matrix and 3x3 Intrinsic Matrix
+	   cv::Mat a = CAM.MATRIX_EXTRINSIC(cv::Range(0,3), cv::Range(0,2));
+	   cv::Mat b = CAM.MATRIX_EXTRINSIC(cv::Range(0,3), cv::Range(3,4));
+	   cv::hconcat(a, b, lW_TO_IMG);
+
+	   lW_TO_IMG = CAM.MATRIX_INTRINSIC * lW_TO_IMG;
+
+	   lIMG_TO_W = lW_TO_IMG.inv();
+
+	   lImgPt.at<float>(0,0) = 0;
+	   lImgPt.at<float>(1,0) = (float)Y_ICS; 
+	   lImgPt.at<float>(2,0) = 1;
+
+	   lWorldPt = lIMG_TO_W * lImgPt;
+	   lWorldPt = lWorldPt/lWorldPt.at<float>(2);
+	   
+	   VectorXi lPixelBins;
 	   lPixelBins = BINS_cm;
-	   eigen2cv(lPixelBins, lMat);
+
+	   for(int i=0; i< BINS_cm.size(); i++)
+	   {
+		lWorldPt.at<float>(0)	= BINS_cm[i]/100.0;
+		lImgPt = lW_TO_IMG * lWorldPt;
+	 	lMat.at<int32_t>(i,0) = round(lImgPt.at<float>(0,0)/lImgPt.at<float>(0,2)) ;
+	   }
 	}
 
-	lMat.convertTo(lMat, CV_32S);
 	return lMat;
 }
 
@@ -50,7 +78,7 @@ LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
 
   O_ICS_ICCS(mCAMERA.O_ICS_ICCS),
 
-  O_IBCS_ICS(cv::Point(0, mCAMERA.RES_VH(1))),
+  O_IBCS_ICS(cv::Point(0, mCAMERA.RES_VH(0))),
 
   BASE_LINE_ICCS(BASE_LINE_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),  
 

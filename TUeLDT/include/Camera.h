@@ -49,13 +49,12 @@ public:
 
 
 		Camera():
-			 NAME (CAMERA_NAME), 
+			 NAME (CAMERA_NAME),
 			 MATRIX_INTRINSIC(getCameraMatrix("CAMERA_MATRIX_INTRINSIC")),
 			 MATRIX_EXTRINSIC(getCameraMatrix("CAMERA_MATRIX_EXTRINSIC")), 
 			 RES_VH(getCameraRES("CAMERA_RES")),
-			 FOV_VH(Vector2f(45, 60)),
-			/* FOV_VH(Vector2f(2*atan(( (RES_VH(0)/2.0) / (MATRIX_INTRINSIC.at<float>(1,1)) )*180/M_PI),
-					 2*atan(( (RES_VH(1)/2.0) / (MATRIX_INTRINSIC.at<float>(0,0)) )*180/M_PI))), */
+			 FOV_VH(Vector2f(2*atan( (RES_VH(0)/2.0) / (MATRIX_INTRINSIC.at<float>(1,1)) )*180/M_PI ,
+					 2*atan( (RES_VH(1)/2.0) / (MATRIX_INTRINSIC.at<float>(0,0)) )*180/M_PI )),
 			 O_ICCS_ICS( cv::Point( RES_VH[1]/2,  RES_VH[0]/2) ), 
 			 O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) )
 			{
@@ -64,27 +63,25 @@ public:
 			}
 
 private:
-
-	   std::string 	mFile; 
-		
 	   cv::Mat getCameraMatrix(std::string Mat_name)
 	   {
+
 		int lSuccess = 0;
 
 		cv::Mat 	lCAMERA_MATRIX;
 
-		stringstream 	formattedString;
-		string 		path;
+		stringstream 	lFormattedString;
+		string 		lFile, lPath;
 
 		// Read location of Binary
 		char lBuff[65536];
-		ssize_t len = ::readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
+		ssize_t lLen = ::readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
 
-		if (len!=-1)
+		if (lLen!=-1)
 		{
-		  path = std::string(lBuff);
-		  std::string::size_type Idx = path.find_last_of("/");
-		  path = path.substr(0,Idx);
+		  lPath = std::string(lBuff);
+		  std::string::size_type Idx = lPath.find_last_of("/");
+		  lPath = lPath.substr(0,Idx);
 		}
 		else
 		{
@@ -96,23 +93,23 @@ private:
 		  lSuccess =-1;
 		}
 
-		formattedString<<path<<"/ConfigFiles/Camera/"<<NAME<<".yaml";
-		mFile = formattedString.str();
+		lFormattedString<<lPath<<"/ConfigFiles/Camera/"<<NAME<<".yaml";
+		lFile = lFormattedString.str();
 
 		struct 	stat  lBufStat;
-		lSuccess |= stat(mFile.c_str(),&lBufStat);
+		lSuccess |= stat(lFile.c_str(),&lBufStat);
 
 		if ( lSuccess !=0 )
 		{
 		  #ifdef PROFILER_ENABLED
 		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
 		   <<"Unable to load camera configuration: "<<endl
-		   << "File not found: " << mFile.c_str() << endl;
+		   << "File not found: " << lFile.c_str() << endl;
 		  #endif
 		}
 		else
 		{
-		  cv::FileStorage loadFile( mFile, cv::FileStorage::READ);
+		  cv::FileStorage loadFile( lFile, cv::FileStorage::READ);
 		  loadFile[Mat_name]>> lCAMERA_MATRIX;
 		}
 
@@ -123,40 +120,71 @@ private:
 
 	  Vector2i getCameraRES(std::string Mat_name)
 	  {
-	     cv::Size	lRES(0,0);
-	     int 	lSuccess = 0; 
-	     struct 	stat  lBufStat;
 
-	     
-	     lSuccess |= stat(mFile.c_str(),&lBufStat);
+	     	int 		lSuccess = 0; 
+	     	cv::Size	lRES(0,0);
 
-	    if ( lSuccess != 0 )
-	    {
-	       #ifdef PROFILER_ENABLED
-	        LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-	        <<"Unable to load camera configuration: "<<endl
-	        << "File not found: " << mFile.c_str() << endl;
-	       #endif
-  	    }
-	    else
-	    {
-	     	 cv::FileStorage loadFile( mFile, cv::FileStorage::READ);
-	     	 loadFile[Mat_name]>> lRES;
-	    }
-	    return Vector2i(lRES.height, lRES.width);
+		stringstream 	lFormattedString;
+		string 		lFile, lPath;
+
+		// Read location of Binary
+		char lBuff[65536];
+		ssize_t lLen = ::readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
+
+		if (lLen!=-1)
+		{
+		  lPath = std::string(lBuff);
+		  std::string::size_type Idx = lPath.find_last_of("/");
+		  lPath = lPath.substr(0,Idx);
+		}
+		else
+		{
+		  #ifdef PROFILER_ENABLED
+		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		   <<"Unable to find the path to binary"<<endl
+		   <<"[Searching for Camera configuration files]: "<<endl;
+		  #endif
+		  lSuccess =-1;
+		}
+
+		lFormattedString<<lPath<<"/ConfigFiles/Camera/"<<NAME<<".yaml";
+		lFile = lFormattedString.str();
+
+	     	struct  stat  lBufStat;
+
+	     	lSuccess |= stat(lFile.c_str(),&lBufStat);
+
+	    	if ( lSuccess != 0 )
+	    	{
+	       	  #ifdef PROFILER_ENABLED
+		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		  <<"Unable to load camera configuration: "<<endl
+		  << "File not found: " << lFile.c_str() << endl;
+	          #endif
+	    	}
+	    	else
+	    	{
+		  cv::FileStorage loadFile( lFile, cv::FileStorage::READ);
+		  loadFile[Mat_name]>> lRES;
+	    	}
+
+	   	 return Vector2i(lRES.height, lRES.width);
 	 }
 };
 
 inline ostream& operator<<(ostream& os, const Camera& lCamera)
 {
-  os<<endl<<"[Camera Propoerties]"<<endl;
+  os<<endl<<"[Camera Properties]"<<endl;
+
+  os<<"***********************************************"<<endl;
   os<<"Name			: "<<lCamera.NAME<<endl;
-  os<<"Extrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_EXTRINSIC<<endl;
-  os<<"Intrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_INTRINSIC<<endl;
+  os<<"Extrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_EXTRINSIC<<endl<<endl;
+  os<<"Intrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_INTRINSIC<<endl<<endl;
   os<<"Resolution[VxH]		: "<<"[ "<<lCamera.RES_VH[0]<<" x "<<lCamera.RES_VH[1]<<" ]"<<endl;
   os<<"Field-of-View [V, H]	: "<<"[ "<<lCamera.FOV_VH[0]<<" , "<<lCamera.FOV_VH[1]<<" ]"<<endl;
   os<<"Origin-ICCS-ICS		: "<<lCamera.O_ICCS_ICS<<endl;
-  os<<"Origin-ICS-ICCS		: "<<lCamera.O_ICS_ICCS;
+  os<<"Origin-ICS-ICCS		: "<<lCamera.O_ICS_ICCS<<endl;
+  os<<"***********************************************"<<endl;
 
   return os;
 }

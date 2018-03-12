@@ -72,17 +72,35 @@ protected:
 	/*................................................
 	 Set from outside, before buffering is activated   */ 
 
-	int				mHORIZON_ICCS;
-	int 				mVP_RANGE_V;
-	int 				mSPAN;
-	
-	cv::Mat	 			mGRADIENT_TAN_ROOT;
-   	cv::Mat				mFOCUS_MASK_ROOT;
-    	cv::Mat				mDEPTH_MAP_ROOT;
+	int		mHORIZON_ICCS; 		/**< /brief Position of Horizon in the Image-Center-CS [pixels]
+				 	  	*  /n +ve value implies that the ROI is below the center line.
+					  	*  /n -ve value implies that the ROI is above the center line. */
 
-	cv::Mat     			mX_ICS;
-	cv::Mat     			mY_ICS;
+	int 		mVP_RANGE_V;      	/**< Vertical range of the vanishing-point in either direction [pixels] */
+
+	int 		mSPAN;			/**< Vertical size  of the ROI [pixels]
+						* /n Automatically calculated from  #HORIZON_ICCS and #VP_RANGE_V */
 	
+	cv::Mat	 	mGRADIENT_TAN_ROOT;	/**< ROOT-TEMPLATE for extracting gradient tangents reference.
+				  		* /n The size of /em GRADIENT_TAN_ROOT is [2x#RES_V +1 , 2x#RES_H +1] */
+
+	cv::Mat		mFOCUS_MASK_ROOT; 	/**< /brief ROOT-TEMPLATE for extracting mask to compensate pitch movements.
+						* /n The size of /em FOCUS ROOT is [#SPAN + (2x#VP_RANGE_V), #RES_H]
+						* /n Normal activation all elements in rowrange (#SPAN - #VP_RANGE) = 255
+						* /n Best   activation all elements in #SPAN = 255
+						* /n Worst  activation all elements in rowrange (#SPAN - 2x#VP_RANGE) = 255 */
+
+    	cv::Mat		mDEPTH_MAP_ROOT;	/**< ROOT-TEMPLATE for assigning perspective weights to the pixels.
+				     		* /n The size of /em DEPTH_MAP_ROOT is [#RES_V, #RES_H] */
+
+	cv::Mat     	mX_ICS;	 		/**< X-Coordinates of the ROI in the Image-Coordinate-System.
+				   		* /n The size of /em X_ICS is [#SPAN, #RES_H] */
+
+	cv::Mat     	mY_ICS;  		/**< X-Coordinates of the ROI in the Image-Coordinate-System.
+				   		* /n The size of /em X_ICS is [#SPAN, #RES_H] */
+
+	
+	/**< A buffer, of pre-specified number, for temporal pooling of probability frames and corresponding gradient orientations*/
 	unique_ptr<BufferPool<BufferingDAG_generic>>	mBufferPool;
 	/***************************************************/
 

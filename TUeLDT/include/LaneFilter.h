@@ -90,29 +90,36 @@ public:	 	//Public Interface
 
 		std::vector<BaseHistogramModel>  	baseHistogramModels; /** <Provides a filtered list of Lane models 
 									  	constructed from a multimodal base histogram.*/
-
-
 };
 
 
 		
 inline ostream& operator<<(ostream& os, const LaneFilter& laneFilter)
 {
-  os<<endl<<"LaneFilter Propoerties:"<<endl;
+  os<<endl<<"[LaneFilter Properties]"<<endl;
+  os<<"***********************************************************************"<<endl;
   os<<endl<<laneFilter.mLANE<<endl;
   os<<endl<<laneFilter.mCAMERA<<endl;
 
-/*
-  os<<"Name			: "<< lCamera.NAME<<endl;
-  os<<"Resolution [VxH]		: "<< "[ "<<lCamera.RES_VH[0]<<" x "<<lCamera.RES_VH[1]<<" ]"<<endl;
-  os<<"Field-of-View [V, H]	: "<< "[ "<<lCamera.FOV_VH[0]<<" , "<<lCamera.FOV_VH[1]<<" ]"<<endl;
-  os<<"Origin-ICCS-ICS 		: "<< lCamera.O_ICCS_ICS<<endl;
-  os<<"Origin-ICS-ICCS 		: "<< lCamera.O_ICS_ICCS<<endl;
-  os<<"Extrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_EXTRINSIC<<endl;
-  os<<"Intrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_INTRINSIC<<endl;
-*/
-  return os;
+  os<<"Origin of Image-Center-CS in Image-CS:	"<<laneFilter.O_ICCS_ICS<<endl;
+  os<<"Origin of Image-CS in Image-Center-CS:	"<<laneFilter.O_ICS_ICCS<<endl;
+  os<<"Origin of Image-Base-CS in Image-CS:	"<<laneFilter.O_IBCS_ICS<<endl;
 
+  os<<"Y-coordinate  of base-line in Image-Center-CS:	 "<<laneFilter.BASE_LINE_ICCS<<endl;		
+  os<<"Y-coordinate  of purview-line in Image-Center-CS: "<<laneFilter.PURVIEW_LINE_ICCS<<endl;  
+
+  os<<"BINS_cm step size:	"<<laneFilter.BINS_STEP_cm<<endl;
+  os<<"BINS_cm MAX  value:	"<<laneFilter.BINS_MAX_cm<<endl;
+  os<<"Total number of BINS	"<<laneFilter.COUNT_BINS<<endl;
+  os<<"BINS in cm:		"<<endl<<laneFilter.BINS_cm<<endl<<endl;	
+  os<<"Base-line BINS:		"<<endl<<laneFilter.BASE_BINS<<endl<<endl;
+  os<<"Purview-line BINS:	"<<endl<<laneFilter.PURVIEW_BINS<<endl;
+
+  os<<"************************************************************************"<<endl;
+ // os<<"Lane prior:		"<<endl<<laneFilter.prior<<endl;
+ // os<<"Lane filter		"<<endl<<laneFilter.filter<<endl;			
+
+  return os;
 }
 
 #endif // LANE_FILTER_H

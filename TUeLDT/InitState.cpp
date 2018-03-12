@@ -57,8 +57,6 @@ unique_ptr<LaneFilter> InitState::createLaneFilter()
 	   mLaneFilterCreated = false;
 	   currentStatus= StateStatus::ERROR;
 	}
-
-	cout << "FOV" << flush;
 	return lLaneFilter;	
 }
 

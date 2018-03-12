@@ -26,9 +26,9 @@ int main( int argc, char** argv )
 
 
     // 3x3 Intrinsic Parameters
-    Mat CameraMatrixIntrinsic = (Mat_<float>(3,4) << 185.75209,    0,  		0,
-						     	0,  	99.41125,  	0,
-						    	0,  	   0,  		0 );
+    Mat CameraMatrixIntrinsic = (Mat_<float>(3,3) << 554.25626,    0,  		0,
+						     	0,  	579.41125,  	0,
+						    	0,  	   0,  		1 );
 
     // 4x4  Extrinsic Parameters [Homogenous Transformation]
     Mat CameraMatrixExtrinsic = (Mat_<float>(4,4)<< 1,  0,  0,   0,
@@ -43,18 +43,20 @@ int main( int argc, char** argv )
     fs << "CAMERA_MATRIX_EXTRINSIC" << CameraMatrixExtrinsic;
    
     fs.release();
+    cout<< "Callibration file written!" <<endl<<endl;
   }
 
   else
   {
-    cout<< "Missing Command Line Options" <<endl<<endl;
-
-    cout<< "Usage:"<<endl;
-    cout<< "	cameraCallibrator <char*> NAME_OF_THE_CALLIBRAION FILE " <<endl;
+    cerr<<endl<<"Missing arguments!"<<endl;
+    cout<<endl<<"Usage:"<<endl;
+    cout<< "	  ./cameraCallibrator IDENTIFIER_FOR_THE_CAMERA " <<endl;
+    cout<< "Example:"<<endl;
+    cout<< "	  ./cameraCallibrator MAXIM_OV10640"<<endl<<endl<<endl;
     
     lReturn = -1;
 
   }   
-    cout << "Program exited with return value: "<< lReturn <<endl;
+    cout << "Program exited with return value: "<< lReturn <<endl<<endl;
     return lReturn;
 }

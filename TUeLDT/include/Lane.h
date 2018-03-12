@@ -84,11 +84,13 @@ struct LaneMembership
 
 inline ostream& operator<<(ostream& os, const LaneProperties& laneProperties)
 {
-  os<<"[Lane Propoerties]"<<endl;
+  os<<"[Lane Properties]"<<endl;
+  os<<"****************************"<<endl;
   os<<"Average Width		: "<< laneProperties.AVG_WIDTH<<endl;
   os<<"Standard Deviaion 	: "<< laneProperties.STD_WIDTH<<endl;
   os<<"Minimum  Width 	  	: "<< laneProperties.MIN_WIDTH<<endl;
-  os<<"Maximum  Width 		: "<< laneProperties.MAX_WIDTH;
+  os<<"Maximum  Width 		: "<< laneProperties.MAX_WIDTH<<endl;
+  os<<"****************************"<<endl;
   return os;
 }
 
