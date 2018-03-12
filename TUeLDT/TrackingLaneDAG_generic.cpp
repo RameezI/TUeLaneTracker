@@ -39,7 +39,7 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
 int TrackingLaneDAG_generic::init_DAG()
 {
 
-	mX_VPRS.convertTo(mX_VPRS_SCALED, CV_32S, SCALE_INTSEC );
+	mX_ICCS.convertTo(mX_ICCS_SCALED, CV_32S, SCALE_INTSEC );
 
         mHistBase      = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
         mHistPurview   = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
@@ -102,14 +102,14 @@ mProfiler.start("COMPUTE_INTERSECTIONS");
 #endif	
 
 	//Base Intersections
-	subtract(mLaneFilter->OFFSET_V, mY_VPRS, mIntBase, cv::noArray(), CV_32S);
+	subtract(-mLaneFilter->OFFSET_V, -mY_ICCS, mIntBase, cv::noArray(), CV_32S);
 	divide(mIntBase, mGradTanFocussed, mIntBase, SCALE_INTSEC_TAN, CV_32S);
-	add(mIntBase, mX_VPRS_SCALED, mIntBase);
+	add(mIntBase, mX_ICCS_SCALED, mIntBase);
 	
 	//Purview Intersections
-	subtract(mVpFilter->OFFSET_V, mY_VPRS, mIntPurview, cv::noArray(), CV_32S);
+	subtract(-mVpFilter->OFFSET_V, -mY_ICCS, mIntPurview, cv::noArray(), CV_32S);
 	divide(mIntPurview,mGradTanFocussed, mIntPurview, SCALE_INTSEC_TAN, CV_32S);
-	add(mIntPurview, mX_VPRS_SCALED, mIntPurview);
+	add(mIntPurview, mX_ICCS_SCALED, mIntPurview);
 
 	
 	
@@ -179,9 +179,9 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 	   int32_t* 	HistBase_pixelPTR    	=  mHistBase.ptr<int32_t>(0);
 	   int32_t* 	HistPurview_pixelPTR 	=  mHistPurview.ptr<int32_t>(0);
 
-	   uint16_t   lBaseBinIdx;
-	   uint16_t   lPurviewBinIdx;
-	   int32_t    lWeightBin;
+	   uint16_t   	lBaseBinIdx;
+	   uint16_t   	lPurviewBinIdx;
+	   int32_t    	lWeightBin;
 
 	   for (int i = 0; i < mMAX_PIXELS_ROI; i++,IN_basePTR++,IN_purviewPTR++, IN_weightsPTR++ , IN_maskPTR++)
 	   {
@@ -372,33 +372,27 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("VP_HISTOGRAM_MATCHING");
 #endif
-
-	const int delta= round(mLaneFilter->STEP/2.0);
 	
 	{	
 	   int   		bestPosteriorProb  = 0;
-	   int32_t* 	HistPurviewPTR     =  mHistPurview.ptr<int32_t>(0);
+	   int32_t* 		HistPurviewPTR     =  mHistPurview.ptr<int32_t>(0);
 
 	
-	   const float left_VP  = ((-mLaneModel.leftOffset  - delta)
-				  +(-mLaneModel.leftOffset  + delta))
-				/2.0;													
+	   const float left_VP  = -mLaneModel.leftOffset ;												
 	
-	   const float right_VP  = ((mLaneModel.rightOffset  - delta)
-				   +(mLaneModel.rightOffset  + delta))
-				/2.0;
+	   const float right_VP  = mLaneModel.rightOffset ;
 				
 		
 	   const int    FRAME_CENTER_V		= mCAMERA.FRAME_CENTER(0);
 	   const float  PIXEL_TO_CM     	= 1.0/mCAMERA.CM_TO_PIXEL;
 
-	   const int    VP_FILTER_OFFSET = mVpFilter->OFFSET_V;
-	   const int    VP_HIST_STEP	 = mVpFilter->STEP;
-	   const int    VP_HIST_START	 = mVpFilter->HISTOGRAM_BINS(0);
-	   const int    VP_HIST_SIZE	 = mVpFilter->HISTOGRAM_BINS.size();
-	   const int    VP_HIST_END	 	 = mVpFilter->HISTOGRAM_BINS(VP_HIST_SIZE-1);
-	   const float  VP_HIST_RATIO  	 = mVpFilter->mVP_LANE_RATIO;
-	   const float  WIDTH_FACTOR   	 = PIXEL_TO_CM* 1.0/VP_HIST_RATIO;
+	   const int    VP_FILTER_OFFSET 	= mVpFilter->OFFSET_V;
+	   const int    VP_HIST_STEP	 	= mVpFilter->STEP;
+	   const int    VP_HIST_START	 	= mVpFilter->HISTOGRAM_BINS(0);
+	   const int    VP_HIST_SIZE	 	= mVpFilter->HISTOGRAM_BINS.size();
+	   const int    VP_HIST_END	 	= mVpFilter->HISTOGRAM_BINS(VP_HIST_SIZE-1);
+	   const float  VP_HIST_RATIO  	 	= mVpFilter->mVP_LANE_RATIO;
+	   const float  WIDTH_FACTOR   	 	= PIXEL_TO_CM* 1.0/VP_HIST_RATIO;
 		
 
 	   float  IntSecLeft, IntSecRight; 
@@ -419,16 +413,14 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 	   for(int v=0; v < mVpFilter->mNb_VP_BINS_V;v++)
 	   {	for(int h=0; h < mVpFilter->mNb_VP_BINS_H; h++)
 		{
-			
-		   //Convert from Center to VP Coordinate system
-		   const	int&  binV = -mVpFilter->VP_BINS_V(v);
+		   const	int&  binV = mVpFilter->VP_BINS_V(v);
 		   const 	int&  binH = mVpFilter->VP_BINS_H(h);
 		
-		   IntSecLeft = ((binH - left_VP)/(float)(binV+FRAME_CENTER_V))
+		   IntSecLeft = ((binH - left_VP)/(float)(binV - FRAME_CENTER_V))
 					 *(VP_FILTER_OFFSET - binV) +binH;
 
 
-		   IntSecRight 	= ((binH - right_VP)/(float)(binV+FRAME_CENTER_V))
+		   IntSecRight 	= ((binH - right_VP)/(float)(binV - FRAME_CENTER_V))
 				  *(VP_FILTER_OFFSET - binV) +binH;
 
 
@@ -493,7 +485,7 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		      if(mPosteriorProbVP > bestPosteriorProb)
 		      {
 			   bestPosteriorProb=mPosteriorProbVP;
-			   mVanishPt.V = -binV;
+			   mVanishPt.V =  binV;
 			   mVanishPt.H =  binH;
 		      }
 
@@ -544,10 +536,10 @@ mProfiler.start("DISPLAY");
 
 	   //Lane Bundaries
 	   Point  Start_leftLaneInner( mCAMERA.FRAME_CENTER(1) 	-  
-		((int)( mLaneModel.leftOffset  + delta)/mLaneFilter->STEP)*mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
+		((int)( mLaneModel.leftOffset)/mLaneFilter->STEP)*mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
 
 	   Point  Start_rightLaneInner( mCAMERA.FRAME_CENTER(1) +  
-		((int)( mLaneModel.rightOffset - delta)/mLaneFilter->STEP)*mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
+		((int)( mLaneModel.rightOffset)/mLaneFilter->STEP)*mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
 	
 	   Point  StartMidLane( ((int)((Start_leftLaneInner.x + Start_rightLaneInner.x)/2.0)/ mLaneFilter->STEP)* 
 		  mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
@@ -592,8 +584,8 @@ mProfiler.start("DISPLAY");
 
 	   //Draw Purview Line
 	   line(mFrameRGB,
-	     cvPoint(0, mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V),
-	     cvPoint(mCAMERA.RES_VH(1), mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V),
+	     cvPoint(0, mCAMERA.FRAME_CENTER(0) +  mVpFilter->OFFSET_V),
+	     cvPoint(mCAMERA.RES_VH(1), mCAMERA.FRAME_CENTER(0) + mVpFilter->OFFSET_V),
 	     CvScalar(0,0,0),
 	     1
 	    );
@@ -627,8 +619,8 @@ mProfiler.start("DISPLAY");
 
 		int x = mCAMERA.FRAME_CENTER(1)+ mVpFilter->HISTOGRAM_BINS(i);
 		//if(x !=  StartMidLane.x)
-		line(mFrameRGB, cvPoint(x,mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V), 
-				cvPoint(x,mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V-30), cvScalar(0,0,0), 1);
+		line(mFrameRGB, cvPoint(x,mCAMERA.FRAME_CENTER(0) + mVpFilter->OFFSET_V), 
+				cvPoint(x,mCAMERA.FRAME_CENTER(0) + mVpFilter->OFFSET_V-30), cvScalar(0,0,0), 1);
 	   }
 
 

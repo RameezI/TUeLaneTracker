@@ -67,7 +67,7 @@ private:
 	VanishingPtFilter*	mVpFilter;
 	
 	
-	cv::Mat 		mX_VPRS_SCALED;	
+	cv::Mat 		mX_ICCS_SCALED;	
 	cv::Mat 		mIntBase;           
 	cv::Mat			mIntPurview;
 	cv::Mat 		mIntWeights;

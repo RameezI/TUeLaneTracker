@@ -118,8 +118,8 @@ protected:
 	cv::Mat 			mGradTanTemplate;
 	cv::Mat 			mDepthTemplate;
 	cv::Mat 			mFocusTemplate;
-	cv::Mat 			mX_VPRS;
-	cv::Mat 			mY_VPRS;
+	cv::Mat 			mX_ICCS;
+	cv::Mat 			mY_ICCS;
 
 
 	// Temporary Probability Maps
@@ -198,8 +198,8 @@ public:
 	   mProbMap_GradDir		= std::move(bufferingGraph.mProbMap_GradDir);
 	
 	   mFrameCount			= std::move(bufferingGraph.mFrameCount);
-	   mX_VPRS			= std::move(bufferingGraph.mX_VPRS);
-	   mY_VPRS			= std::move(bufferingGraph.mY_VPRS);
+	   mX_ICCS			= std::move(bufferingGraph.mX_ICCS);
+	   mY_ICCS			= std::move(bufferingGraph.mY_ICCS);
 		
 	   mSource			= std::move(bufferingGraph.mSource);
 	   mFiles			= std::move(bufferingGraph.mFiles);

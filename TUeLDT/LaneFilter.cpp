@@ -38,7 +38,7 @@ LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
   
   mNb_OFFSET_BINS(floor((mNb_HISTOGRAM_BINS-1)/2) +1),
 
-  OFFSET_V(-240),
+  OFFSET_V(240),
   
   HISTOGRAM_BINS(VectorXi::LinSpaced(mNb_HISTOGRAM_BINS,-mBIN_MAX, mBIN_MAX)),
   
