@@ -17,9 +17,15 @@ What things you need to install the software and how to install them
 * OpenCv-3.1.0
 * Boostv-1.62.0
 ```
-[OpenCV Installaion Guide](http://docs.opencv.org/3.1.0/d7/d9f/tutorial_linux_install.html)
+[OpenCV Installation Guide](http://docs.opencv.org/3.1.0/d7/d9f/tutorial_linux_install.html)
+
 [Boost Library Sources](http://www.boost.org/users/history/version_1_62_0.html)
 
+Ubuntu 17.10 Installation:
+```
+sudo apt-get install libboost-dev-all
+```
+[Ubuntu 16.04 Installation Guide](https://askubuntu.com/questions/859333/how-to-install-libboost-version1-59-or-newer-on-ubuntu16-04)
 
 
 ### Build, Install and Run the Application
@@ -101,7 +107,7 @@ Currently, the callibration is parameterized in the corresponding header files. 
 * [OpenCV3.1](http://docs.opencv.org/3.1.0/index.html) - Copmputer vision library
 * [CMake](https://maven.apache.org/) - Dependency management and makefiles generation
 * [Eigen 3.3.3](http://eigen.tuxfamily.org/index.php?title=Main_Page) - Linear Algebra  library
-* [Boost 1.62.0]((http://www.boost.org/users/history/version_1_62_0.html) - Provides Program Options
+* [Boost 1.62.0](http://www.boost.org/users/history/version_1_62_0.html) - Provides Program Options
 
 
 ## Contributing
