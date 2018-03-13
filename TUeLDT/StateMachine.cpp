@@ -196,8 +196,7 @@ int StateMachine::spin()
 		    (new TrackingLaneState<TrackingLaneDAG_generic>( move(mPtrBufferingState->mGraph) ) );
 		   #endif
 
-		   //^TODO: CHANGE DISPOSED TO TRACKING [DISPOSED IS FOR TESTING ONLY]
-		   mCurrentState 	= States::DISPOSED;
+		   mCurrentState 	= States::DETECTING_LANES;
 		   mPtrBufferingState 	= nullptr;
 
 		   cout<<"Completed!"<<endl;

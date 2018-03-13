@@ -123,6 +123,12 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("COMPUTE_INTERSECTIONS");
 #endif	
+	{
+	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::WRITE);
+	  file<<"mY_ICCS"<<mY_ICCS;
+	  file<<"mGradTanFocussed"<<mGradTanFocussed;
+	  file<<"mProbMapFocussed"<<mProbMapFocussed;
+	}
 
 	//Base Intersections
 	subtract(-mLaneFilter->BASE_LINE_ICCS, -mY_ICCS, mIntBase, cv::noArray(), CV_32S);
@@ -209,19 +215,11 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 	   {
 	      if(!(*lPtrMask ==0) )
 	      {		
+		 lBaseBinIdx	= (*lPtrIntBase    - mLOWER_LIMIT_BASE    + (mSTEP_BASE/2))/mSTEP_BASE;
 
-		//^TODO: Add members: mSCALED_BASE_BINS, mSCALED_PURVIEW_BINS
-		// 	
- 		// auto const lBaseIdx = std::lower_bound(mSCALED_BASE_BINS.begin(), mSCALED_BASE_BINS.end(), *lPtrIntBase);
-		//if (it != mSCALED_BASE_BINS.begin())
-		//  if(mSCALED_BASE_BINS(lBASEIdx) - *lPtrIntBase >  *PtrIntBase - mSCALED_BASE_BINS(lBaseIdx-1))
-		//  lBaseIdx--;
-
-		lBaseBinIdx	= (*lPtrIntBase    - mLOWER_LIMIT_BASE    + (mSTEP_BASE/2))/mSTEP_BASE;
-
-		lPurviewBinIdx	= (*lPtrIntPurview - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW/2))/mSTEP_PURVIEW;
+		 lPurviewBinIdx	= (*lPtrIntPurview - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW/2))/mSTEP_PURVIEW;
 		
-	         lWeightBin = *lPtrWeights;
+	         lWeightBin 	= *lPtrWeights;
 		
 	         *(lPtrHistBase     + lBaseBinIdx   )  	+= lWeightBin;
 	         *(lPtrHistPurview  + lPurviewBinIdx) 	+= lWeightBin;
@@ -402,7 +400,7 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 	   const int& 	lBaseLine		= mLaneFilter->BASE_LINE_ICCS;
 	   const int& 	lPurviewLine		= mLaneFilter->PURVIEW_LINE_ICCS;
 	
-	   int		lIntSecLeft, lIntSecRight, lWidth_cm;
+	   int32_t	lIntSecLeft, lIntSecRight, lWidth_cm;
 
 	   size_t  	lIdx_BL, lIdx_Mid, lIdx_BR, lIdx_NBL, lIdx_NBR, lCount_NBL, lCount_NBR;
 
@@ -422,17 +420,14 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		{
 		   const int&  binV = mVpFilter->BINS_V(v);
 		   const int&  binH = mVpFilter->BINS_H(h);
-
-
-		   lBaseBinIdx	= (*lPtrIntBase    - mLOWER_LIMIT_BASE    + (mSTEP_BASE/2))/mSTEP_BASE;
-
 		
-		   lIntSecLeft  = ((binH - lBaseLB)/(float)(binV - lBaseLine))*(lPurviewLine - binV) +binH;
-		   lIntSecRight = ((binH - lBaseRB)/(float)(binV - lBaseLine))*(lPurviewLine - binV) +binH;
+		   lIntSecLeft  = SCALE_INTSEC*( ((binH - lBaseLB)/(float)(binV - lBaseLine))*(lPurviewLine - binV) +binH );
+		   lIntSecRight = SCALE_INTSEC*( ((binH - lBaseRB)/(float)(binV - lBaseLine))*(lPurviewLine - binV) +binH );
 
-		   lIdx_BL 	= (lIntSecLeft - mLOWER_LIMIT_BASE;
+		   lIdx_BL 	= ( lIntSecLeft  - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW/2))/mSTEP_PURVIEW;
+		   lIdx_BR 	= ( lIntSecRight - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW/2))/mSTEP_PURVIEW;
 
-		   lIdx_Mid  	= round( (lIdx_BL+ lIdx_BR)/2.0 );
+		   lIdx_Mid  	= round((lIdx_BL+ lIdx_BR)/2.0 );
 
 		   //^TODO:start=> Make non-boundary region dependent on the binwidth
 		   lIdx_NBL   	= lIdx_BL   + 2;
@@ -519,6 +514,11 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("ASSIGN_LANE_MODEL");
 #endif
+	mLaneModel.setModel(mBaseHistModel.boundary_left,
+			    mBaseHistModel.boundary_left_cm,
+			    mBaseHistModel.boundary_right,
+			    mBaseHistModel.boundary_right_cm,
+			    mVanishPt);
 
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -533,135 +533,16 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 
 
 
-
 #ifdef PROFILER_ENABLED
 mProfiler.start("DISPLAY");
 #endif
-/*
+
 	#ifdef DISPLAY_GRAPHICS
 	{
-	  using namespace cv;
-
-	   const float lRatioLookAhead = 0.35;
-
-	   //Transform VP to Image Coordianate System
-	   int VP_V =  mVanishPt.V + mCAMERA.FRAME_CENTER(0);
-	   int VP_H =  mVanishPt.H + mCAMERA.FRAME_CENTER(1);	
-
-	   //Lane Bundaries
-	   Point  Start_leftLaneInner( mCAMERA.FRAME_CENTER(1) 	+  
-		((int)( mLaneModel.leftOffset  + lDelta)/mLaneFilter->STEP)*mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
-
-	   Point  Start_rightLaneInner( mCAMERA.FRAME_CENTER(1) +  
-		((int)( mLaneModel.rightOffset - lDelta)/mLaneFilter->STEP)*mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
-	
-	   Point  StartMidLane( ((int)((Start_leftLaneInner.x + Start_rightLaneInner.x)/2.0)/ mLaneFilter->STEP)* 
-		  mLaneFilter->STEP,  mCAMERA.RES_VH(0) );
- 
-	   float slopeLeft =  (float)( VP_V-mCAMERA.RES_VH(0) ) / (VP_H- Start_leftLaneInner.x);
-	   float slopeRight = (float)( VP_V-mCAMERA.RES_VH(0) ) / (VP_H- Start_rightLaneInner.x);
-	
-
-	   Point End_leftLaneInner 	= Start_leftLaneInner;
-	   End_leftLaneInner.x 		+= -round((mCAMERA.RES_VH(0)*lRatioLookAhead) / slopeLeft);
-	   End_leftLaneInner.y 		+= -round( (mCAMERA.RES_VH(0)*lRatioLookAhead));
-	
-	   Point End_rightLaneInner 	= Start_rightLaneInner;
-	   End_rightLaneInner.x 	+= -round ((mCAMERA.RES_VH(0)*lRatioLookAhead) / slopeRight);
-	   End_rightLaneInner.y 	+= -round ((mCAMERA.RES_VH(0)*lRatioLookAhead));
-
-
-	   // Draw Left Boundary Line
-	   line(mFrameRGB,
-		 Start_leftLaneInner,
-		 End_leftLaneInner,
-		 CvScalar(0,255,0),
-		 3
-	   	);
-
-	   //Draw Right Boundary Line	
-	   line(mFrameRGB,
-		 Start_rightLaneInner,
-		 End_rightLaneInner,
-		 CvScalar(0,255,0),
-		 3
-	   	);
-	   
-	   //Draw Middle Line
-	   line(mFrameRGB,
-	     StartMidLane,
-	     (End_rightLaneInner + End_leftLaneInner)/2.0,
-	     CvScalar(255,0,0),
-	     2
-	    );
-
-
-	   //Draw Purview Line
-	   line(mFrameRGB,
-	     cvPoint(0, mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V),
-	     cvPoint(mCAMERA.RES_VH(1), mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V),
-	     CvScalar(0,0,0),
-	     1
-	    );
-	
- 
-	  // Highlight ROI 
-	   Rect lROI;
-	   lROI = Rect(0, mCAMERA.RES_VH(0) - mSPAN, mCAMERA.RES_VH(1), mSPAN);
-	   cv::Mat lYellow(mSPAN, mCAMERA.RES_VH(1), CV_8UC3, Scalar(0,125,125));
-
-    	   cv::Mat lFrameRGB_mSPAN = mFrameRGB(lROI);
-	   cv::addWeighted(lYellow, 0.4, lFrameRGB_mSPAN, 0.6, 0, lFrameRGB_mSPAN);
-	
-
-	
-	   // Draw Histogram-Bins at the Base
-	   for (int i=0; i< mLaneFilter->HISTOGRAM_BINS.size(); i++)
-	   {
-		int x = mCAMERA.FRAME_CENTER(1)+ mLaneFilter->HISTOGRAM_BINS(i); 
-		if(x !=  StartMidLane.x)
-		line(mFrameRGB, cvPoint(x,mCAMERA.RES_VH(0)), cvPoint(x,mCAMERA.RES_VH(0) -30), cvScalar(0,0,0), 1);
-		else
-		line(mFrameRGB, cvPoint(x,mCAMERA.RES_VH(0)), cvPoint(x,mCAMERA.RES_VH(0) -40), cvScalar(0,0,255), 2);
-	   }
-
-
-
-	   // Draw Histogram-Bins at the Purview
-	   for (int i=0; i< mVpFilter->HISTOGRAM_BINS.size(); i++)
-	   {
-
-		int x = mCAMERA.FRAME_CENTER(1)+ mVpFilter->HISTOGRAM_BINS(i);
-		//if(x !=  StartMidLane.x)
-		line(mFrameRGB, cvPoint(x,mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V), 
-				cvPoint(x,mCAMERA.FRAME_CENTER(0) - mVpFilter->OFFSET_V-30), cvScalar(0,0,0), 1);
-	   }
-
-
-	   #ifdef DISPLAY_GRAPHICS_DCU
-	   	mDCU.PutFrame(mFrameRGB.data);
-	   #else  
-
-	   imshow( "Display window", mFrameRGB);
-	   
-	   if ( (char)32 == (char) waitKey(10) )
-	   {
-		cout << "Lane Histogram Bins :		"<< mLaneFilter->HISTOGRAM_BINS.transpose() <<endl << endl;
-
-		cout << "VanishingPt Histogram Bins : 	"<< mVpFilter->HISTOGRAM_BINS.transpose() <<endl << endl;
-
-		while ((char)32 != (char)waitKey(1));
-	   }
-
-	   #endif
-
-
-
 	   //write the processed frame to the video
 	   //mOutputVideo<<mFrameRGB;
 	}
-	#endif // Display Graphics
-*/		
+	#endif // Display Graphics	
 								
 #ifdef PROFILER_ENABLED
 mProfiler.end();

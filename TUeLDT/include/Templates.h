@@ -117,18 +117,17 @@ public:
 			DEPTH_MAP_ROOT.convertTo(DEPTH_MAP_ROOT, CV_16U);
 
 		/* Create X Template */
-			cv::Mat Row = cv::Mat(1, RES_H, CV_16S);
-			int16_t* ptr = Row.ptr<int16_t>(0);
+			cv::Mat Row = cv::Mat(1, RES_H, CV_32S);
+			int32_t* ptr = Row.ptr<int32_t>(0);
 			for (int i=0; i<RES_H; i++)
 			{
 				ptr[i]= i;			
 			}
 			repeat(Row,SPAN,1 ,X_ICS);
-			X_ICS.convertTo(X_ICS, CV_16S);
 
 		/* Create Y Template */
-			cv::Mat Col = cv::Mat(SPAN, 1, CV_16S);
-			ptr = Col.ptr<int16_t>(0);
+			cv::Mat Col = cv::Mat(SPAN, 1, CV_32S);
+			ptr = Col.ptr<int32_t>(0);
 			for (int i=0; i<SPAN; i++)
 			{
 				ptr[i]= (RES_V-SPAN) + i;			
@@ -158,24 +157,25 @@ public:
 
 			prefix= "GradientTangent_";
 
-			formattedString<<path<<"/ConfigFiles/Templates/"<<prefix<<std::to_string(RES_H)<<"x"<<std::to_string(RES_V)<<".yaml";
+			formattedString<<path<<"/ConfigFiles/Templates/"<<prefix
+			<<std::to_string(RES_H)<<"x"<<std::to_string(RES_V)<<".yaml";
+
 			templateFile = formattedString.str();
 
 			struct stat buf;
 			int statResult = stat(templateFile.c_str(),&buf);
 			if (statResult != 0) 
 			{
-				
-				#ifdef PROFILER_ENABLED
-				 LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-				 <<"File not found: "<<templateFile.c_str()<<endl;
-				#endif
+			  #ifdef PROFILER_ENABLED
+			   LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+			   <<"File not found: "<<templateFile.c_str()<<endl;
+		 	  #endif
 			}
 			else
 			{
-				cv::FileStorage loadGradientTemplate( templateFile, cv::FileStorage::READ);
-				loadGradientTemplate["ROOT_DIR_TEMPLATE"]>> GRADIENT_TAN_ROOT;
-				GRADIENT_TAN_ROOT.convertTo(GRADIENT_TAN_ROOT,CV_16SC1);
+			  cv::FileStorage loadGradientTemplate( templateFile, cv::FileStorage::READ);
+			  loadGradientTemplate["ROOT_DIR_TEMPLATE"]>> GRADIENT_TAN_ROOT;
+			  GRADIENT_TAN_ROOT.convertTo(GRADIENT_TAN_ROOT,CV_16SC1);
 			}
 
 			//Check if every template is non-empty and throw an exception if not.
