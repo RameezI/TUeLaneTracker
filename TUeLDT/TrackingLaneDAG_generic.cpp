@@ -101,20 +101,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 mProfiler.start("COMPUTE_INTERSECTIONS");
 #endif	
 
-	{
-	  cv::Mat lY_ICCS, lGradTanFocussed, lProbMapFocussed;
-	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::READ);
-	  file["mY_ICCS"]>>lY_ICCS;
-	  file["mGradTanFocussed"]>>lGradTanFocussed;
-	  file["mProbMapFocussed"]>>lProbMapFocussed;
-
-	  lProbMapFocussed.convertTo(lProbMapFocussed, CV_8U);
-	  int d = cv::norm(mProbMapFocussed, lProbMapFocussed,cv::NORM_INF);
-	  cout<<"dist: " << d <<endl;
-	
-	}
-
-	exit(0);
 
 	//Base Intersections
 	subtract(-mLaneFilter->OFFSET_V, -mY_ICCS, mIntBase, cv::noArray(), CV_32S);
@@ -160,6 +146,20 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
         mHistBase      = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
         mHistPurview   = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
 		
+	{
+	  cv::Mat lIntBase, lIntPurview;
+
+	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::READ);
+	  file["mIntBase"]>>lIntBase;
+	  file["mIntPurview"]>>lIntPurview;
+
+	  lIntPurview.convertTo(lIntPurview, CV_32S);
+	  int d = cv::norm(mIntPurview, lIntPurview,cv::NORM_INF);
+	  cout<<"dist: " << d <<endl;
+	
+	}
+
+	exit(0);
 
 #ifdef PROFILER_ENABLED
 mProfiler.end();
