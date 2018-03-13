@@ -32,8 +32,9 @@ BufferingDAG_generic::BufferingDAG_generic()
 
 int BufferingDAG_generic::init_DAG()
 {
-        mY_ICCS   = mX_ICS + mCAMERA.O_ICS_ICCS.x;
-        mX_ICCS   = mY_ICS + mCAMERA.O_ICS_ICCS.y;
+        mX_ICCS   = mX_ICS + mCAMERA.O_ICS_ICCS.x;
+	
+        mY_ICCS   = mY_ICS + mCAMERA.O_ICS_ICCS.y ; // mCAMERA.O_ICS_ICCS.y;
 
 	return 0;
 }

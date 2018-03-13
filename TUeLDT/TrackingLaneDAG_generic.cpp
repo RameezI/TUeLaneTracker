@@ -71,8 +71,8 @@ int TrackingLaneDAG_generic::init_DAG()
 	mSTEP_PURVIEW	 	 =  mBASE_BINS_SCALED.at<int32_t>(1,0)
 				   -mBASE_BINS_SCALED.at<int32_t>(0,0) ;
 
-        mHistBase      		 =  cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
-        mHistPurview   		 =  cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
+        mHistBase      		 =  cv::Mat::zeros(lCOUNT,  1 ,  CV_32S);
+        mHistPurview   		 =  cv::Mat::zeros(lCOUNT,  1 ,  CV_32S);
 
   	return 0;
 }
@@ -123,12 +123,14 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("COMPUTE_INTERSECTIONS");
 #endif	
+	
 	{
 	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::WRITE);
 	  file<<"mY_ICCS"<<mY_ICCS;
 	  file<<"mGradTanFocussed"<<mGradTanFocussed;
 	  file<<"mProbMapFocussed"<<mProbMapFocussed;
 	}
+	
 
 	//Base Intersections
 	subtract(-mLaneFilter->BASE_LINE_ICCS, -mY_ICCS, mIntBase, cv::noArray(), CV_32S);
@@ -238,9 +240,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<  "Min Time: " << mProfiler.getMinTime("COMPUTE_HISTOGRAMS")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
-
-
-
 
 
 
