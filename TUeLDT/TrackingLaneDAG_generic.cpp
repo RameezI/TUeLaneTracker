@@ -156,9 +156,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("MASK_INVALID_BIN_IDS");
 #endif
-
      {
-
 	//Build Mask for Valid Intersections
 	bitwise_and(mProbMapFocussed > 0, mGradTanFocussed !=0, mMask);
 
@@ -173,11 +171,12 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
         mHistPurview   = cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
      }		
 
-    {
+     {
  	cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::WRITE);
+	file<<"mPURVIEW_BINS_SCALED"<<mPURVIEW_BINS_SCALED;
   	file<<"mIntBase"<<mIntBase;
   	file<<"mIntPurview"<<mIntPurview;
-    }
+     }
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
