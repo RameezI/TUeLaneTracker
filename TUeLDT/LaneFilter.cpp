@@ -30,7 +30,7 @@ LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
   
   mSTEP_CM(10),
   
-  STEP(ceil((mSTEP_CM*mCAMERA.CM_TO_PIXEL)/10)*10),
+  STEP(mSTEP_CM*mCAMERA.CM_TO_PIXEL),
   
   mBIN_MAX(round((mLANE.MAX_WIDTH*mCAMERA.CM_TO_PIXEL)/STEP)*STEP ),
   

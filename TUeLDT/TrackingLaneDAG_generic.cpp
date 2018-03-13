@@ -50,7 +50,6 @@ int TrackingLaneDAG_generic::init_DAG()
 
 void TrackingLaneDAG_generic::extractLanes()
 {
-	
 
 	WriteLock  wrtLock(_mutex, std::defer_lock);
 
@@ -59,8 +58,6 @@ void TrackingLaneDAG_generic::extractLanes()
 	this->mStartFiltering = true;
 	wrtLock.unlock();
 	_sateChange.notify_one();
-
-
 
 
 #ifdef PROFILER_ENABLED
@@ -146,12 +143,12 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
 	  file["mIntPurview"]>>lIntPurview;
 	  file["mPURVIEW_BINS_SCALED"]>>lPURVIEW_BINS_SCALED;
 
-	  lIntPurview.convertTo(lIntPurview, CV_32S);
-	  int d = cv::norm(mIntPurview, lIntPurview,cv::NORM_INF);
+	  lIntBase.convertTo(lIntBase, CV_32S);
+	  int d = cv::norm(mIntBase, lIntBase,cv::NORM_INF);
 	  cout<<"dist: " << d <<endl;
 
-	  cout<<"FIRST PURVIEW BIN SCALED"<<mLOWER_LIMIT_IntPurview<<endl;
-	  cout<<endl<<"Complete Vector"<<endl<< lPURVIEW_BINS_SCALED<<endl;
+	  //cout<<"FIRST PURVIEW BIN SCALED"<<mLOWER_LIMIT_IntPurview<<endl;
+	 // cout<<endl<<"Complete Vector"<<endl<< lPURVIEW_BINS_SCALED<<endl;
 	
 	}
 
