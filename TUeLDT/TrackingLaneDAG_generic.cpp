@@ -143,12 +143,9 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
 	  file["mIntPurview"]>>lIntPurview;
 	  file["mPURVIEW_BINS_SCALED"]>>lPURVIEW_BINS_SCALED;
 
-	  lIntBase.convertTo(lIntBase, CV_32S);
-	  int d = cv::norm(mIntBase, lIntBase,cv::NORM_INF);
+	  lIntPurview.convertTo(lIntBase, CV_32S);
+	  int d = cv::norm(mIntPurview, lIntPurview,cv::NORM_INF);
 	  cout<<"dist: " << d <<endl;
-
-	  //cout<<"FIRST PURVIEW BIN SCALED"<<mLOWER_LIMIT_IntPurview<<endl;
-	 // cout<<endl<<"Complete Vector"<<endl<< lPURVIEW_BINS_SCALED<<endl;
 	
 	}
 
