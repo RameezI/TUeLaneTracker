@@ -423,13 +423,10 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		   IntSecRight 	= ((binH - right_VP)/(float)(binV - FRAME_CENTER_V))
 				  *(VP_FILTER_OFFSET - binV) +binH;
 
+		   IntSecLeft 	= VP_HIST_STEP * round(IntSecLeft/VP_HIST_STEP);
 
-		   IntSecLeft = VP_HIST_STEP * round(IntSecLeft/VP_HIST_STEP);
-		   LeftIdx= (IntSecLeft - VP_HIST_START)/VP_HIST_STEP;
-		
-
-		   IntSecRight 	= VP_HIST_STEP * round(IntSecRight/VP_HIST_STEP);
-		   RightIdx 	= (VP_HIST_SIZE-1) - (VP_HIST_END - IntSecRight)/VP_HIST_STEP;
+	           LeftIdx 	= (IntSecLeft  - VP_HIST_START + (VP_HIST_STEP/2))/VP_HIST_STEP;
+	           RightIdx 	= (IntSecRight - VP_HIST_START + (VP_HIST_STEP/2))/VP_HIST_STEP;
 		
 		   MidIdx  	= round( ( LeftIdx+ RightIdx ) /2.0);
 		
