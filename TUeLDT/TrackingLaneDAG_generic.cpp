@@ -108,8 +108,8 @@ mProfiler.start("COMPUTE_INTERSECTIONS");
 	  file["mGradTanFocussed"]>>lGradTanFocussed;
 	  file["mProbMapFocussed"]>>lProbMapFocussed;
 
-	  lGradTanFocussed.convertTo(lGradTanFocussed, CV_16S);
-	  int d = cv::norm(mGradTanFocussed, lGradTanFocussed,cv::NORM_INF);
+	  lProbMapFocussed.convertTo(lProbMapFocussed, CV_8U);
+	  int d = cv::norm(mProbMapFocussed, lProbMapFocussed,cv::NORM_INF);
 	  cout<<"dist: " << d <<endl;
 	
 	}
