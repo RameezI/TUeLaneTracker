@@ -1,6 +1,4 @@
-/******************************************************************************
-* NXP Confidential Proprietary
-* 
+/*
 * Copyright (c) 2017 NXP Semiconductor;
 * All Rights Reserved
 *
@@ -100,8 +98,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("COMPUTE_INTERSECTIONS");
 #endif	
-
-
 	//Base Intersections
 	subtract(-mLaneFilter->OFFSET_V, -mY_ICCS, mIntBase, cv::noArray(), CV_32S);
 	divide(mIntBase, mGradTanFocussed, mIntBase, SCALE_INTSEC_TAN, CV_32S);
@@ -111,8 +107,6 @@ mProfiler.start("COMPUTE_INTERSECTIONS");
 	subtract(-mVpFilter->OFFSET_V, -mY_ICCS, mIntPurview, cv::noArray(), CV_32S);
 	divide(mIntPurview,mGradTanFocussed, mIntPurview, SCALE_INTSEC_TAN, CV_32S);
 	add(mIntPurview, mX_ICCS_SCALED, mIntPurview);
-
-	
 	
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -133,8 +127,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("MASK_INVALID_BIN_IDS");
 #endif
-
-	
 	//Build Mask for Valid Intersections
 	bitwise_and(mProbMapFocussed > 0, mGradTanFocussed !=0,    mMask);
 	bitwise_and(mMask, mIntBase    > mLOWER_LIMIT_IntBase,     mMask);
@@ -147,15 +139,19 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
         mHistPurview   = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
 		
 	{
-	  cv::Mat lIntBase, lIntPurview;
+	  cv::Mat lIntBase, lIntPurview, lPURVIEW_BINS_SCALED;
 
 	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::READ);
 	  file["mIntBase"]>>lIntBase;
 	  file["mIntPurview"]>>lIntPurview;
+	  file["mPURVIEW_BINS_SCALED"]>>lPURVIEW_BINS_SCALED;
 
 	  lIntPurview.convertTo(lIntPurview, CV_32S);
 	  int d = cv::norm(mIntPurview, lIntPurview,cv::NORM_INF);
 	  cout<<"dist: " << d <<endl;
+
+	  cout<<"FIRST PURVIEW BIN SCALED"<<mLOWER_LIMIT_IntPurview<<endl;
+	  cout<<endl<<"Complete Vector"<<endl<< lPURVIEW_BINS_SCALED<<endl;
 	
 	}
 
