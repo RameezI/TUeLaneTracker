@@ -124,12 +124,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 mProfiler.start("COMPUTE_INTERSECTIONS");
 #endif	
 	
-	{
-	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::WRITE);
-	  file<<"mY_ICCS"<<mY_ICCS;
-	  file<<"mGradTanFocussed"<<mGradTanFocussed;
-	  file<<"mProbMapFocussed"<<mProbMapFocussed;
-	}
 	
 
 	//Base Intersections
@@ -179,6 +173,11 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
         mHistPurview   = cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
      }		
 
+    {
+ 	cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::WRITE);
+  	file<<"mIntBase"<<mIntBase;
+  	file<<"mIntPurview"<<mIntPurview;
+    }
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
