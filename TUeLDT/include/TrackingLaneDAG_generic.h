@@ -26,23 +26,17 @@
 
 class TrackingLaneDAG_generic: public BufferingDAG_generic
 {
-	
+
 template<typename T>
 friend class TrackingLaneState;
 	
 private:
 
-	/***********************************/
-	// Set from setupDAG()
-	LaneFilter* 		mLaneFilter;
-	VanishingPtFilter*	mVpFilter;
-	/***********************************/
-
 	bool  		mStartBufferShift;
 	bool    	mStartFiltering;
 	bool 		mFiltersReady;	
 	
-	int		mMAX_PIXELS_ROI;
+	int32_t		mMAX_PIXELS_ROI;
 	
 	float   	mLikelihood_LB;
 	float 		mLikelihood_RB;
@@ -54,9 +48,25 @@ private:
 	float		mPosterior;
 	float		mMaxPosterior;
 
-	cv::Mat		mBASE_BINS_SCALED;
-	cv::Mat		mPURVIEW_BINS_SCALED;
-	cv::Mat 	mX_ICCS_SCALED;	
+	int32_t 	mLOWER_LIMIT_BASE;
+	int32_t 	mLOWER_LIMIT_PURVIEW;
+
+	int32_t 	mUPPER_LIMIT_BASE;
+	int32_t 	mUPPER_LIMIT_PURVIEW;
+
+	int32_t 	mSTEP_BASE;
+	int32_t 	mSTEP_PURVIEW;
+
+
+	/***********************************/
+	// Set from setupDAG()
+	 LaneFilter* 		mLaneFilter;
+	 VanishingPtFilter*	mVpFilter;
+	/***********************************/
+
+	 cv::Mat	mBASE_BINS_SCALED;
+	 cv::Mat	mPURVIEW_BINS_SCALED;
+	 cv::Mat 	mX_ICCS_SCALED;	
 
 	cv::Mat		mProbMapFocussed;
 	cv::Mat 	mGradTanFocussed;
@@ -70,6 +80,8 @@ private:
 	
 	cv::Mat 	mTransitLaneFilter;
 	cv::Mat 	mTransitVpFilter;
+
+
 
 	BaseHistogramModel	mBaseHistModel;  	/**< Selected Base-Histogram Model */
 	LaneModel   		mLaneModel;		/**< The detected Lane-Model */

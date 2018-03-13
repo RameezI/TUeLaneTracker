@@ -36,7 +36,13 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
   mConditionalProb(0),
   mCorrelationNB(0),
   mPosterior(0),
-  mMaxPosterior(0)
+  mMaxPosterior(0),
+  mLOWER_LIMIT_BASE(0),
+  mLOWER_LIMIT_PURVIEW(0),
+  mUPPER_LIMIT_BASE(0),
+  mUPPER_LIMIT_PURVIEW(0),
+  mSTEP_BASE(0),
+  mSTEP_PURVIEW(0)
 {	
 	//Write Images to a video file
 	//mOutputVideo.open("TUeLaneTracker.avi", CV_FOURCC('M','P','4','V'), 30, mFrameRGB.size());
@@ -45,12 +51,28 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
 
 int TrackingLaneDAG_generic::init_DAG()
 {
-	mX_ICCS_SCALED		=  SCALE_INTSEC*mX_ICCS;
-	mBASE_BINS_SCALED  	=  SCALE_INTSEC*mLaneFilter->BASE_BINS;
-	mPURVIEW_BINS_SCALED	=  SCALE_INTSEC*mLaneFilter->PURVIEW_BINS;
+	const size_t& lCOUNT 	 = mLaneFilter->COUNT_BINS;
 
-        mHistBase      		= cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
-        mHistPurview   		= cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
+	mX_ICCS_SCALED	 	 =  SCALE_INTSEC*mX_ICCS;
+	mBASE_BINS_SCALED  	 =  SCALE_INTSEC*mLaneFilter->BASE_BINS;
+	mPURVIEW_BINS_SCALED	 =  SCALE_INTSEC*mLaneFilter->PURVIEW_BINS;
+
+	mLOWER_LIMIT_BASE	 =  mBASE_BINS_SCALED.at<int32_t>(0,0);
+	mLOWER_LIMIT_PURVIEW  	 =  mPURVIEW_BINS_SCALED.at<int32_t>(0,0);
+
+	mUPPER_LIMIT_BASE	 =  mBASE_BINS_SCALED.at<int32_t>(lCOUNT-1,0);
+	mUPPER_LIMIT_PURVIEW  	 =  mPURVIEW_BINS_SCALED.at<int32_t>(lCOUNT-1,0);
+
+
+	//Assuming a constant step
+	mSTEP_BASE	 	 =  mBASE_BINS_SCALED.at<int32_t>(1,0)
+				   -mBASE_BINS_SCALED.at<int32_t>(0,0) ;
+
+	mSTEP_PURVIEW	 	 =  mBASE_BINS_SCALED.at<int32_t>(1,0)
+				   -mBASE_BINS_SCALED.at<int32_t>(0,0) ;
+
+        mHistBase      		 =  cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
+        mHistPurview   		 =  cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
 
   	return 0;
 }
@@ -81,7 +103,6 @@ mProfiler.start("TEMPORAL_FILTERING");
 	    mBufferPool->GradientTangent[i].copyTo(mGradTanFocussed, mMask );
 	}
 	
-
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
@@ -104,12 +125,12 @@ mProfiler.start("COMPUTE_INTERSECTIONS");
 #endif	
 
 	//Base Intersections
-	subtract(mLaneFilter->BASE_LINE_ICCS, mY_ICCS, mIntBase, cv::noArray(), CV_32S);
+	subtract(-mLaneFilter->BASE_LINE_ICCS, -mY_ICCS, mIntBase, cv::noArray(), CV_32S);
 	divide(mIntBase, mGradTanFocussed, mIntBase, SCALE_INTSEC_TAN, CV_32S);
 	add(mIntBase, mX_ICCS_SCALED, mIntBase);
 	
 	//Purview Intersections
-	subtract(mLaneFilter->PURVIEW_LINE_ICCS, mY_ICCS, mIntPurview, cv::noArray(), CV_32S);
+	subtract(-mLaneFilter->PURVIEW_LINE_ICCS, -mY_ICCS, mIntPurview, cv::noArray(), CV_32S);
 	divide(mIntPurview,mGradTanFocussed, mIntPurview, SCALE_INTSEC_TAN, CV_32S);
 	add(mIntPurview, mX_ICCS_SCALED, mIntPurview);
 
@@ -135,16 +156,15 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
 #endif
 
      {
-	const size_t& lCOUNT = mLaneFilter->COUNT_BINS;
 
 	//Build Mask for Valid Intersections
 	bitwise_and(mProbMapFocussed > 0, mGradTanFocussed !=0, mMask);
 
-	bitwise_and(mMask, mIntBase    >  mBASE_BINS_SCALED.at<int32_t>(0,0),    mMask);
-	bitwise_and(mMask, mIntPurview >  mPURVIEW_BINS_SCALED.at<int32_t>(0,0), mMask);
+	bitwise_and(mMask, mIntBase    >  mLOWER_LIMIT_BASE,    mMask);
+	bitwise_and(mMask, mIntPurview >  mLOWER_LIMIT_PURVIEW, mMask);
 
-    	bitwise_and(mMask, mIntBase    <  mBASE_BINS_SCALED.at<int32_t>(lCOUNT-1 , 0), mMask);
-    	bitwise_and(mMask, mIntPurview <  mPURVIEW_BINS_SCALED.at<int32_t>(lCOUNT-1 , 0),mMask);
+    	bitwise_and(mMask, mIntBase    <  mUPPER_LIMIT_BASE, 	mMask);
+    	bitwise_and(mMask, mIntPurview <  mUPPER_LIMIT_PURVIEW, mMask);
 
 	//^TODO: Put on the side thread
         mHistBase      = cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
@@ -197,6 +217,9 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 		//  if(mSCALED_BASE_BINS(lBASEIdx) - *lPtrIntBase >  *PtrIntBase - mSCALED_BASE_BINS(lBaseIdx-1))
 		//  lBaseIdx--;
 
+		lBaseBinIdx	= (*lPtrIntBase    - mLOWER_LIMIT_BASE    + (mSTEP_BASE/2))/mSTEP_BASE;
+
+		lPurviewBinIdx	= (*lPtrIntPurview - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW/2))/mSTEP_PURVIEW;
 		
 	         lWeightBin = *lPtrWeights;
 		
@@ -399,9 +422,15 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		{
 		   const int&  binV = mVpFilter->BINS_V(v);
 		   const int&  binH = mVpFilter->BINS_H(h);
+
+
+		   lBaseBinIdx	= (*lPtrIntBase    - mLOWER_LIMIT_BASE    + (mSTEP_BASE/2))/mSTEP_BASE;
+
 		
 		   lIntSecLeft  = ((binH - lBaseLB)/(float)(binV - lBaseLine))*(lPurviewLine - binV) +binH;
 		   lIntSecRight = ((binH - lBaseRB)/(float)(binV - lBaseLine))*(lPurviewLine - binV) +binH;
+
+		   lIdx_BL 	= (lIntSecLeft - mLOWER_LIMIT_BASE;
 
 		   lIdx_Mid  	= round( (lIdx_BL+ lIdx_BR)/2.0 );
 
