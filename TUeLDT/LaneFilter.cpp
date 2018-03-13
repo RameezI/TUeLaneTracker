@@ -80,9 +80,9 @@ LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
 
   O_IBCS_ICS(cv::Point(0, mCAMERA.RES_VH(0))),
 
-  BASE_LINE_ICCS(BASE_LINE_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),  
+  BASE_LINE_ICCS(-BASE_LINE_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),  
 
-  PURVIEW_LINE_ICCS(PURVIEW_LINE_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),
+  PURVIEW_LINE_ICCS(-PURVIEW_LINE_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),
   
   BINS_STEP_cm(10),
   
