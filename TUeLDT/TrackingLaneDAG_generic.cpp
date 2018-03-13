@@ -103,19 +103,18 @@ mProfiler.start("COMPUTE_INTERSECTIONS");
 
 	{
 	  cv::Mat lY_ICCS, lGradTanFocussed, lProbMapFocussed;
-	  cv::FileStorage file("/home/s32v/compare/Mat_old", cv::FileStorage::WRITE);
-	  file<<"mY_ICCS"<<mY_ICCS;
-	  file<<"mGradTanFocussed"<<mGradTanFocussed;
-	  file<<"mProbMapFocussed"<<mProbMapFocussed;
-/*
-	  lY_ICCS.convertTo(lY_ICCS, CV_16S);
-	  int d = cv::norm(lY_ICCS, mY_ICCS,cv::NORM_INF);
+	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::READ);
+	  file["mY_ICCS"]>>lY_ICCS;
+	  file["mGradTanFocussed"]>>lGradTanFocussed;
+	  file["mProbMapFocussed"]>>lProbMapFocussed;
+
+	  lGradTanFocussed.convertTo(lGradTanFocussed, CV_16S);
+	  int d = cv::norm(mGradTanFocussed, lGradTanFocussed,cv::NORM_INF);
 	  cout<<"dist: " << d <<endl;
-*/
 	
 	}
 
-	while(1);
+	exit(0);
 
 	//Base Intersections
 	subtract(-mLaneFilter->OFFSET_V, -mY_ICCS, mIntBase, cv::noArray(), CV_32S);
