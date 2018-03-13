@@ -101,6 +101,12 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 mProfiler.start("COMPUTE_INTERSECTIONS");
 #endif	
 
+	{
+	cv::FileStorage file("/home/s32v/compare/MAt_new", cv::FileStorage::READ);
+	file[]>>lY_ICCS;
+	file[]>>lGradTanFocussed;
+	file[]>>mProbMapFocussed;
+	}
 	//Base Intersections
 	subtract(-mLaneFilter->OFFSET_V, -mY_ICCS, mIntBase, cv::noArray(), CV_32S);
 	divide(mIntBase, mGradTanFocussed, mIntBase, SCALE_INTSEC_TAN, CV_32S);
