@@ -193,33 +193,6 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 		
 	}//Block Ends
 
-	   {
-	     
-	     cv::Mat lIntBase, lIntPurview, lIntWeights, lMask,  lHistBase, lHistPurview;
-	     cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::READ);
-	     file["mIntBase"]>> lIntBase;
-	     file["mIntPurview"]>> lIntPurview;
-	     file["mIntWeights"]>> lIntWeights;
-	     file["mMask"]>> lMask;
-	     file["mHistBase"]>>lHistBase;
-	     file["mHistPurview"]>>lHistPurview;
-
-	     // lHistBase.convertTo(lIntBase, CV_32S);
-	     int d  = cv::norm(mIntBase, lIntBase, cv::NORM_INF);
-		 d += cv::norm(mIntPurview, lIntPurview, cv::NORM_INF);
-		 d += cv::norm(mIntWeights, lIntWeights, cv::NORM_INF);
-		 d += cv::norm(mMask, lMask, cv::NORM_INF);
-
-
-		 //d += cv::norm(mHistBase,    lHistBase,    cv::NORM_INF);
-		 //d += cv::norm(mHistPurview, lHistPurview, cv::NORM_INF);
-
-	      cout<<"dist: " << d <<endl;
-	     
-	     //cout<<"size of Histogram Base:" << lHistBase.size()<<"	vs	"<< mHistBase.size()<<endl;
-	   }
-
-	  exit(0);
 	
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -367,6 +340,42 @@ mProfiler.start("HISTOGRAM_MATCHING");
 	 
 	   mLaneModel.confidenceLeft  	= round(100* mLaneModel.confidenceLeft/(float)SCALE_FILTER);
 	   mLaneModel.confidenceRight  	= round(100* mLaneModel.confidenceRight/(float)SCALE_FILTER);
+
+
+	   {
+	     
+	     cv::Mat lIntBase, lIntPurview, lIntWeights, lMask,  lHistBase, lHistPurview;
+	     int L, R, W;
+	     cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::READ);
+	     file["mIntBase"]>> lIntBase;
+	     file["mIntPurview"]>> lIntPurview;
+	     file["mIntWeights"]>> lIntWeights;
+	     file["mMask"]>> lMask;
+	     file["mHistBase"]>>lHistBase;
+	     file["mHistPurview"]>>lHistPurview;
+	     file["leftBoundary"]>>L;
+	     file["rightBoundary"]>>R;
+	     file["width"]>>W;
+
+	     // lHistBase.convertTo(lIntBase, CV_32S);
+	     int d  = cv::norm(mIntBase, lIntBase, cv::NORM_INF);
+		 d += cv::norm(mIntPurview, lIntPurview, cv::NORM_INF);
+		 d += cv::norm(mIntWeights, lIntWeights, cv::NORM_INF);
+		 d += cv::norm(mMask, lMask, cv::NORM_INF);
+		 d += cv::norm(mHistBase,    lHistBase,    cv::NORM_INF);
+		 d += cv::norm(mHistPurview, lHistPurview, cv::NORM_INF);
+		 d += mLaneModel.laneWidth  -W ;
+		 d += mLaneModel.leftOffset -L;
+		 d += mLaneModel.rightOffset - R;
+
+	      cout<<"dist: " << d <<endl;
+	     
+	     //cout<<"size of Histogram Base:" << lHistBase.size()<<"	vs	"<< mHistBase.size()<<endl;
+	   }
+
+	  exit(0);
+
+
 		
 	}//Scope End
 		
