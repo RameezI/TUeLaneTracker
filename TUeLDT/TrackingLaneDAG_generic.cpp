@@ -164,6 +164,18 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
     	bitwise_and(mMask, mIntBase    <  mUPPER_LIMIT_BASE, 	mMask);
     	bitwise_and(mMask, mIntPurview <  mUPPER_LIMIT_PURVIEW, mMask);
 
+
+     	{
+ 	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::WRITE);
+	 // file<<"mIntBase"<<mIntBase;
+          //file<<"mIntPurview"<<mIntPurview;
+          //file<<"mIntWeights"<<mIntWeights;
+          file<<"mMask"<<mMask;
+	  //file<<"mHistBase"<<mHistBase;
+  	  //file<<"mHistPurview"<<mHistPurview;
+     	}
+
+
 	//^TODO: Put on the side thread
         mHistBase      = cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
         mHistPurview   = cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
@@ -219,15 +231,6 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 		
 	}//Block Ends
 
-     	{
- 	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::WRITE);
-	  file<<"mIntBase"<<mIntBase;
-          file<<"mIntPurview"<<mIntPurview;
-          file<<"mIntWeights"<<mIntWeights;
-          file<<"mMask"<<mMask;
-	  file<<"mHistBase"<<mHistBase;
-  	  file<<"mHistPurview"<<mHistPurview;
-     	}
 
 #ifdef PROFILER_ENABLED
 mProfiler.end();
