@@ -31,10 +31,10 @@ LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
   mSTEP_CM(10),
   
   STEP(mSTEP_CM*mCAMERA.CM_TO_PIXEL),
-  
+
   mBIN_MAX(round((mLANE.MAX_WIDTH*mCAMERA.CM_TO_PIXEL)/STEP)*STEP ),
-  
-  mNb_HISTOGRAM_BINS(floor((2*mBIN_MAX)/STEP) +1),
+
+  mNb_HISTOGRAM_BINS(2*round(mLANE.MAX_WIDTH/mSTEP_CM) +1),
   
   mNb_OFFSET_BINS(floor((mNb_HISTOGRAM_BINS-1)/2) +1),
 

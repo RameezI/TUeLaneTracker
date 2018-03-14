@@ -36,7 +36,6 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
 
 int TrackingLaneDAG_generic::init_DAG()
 {
-
 	mX_ICCS.convertTo(mX_ICCS_SCALED, CV_32S, SCALE_INTSEC );
 
         mHistBase      = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
@@ -74,7 +73,6 @@ mProfiler.start("TEMPORAL_FILTERING");
 	    mBufferPool->GradientTangent[i].copyTo(mGradTanFocussed, mMask );
 	}
 	
-
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
@@ -195,6 +193,30 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 	   }
 		
 	}//Block Ends
+
+	   {
+	     cv::Mat lIntBase, lIntPurview, lIntWeights, lHistBase, lHistPurview;
+	     cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::READ);
+	     file["mIntBase"]>> lIntBase;
+	     file["mIntPurview"]>> lIntPurview;
+	     file["mIntWeights"]>> lIntWeights;
+	     file["mHistBase"]>>lHistBase;
+	     file["mHistPurview"]>>lHistPurview;
+
+	     // lHistBase.convertTo(lIntBase, CV_32S);
+	     int d  = cv::norm(mIntBase, lIntBase, cv::NORM_INF);
+		 d += cv::norm(mIntPurview, lIntPurview, cv::NORM_INF);
+		 d += cv::norm(mIntWeights, lIntWeights, cv::NORM_INF);
+
+		 //d += cv::norm(mHistBase,    lHistBase,    cv::NORM_INF);
+		 //d += cv::norm(mHistPurview, lHistPurview, cv::NORM_INF);
+
+	      cout<<"dist: " << d <<endl;
+	     
+	     //cout<<"size of Histogram Base:" << lHistBase.size()<<"	vs	"<< mHistBase.size()<<endl;
+	   }
+
+	  exit(0);
 	
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -260,23 +282,6 @@ mProfiler.start("HISTOGRAM_MATCHING");
 	    mHistPurview.convertTo(mHistPurview, CV_64F, SCALE_FILTER);
 	    mHistPurview.convertTo(mHistPurview, CV_32S, 1.0/SUM );
 		
-	   {
-	     cv::Mat lHistBase, lHistPurview;
-	     cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::READ);
-
-	     file["mHistBase"]>>lHistBase;
-	     file["mHistPurview"]>>lHistPurview;
-
-	     // lHistBase.convertTo(lIntBase, CV_32S);
-	     /*int d  = cv::norm(mHistPurview, lHistPurview, cv::NORM_INF);
-	         d += cv::norm(mHistBase, lHistBase, cv::NORM_INF);
-	     cout<<"dist: " << d <<endl;
-	     */
-
-	     cout<<"size of Histogram Base:" << lHistBase.size()<<"	vs	"<< mHistBase.size()<<endl;
-	   }
-
-	  exit(0);
 		
 	   int   BestModelIdx=-1;
 	   int   NegLaneCorrelation;
@@ -351,8 +356,8 @@ mProfiler.start("HISTOGRAM_MATCHING");
 	   if (bestPosteriorProb == 0)
 	   return;
 		  
-	   mLaneModel.leftOffset 		= Models[BestModelIdx].leftOffset;
-	   mLaneModel.rightOffset		= Models[BestModelIdx].rightOffset;
+	   mLaneModel.leftOffset 	= Models[BestModelIdx].leftOffset;
+	   mLaneModel.rightOffset	= Models[BestModelIdx].rightOffset;
 	   mLaneModel.centerLane    	= round((mLaneModel.leftOffset + mLaneModel.rightOffset)/2.0);
 		
 	   mLaneModel.laneWidth     	= Models[BestModelIdx].width_cm;
