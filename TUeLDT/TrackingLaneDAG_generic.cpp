@@ -281,9 +281,8 @@ mProfiler.start("HISTOGRAM_MATCHING");
 		int& Nleft          	= Models[i].nbNonBoundaryBinsLeft;
 		int& Nright		= Models[i].nbNonBoundaryBinsRight;
 
-cout<<endl<<LeftIdx<<"  ,  "<<RightIdx<<"   ,  "<< NegLeftIdx<<"  ,  "<<NegRightIdx<<"  ,  "<<Nleft<<"  ,  "<<Nright<<endl;
+cout<<endl<<LeftIdx<<"  ,  "<<RightIdx<<"   ,  "<< mLaneFilter->filter.at<int32_t>(Models[i].leftOffsetIdx, Models[i].rightOffsetIdx)<<endl;
 		
-
 		mLikelihoodLeftBoundary  =  round(HistBasePTR[LeftIdx-1]*0.25
 						+HistBasePTR[LeftIdx]
 						+HistBasePTR[LeftIdx+1]*0.25);
