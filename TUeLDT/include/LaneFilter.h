@@ -74,9 +74,10 @@ private:
 		const int		mSTEP_CM; /*< BaseHistogram and PurviewHistogram step size [cm] */
 
 public:	 //Public Interface 
+		const int   		mNb_HISTOGRAM_BINS;    	/*< Number of bins in the base Histogram */
+		const VectorXf		BINS_CM;			
 		const int 		STEP;   		/*< BaseHistogram step [Pixels] */
 		const int 		mBIN_MAX;		/*< BaseHistogram max bin value [Pixels] */
-		const int   		mNb_HISTOGRAM_BINS;    	/*< Number of bins in the base Histogram */
 		const int   		mNb_OFFSET_BINS;	/*< Number of bins in offsets vector [Half of the mNb_HISTOGRAM_BINS] */
 		
 public:	 //Public Interface of the class	

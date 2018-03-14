@@ -29,18 +29,20 @@ LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
   mCAMERA(CAMERA),
   
   mSTEP_CM(10),
-  
+
+  mNb_HISTOGRAM_BINS(2*round(mLANE.MAX_WIDTH/mSTEP_CM) +1),
+
+  BINS_CM(VectorXf::LinSpaced(mNb_HISTOGRAM_BINS,-mLANE.MAX_WIDTH, mLANE.MAX_WIDTH)),
+
   STEP(mSTEP_CM*mCAMERA.CM_TO_PIXEL),
 
   mBIN_MAX(round((mLANE.MAX_WIDTH*mCAMERA.CM_TO_PIXEL)/STEP)*STEP ),
-
-  mNb_HISTOGRAM_BINS(2*round(mLANE.MAX_WIDTH/mSTEP_CM) +1),
   
   mNb_OFFSET_BINS(floor((mNb_HISTOGRAM_BINS-1)/2) +1),
 
   OFFSET_V(240),
 
-  HISTOGRAM_BINS(VectorXi::LinSpaced(mNb_HISTOGRAM_BINS,-mBIN_MAX, mBIN_MAX)),
+  HISTOGRAM_BINS((BINS_CM*mCAMERA.CM_TO_PIXEL).cast<int32_t>()),
   
   OFFSET_BINS(HISTOGRAM_BINS.tail(mNb_OFFSET_BINS)),
   
@@ -49,8 +51,6 @@ LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
   filter( cv::Mat::zeros( (int)(mBIN_MAX/this->STEP) +1, (int)(mBIN_MAX/this->STEP) +1 , CV_32SC1) )
   
   {
-	//cout << HISTOGRAM_BINS <<endl;
-	 cout<<mBIN_MAX;
 	createHistogramModels();
 	this->filter = this->prior.clone();
   }

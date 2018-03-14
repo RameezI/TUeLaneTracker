@@ -129,21 +129,6 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
     	bitwise_and(mMask, mIntBase    < mUPPER_LIMIT_IntBase,     mMask);
     	bitwise_and(mMask, mIntPurview < mUPPER_LIMIT_IntPurview,  mMask);
 
-	cout<<"A= "<< mLOWER_LIMIT_IntBase<<endl;
-	cout<<"B= "<< mLOWER_LIMIT_IntPurview<<endl;
-	cout<<"C= "<< mUPPER_LIMIT_IntBase<<endl;
-	cout<<"D= "<< mUPPER_LIMIT_IntPurview<<endl;
-
-	   {
-	     cv::Mat lMask;
-	     cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::READ);
-	     file["mMask"]>> lMask;
-	     int d  = cv::norm(mMask, lMask, cv::NORM_INF);
-	     cout<< "Mask compare = "<< d <<endl ;
-	     exit(0);
-	   }
-
-
         mHistBase      = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
         mHistPurview   = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
 
@@ -218,12 +203,6 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 	     file["mMask"]>> lMask;
 	     file["mHistBase"]>>lHistBase;
 	     file["mHistPurview"]>>lHistPurview;
-/*
-	    cout << "STEP_BASE:		" << mSCALED_STEP_LANE_FILTER<<endl;
-	    cout << "STEP_PURVIEW:	" << mSCALED_STEP_VP_FILTER<<endl;
-	    cout << "START_LANE:	" << mSCALED_START_LANE_FILTER<<endl;
-	    cout << "START_PURV:	" << mSCALED_START_VP_FILTER<<endl;
-*/
 
 	     // lHistBase.convertTo(lIntBase, CV_32S);
 	     int d  = cv::norm(mIntBase, lIntBase, cv::NORM_INF);
