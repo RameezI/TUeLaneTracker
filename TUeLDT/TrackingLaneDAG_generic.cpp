@@ -276,8 +276,12 @@ mProfiler.start("NORMALIZE_HISTOGRAM");
 
      	{
  	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::WRITE);
+	  file<<"mIntBase"<<mIntBase;
+          file<<"mIntPurview"<<mIntPurview;
+          file<<"mIntWeights"<<mIntWeights;
 	  file<<"mHistBase"<<mHistBase;
   	  file<<"mHistPurview"<<mHistPurview;
+
      	}
 	
 #ifdef PROFILER_ENABLED
