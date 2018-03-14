@@ -320,15 +320,19 @@ mProfiler.start("HISTOGRAM_MATCHING");
 		int& lCount_NBL          = Models[i].nonBoundaryBinsCount_left;
 		int& lCount_NBR		 = Models[i].nonBoundaryBinsCount_right;
 
-		mLikelihood_LB  	=  lPtrHistBase[lIdx_BL-1]*0.25
+
+cout<<endl<<lIdx_BL<<"  ,  "<<lIdx_BR<<"   ,  "<< lIdx_NBL<<"  ,  "<<lIdx_NBR<<"  ,  "<<lCount_NBL<<"  ,  "<<lCount_NBR<<endl;
+
+		mLikelihood_LB  	=  round(lPtrHistBase[lIdx_BL-1]*0.25
 					   +lPtrHistBase[lIdx_BL]
-					   +lPtrHistBase[lIdx_BL+1]*0.25;
+					   +lPtrHistBase[lIdx_BL+1]*0.25);
 										 
-		mLikelihood_RB 		=  lPtrHistBase[lIdx_BR-1]*0.25
+		mLikelihood_RB 		=  round(lPtrHistBase[lIdx_BR-1]*0.25
 					   +lPtrHistBase[lIdx_BR]
-					   +lPtrHistBase[lIdx_BR+1]*0.25;
+					   +lPtrHistBase[lIdx_BR+1]*0.25);
 	
 		mConditionalProb  	=  (mLikelihood_LB *mLikelihood_RB)/(float)SCALE_FILTER;
+
 
 
 		//TODO:start=> Put this block on the side thread
