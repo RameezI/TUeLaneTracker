@@ -36,18 +36,17 @@ class BufferingState : public State
 {
 	
 private:
-
-	const  int   mNbBuffer;
-	uint_fast8_t mRetryGrab;
-	std::thread  mSideExecutor;
-
+	size_t       	mBufferSize;
+	uint_fast8_t 	mRetryGrab;
+	std::thread  	mSideExecutor;
 
 public:
+
 	BufferingState();
 
 	GRAPH 	mGraph;
 	int  	setSource(FrameSource, string);
-	void 	setupDAG(const Templates& templates);
+	void 	setupDAG(const Templates& TEMPLATES, const size_t & BUFFER_SIZE);
 	void 	run();
 
 	~BufferingState();
@@ -56,12 +55,12 @@ public:
 
 //******************************************************************/*
 // Class Definitions
-//Template class thus declarations and definitions in a single file
+//Templated class thus declarations and definitions in a single file
 //******************************************************************/
 
 template<typename GRAPH>
 BufferingState<GRAPH>::BufferingState()
-: mNbBuffer(5),
+: mBufferSize(0),
   mRetryGrab(0)
 {
 
@@ -186,45 +185,31 @@ int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
 }
 
 
-
-
 template<typename GRAPH>  
-void BufferingState<GRAPH>::setupDAG(const Templates& templates)
+void BufferingState<GRAPH>::setupDAG(const Templates & TEMPLATES, const size_t & BUFFER_SIZE)
 {
 
 #ifdef PROFILER_ENABLED
 mProfiler.start("SET_UP_BUFFERING_DAG");
 #endif
+	if(BUFFER_SIZE <= 0)
+	{
+	   this->currentStatus = StateStatus::ERROR;
+	}
+	else if ( 0 == mGraph.init_DAG(TEMPLATES, BUFFER_SIZE) )
+	{
+	   mBufferSize = BUFFER_SIZE;
+	   this->currentStatus= StateStatus::ACTIVE;
+	}
 
-	const int RES_H 		= mGraph.mCAMERA.RES_VH(1);
-	
-	mGraph.mVP_RANGE_V   		= templates.VP_RANGE_V;
-	mGraph.mSPAN			= templates.SPAN;
-	mGraph.mHORIZON_ICCS		= templates.HORIZON_ICCS;
-	
-	//allocate buffers
-	mGraph.mBufferPool.reset(new BufferPool<GRAPH>(templates.SPAN, RES_H, mNbBuffer));
-
-	// assign templates
-	mGraph.mGRADIENT_TAN_ROOT 	= templates.GRADIENT_TAN_ROOT;
-	mGraph.mDEPTH_MAP_ROOT    	= templates.DEPTH_MAP_ROOT;
-	mGraph.mFOCUS_MASK_ROOT   	= templates.FOCUS_MASK_ROOT;
-
-	mGraph.mY_ICS	 	  	= templates.Y_ICS;
-	mGraph.mX_ICS    	  	= templates.X_ICS;
-
-	if ( 0 == mGraph.init_DAG() )
-	this->currentStatus= StateStatus::ACTIVE;
-
-		
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
-				<<"******************************"<<endl
-				<<  "Setting up Buffering Graph." <<endl
-				<<  "Setup Time: "  << mProfiler.getAvgTime("SET_UP_BUFFERING_DAG")<<endl
-				<<"******************************"<<endl<<endl;	
-				#endif
+				 <<"******************************"<<endl
+				 <<  "Setting up Buffering Graph." <<endl
+				 <<  "Setup Time: "  << mProfiler.getAvgTime("SET_UP_BUFFERING_DAG")<<endl
+				 <<"******************************"<<endl<<endl;	
+				 #endif
 }
 
 
@@ -234,32 +219,30 @@ void BufferingState<GRAPH>::run()
 {
 
 #ifdef PROFILER_ENABLED
-	mProfiler.start("RUN_BUFFERING_DAG");
+mProfiler.start("RUN_BUFFERING_DAG");
 #endif	
 
-
-	
 	if (0==mGraph.grabFrame())
 	{
-		if (mSideExecutor.joinable())
-		mSideExecutor.join();
+	  if (mSideExecutor.joinable())
+	    mSideExecutor.join();
 
-		mSideExecutor = std::thread(&GRAPH::runAuxillaryTasks, std::ref(mGraph));
-		mGraph.buffer();
-		
-		this->StateCounter++;
-		
-		if(this->StateCounter >= mNbBuffer-1)
-		{
-		  this->currentStatus = StateStatus::DONE;
-		}
+	  mSideExecutor = std::thread(&GRAPH::runAuxillaryTasks, std::ref(mGraph));
+	  mGraph.buffer();
+	
+	  this->StateCounter++;
+	
+	  if(this->StateCounter >= mBufferSize-1)
+	  {
+	    this->currentStatus = StateStatus::DONE;
+	  }
 	}
 		
 	else
 	{ 	
-		mRetryGrab ++;
-		if(mRetryGrab > 3)
-		 currentStatus = StateStatus::ERROR;
+	  mRetryGrab ++;
+	  if(mRetryGrab > 3)
+	   currentStatus = StateStatus::ERROR;
 	}
 
 
@@ -268,9 +251,9 @@ mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				<<"******************************"<<endl
 				<<  "Total Time for Buffering Graph." <<endl
-				<<  "Max Time: " << mProfiler.getMaxTime("RUN_BUFFERING_DAG")<<endl
-				<<  "Avg. Time: " << mProfiler.getAvgTime("RUN_BUFFERING_DAG")<<endl
-				<<  "Min Time: " << mProfiler.getMinTime("RUN_BUFFERING_DAG")<<endl
+				<<  "Max  Time:  " << mProfiler.getMaxTime("RUN_BUFFERING_DAG")<<endl
+				<<  "Avg. Time:  " << mProfiler.getAvgTime("RUN_BUFFERING_DAG")<<endl
+				<<  "Min  Time:  " << mProfiler.getMinTime("RUN_BUFFERING_DAG")<<endl
 				<<"******************************"<<endl<<endl;	
  				#endif
 }

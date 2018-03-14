@@ -27,6 +27,7 @@
 #include <condition_variable>
 
 #include "State.h"		//implicit include of profiling and logging headers
+#include "Templates.h"
 #include "LaneModel.h"		//implicit include of LaneFilter and VanishingPtFilter
 #include "gmock/gmock.h"	//google-testing framework includes
 
@@ -68,9 +69,6 @@ protected:
     	 ProfilerLDT         		mProfiler;
 	#endif
 
-	
-	/*................................................
-	 Set from outside, before buffering is activated   */ 
 
 	int		mHORIZON_ICCS; 		/**< /brief Position of Horizon in the Image-Center-CS [pixels]
 				 	  	*  /n +ve value implies that the ROI is below the center line.
@@ -102,7 +100,6 @@ protected:
 	
 	/**< A buffer, of pre-specified number, for temporal pooling of probability frames and corresponding gradient orientations*/
 	unique_ptr<BufferPool<BufferingDAG_generic>>	mBufferPool;
-	/***************************************************/
 
 
 	// Needed for graph computations
@@ -156,9 +153,10 @@ protected:
 	cv::VideoCapture 		mCAPTURE;
 
 	
-public:
+public:	
+	/** *For initialising DAG ONE TIME EXECUTION */
+	int  init_DAG(const Templates & TEMPLATES, const size_t & BUFFER_SIZE);
 
-	int  init_DAG();		// For initialising DAG ONE TIME EXECUTION
 	int  grabFrame(); 		// Grab Frame from the Source
 	void runAuxillaryTasks(); 	// Perform assitve tasks for buffering from seperate executor
 	void buffer();   		// Perform tasks for buffering from main Thread

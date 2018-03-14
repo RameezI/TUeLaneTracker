@@ -107,7 +107,7 @@ protected:
 	#endif
 	
 public:
-	int64_t 		StateCounter   =  0;
+	uint64_t 		StateCounter   =  0;
 	StateStatus 	       	currentStatus  =  StateStatus::INACTIVE;
 	
 	void preDispose()	{currentStatus = StateStatus::ERROR;}

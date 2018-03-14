@@ -30,11 +30,25 @@ BufferingDAG_generic::BufferingDAG_generic()
 }
 
 
-int BufferingDAG_generic::init_DAG()
+int BufferingDAG_generic::init_DAG(const Templates & TEMPLATES, const size_t & BUFFER_SIZE)
 {
-        mX_ICCS   = mX_ICS + mCAMERA.O_ICS_ICCS.x;
+
+
+	const int RES_H 	= mCAMERA.RES_VH(1);
+	mVP_RANGE_V   		= TEMPLATES.VP_RANGE_V;
+	mSPAN			= TEMPLATES.SPAN;
+	mHORIZON_ICCS		= TEMPLATES.HORIZON_ICCS;
 	
-        mY_ICCS   = mY_ICS + mCAMERA.O_ICS_ICCS.y ; // mCAMERA.O_ICS_ICCS.y;
+	mBufferPool.reset(new BufferPool<BufferingDAG_generic>(mSPAN, RES_H, BUFFER_SIZE));
+
+	mGRADIENT_TAN_ROOT 	= TEMPLATES.GRADIENT_TAN_ROOT;
+	mDEPTH_MAP_ROOT    	= TEMPLATES.DEPTH_MAP_ROOT;
+	mFOCUS_MASK_ROOT   	= TEMPLATES.FOCUS_MASK_ROOT;
+	mY_ICS	 	  	= TEMPLATES.Y_ICS;
+	mX_ICS    	  	= TEMPLATES.X_ICS;
+
+        mX_ICCS   		= mX_ICS + mCAMERA.O_ICS_ICCS.x;
+        mY_ICCS   		= mY_ICS + mCAMERA.O_ICS_ICCS.y;
 
 	return 0;
 }
@@ -43,23 +57,23 @@ int BufferingDAG_generic::init_DAG()
 void BufferingDAG_generic::buffer( )
 {
 
-
 #ifdef PROFILER_ENABLED
 mProfiler.start("GRAY_FRAME_CONVERSION");
 #endif
 				
 	cvtColor(mFrameRGB, mFrameGRAY, CV_BGR2GRAY);
 
+
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
-				<<"******************************"<<endl
-				<<  "GRAY Frame Conversion." <<endl
-				<<  "Max Time: " << mProfiler.getMaxTime("GRAY_FRAME_CONVERSION")<<endl
-				<<  "Avg Time: " << mProfiler.getAvgTime("GRAY_FRAME_CONVERSION")<<endl
-				<<  "Min Time: " << mProfiler.getMinTime("GRAY_FRAME_CONVERSION")<<endl
-				<<"******************************"<<endl<<endl;	
-				#endif
+				 <<"******************************"<<endl
+				 <<  "GRAY Frame Conversion." <<endl
+				 <<  "Max Time: " << mProfiler.getMaxTime("GRAY_FRAME_CONVERSION")<<endl
+				 <<  "Avg Time: " << mProfiler.getAvgTime("GRAY_FRAME_CONVERSION")<<endl
+				 <<  "Min Time: " << mProfiler.getMinTime("GRAY_FRAME_CONVERSION")<<endl
+				 <<"******************************"<<endl<<endl;	
+				 #endif
 
 
 

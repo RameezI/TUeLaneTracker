@@ -124,8 +124,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 mProfiler.start("COMPUTE_INTERSECTIONS");
 #endif	
 	
-	
-
 	//Base Intersections
 	subtract(-mLaneFilter->BASE_LINE_ICCS, -mY_ICCS, mIntBase, cv::noArray(), CV_32S);
 	divide(mIntBase, mGradTanFocussed, mIntBase, SCALE_INTSEC_TAN, CV_32S);
@@ -171,12 +169,6 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
         mHistPurview   = cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
      }		
 
-     {
- 	cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::WRITE);
-	file<<"mPURVIEW_BINS_SCALED"<<mPURVIEW_BINS_SCALED;
-  	file<<"mIntBase"<<mIntBase;
-  	file<<"mIntPurview"<<mIntPurview;
-     }
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
@@ -197,7 +189,6 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 #endif
 	//Weights of Intersections
 	multiply(mDepthTemplate, mProbMapFocussed, mIntWeights, 1, CV_32S);	
-
 	{
 	   int32_t* 	lPtrIntBase 	    	= mIntBase.ptr<int32_t>(0);
 	   int32_t* 	lPtrIntPurview   	= mIntPurview.ptr<int32_t>(0);
@@ -227,7 +218,7 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 	   }
 		
 	}//Block Ends
-	
+
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
@@ -245,15 +236,13 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("FILTERS_WAIT");
 #endif 				
-		
 	wrtLock.lock();
 	_sateChange.wait(wrtLock,[this]{return mFiltersReady;} );
 	mFiltersReady = false; //reset the flag for next loop.
 	this->mStartBufferShift = true;
 	wrtLock.unlock();
 	_sateChange.notify_one();
-
-				
+		
 #ifdef PROFILER_ENABLED
  mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
@@ -285,6 +274,12 @@ mProfiler.start("NORMALIZE_HISTOGRAM");
 	    mHistPurview.convertTo(mHistPurview, CV_32S, 1.0/lSUM );
 	}
 
+     	{
+ 	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::WRITE);
+	  file<<"mHistBase"<<mHistBase;
+  	  file<<"mHistPurview"<<mHistPurview;
+     	}
+	
 #ifdef PROFILER_ENABLED
  mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
@@ -661,9 +656,6 @@ void TrackingLaneDAG_generic::runAuxillaryTasks()
 	
 	wrtLock.unlock();
 	_sateChange.notify_one();
-
-
-
 
 // MODE: C  
 

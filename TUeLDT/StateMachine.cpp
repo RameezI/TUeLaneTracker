@@ -99,59 +99,51 @@ int StateMachine::spin()
 	   mCurrentState = States::DISPOSED;
 	}
 
-
 	switch(mCurrentState) {
 
 	case States::BOOTING :
 	{
-		mPtrBootingState 	= unique_ptr<InitState>(new InitState());
+		if (mPtrBufferingState == nullptr)
+	  	{
+		   mPtrBootingState   = unique_ptr<InitState>(new InitState());
 
-		if (mPtrBootingState->currentStatus  != StateStatus::ERROR)
-		 mPtrLaneFilter 	= mPtrBootingState->createLaneFilter();
+		   if (mPtrBootingState->currentStatus  != StateStatus::ERROR)
+		      mPtrLaneFilter = mPtrBootingState->createLaneFilter();
 
-		if (mPtrBootingState->currentStatus != StateStatus::ERROR)
-		 mPtrVanishingPtFilter	= mPtrBootingState->createVanishingPtFilter();
+		   if (mPtrBootingState->currentStatus != StateStatus::ERROR)
+		      mPtrVanishingPtFilter = mPtrBootingState->createVanishingPtFilter();
 
-		if (mPtrBootingState->currentStatus != StateStatus::ERROR)
-		 mPtrTemplates		= mPtrBootingState->createTemplates();
+		   if (mPtrBootingState->currentStatus != StateStatus::ERROR)
+		      mPtrTemplates = mPtrBootingState->createTemplates();
 
-		if (mPtrBootingState->currentStatus == StateStatus::DONE)
-		{
-		
-		  mPtrBufferingState.reset
-		  #ifdef S32V2XX
-		   (new BufferingState<BufferingDAG_s32>());
-		  #else
-		   (new BufferingState<BufferingDAG_generic>());
-		  #endif
-	
-		
-		  mCurrentState 	= States::BUFFERING;
-		  mPtrBootingState 	= nullptr;
-		  cout<< "Completed!" <<endl;
+		   if (mPtrBootingState->currentStatus == StateStatus::DONE)
+		   {				
+		      mCurrentState 	= States::BUFFERING;
+		      cout<< "Completed!"<<endl;
 
-		 #ifdef PROFILER_ENABLED
-		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		    <<"****************************************"<<endl
-		    << "Printing Booting Configuration"<<endl
-		    <<  *(mPtrLaneFilter)<<endl
-		    <<"****************************************"<<endl<<endl;
-		  #endif
-		
-		}
-		else
-		{
-		 #ifdef PROFILER_ENABLED
-		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		    <<"****************************************"<<endl
-		    <<  "[Failed to Complete the Booting Process]"<<endl
-		    <<  "Shutting Down the State-Machine."<<endl
-		    <<"****************************************"<<endl<<endl;
-		  #endif
+		      #ifdef PROFILER_ENABLED
+		       LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+		       <<"****************************************"<<endl
+		       << "Printing Booting Configuration"<<endl
+		       <<  *(mPtrLaneFilter)<<endl
+		       <<"****************************************"<<endl<<endl;
+		      #endif
+
+		   }
+		   else
+		   {
+		      #ifdef PROFILER_ENABLED
+		       LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+		       <<"****************************************"<<endl
+		       <<  "[Failed to Complete the Booting Process]"<<endl
+		       <<  "Shutting Down the State-Machine."<<endl
+		       <<"****************************************"<<endl<<endl;
+		      #endif
 			
-		  mCurrentState 	= States::DISPOSED;
-		  lReturn 		= -1;
-		  mPtrBootingState 	= nullptr;
+		      mCurrentState 	= States::DISPOSED;
+		      lReturn 		= -1;
+		      mPtrBootingState 	= nullptr;
+		   }
 		}
 	}
 	break; //BOOTING PROCESS SCOPE ENDS
@@ -160,13 +152,21 @@ int StateMachine::spin()
 
 	case States::BUFFERING :
 	{
+		if (mPtrBufferingState == nullptr)
+		{
+		   #ifdef S32V2XX
+		    mPtrBufferingState.reset(new BufferingState<BufferingDAG_s32v>());
+		   #else
+		    mPtrBufferingState.reset(new BufferingState<BufferingDAG_generic>());
+		   #endif
+		}
+
 		if (mPtrBufferingState->currentStatus == StateStatus::INACTIVE)
 		{
-		   lReturn |= mPtrBufferingState->setSource(mFrameSource, mSourceStr);
+		   lReturn |= mPtrBufferingState->setSource(mFrameSource, mSourceStr); //TODO: remove-> FrameGrabber
 
-		   if (lReturn != 0)
+		   if (lReturn != 0)	//TODO:remove->FrameGrabber
 		   {
-
 		      #ifdef PROFILER_ENABLED
 		       LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 		       <<"*********************************"<<endl
@@ -174,11 +174,11 @@ int StateMachine::spin()
 		       <<  "Shutting Down the State-Machine"<<endl
 		       <<"******************************"<<endl;
 		      #endif
-		      mPtrBufferingState->preDispose();
+		      mPtrBufferingState->preDispose(); //TODO: remove-> FrameGrabber
 		   }
 		   else
 		   {
-		      mPtrBufferingState->setupDAG(std::ref(*mPtrTemplates));
+		      mPtrBufferingState->setupDAG(std::ref(*mPtrTemplates), 5);
 		   }
 		}
 
@@ -189,16 +189,7 @@ int StateMachine::spin()
 
 		if( mPtrBufferingState->currentStatus == StateStatus::DONE)
 		{
-		   mPtrTrackingState.reset
-		   #ifdef S32V2XX
-		    (new TrackingLaneState<TrackingLaneDAG_s32v>( move(mPtrBufferingState->mGraph) ) );
-		   #else
-		    (new TrackingLaneState<TrackingLaneDAG_generic>( move(mPtrBufferingState->mGraph) ) );
-		   #endif
-
 		   mCurrentState 	= States::DETECTING_LANES;
-		   mPtrBufferingState 	= nullptr;
-
 		   cout<<"Completed!"<<endl;
 		}
 
@@ -223,6 +214,16 @@ int StateMachine::spin()
 
 	case States::DETECTING_LANES :
 	{
+		
+		if (mPtrTrackingState == nullptr)
+		{
+		   #ifdef S32V2XX
+		   mPtrTrackingState.reset(new TrackingLaneState<TrackingLaneDAG_s32v>( move(mPtrBufferingState->mGraph) ) );
+		   #else
+		   mPtrTrackingState.reset(new TrackingLaneState<TrackingLaneDAG_generic>( move(mPtrBufferingState->mGraph) ) );
+		   #endif
+		   mPtrBufferingState 	= nullptr; //BufferingState does not contian graph so make it unuseable.
+		}
 
 		if (mPtrTrackingState->currentStatus == StateStatus::INACTIVE)
 		{
