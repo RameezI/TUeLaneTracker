@@ -134,22 +134,6 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
 
         mHistBase      = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
         mHistPurview   = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
-		
-	{
-	  cv::Mat lIntBase, lIntPurview, lPURVIEW_BINS_SCALED;
-
-	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::READ);
-	  file["mIntBase"]>>lIntBase;
-	  file["mIntPurview"]>>lIntPurview;
-	  file["mPURVIEW_BINS_SCALED"]>>lPURVIEW_BINS_SCALED;
-
-	  lIntPurview.convertTo(lIntBase, CV_32S);
-	  int d = cv::norm(mIntPurview, lIntPurview,cv::NORM_INF);
-	  cout<<"dist: " << d <<endl;
-	
-	}
-
-	exit(0);
 
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -275,6 +259,24 @@ mProfiler.start("HISTOGRAM_MATCHING");
 	    SUM = sum(mHistPurview)[0];
 	    mHistPurview.convertTo(mHistPurview, CV_64F, SCALE_FILTER);
 	    mHistPurview.convertTo(mHistPurview, CV_32S, 1.0/SUM );
+		
+	   {
+	     cv::Mat lHistBase, lHistPurview;
+	     cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::READ);
+
+	     file["mHistBase"]>>lHistBase;
+	     file["mHistPurview"]>>lHistPurview;
+
+	     // lHistBase.convertTo(lIntBase, CV_32S);
+	     /*int d  = cv::norm(mHistPurview, lHistPurview, cv::NORM_INF);
+	         d += cv::norm(mHistBase, lHistBase, cv::NORM_INF);
+	     cout<<"dist: " << d <<endl;
+	     */
+
+	     cout<<"size of Histogram Base:" << lHistBase.size()<<"	vs	"<< mHistBase.size()<<endl;
+	   }
+
+	  exit(0);
 		
 	   int   BestModelIdx=-1;
 	   int   NegLaneCorrelation;
