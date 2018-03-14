@@ -281,9 +281,10 @@ mProfiler.start("HISTOGRAM_MATCHING");
 		int& Nleft          	= Models[i].nbNonBoundaryBinsLeft;
 		int& Nright		= Models[i].nbNonBoundaryBinsRight;
 
+cout<<endl<<LeftIdx<<"  ,  "<<RightIdx<<"   ,  "<< NegLeftIdx<<"  ,  "<<NegRightIdx<<"  ,  "<<Nleft<<"  ,  "<<Nright<<endl;
 		
 
-		mLikelihoodLeftBoundary =  round(HistBasePTR[LeftIdx-1]*0.25
+		mLikelihoodLeftBoundary  =  round(HistBasePTR[LeftIdx-1]*0.25
 						+HistBasePTR[LeftIdx]
 						+HistBasePTR[LeftIdx+1]*0.25);
 										 
@@ -291,7 +292,7 @@ mProfiler.start("HISTOGRAM_MATCHING");
 						+HistBasePTR[RightIdx]
 						+HistBasePTR[RightIdx+1]*0.25);
 	
-		conditionalProb  =  (mLikelihoodLeftBoundary*mLikelihoodRightBoundary)/(float)SCALE_FILTER;
+		conditionalProb  	 =  (mLikelihoodLeftBoundary*mLikelihoodRightBoundary)/(float)SCALE_FILTER;
 
 
 //TODO:	Put on the side thread.(start)
