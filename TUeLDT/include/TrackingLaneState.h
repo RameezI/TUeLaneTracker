@@ -85,8 +85,8 @@ void TrackingLaneState<GRAPH>::setupDAG(LaneFilter* laneFilter, VanishingPtFilte
 	mGraph.mLOWER_LIMIT_IntBase =   SCALE_INTSEC*laneFilter->HISTOGRAM_BINS(0);
 	mGraph.mLOWER_LIMIT_IntPurview = SCALE_INTSEC*vpFilter->HISTOGRAM_BINS(0);
 
-	mGraph.mUPPER_LIMIT_IntBase =   SCALE_INTSEC*laneFilter->HISTOGRAM_BINS(laneFilter->mNb_HISTOGRAM_BINS-1);
-	mGraph.mUPPER_LIMIT_IntPurview = SCALE_INTSEC*vpFilter->HISTOGRAM_BINS(laneFilter->mNb_HISTOGRAM_BINS-1) ;
+	mGraph.mUPPER_LIMIT_IntBase 	=   SCALE_INTSEC*laneFilter->HISTOGRAM_BINS(laneFilter->mNb_HISTOGRAM_BINS-1);
+	mGraph.mUPPER_LIMIT_IntPurview 	=   SCALE_INTSEC*vpFilter->HISTOGRAM_BINS(laneFilter->mNb_HISTOGRAM_BINS-1) ;
 
 
 	mGraph.mSCALED_STEP_LANE_FILTER		= laneFilter->STEP*SCALE_INTSEC;

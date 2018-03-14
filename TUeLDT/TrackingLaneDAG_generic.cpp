@@ -129,6 +129,11 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
     	bitwise_and(mMask, mIntBase    < mUPPER_LIMIT_IntBase,     mMask);
     	bitwise_and(mMask, mIntPurview < mUPPER_LIMIT_IntPurview,  mMask);
 
+	cout<<"A= "<< mLOWER_LIMIT_IntBase<<endl;
+	cout<<"B= "<< mLOWER_LIMIT_IntPurview<<endl;
+	cout<<"C= "<< mUPPER_LIMIT_IntBase<<endl;
+	cout<<"D= "<< mUPPER_LIMIT_IntPurview<<endl;
+
 	   {
 	     cv::Mat lMask;
 	     cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::READ);
