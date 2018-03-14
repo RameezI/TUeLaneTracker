@@ -124,6 +124,10 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
 #endif
 	//Build Mask for Valid Intersections
 	bitwise_and(mProbMapFocussed > 0, mGradTanFocussed !=0,    mMask);
+	bitwise_and(mMask, mIntBase    > mLOWER_LIMIT_IntBase,     mMask);
+	bitwise_and(mMask, mIntPurview > mLOWER_LIMIT_IntPurview,  mMask);
+    	bitwise_and(mMask, mIntBase    < mUPPER_LIMIT_IntBase,     mMask);
+    	bitwise_and(mMask, mIntPurview < mUPPER_LIMIT_IntPurview,  mMask);
 
 	   {
 	     cv::Mat lMask;
@@ -133,11 +137,6 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
 	     cout<< "Mask compare = "<< d <<endl ;
 	     exit(0);
 	   }
-
-	bitwise_and(mMask, mIntBase    > mLOWER_LIMIT_IntBase,     mMask);
-	bitwise_and(mMask, mIntPurview > mLOWER_LIMIT_IntPurview,  mMask);
-    	bitwise_and(mMask, mIntBase    < mUPPER_LIMIT_IntBase,     mMask);
-    	bitwise_and(mMask, mIntPurview < mUPPER_LIMIT_IntPurview,  mMask);
 
 
         mHistBase      = cv::Mat::zeros(mLaneFilter->mNb_HISTOGRAM_BINS,  1 ,  CV_32S);
