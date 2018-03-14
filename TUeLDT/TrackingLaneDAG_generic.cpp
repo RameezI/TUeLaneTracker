@@ -326,6 +326,7 @@ mProfiler.start("HISTOGRAM_MATCHING");
 		   mLaneModel.confidenceLeft  = mLikelihoodLeftBoundary;
 		   mLaneModel.confidenceRight = mLikelihoodRightBoundary;
 		}
+
 				
 	   } 
 		
@@ -341,11 +342,15 @@ mProfiler.start("HISTOGRAM_MATCHING");
 	   mLaneModel.confidenceLeft  	= round(100* mLaneModel.confidenceLeft/(float)SCALE_FILTER);
 	   mLaneModel.confidenceRight  	= round(100* mLaneModel.confidenceRight/(float)SCALE_FILTER);
 
+		cout <<"Index : "<<BestModelIdx;
+		cout<< "Filter: "<<mPosteriorProbBase;
+		
+	}//Scope End
+
 
 	   {
 	     
 	     cv::Mat lIntBase, lIntPurview, lIntWeights, lMask,  lHistBase, lHistPurview;
-	     int L, R, W;
 	     cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::READ);
 	     file["mIntBase"]>> lIntBase;
 	     file["mIntPurview"]>> lIntPurview;
@@ -353,9 +358,6 @@ mProfiler.start("HISTOGRAM_MATCHING");
 	     file["mMask"]>> lMask;
 	     file["mHistBase"]>>lHistBase;
 	     file["mHistPurview"]>>lHistPurview;
-	     file["leftBoundary"]>>L;
-	     file["rightBoundary"]>>R;
-	     file["width"]>>W;
 
 	     // lHistBase.convertTo(lIntBase, CV_32S);
 	     int d  = cv::norm(mIntBase, lIntBase, cv::NORM_INF);
@@ -364,9 +366,6 @@ mProfiler.start("HISTOGRAM_MATCHING");
 		 d += cv::norm(mMask, lMask, cv::NORM_INF);
 		 d += cv::norm(mHistBase,    lHistBase,    cv::NORM_INF);
 		 d += cv::norm(mHistPurview, lHistPurview, cv::NORM_INF);
-		 d += mLaneModel.laneWidth  -W ;
-		 d += mLaneModel.leftOffset -L;
-		 d += mLaneModel.rightOffset - R;
 
 	      cout<<"dist: " << d <<endl;
 	     
@@ -376,8 +375,6 @@ mProfiler.start("HISTOGRAM_MATCHING");
 	  exit(0);
 
 
-		
-	}//Scope End
 		
 #ifdef PROFILER_ENABLED
 mProfiler.end();
