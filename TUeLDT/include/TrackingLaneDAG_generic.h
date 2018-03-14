@@ -44,9 +44,9 @@ private:
     	float		mLikelihood_W;
 
 	float 		mConditionalProb;
-	int		mCorrelationNB;
 	float		mPosterior;
 	float		mMaxPosterior;
+	int32_t		mCorrelationNB;
 
 	int32_t 	mLOWER_LIMIT_BASE;
 	int32_t 	mLOWER_LIMIT_PURVIEW;

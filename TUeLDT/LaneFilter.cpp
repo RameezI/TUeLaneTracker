@@ -143,7 +143,7 @@ void LaneFilter::createPrior()
 	       size_t lNonBoundaryBinsCount_left  = (idxM-3) - (idxL +2);
 	       size_t lNonBoundaryBinsCount_right = (idxR-2) - (idxM +3);
 
-	       if( 0 < idxL && idxR < COUNT_BINS )
+	       if( 0 < idxL && idxR < COUNT_BINS-1 )
 	       {
 		   baseHistogramModels.push_back( BaseHistogramModel());
 

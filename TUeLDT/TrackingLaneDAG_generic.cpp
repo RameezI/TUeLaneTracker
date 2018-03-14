@@ -364,8 +364,13 @@ mProfiler.start("HISTOGRAM_MATCHING");
 	      return;
 	   else
 	      mBaseHistModel = Models[lBestModelIdx];
+
+	cout<<endl;
+	cout<<"selected Index: "<<lBestModelIdx<<endl;
+        cout<<"Filter Value  : "<< mPosterior <<endl;
 		
 	}//Scope End
+
 
      	{
  	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::WRITE);
@@ -375,9 +380,6 @@ mProfiler.start("HISTOGRAM_MATCHING");
           file<<"mMask"<<mMask;
 	  file<<"mHistBase"<<mHistBase;
   	  file<<"mHistPurview"<<mHistPurview;
-	  file<<"leftBoundary"<<mBaseHistModel.boundary_left;
-	  file<<"rightBoundary"<<mBaseHistModel.boundary_right;
-	  file<<"width"<<mBaseHistModel.width_cm;
      	}
 		
 #ifdef PROFILER_ENABLED
