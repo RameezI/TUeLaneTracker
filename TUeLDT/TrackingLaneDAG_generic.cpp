@@ -68,8 +68,8 @@ int TrackingLaneDAG_generic::init_DAG()
 	mSTEP_BASE	 	 =  mBASE_BINS_SCALED.at<int32_t>(1,0)
 				   -mBASE_BINS_SCALED.at<int32_t>(0,0) ;
 
-	mSTEP_PURVIEW	 	 =  mBASE_BINS_SCALED.at<int32_t>(1,0)
-				   -mBASE_BINS_SCALED.at<int32_t>(0,0) ;
+	mSTEP_PURVIEW	 	 =  mPURVIEW_BINS_SCALED.at<int32_t>(1,0)
+				   -mPURVIEW_BINS_SCALED.at<int32_t>(0,0) ;
 
         mHistBase      		 =  cv::Mat::zeros(lCOUNT,  1 ,  CV_32S);
         mHistPurview   		 =  cv::Mat::zeros(lCOUNT,  1 ,  CV_32S);
@@ -219,6 +219,16 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 		
 	}//Block Ends
 
+     	{
+ 	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::WRITE);
+	  file<<"mIntBase"<<mIntBase;
+          file<<"mIntPurview"<<mIntPurview;
+          file<<"mIntWeights"<<mIntWeights;
+          file<<"mMask"<<mMask;
+	  file<<"mHistBase"<<mHistBase;
+  	  file<<"mHistPurview"<<mHistPurview;
+     	}
+
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
@@ -274,15 +284,6 @@ mProfiler.start("NORMALIZE_HISTOGRAM");
 	    mHistPurview.convertTo(mHistPurview, CV_32S, 1.0/lSUM );
 	}
 
-     	{
- 	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::WRITE);
-	  file<<"mIntBase"<<mIntBase;
-          file<<"mIntPurview"<<mIntPurview;
-          file<<"mIntWeights"<<mIntWeights;
-	  file<<"mHistBase"<<mHistBase;
-  	  file<<"mHistPurview"<<mHistPurview;
-
-     	}
 	
 #ifdef PROFILER_ENABLED
  mProfiler.end();
