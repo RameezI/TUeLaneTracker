@@ -277,15 +277,6 @@ mProfiler.start("NORMALIZE_HISTOGRAM");
 	}
 
 	
-     	{
- 	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::WRITE);
-	  file<<"mIntBase"<<mIntBase;
-          file<<"mIntPurview"<<mIntPurview;
-          file<<"mIntWeights"<<mIntWeights;
-          file<<"mMask"<<mMask;
-	  file<<"mHistBase"<<mHistBase;
-  	  file<<"mHistPurview"<<mHistPurview;
-     	}
 
 
 #ifdef PROFILER_ENABLED
@@ -375,6 +366,19 @@ mProfiler.start("HISTOGRAM_MATCHING");
 	      mBaseHistModel = Models[lBestModelIdx];
 		
 	}//Scope End
+
+     	{
+ 	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::WRITE);
+	  file<<"mIntBase"<<mIntBase;
+          file<<"mIntPurview"<<mIntPurview;
+          file<<"mIntWeights"<<mIntWeights;
+          file<<"mMask"<<mMask;
+	  file<<"mHistBase"<<mHistBase;
+  	  file<<"mHistPurview"<<mHistPurview;
+	  file<<"leftBoundary"<<mBaseHistModel.boundary_left;
+	  file<<"rightBoundary"<<mBaseHistModel.boundary_right;
+	  file<<"width"<<mBaseHistModel.width_cm;
+     	}
 		
 #ifdef PROFILER_ENABLED
 mProfiler.end();
