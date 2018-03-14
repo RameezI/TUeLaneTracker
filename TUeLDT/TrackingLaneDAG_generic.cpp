@@ -124,6 +124,16 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
 #endif
 	//Build Mask for Valid Intersections
 	bitwise_and(mProbMapFocussed > 0, mGradTanFocussed !=0,    mMask);
+
+	   {
+	     cv::Mat lMask;
+	     cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::READ);
+	     file["mMask"]>> lMask;
+	     int d  = cv::norm(mMask, lMask, cv::NORM_INF);
+	     cout<< "Mask compare = "<< d <<endl ;
+	     exit(0);
+	   }
+
 	bitwise_and(mMask, mIntBase    > mLOWER_LIMIT_IntBase,     mMask);
 	bitwise_and(mMask, mIntPurview > mLOWER_LIMIT_IntPurview,  mMask);
     	bitwise_and(mMask, mIntBase    < mUPPER_LIMIT_IntBase,     mMask);
@@ -195,18 +205,28 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 	}//Block Ends
 
 	   {
-	     cv::Mat lIntBase, lIntPurview, lIntWeights, lHistBase, lHistPurview;
+	     
+	     cv::Mat lIntBase, lIntPurview, lIntWeights, lMask,  lHistBase, lHistPurview;
 	     cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::READ);
 	     file["mIntBase"]>> lIntBase;
 	     file["mIntPurview"]>> lIntPurview;
 	     file["mIntWeights"]>> lIntWeights;
+	     file["mMask"]>> lMask;
 	     file["mHistBase"]>>lHistBase;
 	     file["mHistPurview"]>>lHistPurview;
+/*
+	    cout << "STEP_BASE:		" << mSCALED_STEP_LANE_FILTER<<endl;
+	    cout << "STEP_PURVIEW:	" << mSCALED_STEP_VP_FILTER<<endl;
+	    cout << "START_LANE:	" << mSCALED_START_LANE_FILTER<<endl;
+	    cout << "START_PURV:	" << mSCALED_START_VP_FILTER<<endl;
+*/
 
 	     // lHistBase.convertTo(lIntBase, CV_32S);
 	     int d  = cv::norm(mIntBase, lIntBase, cv::NORM_INF);
 		 d += cv::norm(mIntPurview, lIntPurview, cv::NORM_INF);
 		 d += cv::norm(mIntWeights, lIntWeights, cv::NORM_INF);
+		 d += cv::norm(mMask, lMask, cv::NORM_INF);
+
 
 		 //d += cv::norm(mHistBase,    lHistBase,    cv::NORM_INF);
 		 //d += cv::norm(mHistPurview, lHistPurview, cv::NORM_INF);
