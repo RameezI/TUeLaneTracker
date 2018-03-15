@@ -531,6 +531,8 @@ mProfiler.start("DISPLAY");
 
 	#ifdef DISPLAY_GRAPHICS
 	{
+
+	   mLaneModel.drawLane(mFrameRGB, mSPAN,  *mLaneFilter);
 	   //write the processed frame to the video
 	   //mOutputVideo<<mFrameRGB;
 	}
