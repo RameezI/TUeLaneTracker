@@ -258,7 +258,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
-
 #ifdef PROFILER_ENABLED
 mProfiler.start("NORMALIZE_HISTOGRAM");
 #endif
@@ -320,9 +319,6 @@ mProfiler.start("HISTOGRAM_MATCHING");
 		int& lCount_NBL          = Models[i].nonBoundaryBinsCount_left;
 		int& lCount_NBR		 = Models[i].nonBoundaryBinsCount_right;
 
-
-cout<<endl<<lIdx_BL<<"  ,  "<<lIdx_BR<<"   ,  "<<mLaneFilter->filter.at<int32_t>(Models[i].rowIdxFilter, Models[i].colIdxFilter)<<endl;
-
 		mLikelihood_LB  	=  round(lPtrHistBase[lIdx_BL-1]*0.25
 					   +lPtrHistBase[lIdx_BL]
 					   +lPtrHistBase[lIdx_BL+1]*0.25);
@@ -369,23 +365,8 @@ cout<<endl<<lIdx_BL<<"  ,  "<<lIdx_BR<<"   ,  "<<mLaneFilter->filter.at<int32_t>
 	   else
 	      mBaseHistModel = Models[lBestModelIdx];
 
-	cout<<endl;
-	cout<<"selected Index: "<<lBestModelIdx<<endl;
-        cout<<"Filter Value  : "<< mPosterior <<endl;
-		
 	}//Scope End
 
-
-     	{
- 	  cv::FileStorage file("/home/s32v/compare/Mat_new", cv::FileStorage::WRITE);
-	  file<<"mIntBase"<<mIntBase;
-          file<<"mIntPurview"<<mIntPurview;
-          file<<"mIntWeights"<<mIntWeights;
-          file<<"mMask"<<mMask;
-	  file<<"mHistBase"<<mHistBase;
-  	  file<<"mHistPurview"<<mHistPurview;
-     	}
-		
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
@@ -410,8 +391,9 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 	   const int& 	lPurviewLine		= mLaneFilter->PURVIEW_LINE_ICCS;
 	
 	   int32_t	lIntSecLeft, lIntSecRight, lWidth_cm;
+	   int32_t	lIdx_BL, lIdx_BR;
 
-	   size_t  	lIdx_BL, lIdx_Mid, lIdx_BR, lIdx_NBL, lIdx_NBR, lCount_NBL, lCount_NBR;
+	   size_t  	lIdx_Mid, lIdx_NBL, lIdx_NBR, lCount_NBL, lCount_NBR;
 
 	   cv::Mat   	lRange;
 
@@ -433,10 +415,10 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		   lIntSecLeft  = SCALE_INTSEC*( ((binH - lBaseLB)/(float)(binV - lBaseLine))*(lPurviewLine - binV) +binH );
 		   lIntSecRight = SCALE_INTSEC*( ((binH - lBaseRB)/(float)(binV - lBaseLine))*(lPurviewLine - binV) +binH );
 
-		   lIdx_BL 	= ( lIntSecLeft  - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW/2))/mSTEP_PURVIEW;
-		   lIdx_BR 	= ( lIntSecRight - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW/2))/mSTEP_PURVIEW;
-
+		   lIdx_BL 	= ( lIntSecLeft  - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW/2.0))/mSTEP_PURVIEW;
+		   lIdx_BR 	= ( lIntSecRight - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW/2.0))/mSTEP_PURVIEW;
 		   lIdx_Mid  	= round((lIdx_BL+ lIdx_BR)/2.0 );
+
 
 		   //^TODO:start=> Make non-boundary region dependent on the binwidth
 		   lIdx_NBL   	= lIdx_BL   + 2;
@@ -445,10 +427,12 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		   lCount_NBR   = (lIdx_BR  - 2) - (lIdx_Mid + 3) ;
 		   //(TODO:end)
 
-		   lWidth_cm= mLaneFilter->BINS_cm(lIdx_BR) - mLaneFilter->BINS_cm(lIdx_BL);
 					   
-		   if (lIdx_BL > 0 && lIdx_BR < mLaneFilter->COUNT_BINS -2 )
+		   if (lIdx_BL > 0 && lIdx_BR < (int32_t) (mLaneFilter->COUNT_BINS -2) )
 		   {			
+
+		      lWidth_cm= mLaneFilter->BINS_cm(lIdx_BR) - mLaneFilter->BINS_cm(lIdx_BL);
+
 		      // VP Probability over lane width difference between base and purview line
 		      mLikelihood_W  	= mLaneMembership.WIDTH_DIFF_NORMA;
 		      mLikelihood_W    *= exp(-pow(mBaseHistModel.width_cm - lWidth_cm, 2) / mLaneMembership.WIDTH_DIFF_NOMIN );
@@ -491,7 +475,8 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		      }//end, if posterior is greater than existing Max
 
 		    } //end, if Intersections are not in the BIN-Range 
-					
+
+				
 		 }//for-end			
 	     }//for-end
 		
@@ -514,7 +499,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				<<  "Min Time: " << mProfiler.getMinTime("VP_HISTOGRAM_MATCHING")<<endl
 		  		<<"******************************"<<endl<<endl;	
 				#endif
-
 
 
 
@@ -562,6 +546,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				<<  "Min Time: " << mProfiler.getMinTime("DISPLAY")<<endl
 		  		<<"******************************"<<endl<<endl;	
 		 		#endif
+
 }//extractLanes
 
 

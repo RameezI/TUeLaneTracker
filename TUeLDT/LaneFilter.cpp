@@ -161,6 +161,9 @@ void LaneFilter::createPrior()
 		   baseHistogramModels.back().binIdxNonBoundary_right  		= idxM+4;
 		   baseHistogramModels.back().nonBoundaryBinsCount_right 	= lNonBoundaryBinsCount_right;
 
+		   baseHistogramModels.back().boundary_left 			=  BASE_BINS.at<int32_t>(idxL,0);
+		   baseHistogramModels.back().boundary_right 			=  BASE_BINS.at<int32_t>(idxR,0);
+
 		   baseHistogramModels.back().boundary_left_cm 			=  BINS_cm(idxL);
 		   baseHistogramModels.back().boundary_right_cm 		=  BINS_cm(idxR);
 		   baseHistogramModels.back().width_cm				=  lWidth_cm;

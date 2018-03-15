@@ -40,7 +40,7 @@ VanishingPtFilter::VanishingPtFilter()
   
   prior(  cv::Mat::zeros( COUNT_BINS_V, COUNT_BINS_H , CV_32SC1) ),
   
-  filter( cv::Mat::zeros( COUNT_BINS_H, COUNT_BINS_H,  CV_32SC1) )
+  filter( cv::Mat::zeros( COUNT_BINS_V, COUNT_BINS_H,  CV_32SC1) )
 {
 	createPrior();
 	this->filter = this->prior.clone();
