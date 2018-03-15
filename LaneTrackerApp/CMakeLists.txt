@@ -7,7 +7,7 @@ find_package(OpenCV REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Boost 1.62.0 REQUIRED COMPONENTS program_options )
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -O1 -std=c++11")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -O0 -std=c++11")
 
 #add_definitions (-D_GLIBCXX_USE_CXX11_ABI=0)
 

@@ -34,9 +34,9 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
   mLikelihood_NB(0),
   mLikelihood_W(0),
   mConditionalProb(0),
-  mCorrelationNB(0),
   mPosterior(0),
   mMaxPosterior(0),
+  mCorrelationNB(0),
   mLOWER_LIMIT_BASE(0),
   mLOWER_LIMIT_PURVIEW(0),
   mUPPER_LIMIT_BASE(0),
@@ -406,7 +406,6 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 	{
 	   const int& 	lBaseLB  		= mBaseHistModel.boundary_left;	
 	   const int& 	lBaseRB 		= mBaseHistModel.boundary_right;
-
 	   const int& 	lBaseLine		= mLaneFilter->BASE_LINE_ICCS;
 	   const int& 	lPurviewLine		= mLaneFilter->PURVIEW_LINE_ICCS;
 	
@@ -468,7 +467,6 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		
 		      //VP Probability over Non-Boundary Region
 		      mCorrelationNB = 0;
-
 		      lRange 		= mHistPurview(cv::Range(lIdx_NBL, lIdx_NBL + lCount_NBL), cv::Range::all());
 		      mCorrelationNB   +=sum(lRange)[0];
 			
