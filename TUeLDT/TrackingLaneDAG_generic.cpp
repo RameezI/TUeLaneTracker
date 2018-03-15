@@ -321,7 +321,7 @@ mProfiler.start("HISTOGRAM_MATCHING");
 		int& lCount_NBR		 = Models[i].nonBoundaryBinsCount_right;
 
 
-cout<<endl<<lIdx_BL<<"  ,  "<<lIdx_BR<<"   ,  "<<mLaneFilter->filter.at<int32_t>(lIdx_BL, lIdx_BR)<<endl;
+cout<<endl<<lIdx_BL<<"  ,  "<<lIdx_BR<<"   ,  "<<mLaneFilter->filter.at<int32_t>(Models[i].rowIdxFilter, Models[i].colIdxFilter)<<endl;
 
 		mLikelihood_LB  	=  round(lPtrHistBase[lIdx_BL-1]*0.25
 					   +lPtrHistBase[lIdx_BL]
