@@ -24,7 +24,7 @@
 #include <opencv2/core/eigen.hpp>
 
 ///cm to pixel conversion, for a particular row in the image, of the #BINS_cm [Vehicle-Symmetry-CS <---> Image-Center-CS]
-cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const int Y_ICS )
+cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const int Y_ICCS )
 {
 
 	cv::Mat  lMat = cv::Mat(BINS_cm.size(),1,CV_32S);
@@ -47,7 +47,7 @@ cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const
 	   lIMG_TO_W = lW_TO_IMG.inv();
 
 	   lImgPt.at<float>(0,0) = 0;
-	   lImgPt.at<float>(1,0) = (float)Y_ICS; 
+	   lImgPt.at<float>(1,0) = (float)Y_ICCS; 
 	   lImgPt.at<float>(2,0) = 1;
 
 	   lWorldPt = lIMG_TO_W * lImgPt;
@@ -98,7 +98,6 @@ LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
 
 /*^TODO: Calculate using calcPixelWidth */
  // BASE_BINS(),
-
   //PURVIEW_BINS(),
   
   prior( cv::Mat::zeros( (int)(BINS_MAX_cm/BINS_STEP_cm) +1, (int)(BINS_MAX_cm/BINS_STEP_cm) +1 , CV_32SC1) ),

@@ -60,14 +60,11 @@ public:
 			 O_ICCS_ICS( cv::Point( RES_VH[1]/2,  RES_VH[0]/2) ), 
 			 O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) )
 			{
-		   	   if (MATRIX_INTRINSIC.empty() || MATRIX_EXTRINSIC.empty() || !( RES_VH(0)>0 && RES_VH(1)>0 ))
-		   	    throw "Camera Instantiation Failed" ;
 			}
 
 private:
 	   cv::Mat getCameraMatrix(std::string Mat_name)
 	   {
-
 		int lSuccess = 0;
 
 		cv::Mat 	lCAMERA_MATRIX;
@@ -92,7 +89,8 @@ private:
 		   <<"Unable to find the path to binary"<<endl
 		   <<"[Searching for Camera configuration files]: "<<endl;
 		  #endif
-		  lSuccess =-1;
+
+		  throw "Camera Instantiation Failed" ;
 		}
 
 		lFormattedString<<lPath<<"/ConfigFiles/Camera/"<<NAME<<".yaml";
@@ -108,6 +106,7 @@ private:
 		   <<"Unable to load camera configuration: "<<endl
 		   << "File not found: " << lFile.c_str() << endl;
 		  #endif
+		  throw "Camera Instantiation Failed" ;
 		}
 		else
 		{
@@ -125,6 +124,8 @@ private:
 
 	     	int 		lSuccess = 0; 
 	     	cv::Size	lRES(0,0);
+
+		
 
 		stringstream 	lFormattedString;
 		string 		lFile, lPath;
@@ -146,7 +147,7 @@ private:
 		   <<"Unable to find the path to binary"<<endl
 		   <<"[Searching for Camera configuration files]: "<<endl;
 		  #endif
-		  lSuccess =-1;
+		  throw "Camera Instantiation Failed" ;
 		}
 
 		lFormattedString<<lPath<<"/ConfigFiles/Camera/"<<NAME<<".yaml";
@@ -163,6 +164,7 @@ private:
 		  <<"Unable to load camera configuration: "<<endl
 		  << "File not found: " << lFile.c_str() << endl;
 	          #endif
+		  throw "Camera Instantiation Failed" ;
 	    	}
 	    	else
 	    	{
@@ -170,7 +172,7 @@ private:
 		  loadFile[Mat_name]>> lRES;
 	    	}
 
-	   	 return Vector2i(lRES.height, lRES.width);
+	   	return Vector2i(lRES.height, lRES.width);
 	 }
 };
 
