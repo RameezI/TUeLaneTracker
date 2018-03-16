@@ -84,7 +84,7 @@ LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
 
   PURVIEW_LINE_ICCS(-PURVIEW_LINE_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),
   
-  BINS_STEP_cm(10),
+  BINS_STEP_cm(10), // This value must be above 10 for the current implementation.
   
   BINS_MAX_cm(round(mLANE.MAX_WIDTH/BINS_STEP_cm)*BINS_STEP_cm),
 
@@ -95,6 +95,11 @@ LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
   BASE_BINS(toPixelBINS(BINS_cm, mCAMERA, BASE_LINE_ICCS)),
 
   PURVIEW_BINS(toPixelBINS(BINS_cm, mCAMERA, PURVIEW_LINE_ICCS)),
+
+/*^TODO: Calculate using calcPixelWidth */
+ // BASE_BINS(),
+
+  //PURVIEW_BINS(),
   
   prior( cv::Mat::zeros( (int)(BINS_MAX_cm/BINS_STEP_cm) +1, (int)(BINS_MAX_cm/BINS_STEP_cm) +1 , CV_32SC1) ),
   

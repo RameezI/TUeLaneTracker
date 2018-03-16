@@ -114,9 +114,9 @@ unique_ptr<Templates> InitState::createTemplates()
 
 	
 	  lTemplates	 = unique_ptr<Templates>
-	  		   ( new  Templates (lCamera.RES_VH(0), lCamera.RES_VH(1), lCamera.FOV_VH(0), lVanishingPtFilter.RANGE_V) );
+	  ( new  Templates (lCamera.RES_VH(0), lCamera.RES_VH(1), lCamera.FOV_VH(0), lCamera.HORIZON,  lVanishingPtFilter.RANGE_V) );
 	
-	  mTemplatesCreated	= true;
+	   mTemplatesCreated	= true;
 	
 	  if (checkCreationStatus())
 	  currentStatus		= StateStatus::DONE;		

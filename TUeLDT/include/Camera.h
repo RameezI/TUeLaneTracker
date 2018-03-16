@@ -42,7 +42,8 @@ public:
 		const cv::Mat	MATRIX_EXTRINSIC;		/**<  Camera Extrinsic Parameters 4x4 */
 
 		const Vector2i	RES_VH; 	    		/**< Resolution of the camera image */
-		const Vector2f  FOV_VH;				/**  Field-of-View of the camera */
+		const Vector2f  FOV_VH;				/**< Field-of-View of the camera */
+		const int32_t	HORIZON;			/**< Location of Horizon in Image-Center-CS */
 
 		const cv::Point O_ICCS_ICS;			/**< Origin of Image-Center-CS in Image-CS*/
 		const cv::Point O_ICS_ICCS;			/**< Origin of Image-CS in Image-Center-CS*/
@@ -55,6 +56,7 @@ public:
 			 RES_VH(getCameraRES("CAMERA_RES")),
 			 FOV_VH(Vector2f(2*atan( (RES_VH(0)/2.0) / (MATRIX_INTRINSIC.at<float>(1,1)) )*180/M_PI ,
 					 2*atan( (RES_VH(1)/2.0) / (MATRIX_INTRINSIC.at<float>(0,0)) )*180/M_PI )),
+			 HORIZON(0), //Need to be computed from the Camera Matrix ^TODO: Calculate from Exrinsic Matrix
 			 O_ICCS_ICS( cv::Point( RES_VH[1]/2,  RES_VH[0]/2) ), 
 			 O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) )
 			{
