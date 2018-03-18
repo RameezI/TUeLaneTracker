@@ -58,9 +58,7 @@ public:
 					 2*atan( (RES_VH(1)/2.0) / (MATRIX_INTRINSIC.at<float>(0,0)) )*180/M_PI )),
 			 HORIZON(0), //Need to be computed from the Camera Matrix ^TODO: Calculate from Exrinsic Matrix
 			 O_ICCS_ICS( cv::Point( RES_VH[1]/2,  RES_VH[0]/2) ), 
-			 O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) )
-			{
-			}
+			 O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) ){ }
 
 private:
 	   cv::Mat getCameraMatrix(std::string Mat_name)

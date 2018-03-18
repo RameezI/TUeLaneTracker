@@ -58,10 +58,11 @@ cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const
 
 	   for(int i=0; i< BINS_cm.size(); i++)
 	   {
-		lWorldPt.at<float>(0)	= BINS_cm[i]/100.0;
-		lImgPt = lW_TO_IMG * lWorldPt;
-	 	lMat.at<int32_t>(i,0) = round(lImgPt.at<float>(0,0)/lImgPt.at<float>(0,2)) ;
+		  lWorldPt.at<float>(0)	= BINS_cm[i];
+		  lImgPt = lW_TO_IMG * lWorldPt;
+	 	  lMat.at<int32_t>(i,0) = floor( lImgPt.at<float>(0,0)/(lImgPt.at<float>(0,2)*100.0 ) ) ;
 	   }
+
 	}
 
 	return lMat;
@@ -84,7 +85,7 @@ LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
 
   PURVIEW_LINE_ICCS(-PURVIEW_LINE_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),
   
-  BINS_STEP_cm(10), // This value must be above 10 for the current implementation.
+  BINS_STEP_cm(15), // This value must be above 10 for the current implementation.
   
   BINS_MAX_cm(round(mLANE.MAX_WIDTH/BINS_STEP_cm)*BINS_STEP_cm),
 
