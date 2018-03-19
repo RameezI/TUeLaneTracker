@@ -56,7 +56,7 @@ public:
 			 RES_VH(getCameraRES("CAMERA_RES")),
 			 FOV_VH(Vector2f(2*atan( (RES_VH(0)/2.0) / (MATRIX_INTRINSIC.at<float>(1,1)) )*180/M_PI ,
 					 2*atan( (RES_VH(1)/2.0) / (MATRIX_INTRINSIC.at<float>(0,0)) )*180/M_PI )),
-			 HORIZON(0), //Need to be computed from the Camera Matrix ^TODO: Calculate from Exrinsic Matrix
+			 HORIZON(atan2(MATRIX_EXTRINSIC.at<float>(1,0),MATRIX_EXTRINSIC.at<float>) * 180/M_PI * RES_VH(1) / FOV_VH(1)), //Need to be computed from the Camera Matrix ^TODO: Calculate from Exrinsic Matrix
 			 O_ICCS_ICS( cv::Point( RES_VH[1]/2,  RES_VH[0]/2) ), 
 			 O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) ){ }
 
