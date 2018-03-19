@@ -32,7 +32,7 @@ cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const
 	float ty;
 	ty = 1.5; //CAM.MATRIX_EXTRINSIC.at<float>(3,1);
 
-	thetaY = CAM.FOV_HORIZON * ((Y_ICCS) / CAM.RES_HORIZON);
+	thetaY = CAM.FOV_HORIZON * (Y_ICCS / CAM.RES_HORIZON);
 	Z = ty * 100 / tan(thetaY * M_PI / 180);
 	W = 2 * Z * tan(CAM.FOV_VH(1) / 2 * M_PI / 180);
 

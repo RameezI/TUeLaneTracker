@@ -341,3 +341,49 @@ Shutting Down the State-Machine.
 ******************************
 
 
+2018-03-19 14:39:42.125 INFO  [16154] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 14:40:07.564 INFO  [16154] [Templates::Templates@170] File not found: /home/vedecom/TUeLaneTracker/install/ConfigFiles/Templates/GradientTangent_960x600.yaml
+
+2018-03-19 14:40:07.564 INFO  [16154] [InitState::createTemplates@127] 
+******************************
+EXCEPTION CAUGHT: 
+Templates Instatiation Failed
+******************************
+
+
+2018-03-19 14:40:07.564 INFO  [16154] [StateMachine::spin@136] 
+****************************************
+[Failed to Complete the Booting Process]
+Shutting Down the State-Machine.
+****************************************
+
+
+2018-03-19 14:41:25.825 INFO  [16294] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 14:50:26.946 INFO  [17159] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 16:47:34.121 INFO  [8847] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 16:56:10.934 INFO  [11768] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+

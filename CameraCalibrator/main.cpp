@@ -1,3 +1,5 @@
+#define VEDECOMLOGS
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
 #include <iostream>
@@ -13,7 +15,11 @@ int main( int argc, char** argv )
   if(argc >= 2)
   {
 
+  #ifndef VEDECOMLOGS
     Size lRES = cv::Size(640, 480);
+  #else
+    Size lRES = cv::Size(960, 600);    
+  #endif
 
     ostringstream lStringStream;
     lStringStream <<argv[1]<<"_"<<lRES.width<<"x"<<lRES.height<<".yaml";
@@ -24,7 +30,7 @@ int main( int argc, char** argv )
     time_t rawtime; time(&rawtime);
     fs<< "callibrationDate" << asctime(localtime(&rawtime));
 
-
+  #ifndef VEDECOMLOGS
     // 3x3 Intrinsic Parameters
     Mat CameraMatrixIntrinsic = (Mat_<float>(3,3) << 554.25626,    0,  		0,
 						     	0,  	579.41125,  	0,
@@ -35,6 +41,18 @@ int main( int argc, char** argv )
 						    0,  0, -1,  1.5,
 						    0,  1,  0,   0,
 						    0,  0,  0,   1);
+  #else
+// 3x3 Intrinsic Parameters
+    Mat CameraMatrixIntrinsic = (Mat_<float>(3,3) << 1039.232,    0,  		488.58893,
+						     	0,  	1049.1925,  	309.27204,
+						    	0,  	   0,  		1 );
+    float pitchAngle = 0.5 / 180 * M_PI;
+    // 4x4  Extrinsic Parameters [Homogenous Transformation]
+    Mat CameraMatrixExtrinsic = (Mat_<float>(4,4)<< cos(pitchAngle),  -sin(pitchAngle),  0,   0.195,
+						    sin(pitchAngle),  cos(pitchAngle), 0,  1.115,
+						    0,  0,  1,   1.809,
+						    0,  0,  0,   1);
+  #endif
 
 
     // Store Camera Parameters in a file
