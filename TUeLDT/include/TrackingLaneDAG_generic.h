@@ -91,12 +91,10 @@ private:
 
 	
 public:
-
 	TrackingLaneDAG_generic(BufferingDAG_generic&& bufferingGraph);
 	int  init_DAG();
 	void runAuxillaryTasks();
-	void extractLanes();
-	void extractControllerInputs();
+	void execute(cv::Mat FrameGRAY);
 	~TrackingLaneDAG_generic();
 
 };

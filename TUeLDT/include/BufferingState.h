@@ -1,5 +1,5 @@
-#ifndef BUFFERINGSTATE_H
-#define BUFFERINGSTATE_H
+#ifndef BUFFERING_STATE_H
+#define BUFFERING_STATE_H
 
 /******************************************************************************
 * NXP Confidential Proprietary
@@ -37,17 +37,14 @@ class BufferingState : public State
 	
 private:
 	size_t       	mBufferSize;
-	uint_fast8_t 	mRetryGrab;
 	std::thread  	mSideExecutor;
 
 public:
-
 	BufferingState();
 
 	GRAPH 	mGraph;
-	int  	setSource(FrameSource, string);
 	void 	setupDAG(const Templates& TEMPLATES, const size_t & BUFFER_SIZE);
-	void 	run();
+	void 	run(cv::Mat Frame);
 
 	~BufferingState();
 };
@@ -60,127 +57,7 @@ public:
 
 template<typename GRAPH>
 BufferingState<GRAPH>::BufferingState()
-: mBufferSize(0),
-  mRetryGrab(0)
-{
-
-}
-
-template<typename GRAPH>  
-int BufferingState<GRAPH>::setSource(FrameSource lSource, string lSourceStr)
-{
-	int lReturn=0;
-
-	if (lSource == FrameSource::DIRECTORY)
-	{
-       	   cv::String lFolder = lSourceStr;
-	   vector< cv::String> lFiles;
-	  
-           
-	   try
-	   {
-		glob(lFolder, lFiles);
-	   }
-
-	   catch(...)
-	   {
-		lReturn = -1;
-	   }
-
-	   if (lFiles.size() <= SKIP_FRAMES)
-	   {
-		
-		#ifdef PROFILER_ENABLED
-		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		 <<"******************************"<<endl
-		 << "Setting up the Frame Source"
-		 << "Total Number of Image Files are Less than SKIP_FRAMES."<<endl
-		 << "Total Number of Image Files : " << lFiles.size()<<endl
-		 << "...Skipping All"<<endl
-		 <<"******************************"<<endl<<endl;
-		#endif
-
-		lReturn = -1;
-	   }
-
-	   else
-	   {
-		#ifdef PROFILER_ENABLED
-		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		 <<"******************************"<<endl
-		 << "Setting up the Frame Source."<<endl
-		 << "Total Number of Image Files to Process: " << lFiles.size() - SKIP_FRAMES<<endl
-		 << "MODE: "<< FrameSource::DIRECTORY<<endl
-		 <<"******************************"<<endl<<endl;
-		#endif
-
-            	mGraph.mSource 		= lSource;
-           	mGraph.mFiles 		= lFiles;
-           	mGraph.mFrameCount 	= SKIP_FRAMES;
-	   }
-
-
-	}
-
-	else if(lSource == FrameSource::STREAM)
-	{
-		#ifdef PROFILER_ENABLED
-		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		 <<"******************************"<<endl
-		 << "Setting up the Frame Source" <<endl
-		 << "MODE: "<< FrameSource::STREAM<<endl
-		 <<"******************************"<<endl<<endl;
-		#endif
-
-		mGraph.mSource = lSource;
-	   	mGraph.mFrameCount = 0;
-		
-		try
-		{
-		   if(!mGraph.mCAPTURE.open(lSourceStr))
-		   lReturn = -1;
-		}
-
-		catch(...)
-		{
-		    lReturn = -1;
-		}
-	}
-
-	else if (lSource == FrameSource::GMSL)
-	{
-
-		#ifdef PROFILER_ENABLED
-		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		 <<"******************************"<<endl
-		 << "Setting up the Frame Source" <<endl
-		 << "MODE: "<< FrameSource::GMSL<<endl
-		 <<"******************************"<<endl<<endl;
-		#endif
-
-		mGraph.mSource = lSource;
-	   	mGraph.mFrameCount = 0;
-	
-		throw "GMSL function not implemented";
-		lReturn =-1;
-	}
-
-	else
-	{
-
-		#ifdef PROFILER_ENABLED
-		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		 <<"******************************"<<endl
-		 << "Setting up the Frame Source" <<endl
-		 << "MODE: NOT RECOGNIZED"<<endl
-		 << "Exiting"<<endl
-		 <<"******************************"<<endl<<endl;
-		#endif
-
-		lReturn =-1;
-	}
-
-	return lReturn;
+: mBufferSize(0){
 
 }
 
@@ -215,55 +92,28 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 template<typename GRAPH>  
-void BufferingState<GRAPH>::run()
+void BufferingState<GRAPH>::run(cv::Mat Frame)
 {
+   if (mSideExecutor.joinable())
+      mSideExecutor.join();
 
-#ifdef PROFILER_ENABLED
-mProfiler.start("RUN_BUFFERING_DAG");
-#endif	
+   mSideExecutor = std::thread(&GRAPH::runAuxillaryTasks, std::ref(mGraph));
+   mGraph.execute(Frame);
 
-	if (0==mGraph.grabFrame())
-	{
-	  if (mSideExecutor.joinable())
-	    mSideExecutor.join();
+   this->StateCounter++;
 
-	  mSideExecutor = std::thread(&GRAPH::runAuxillaryTasks, std::ref(mGraph));
-	  mGraph.buffer();
-	
-	  this->StateCounter++;
-	
-	  if(this->StateCounter >= mBufferSize-1)
-	  {
-	    this->currentStatus = StateStatus::DONE;
-	  }
-	}
-		
-	else
-	{ 	
-	  mRetryGrab ++;
-	  if(mRetryGrab > 3)
-	   currentStatus = StateStatus::ERROR;
-	}
-
-
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
-				<<"******************************"<<endl
-				<<  "Total Time for Buffering Graph." <<endl
-				<<  "Max  Time:  " << mProfiler.getMaxTime("RUN_BUFFERING_DAG")<<endl
-				<<  "Avg. Time:  " << mProfiler.getAvgTime("RUN_BUFFERING_DAG")<<endl
-				<<  "Min  Time:  " << mProfiler.getMinTime("RUN_BUFFERING_DAG")<<endl
-				<<"******************************"<<endl<<endl;	
- 				#endif
+   if(this->StateCounter >= mBufferSize-1)
+   {
+      this->currentStatus = StateStatus::DONE;
+   }	
 }
 
 
 template<typename GRAPH>  
 BufferingState<GRAPH>::~BufferingState()
 {
-	if (mSideExecutor.joinable())
-	   mSideExecutor.join();	
+   if (mSideExecutor.joinable())
+      mSideExecutor.join();	
 }
 
-#endif // BUFFERINGSTATE_H
+#endif // BUFFERING_STATE_H

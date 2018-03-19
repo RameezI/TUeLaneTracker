@@ -78,14 +78,18 @@ int TrackingLaneDAG_generic::init_DAG()
 }
 
 
-void TrackingLaneDAG_generic::extractLanes()
+void TrackingLaneDAG_generic::execute(cv::Mat FrameGRAY)
 {
 
 	WriteLock  wrtLock(_mutex, std::defer_lock);
+
+
+	BufferingDAG_generic::execute(FrameGRAY);
+       
 	 //Start Filtering
-	 wrtLock.lock();
-	 this->mStartFiltering = true;
-	 wrtLock.unlock();
+	  wrtLock.lock();
+	  this->mStartFiltering = true;
+	  wrtLock.unlock();
 	 _sateChange.notify_one();
 
 
@@ -507,8 +511,8 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 mProfiler.start("ASSIGN_LANE_MODEL");
 #endif
 	mLaneModel.setModel(mBaseHistModel.boundary_left,
-			    mBaseHistModel.boundary_left_cm,
 			    mBaseHistModel.boundary_right,
+			    mBaseHistModel.boundary_left_cm,
 			    mBaseHistModel.boundary_right_cm,
 			    mVanishPt);
 
@@ -532,7 +536,7 @@ mProfiler.start("DISPLAY");
 	#ifdef DISPLAY_GRAPHICS
 	{
 
-	   mLaneModel.drawLane(mFrameRGB, mSPAN,  *mLaneFilter);
+	//   mLaneModel.drawLane(FrameGRAY, mSPAN,  *mLaneFilter);
 	   //write the processed frame to the video
 	   //mOutputVideo<<mFrameRGB;
 	}
@@ -551,12 +555,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 
 }//extractLanes
 
-
-
-void TrackingLaneDAG_generic::extractControllerInputs()
-{
-	
-}
 
 
 

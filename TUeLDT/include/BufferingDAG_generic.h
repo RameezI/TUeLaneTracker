@@ -43,9 +43,8 @@ class BufferingDAG_generic
 {
 
 template<typename T>
-friend class BufferingState;
 
-FRIEND_TEST(BufferingTest, RGB_IMAGE);
+friend class BufferingState;
 FRIEND_TEST(BufferingTest, GRAY_IMAGE);
 FRIEND_TEST(BufferingTest, PROB_MAP);
 FRIEND_TEST(BufferingTest, GRAD_TAN);
@@ -107,16 +106,11 @@ protected:
 	const LaneMembership    	mLaneMembership;
 	VanishingPt 			mVanishPt;
 
-
-	//Image Frames
-	cv::Mat     			mFrameRGB;
-	cv::Mat				mFrameGRAY;
+	//ROI Frame
 	cv::Mat				mFrameGRAY_ROI;
-
 	
 	//Binary Mask 
 	cv::Mat 			mMask;
-	
 	
 	//Image Gradients
 	cv::Mat     			mGradX;
@@ -125,7 +119,6 @@ protected:
 	cv::Mat     			mGradY_abs;
 	cv::Mat     			mFrameGradMag;
 
-
 	// Extracted Templates
 	cv::Mat 			mGradTanTemplate;
 	cv::Mat 			mDepthTemplate;
@@ -133,89 +126,63 @@ protected:
 	cv::Mat 			mX_ICCS;
 	cv::Mat 			mY_ICCS;
 
-
 	// Temporary Probability Maps
 	cv::Mat 			mTempProbMat;
 	cv::Mat				mProbMap_Gray;
 	cv::Mat				mProbMap_GradMag;
 	cv::Mat 			mProbMap_GradDir;
 	
-
-    	// Display Control Unit
-    	#ifdef DISPLAY_GRAPHICS_DCU
-     	 io::FrameOutputV234Fb   mDCU;
-	#endif
-
-	uint64_t 			mFrameCount;
-
-	FrameSource			mSource;
-	vector<cv::String>		mFiles;
-	cv::VideoCapture 		mCAPTURE;
-
 	
 public:	
 	/** *For initialising DAG ONE TIME EXECUTION */
 	int  init_DAG(const Templates & TEMPLATES, const size_t & BUFFER_SIZE);
 
-	int  grabFrame(); 		// Grab Frame from the Source
-	void runAuxillaryTasks(); 	// Perform assitve tasks for buffering from seperate executor
-	void buffer();   		// Perform tasks for buffering from main Thread
-	
+	void runAuxillaryTasks(); 		// Perform assitve tasks for buffering from seperate executor
+	void execute(cv::Mat& FrameGRAY);   	// Perform tasks for buffering from main Thread
 	
    	BufferingDAG_generic (BufferingDAG_generic && bufferingGraph)
-	#ifdef DISPLAY_GRAPHICS_DCU 
-	: mDCU(io::FrameOutputV234Fb(mCAMERA.RES_VH(1), mCAMERA.RES_VH(0), io::IO_DATA_DEPTH_08, io::IO_DATA_CH3))
-	#endif
    	{
 	
-	WriteLock  wrtLock(_mutex);
+	   WriteLock  wrtLock(_mutex);
 	
-	   mTemplatesReady      	= std::move(bufferingGraph.mTemplatesReady);
-       	   mBufferReady             	= std::move(bufferingGraph.mBufferReady);
+	     mTemplatesReady      	= std::move(bufferingGraph.mTemplatesReady);
+       	     mBufferReady             	= std::move(bufferingGraph.mBufferReady);
 
-	   mHORIZON_ICCS		= std::move(bufferingGraph.mHORIZON_ICCS);
-	   mVP_RANGE_V			= std::move(bufferingGraph.mVP_RANGE_V);
-	   mSPAN 			= std::move(bufferingGraph.mSPAN);
+	     mHORIZON_ICCS		= std::move(bufferingGraph.mHORIZON_ICCS);
+	     mVP_RANGE_V		= std::move(bufferingGraph.mVP_RANGE_V);
+	     mSPAN 			= std::move(bufferingGraph.mSPAN);
 		
-	   mGRADIENT_TAN_ROOT 		= std::move(bufferingGraph.mGRADIENT_TAN_ROOT);
-	   mFOCUS_MASK_ROOT   		= std::move(bufferingGraph.mFOCUS_MASK_ROOT);
-	   mDEPTH_MAP_ROOT    		= std::move(bufferingGraph.mDEPTH_MAP_ROOT);
+	     mGRADIENT_TAN_ROOT 	= std::move(bufferingGraph.mGRADIENT_TAN_ROOT);
+	     mFOCUS_MASK_ROOT   	= std::move(bufferingGraph.mFOCUS_MASK_ROOT);
+	     mDEPTH_MAP_ROOT    	= std::move(bufferingGraph.mDEPTH_MAP_ROOT);
 
-       	   mX_ICS                   	= std::move(bufferingGraph.mX_ICS);
-           mY_ICS                   	= std::move(bufferingGraph.mY_ICS);
+       	     mX_ICS                   	= std::move(bufferingGraph.mX_ICS);
+             mY_ICS                   	= std::move(bufferingGraph.mY_ICS);
 	
-	   mBufferPool   		= std::move(bufferingGraph.mBufferPool);
-	   mVanishPt			= std::move(bufferingGraph.mVanishPt);
+	     mBufferPool   		= std::move(bufferingGraph.mBufferPool);
+	     mVanishPt			= std::move(bufferingGraph.mVanishPt);
 	
-	   mFrameRGB			= std::move(bufferingGraph.mFrameRGB);
-	   mFrameGRAY			= std::move(bufferingGraph.mFrameGRAY);
-	   mFrameGRAY_ROI		= std::move(bufferingGraph.mFrameGRAY_ROI);
+	     mFrameGRAY_ROI		= std::move(bufferingGraph.mFrameGRAY_ROI);
 
-	   mMask 			= std::move(bufferingGraph.mMask);
+	     mMask 			= std::move(bufferingGraph.mMask);
 	
-	   mGradX			= std::move(bufferingGraph.mGradX);
-	   mGradY			= std::move(bufferingGraph.mGradY);
-	   mFrameGradMag		= std::move(bufferingGraph.mFrameGradMag);
+	     mGradX			= std::move(bufferingGraph.mGradX);
+	     mGradY			= std::move(bufferingGraph.mGradY);
+	     mFrameGradMag		= std::move(bufferingGraph.mFrameGradMag);
 	
-	   mGradTanTemplate		= std::move(bufferingGraph.mGradTanTemplate);
-	   mDepthTemplate		= std::move(bufferingGraph.mDepthTemplate);
-	   mFocusTemplate		= std::move(bufferingGraph.mFocusTemplate);
+	     mGradTanTemplate		= std::move(bufferingGraph.mGradTanTemplate);
+	     mDepthTemplate		= std::move(bufferingGraph.mDepthTemplate);
+	     mFocusTemplate		= std::move(bufferingGraph.mFocusTemplate);
 	
-	   mTempProbMat			= std::move(bufferingGraph.mTempProbMat);
-	   mProbMap_Gray		= std::move(bufferingGraph.mProbMap_Gray);
-	   mProbMap_GradMag		= std::move(bufferingGraph.mProbMap_GradMag);
-	   mProbMap_GradDir		= std::move(bufferingGraph.mProbMap_GradDir);
+	     mTempProbMat		= std::move(bufferingGraph.mTempProbMat);
+	     mProbMap_Gray		= std::move(bufferingGraph.mProbMap_Gray);
+	     mProbMap_GradMag		= std::move(bufferingGraph.mProbMap_GradMag);
+	     mProbMap_GradDir		= std::move(bufferingGraph.mProbMap_GradDir);
 	
-	   mFrameCount			= std::move(bufferingGraph.mFrameCount);
-	   mX_ICCS			= std::move(bufferingGraph.mX_ICCS);
-	   mY_ICCS			= std::move(bufferingGraph.mY_ICCS);
-		
-	   mSource			= std::move(bufferingGraph.mSource);
-	   mFiles			= std::move(bufferingGraph.mFiles);
-	   mCAPTURE 			= std::move(bufferingGraph.mCAPTURE);
+	     mX_ICCS			= std::move(bufferingGraph.mX_ICCS);
+	     mY_ICCS			= std::move(bufferingGraph.mY_ICCS);
 
-	wrtLock.unlock();
-
+	   wrtLock.unlock();
    	}
 };
 

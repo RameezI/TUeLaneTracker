@@ -23,17 +23,13 @@
 
 BufferingDAG_generic::BufferingDAG_generic()
 :mTemplatesReady(false),
- mBufferReady(false),
- mFrameCount(0)
+ mBufferReady(false)
 {
 	
 }
 
-
 int BufferingDAG_generic::init_DAG(const Templates & TEMPLATES, const size_t & BUFFER_SIZE)
 {
-
-
 	const int RES_H 	= mCAMERA.RES_VH(1);
 	mVP_RANGE_V   		= TEMPLATES.VP_RANGE_V;
 	mSPAN			= TEMPLATES.SPAN;
@@ -54,28 +50,8 @@ int BufferingDAG_generic::init_DAG(const Templates & TEMPLATES, const size_t & B
 }
 
 
-void BufferingDAG_generic::buffer( )
+void BufferingDAG_generic::execute(cv::Mat& FrameGRAY )
 {
-
-#ifdef PROFILER_ENABLED
-mProfiler.start("GRAY_FRAME_CONVERSION");
-#endif
-				
-	cvtColor(mFrameRGB, mFrameGRAY, CV_BGR2GRAY);
-
-
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
-				 <<"******************************"<<endl
-				 <<  "GRAY Frame Conversion." <<endl
-				 <<  "Max Time: " << mProfiler.getMaxTime("GRAY_FRAME_CONVERSION")<<endl
-				 <<  "Avg Time: " << mProfiler.getAvgTime("GRAY_FRAME_CONVERSION")<<endl
-				 <<  "Min Time: " << mProfiler.getMinTime("GRAY_FRAME_CONVERSION")<<endl
-				 <<"******************************"<<endl<<endl;	
-				 #endif
-
-
 
 #ifdef PROFILER_ENABLED
 mProfiler.start("EXTRACT_ROI");
@@ -87,7 +63,7 @@ mProfiler.start("EXTRACT_ROI");
 
 	 //Define ROI from the Input Image
 	 lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
-	 mFrameGRAY_ROI = mFrameGRAY(lROI);
+	 mFrameGRAY_ROI = FrameGRAY(lROI);
 
 	 //Extract Corrseponding Gradient Orientation Template
 	 lRowIndex =  mCAMERA.RES_VH(0) - (mVP_RANGE_V + mVanishPt.V);
@@ -313,73 +289,3 @@ void BufferingDAG_generic::runAuxillaryTasks()
 }
 
 
-//^TODO: Move to BuffeingState.h -> Localise Frame Input Code
-int BufferingDAG_generic::grabFrame()	
-{
-	int lReturn = 0;
-		
-	#ifdef PROFILER_ENABLED
-	mProfiler.start("IMAGE_READ");
-	#endif 
-
-
-	   if(mSource == FrameSource::DIRECTORY)
-	   {
-		 mFrameRGB = imread(mFiles[mFrameCount]);
-		
-		 #ifdef PROFILER_ENABLED
-		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		  <<"Processing Frame: "<<mFrameCount<<endl;
-		 #endif
-
-		 if (mFrameCount+1 < mFiles.size())
-	   	  mFrameCount ++;
-	   }
-
-	   else if (mSource == FrameSource::STREAM)
-	   {
-		 mCAPTURE >> mFrameRGB;
-
-		 #ifdef PROFILER_ENABLED
-		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		  <<"Processing Frame: "<<mFrameCount<<endl;
-		 #endif
-
-	   	 mFrameCount ++;
-	   }
-
-	   else if (mSource == FrameSource::GMSL)
-	   {
-		 #ifdef PROFILER_ENABLED
-		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		  <<"Undefined Input Mode: "<<endl;
-		 #endif
-
-		lReturn = -1;
-	   }
-
-	   else
-	   {
-		 #ifdef PROFILER_ENABLED
-		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		  <<"Undefined Input Mode: "<<endl;
-		 #endif
-
-		 lReturn =-1;
-	   }
-				
-
-	   if(!mFrameRGB.data)
-	   	lReturn = -1;
-
-
-	#ifdef PROFILER_ENABLED
-	mProfiler.end();
-	LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
-				<<"******************************"<<endl
-				<<  "Frame Source:   "<<endl<<mSource<<endl
-				<<  "Read time: " << mProfiler.getAvgTime("IMAGE_READ")<<endl
-				<<"******************************"<<endl<<endl;
-				#endif 
-	return lReturn;
-}

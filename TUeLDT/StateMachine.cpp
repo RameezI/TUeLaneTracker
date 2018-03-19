@@ -31,60 +31,30 @@
  #include "TrackingLaneDAG_generic.h"
 #endif
 
- 
-
-StateMachine::StateMachine(FrameSource lFrameSource, std::string lSourceStr)
-
-: mInitialized(false),
-  mQuitRequest(false),
-  mFrameSource(lFrameSource),
-  mSourceStr(lSourceStr),
-  mCurrentState(States::BOOTING),
-  mPtrLaneFilter(nullptr),
-  mPtrVanishingPtFilter(nullptr),
-  mPtrTemplates(nullptr)
-
+StateMachine::StateMachine(unique_ptr<FrameFeeder> frameFeeder)
+ : mQuitRequest(false),
+   mCurrentState(States::BOOTING),
+   mPtrFrameFeeder(std::move(frameFeeder)),
+   mPtrFrameRenderer(nullptr),
+   mPtrLaneFilter(nullptr),
+   mPtrVanishingPtFilter(nullptr),
+   mPtrTemplates(nullptr)
 {
-	int lReturn =0;
-
-	#ifdef PROFILER_ENABLED
-		Logger::Init();
-		if(lFrameSource == FrameSource::DIRECTORY)
-		{
-			LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-			<<"******************************"<<endl
-			<<  "DIRECTORY_INPUT DEFINED."	  <<endl
-			<<"******************************"<<endl<<endl;
-		}
-	#endif
-
-
 	#ifdef S32V2XX
-		int  lReturn |= OAL_Initialize();
-		ACF_Init();
+	  int  lSuccess |= OAL_Initialize();
+	  if(lSuccess!=0)
+	    throw "Failed to initialize s32v OAL context ";
+	  ACF_Init();
 	#endif
 
-
-	if(lReturn!=0)
-	{
-		#ifdef PROFILER_ENABLED
-		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
- 		 <<  "********************************"<<endl
-		 <<  "[Failed to Start the Booting Process]"<<endl
-		 <<  "Shutting Down the State-Machine."<<endl
-		 <<"******************************"<<endl<<endl;
-		#endif
-	}
-
-	mInitialized = (lReturn==0) ? true : false ;
+	if (mPtrFrameFeeder == nullptr)
+	     throw "State-Machine is missing an instance of FrameFeeder";
 }
 
 
 int StateMachine::spin()
 {
-
 	int lReturn = 0;
-
 
 	// Process Quit Request
 	if (mQuitRequest)
@@ -106,44 +76,38 @@ int StateMachine::spin()
 		if (mPtrBufferingState == nullptr)
 	  	{
 		   mPtrBootingState   = unique_ptr<InitState>(new InitState());
+		}
+	   	if (mPtrBootingState->currentStatus  != StateStatus::ERROR)
+		{
+	      	   mPtrLaneFilter 	 = mPtrBootingState->createLaneFilter();
+		   mPtrVanishingPtFilter = mPtrBootingState->createVanishingPtFilter();
+		   mPtrTemplates 	 = mPtrBootingState->createTemplates();
+		}
+		if (mPtrBootingState->currentStatus == StateStatus::DONE)
+		{				
+		   mCurrentState 	= States::BUFFERING;
+		   cout<< "Completed!"<<endl;
 
-		   if (mPtrBootingState->currentStatus  != StateStatus::ERROR)
-		      mPtrLaneFilter = mPtrBootingState->createLaneFilter();
-
-		   if (mPtrBootingState->currentStatus != StateStatus::ERROR)
-		      mPtrVanishingPtFilter = mPtrBootingState->createVanishingPtFilter();
-
-		   if (mPtrBootingState->currentStatus != StateStatus::ERROR)
-		      mPtrTemplates = mPtrBootingState->createTemplates();
-
-		   if (mPtrBootingState->currentStatus == StateStatus::DONE)
-		   {				
-		      mCurrentState 	= States::BUFFERING;
-		      cout<< "Completed!"<<endl;
-
-		      #ifdef PROFILER_ENABLED
-		       LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		       <<"****************************************"<<endl
-		       << "Printing Booting Configuration"<<endl
-		       <<  *(mPtrLaneFilter)<<endl
-		       <<"****************************************"<<endl<<endl;
-		      #endif
-
-		   }
-		   else
-		   {
-		      #ifdef PROFILER_ENABLED
-		       LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		       <<"****************************************"<<endl
-		       <<  "[Failed to Complete the Booting Process]"<<endl
-		       <<  "Shutting Down the State-Machine."<<endl
-		       <<"****************************************"<<endl<<endl;
-		      #endif
+		   #ifdef PROFILER_ENABLED
+		     LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+		     <<"****************************************"<<endl
+		     << "Printing Booting Configuration"<<endl
+		     <<  *(mPtrLaneFilter)<<endl
+		     <<"****************************************"<<endl<<endl;
+		   #endif
+		}
+		else
+		{
+	      	   #ifdef PROFILER_ENABLED
+	       	     LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	       	     <<"****************************************"<<endl
+	       	     <<  "[Failed to Complete the Booting Process]"<<endl
+	       	     <<  "Shutting Down the State-Machine."<<endl
+	       	     <<"****************************************"<<endl<<endl;
+	      	   #endif
 			
 		      mCurrentState 	= States::DISPOSED;
 		      lReturn 		= -1;
-		      mPtrBootingState 	= nullptr;
-		   }
 		}
 	}
 	break; //BOOTING PROCESS SCOPE ENDS
@@ -160,40 +124,21 @@ int StateMachine::spin()
 		    mPtrBufferingState.reset(new BufferingState<BufferingDAG_generic>());
 		   #endif
 		}
-
 		if (mPtrBufferingState->currentStatus == StateStatus::INACTIVE)
 		{
-		   lReturn |= mPtrBufferingState->setSource(mFrameSource, mSourceStr); //TODO: remove-> FrameGrabber
-
-		   if (lReturn != 0)	//TODO:remove->FrameGrabber
-		   {
-		      #ifdef PROFILER_ENABLED
-		       LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		       <<"*********************************"<<endl
-		       <<  "[Failed to Setup the Frame Source]"<<endl
-		       <<  "Shutting Down the State-Machine"<<endl
-		       <<"******************************"<<endl;
-		      #endif
-		      mPtrBufferingState->preDispose(); //TODO: remove-> FrameGrabber
-		   }
-		   else
-		   {
 		      mPtrBufferingState->setupDAG(std::ref(*mPtrTemplates), 5);
-		   }
 		}
-
 		if (mPtrBufferingState->currentStatus == StateStatus::ACTIVE)
 		{
-		   mPtrBufferingState->run();
+		    mPtrFrameFeeder->produceFrames();
+		    mPtrBufferingState->run(mPtrFrameFeeder->getFrameGRAY());
 		}
-
 		if( mPtrBufferingState->currentStatus == StateStatus::DONE)
 		{
-		   mCurrentState 	= States::DETECTING_LANES;
+		   mCurrentState = States::DETECTING_LANES;
 		   cout<<"Completed!"<<endl;
 		}
-
-		else if( mPtrBufferingState->currentStatus == StateStatus::ERROR)
+		if( mPtrBufferingState->currentStatus == StateStatus::ERROR)
 		{
 		   #ifdef PROFILER_ENABLED
 		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
@@ -204,52 +149,40 @@ int StateMachine::spin()
 		   #endif
 
 		   mCurrentState 	= States::DISPOSED;
-		   mPtrBufferingState 	= nullptr;
 		   lReturn 	        = -1;
 		}
-
 	}
 	break; // BUFFERING PROCESS SCOPE ENDS
 
 
 	case States::DETECTING_LANES :
 	{
-		
 		if (mPtrTrackingState == nullptr)
 		{
 		   #ifdef S32V2XX
-		   mPtrTrackingState.reset(new TrackingLaneState<TrackingLaneDAG_s32v>( move(mPtrBufferingState->mGraph) ) );
+		   mPtrTrackingState.reset(new TrackingLaneState<TrackingLaneDAG_s32v>( move(mPtrBufferingState->mGraph) ));
 		   #else
-		   mPtrTrackingState.reset(new TrackingLaneState<TrackingLaneDAG_generic>( move(mPtrBufferingState->mGraph) ) );
+		   mPtrTrackingState.reset(new TrackingLaneState<TrackingLaneDAG_generic>( move(mPtrBufferingState->mGraph) ));
 		   #endif
 		   mPtrBufferingState 	= nullptr; //BufferingState does not contian graph so make it unuseable.
 		}
-
 		if (mPtrTrackingState->currentStatus == StateStatus::INACTIVE)
 		{
-
 		   mPtrTrackingState->setupDAG(mPtrLaneFilter.get(), mPtrVanishingPtFilter.get());
-
+		   mPtrFrameRenderer.reset(new FrameRenderer(mPtrTemplates->HORIZON_ICCS, *mPtrLaneFilter));
 		}
 		if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
 		{
-		   mPtrTrackingState->run();
+		   mPtrFrameFeeder->produceFrames();
+		   mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->getFrameGRAY());
+		   mPtrFrameRenderer->drawLane(mPtrFrameFeeder->getFrame(), mLaneModel);
+		   
 		}
-
 		if( (mPtrTrackingState->currentStatus == StateStatus::DONE) )
 		{
-		   #ifdef PROFILER_ENABLED
-		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		    <<  "********************************"<<endl
-		    <<  "[Tracking Finished]"<<endl
-		    <<  "Shutting Down the State-Machine."<<endl
-		    <<  "********************************"<<endl<<endl;
-		   #endif
-
 		   mCurrentState 	= States::DISPOSED;
-		   mPtrTrackingState 	= nullptr;
 		}
-		else if(mPtrTrackingState->currentStatus == StateStatus::ERROR)
+		if(mPtrTrackingState->currentStatus == StateStatus::ERROR)
 		{
 		   #ifdef PROFILER_ENABLED
 		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
@@ -259,15 +192,15 @@ int StateMachine::spin()
 		    <<"******************************"<<endl<<endl;
 		   #endif
 
-		   lReturn 		= -1;
 		   mCurrentState 	= States::DISPOSED;
-		   mPtrTrackingState 	= nullptr;
+		   lReturn 		= -1;
 		}
 
 
 	}
 	break; // TRACKING STATE SCOPE ENDS
 	
+
 	case States::DISPOSED:
 	{
 		#ifdef S32V2XX
@@ -279,7 +212,7 @@ int StateMachine::spin()
 		 << "State Machine is Disposed"<< endl;
 		#endif
 
-		cout<<endl<<"Ended..." <<endl;
+		cout<<endl<<"State Machine Ended with return code: "<< lReturn <<endl;
 	}
 	break; } // END SWITCH
 
@@ -287,10 +220,6 @@ int StateMachine::spin()
 
 }
 
-bool StateMachine::isInitialized()
-{
-	return mInitialized;
-}
 
 void StateMachine::quit()
 {

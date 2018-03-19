@@ -1,5 +1,5 @@
-#ifndef TRACKINGLANESTATE_H
-#define TRACKINGLANESTATE_H
+#ifndef TRACKING_LANE_STATE_H
+#define TRACKING_LANE_STATE_H
 
 /******************************************************************************
 * NXP Confidential Proprietary
@@ -40,16 +40,14 @@ class TrackingLaneState: public State
 	
 private:
 	uint_fast8_t mRetryGrab;
-	std::thread mSideExecutor;
-
-public:
-	GRAPH 	mGraph;
+	std::thread  mSideExecutor;
+	GRAPH 	     mGraph;
 
 
 public:	
-	void run();
+	const LaneModel& run(cv::Mat Frame);
 	void setupDAG(LaneFilter* laneFilters, VanishingPtFilter* vpFilter);
-	
+
 	template<typename GRAPH_BASE>
 	TrackingLaneState(GRAPH_BASE&& lBaseGraph);
 
@@ -78,59 +76,32 @@ TrackingLaneState<GRAPH>::TrackingLaneState(GRAPH_BASE&& lBaseGraph)
 template<typename GRAPH>
 void TrackingLaneState<GRAPH>::setupDAG(LaneFilter* laneFilter, VanishingPtFilter* vpFilter)
 {
-	//Setting up the  filters for the Graph	[observing pointers]
-	mGraph.mLaneFilter 	= laneFilter;
-	mGraph.mVpFilter    	= vpFilter; 
-	
-	if (0 == mGraph.init_DAG())
-	 this->currentStatus= StateStatus::ACTIVE;	
+   //Setting up the  filters for the Graph	[observing pointers]
+   mGraph.mLaneFilter 	= laneFilter;
+   mGraph.mVpFilter    	= vpFilter; 
+
+   if (0 == mGraph.init_DAG())
+   this->currentStatus= StateStatus::ACTIVE;	
 }
 
 
 template<typename GRAPH>
-void TrackingLaneState<GRAPH>::run()
+const LaneModel& TrackingLaneState<GRAPH>::run(cv::Mat Frame)
 {
-
-#ifdef PROFILER_ENABLED
-mProfiler.start("SingleRun_TRACK");
-#endif
-		
-	if (0==mGraph.grabFrame())
-	{
-
-	  if (mSideExecutor.joinable())
-	     mSideExecutor.join();
-		 
-	  mSideExecutor = std::thread(&GRAPH::runAuxillaryTasks, std::ref(mGraph));
-	  mGraph.buffer();
-	  mGraph.extractLanes();
-	  this->StateCounter++;
-	}
-			
-	else
-	{
-	   mRetryGrab ++;
-	   if(mRetryGrab >3)
-	    currentStatus = StateStatus::ERROR;
-	}
-
-		
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
-				<<"******************************"<<endl
-				<<  "Completing a TrackingLanes run." <<endl
-				<<  "Complete run Time: " << mProfiler.getAvgTime("SingleRun_TRACK")<<endl
-				<<"******************************"<<endl<<endl;	
-				#endif	
+   if (mSideExecutor.joinable())
+    mSideExecutor.join();
+	 
+   mSideExecutor = std::thread(&GRAPH::runAuxillaryTasks, std::ref(mGraph));
+   mGraph.execute(Frame);
+   this->StateCounter++;
+   return mGraph.mLaneModel;
 }
 
 template<typename GRAPH>
 TrackingLaneState<GRAPH>::~TrackingLaneState()
 {
-	if (mSideExecutor.joinable())
-	   mSideExecutor.join();	
+   if (mSideExecutor.joinable())
+     mSideExecutor.join();	
 }
 
-
-#endif // TRACKINGLANESTATE_H
+#endif // TRACKING_LANE_STATE_H

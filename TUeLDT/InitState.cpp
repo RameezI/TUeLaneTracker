@@ -28,9 +28,9 @@
 
 unique_ptr<LaneFilter> InitState::createLaneFilter()
 {
-
-	unique_ptr<LaneFilter> 	lLaneFilter;
-
+	
+	unique_ptr<LaneFilter> 	lLaneFilter = nullptr;
+	
 	try
 	{
 	  Camera 			lCamera;
@@ -143,8 +143,7 @@ unique_ptr<Templates> InitState::createTemplates()
 bool InitState::checkCreationStatus()
 {
 	if (mLaneFilterCreated && mVpFilterCreated && mTemplatesCreated)
-	return true;
-	
+	 return true;
 	else
 	return false;
 }
