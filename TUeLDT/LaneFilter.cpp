@@ -18,11 +18,38 @@
 * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
+#define NEWPIXELBINS
 
 #include "LaneFilter.h"
 #include "ScalingFactors.h"
 #include <opencv2/core/eigen.hpp>
+#ifdef NEWPIXELBINS
+	///cm to pixel conversion, for a particular row in the image, of the #BINS_cm [Vehicle-Symmetry-CS <---> Image-Center-CS]
+cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const int Y_ICCS )
+{
 
+	float Z, W, thetaY, cm2px;
+	float ty;
+	ty = 1.5; //CAM.MATRIX_EXTRINSIC.at<float>(3,1);
+
+	thetaY = CAM.FOV_HORIZON * ((Y_ICCS) / CAM.RES_HORIZON);
+	Z = ty * 100 / tan(thetaY * M_PI / 180);
+	W = 2 * Z * tan(CAM.FOV_VH(1) / 2 * M_PI / 180);
+
+	cm2px = CAM.RES_VH(1) / W;
+
+	cv::Mat  lMat = cv::Mat(BINS_cm.size(),1,CV_32S);
+	cv::Mat  lWorldPt	= cv::Mat(3,1, CV_32F);
+	for(int i=0; i< BINS_cm.size(); i++)
+	   {
+		  lWorldPt.at<float>(0)	= BINS_cm[i];
+	 	  lMat.at<int32_t>(i,0) = floor(lWorldPt.at<float>(0,0) * cm2px) ;
+	   }
+
+	return lMat;
+}
+#endif
+#ifndef NEWPIXELBINS
 ///cm to pixel conversion, for a particular row in the image, of the #BINS_cm [Vehicle-Symmetry-CS <---> Image-Center-CS]
 cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const int Y_ICCS )
 {
@@ -67,6 +94,7 @@ cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const
 
 	return lMat;
 }
+#endif
 
 
 LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
