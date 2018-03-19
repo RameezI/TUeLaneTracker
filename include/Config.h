@@ -30,8 +30,8 @@
 #define TEST_APEX_CODE	       /**< S32V234 test specific flags */
 
 /** Provide target camera and resolution [Required for loading corresponding callibration file] */
-#define CAMERA_NAME "BUMBLEBEE_640x480"
-//#define CAMERA_NAME "BUMBLEBEE_960x600"
+//#define CAMERA_NAME "BUMBLEBEE_640x480"
+#define CAMERA_NAME "BUMBLEBEE_960x600"
 
 //^TODO: Move it to sourceString
 #define SKIP_FRAMES 0 			//Skip frames in case of directory input
