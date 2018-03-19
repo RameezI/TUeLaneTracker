@@ -2,6 +2,7 @@
 .clang/
 .build-debug/
 .codelite/
+.vscode/
 build/
 install/
 *~
