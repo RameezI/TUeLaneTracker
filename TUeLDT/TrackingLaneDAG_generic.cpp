@@ -25,9 +25,6 @@
 TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferingGraph)
 : 
   BufferingDAG_generic(std::move(bufferingGraph)),
-  mStartBufferShift(false),
-  mStartFiltering(false),
-  mFiltersReady(false),
   mMAX_PIXELS_ROI(mFrameGRAY_ROI.rows * mFrameGRAY_ROI.cols),
   mLikelihood_LB(0),
   mLikelihood_RB(0),
@@ -49,8 +46,12 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
 }
 
 
-int TrackingLaneDAG_generic::init_DAG()
+int TrackingLaneDAG_generic::init_DAG(LaneFilter* laneFilter, VanishingPtFilter* vpFilter)
 {
+
+	mLaneFilter		 = laneFilter;
+	mVpFilter		 = vpFilter;
+
 	const size_t& lCOUNT 	 = mLaneFilter->COUNT_BINS;
 
 	mX_ICCS_SCALED	 	 =  SCALE_INTSEC*mX_ICCS;
@@ -63,8 +64,6 @@ int TrackingLaneDAG_generic::init_DAG()
 	mUPPER_LIMIT_BASE	 =  mBASE_BINS_SCALED.at<int32_t>(lCOUNT-1,0);
 	mUPPER_LIMIT_PURVIEW  	 =  mPURVIEW_BINS_SCALED.at<int32_t>(lCOUNT-1,0);
 
-
-	//Assuming a constant step
 	mSTEP_BASE	 	 =  mBASE_BINS_SCALED.at<int32_t>(1,0)
 				   -mBASE_BINS_SCALED.at<int32_t>(0,0) ;
 
@@ -81,16 +80,60 @@ int TrackingLaneDAG_generic::init_DAG()
 void TrackingLaneDAG_generic::execute(cv::Mat FrameGRAY)
 {
 
-	WriteLock  wrtLock(_mutex, std::defer_lock);
-
 
 	BufferingDAG_generic::execute(FrameGRAY);
-       
-	 //Start Filtering
-	  wrtLock.lock();
-	  this->mStartFiltering = true;
-	  wrtLock.unlock();
-	 _sateChange.notify_one();
+
+
+#ifdef PROFILER_ENABLED
+mProfiler.start("SETUP_ASYNC_FILTERING");
+#endif
+	mFuture = std::async([this]
+	{
+	   int64_t lSUM;
+
+	   WriteLock  lLock(_mutex, std::defer_lock);	
+
+	   //Predict Lane States
+	   lLock.lock();	
+	    mLaneFilter->filter.convertTo(mLaneFilter->filter, CV_64F);
+	    boxFilter(mLaneFilter->filter, mTransitLaneFilter, -1, cv::Size(11,11), cv::Point(-1,-1), false, cv::BORDER_REPLICATE );
+    	    mLaneFilter->filter.convertTo(mLaneFilter->filter, CV_32S);
+
+	    lSUM = sum(mTransitLaneFilter)[0];
+	    mTransitLaneFilter= mTransitLaneFilter*SCALE_FILTER;
+	    mTransitLaneFilter.convertTo(mTransitLaneFilter, CV_32S, 1.0/lSUM);
+	    mTransitLaneFilter = 	mTransitLaneFilter + 0.1*mLaneFilter->prior;
+	   lLock.unlock();
+
+
+	   //Predict VP States
+	   lLock.lock();	
+	    mVpFilter->filter.convertTo(mVpFilter->filter, CV_64F);
+	    boxFilter(mVpFilter->filter, mTransitVpFilter, -1, cv::Size(3,3), cv::Point(-1,-1), false, cv::BORDER_REPLICATE );
+    	    mVpFilter->filter.convertTo(mVpFilter->filter, CV_32S);
+
+	    lSUM = sum(mTransitVpFilter)[0];
+	    mTransitVpFilter= mTransitVpFilter*SCALE_FILTER;
+	    mTransitVpFilter.convertTo(mTransitVpFilter, CV_32S, 1.0/lSUM);	
+	    mTransitVpFilter = mTransitVpFilter + 0.1*mVpFilter->prior;
+	   lLock.unlock();
+	   //Local Variables
+
+	});
+
+#ifdef PROFILER_ENABLED
+mProfiler.end();
+LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
+				<<"******************************"<<endl
+				<<  "Setting up async task for filtering LaneFilter." <<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("SETUP_ASYNC_FILTERING")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("SETUP_ASYNC_FILTERING")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("SETUP_ASYNC_FILTERING")<<endl
+				<<"******************************"<<endl<<endl;	
+				#endif
+
+
+
 
 
 #ifdef PROFILER_ENABLED
@@ -242,13 +285,8 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("FILTERS_WAIT");
 #endif 				
-	wrtLock.lock();
-	_sateChange.wait(wrtLock,[this]{return mFiltersReady;} );
-	mFiltersReady = false; //reset the flag for next loop.
-	this->mStartBufferShift = true;
-	wrtLock.unlock();
-	_sateChange.notify_one();
-		
+	mFuture.wait();
+
 #ifdef PROFILER_ENABLED
  mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
@@ -259,6 +297,38 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<  "Min Time: " << mProfiler.getMinTime("FILTERS_WAIT")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif	
+
+
+
+
+#ifdef PROFILER_ENABLED
+mProfiler.start("SETUP_ASYNC_BUFFER_SHIFT");
+#endif
+	mFuture = std::async([this]
+	{
+	   WriteLock  lLock(_mutex, std::defer_lock);	
+
+	   for ( std::size_t i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
+	   {
+	 	mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
+		mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);
+	   }	
+
+	   lLock.unlock();
+
+	});
+
+#ifdef PROFILER_ENABLED
+mProfiler.end();
+LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
+				<<"******************************"<<endl
+				<<  "Setting up async task for shifting Buffers." <<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("SETUP_ASYNC_BUFFER_SHIFT")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("SETUP_ASYNC_BUFFER_SHIFT")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("SETUP_ASYNC_BUFFER_SHIFT")<<endl
+				<<"******************************"<<endl<<endl;	
+				#endif
+
 
 
 
@@ -528,155 +598,22 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				#endif
 
 
+#ifdef PROFILER_ENABLED
+mProfiler.start("BUFFER_SHIFT_WAIT");
+#endif 				
+	mFuture.wait();
 
 #ifdef PROFILER_ENABLED
-mProfiler.start("DISPLAY");
-#endif
+ mProfiler.end();
+LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
+				<<"******************************"<<endl
+				<<  "Waiting for async task to finish shifting buffers." <<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("BUFFER_SHIFT_WAIT")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("BUFFER_SHIFT_WAIT")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("BUFFER_SHIFT_WAIT")<<endl
+				<<"******************************"<<endl<<endl;	
+				#endif	
 
-	#ifdef DISPLAY_GRAPHICS
-	{
-
-	//   mLaneModel.drawLane(FrameGRAY, mSPAN,  *mLaneFilter);
-	   //write the processed frame to the video
-	   //mOutputVideo<<mFrameRGB;
-	}
-	#endif // Display Graphics	
-								
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
-		  		<<"******************************"<<endl
-		  		<<  "Screen Display." <<endl
-				<<  "Max Time: " << mProfiler.getMaxTime("DISPLAY")<<endl
-				<<  "Avg Time: " << mProfiler.getAvgTime("DISPLAY")<<endl
-				<<  "Min Time: " << mProfiler.getMinTime("DISPLAY")<<endl
-		  		<<"******************************"<<endl<<endl;	
-		 		#endif
 
 }//extractLanes
 
-
-
-
-void TrackingLaneDAG_generic::runAuxillaryTasks()
-{
-	int  lRowIndex;
-	cv::Rect lROI;
-	WriteLock  wrtLock(_mutex, std::defer_lock);
-
-	wrtLock.lock();
-	 if (mBufferReady == false)
-
-// MODE: A + C 
-	{
-		wrtLock.unlock();
-		 // Extract Depth Template
-		 lRowIndex = mCAMERA.RES_VH(0)- mSPAN; 
-		 lROI = cv::Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSPAN);
-
-		wrtLock.lock();
-		 mDEPTH_MAP_ROOT(lROI).copyTo(mDepthTemplate);
-		wrtLock.unlock();
-
-		 // Extract Focus Template
-		 lRowIndex = mVP_RANGE_V - mVanishPt.V;
-		 lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
-		
-		wrtLock.lock();
-		 mFOCUS_MASK_ROOT(lROI).copyTo(mFocusTemplate);	
-		wrtLock.unlock();
-
-		wrtLock.lock();
-		  for ( std::size_t i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
-		  {
-			 mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
-			 mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);		
-		  }
-		
-		  mTemplatesReady = true;
-		  mBufferReady    = true;
-		wrtLock.unlock();
-	}
-
-	else
-
-// MODE: A ONLY 
-	{
-		wrtLock.unlock();
-		 lRowIndex = mCAMERA.RES_VH(0)- mSPAN; 
-		 lROI = cv::Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSPAN);
-		
-		wrtLock.lock();
-		 mDEPTH_MAP_ROOT(lROI).copyTo(mDepthTemplate);
-		wrtLock.unlock();
-
-		lRowIndex = mVP_RANGE_V-mVanishPt.V;
-		lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
-
-
-		wrtLock.lock();
-		 mFOCUS_MASK_ROOT(lROI).copyTo(mFocusTemplate);
-		 mTemplatesReady= true;		
-		wrtLock.unlock();
-	}
-	
-	_sateChange.notify_one();
-	
-	
-//MODE B:
-
-	wrtLock.lock();
-	_sateChange.wait(wrtLock,[this]{return mStartFiltering;} );
-
-	int64_t lSUM;
-	
-	//Predict Lane States
-	mLaneFilter->filter.convertTo(mLaneFilter->filter, CV_64F);
-	boxFilter(mLaneFilter->filter, mTransitLaneFilter, -1, cv::Size(11,11), cv::Point(-1,-1), false, cv::BORDER_REPLICATE );
-    	mLaneFilter->filter.convertTo(mLaneFilter->filter, CV_32S);
-
-	lSUM = sum(mTransitLaneFilter)[0];
-	mTransitLaneFilter= mTransitLaneFilter*SCALE_FILTER;
-	mTransitLaneFilter.convertTo(mTransitLaneFilter, CV_32S, 1.0/lSUM);
-	mTransitLaneFilter = 	mTransitLaneFilter + 0.1*mLaneFilter->prior;
-
-
-	//Predict VP States
-	mVpFilter->filter.convertTo(mVpFilter->filter, CV_64F);
-	boxFilter(mVpFilter->filter, mTransitVpFilter, -1, cv::Size(3,3), cv::Point(-1,-1), false, cv::BORDER_REPLICATE );
-    	mVpFilter->filter.convertTo(mVpFilter->filter, CV_32S);
-	
-	lSUM = sum(mTransitVpFilter)[0];
-	mTransitVpFilter= mTransitVpFilter*SCALE_FILTER;
-	mTransitVpFilter.convertTo(mTransitVpFilter, CV_32S, 1.0/lSUM);	
-	mTransitVpFilter = mTransitVpFilter + 0.1*mVpFilter->prior;
-			
-
-	mFiltersReady   = true;
-	mStartFiltering = false;
-	
-	wrtLock.unlock();
-	_sateChange.notify_one();
-
-// MODE: C  
-
-	wrtLock.lock();
-	_sateChange.wait(wrtLock,[this]{return mStartBufferShift;} );
-	
-	   for ( std::size_t i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
-	   {
-	 	mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
-		mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);
-	   }	
-
-	   mBufferReady    = true;
-	   mStartBufferShift=false;
-
-	wrtLock.unlock();
-}
-
-TrackingLaneDAG_generic::~TrackingLaneDAG_generic()
-{
-	
-
-}

@@ -31,11 +31,6 @@ template<typename T>
 friend class TrackingLaneState;
 	
 private:
-
-	bool  		mStartBufferShift;
-	bool    	mStartFiltering;
-	bool 		mFiltersReady;	
-	
 	int32_t		mMAX_PIXELS_ROI;
 	
 	float   	mLikelihood_LB;
@@ -58,15 +53,12 @@ private:
 	int32_t 	mSTEP_PURVIEW;
 
 
-	/***********************************/
-	// Set from setupDAG()
-	 LaneFilter* 		mLaneFilter;
-	 VanishingPtFilter*	mVpFilter;
-	/***********************************/
+	LaneFilter* 		mLaneFilter;
+	VanishingPtFilter*	mVpFilter;
 
-	 cv::Mat	mBASE_BINS_SCALED;
-	 cv::Mat	mPURVIEW_BINS_SCALED;
-	 cv::Mat 	mX_ICCS_SCALED;	
+	cv::Mat		mBASE_BINS_SCALED;
+	cv::Mat		mPURVIEW_BINS_SCALED;
+	cv::Mat 	mX_ICCS_SCALED;	
 
 	cv::Mat		mProbMapFocussed;
 	cv::Mat 	mGradTanFocussed;
@@ -92,11 +84,8 @@ private:
 	
 public:
 	TrackingLaneDAG_generic(BufferingDAG_generic&& bufferingGraph);
-	int  init_DAG();
-	void runAuxillaryTasks();
+	int  init_DAG(LaneFilter* laneFilter, VanishingPtFilter* vpFilter);
 	void execute(cv::Mat FrameGRAY);
-	~TrackingLaneDAG_generic();
-
 };
 
 #endif // TRACKINGLANESDAG_GENERIC_H

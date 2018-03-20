@@ -22,10 +22,8 @@
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
 
-#include <thread>
 #include "State.h"
 #include "ScalingFactors.h"
-
 
 #ifdef   S32V2XX
  #include "TrackingLaneDAG_s32v.h"
@@ -50,12 +48,7 @@ public:
 
 	template<typename GRAPH_BASE>
 	TrackingLaneState(GRAPH_BASE&& lBaseGraph);
-
-	~TrackingLaneState();
 };
-
-
-
 
 
 //******************************************************************/*
@@ -76,11 +69,7 @@ TrackingLaneState<GRAPH>::TrackingLaneState(GRAPH_BASE&& lBaseGraph)
 template<typename GRAPH>
 void TrackingLaneState<GRAPH>::setupDAG(LaneFilter* laneFilter, VanishingPtFilter* vpFilter)
 {
-   //Setting up the  filters for the Graph	[observing pointers]
-   mGraph.mLaneFilter 	= laneFilter;
-   mGraph.mVpFilter    	= vpFilter; 
-
-   if (0 == mGraph.init_DAG())
+   if (0 == mGraph.init_DAG(laneFilter, vpFilter))
    this->currentStatus= StateStatus::ACTIVE;	
 }
 
@@ -88,20 +77,17 @@ void TrackingLaneState<GRAPH>::setupDAG(LaneFilter* laneFilter, VanishingPtFilte
 template<typename GRAPH>
 const LaneModel& TrackingLaneState<GRAPH>::run(cv::Mat Frame)
 {
-   if (mSideExecutor.joinable())
-    mSideExecutor.join();
-	 
-   mSideExecutor = std::thread(&GRAPH::runAuxillaryTasks, std::ref(mGraph));
-   mGraph.execute(Frame);
-   this->StateCounter++;
-   return mGraph.mLaneModel;
-}
+   try
+   {
+      mGraph.execute(Frame);
+      StateCounter++;
+   }
+   catch(...)
+   {
+     currentStatus = StateStatus::ERROR;
+   }
 
-template<typename GRAPH>
-TrackingLaneState<GRAPH>::~TrackingLaneState()
-{
-   if (mSideExecutor.joinable())
-     mSideExecutor.join();	
+   return mGraph.mLaneModel;
 }
 
 #endif // TRACKING_LANE_STATE_H

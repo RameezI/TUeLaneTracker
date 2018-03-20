@@ -37,7 +37,6 @@ class BufferingState : public State
 	
 private:
 	size_t       	mBufferSize;
-	std::thread  	mSideExecutor;
 
 public:
 	BufferingState();
@@ -45,8 +44,6 @@ public:
 	GRAPH 	mGraph;
 	void 	setupDAG(const Templates& TEMPLATES, const size_t & BUFFER_SIZE);
 	void 	run(cv::Mat Frame);
-
-	~BufferingState();
 };
 
 
@@ -57,63 +54,38 @@ public:
 
 template<typename GRAPH>
 BufferingState<GRAPH>::BufferingState()
-: mBufferSize(0){
-
-}
+: mBufferSize(0){}
 
 
 template<typename GRAPH>  
 void BufferingState<GRAPH>::setupDAG(const Templates & TEMPLATES, const size_t & BUFFER_SIZE)
 {
-
-#ifdef PROFILER_ENABLED
-mProfiler.start("SET_UP_BUFFERING_DAG");
-#endif
-	if(BUFFER_SIZE <= 0)
-	{
-	   this->currentStatus = StateStatus::ERROR;
-	}
-	else if ( 0 == mGraph.init_DAG(TEMPLATES, BUFFER_SIZE) )
-	{
-	   mBufferSize = BUFFER_SIZE;
-	   this->currentStatus= StateStatus::ACTIVE;
-	}
-
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
-				 <<"******************************"<<endl
-				 <<  "Setting up Buffering Graph." <<endl
-				 <<  "Setup Time: "  << mProfiler.getAvgTime("SET_UP_BUFFERING_DAG")<<endl
-				 <<"******************************"<<endl<<endl;	
-				 #endif
+  if(BUFFER_SIZE <= 0)
+  {
+    currentStatus = StateStatus::ERROR;
+  }
+  else if ( 0 == mGraph.init_DAG(TEMPLATES, BUFFER_SIZE) )
+  {
+   mBufferSize = BUFFER_SIZE;
+    currentStatus= StateStatus::ACTIVE;
+  }
 }
-
-
 
 template<typename GRAPH>  
 void BufferingState<GRAPH>::run(cv::Mat Frame)
 {
-   if (mSideExecutor.joinable())
-      mSideExecutor.join();
+  try
+  {
+    mGraph.execute(Frame);
+    this->StateCounter++;
+  }
+  catch(...)
+  {
+    currentStatus = StateStatus::ERROR;
+  }
 
-   mSideExecutor = std::thread(&GRAPH::runAuxillaryTasks, std::ref(mGraph));
-   mGraph.execute(Frame);
-
-   this->StateCounter++;
-
-   if(this->StateCounter >= mBufferSize-1)
-   {
-      this->currentStatus = StateStatus::DONE;
-   }	
-}
-
-
-template<typename GRAPH>  
-BufferingState<GRAPH>::~BufferingState()
-{
-   if (mSideExecutor.joinable())
-      mSideExecutor.join();	
+  if(StateCounter >= mBufferSize-1)
+      currentStatus = StateStatus::DONE;
 }
 
 #endif // BUFFERING_STATE_H

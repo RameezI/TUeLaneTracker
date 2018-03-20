@@ -25,6 +25,8 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <future>
+
 
 #include "State.h"		//implicit include of profiling and logging headers
 #include "Templates.h"
@@ -35,6 +37,8 @@
 #include "frame_output_v234fb.h"
 #endif
 
+
+using WriteLock = std::unique_lock<std::mutex>;
 
 template<typename T>
 struct BufferPool;
@@ -54,12 +58,12 @@ public:
 
 protected:
 
-	using MutexType = std::mutex;
-	using WriteLock = std::unique_lock<MutexType>;
 	
-
-	MutexType 			_mutex;
+	std::mutex 			_mutex;
 	condition_variable  		_sateChange;
+
+
+	std::future<void>		mFuture;
 	bool 				mTemplatesReady;
 	bool 				mBufferReady;
 
@@ -68,7 +72,7 @@ protected:
     	 ProfilerLDT         		mProfiler;
 	#endif
 
-
+	size_t 		mBufferPos;
 	int		mHORIZON_ICCS; 		/**< /brief Position of Horizon in the Image-Center-CS [pixels]
 				 	  	*  /n +ve value implies that the ROI is below the center line.
 					  	*  /n -ve value implies that the ROI is above the center line. */
@@ -134,19 +138,20 @@ protected:
 	
 	
 public:	
-	/** *For initialising DAG ONE TIME EXECUTION */
+	/** For initialising of the DAG [ONE TIME EXECUTION]  */
 	int  init_DAG(const Templates & TEMPLATES, const size_t & BUFFER_SIZE);
 
-	void runAuxillaryTasks(); 		// Perform assitve tasks for buffering from seperate executor
-	void execute(cv::Mat& FrameGRAY);   	// Perform tasks for buffering from main Thread
+	/** executes the Directed Acyclic Graph*/
+	void execute(cv::Mat& FrameGRAY);  
 	
    	BufferingDAG_generic (BufferingDAG_generic && bufferingGraph)
    	{
 	
-	   WriteLock  wrtLock(_mutex);
+	   WriteLock  lLock(_mutex);
 	
 	     mTemplatesReady      	= std::move(bufferingGraph.mTemplatesReady);
        	     mBufferReady             	= std::move(bufferingGraph.mBufferReady);
+	     mBufferPos			= std::move(bufferingGraph.mBufferPos);
 
 	     mHORIZON_ICCS		= std::move(bufferingGraph.mHORIZON_ICCS);
 	     mVP_RANGE_V		= std::move(bufferingGraph.mVP_RANGE_V);
@@ -182,7 +187,7 @@ public:
 	     mX_ICCS			= std::move(bufferingGraph.mX_ICCS);
 	     mY_ICCS			= std::move(bufferingGraph.mY_ICCS);
 
-	   wrtLock.unlock();
+	   lLock.unlock();
    	}
 };
 
