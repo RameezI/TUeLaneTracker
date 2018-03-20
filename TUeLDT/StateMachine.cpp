@@ -86,6 +86,7 @@ int StateMachine::spin()
 		if (mPtrBootingState->currentStatus == StateStatus::DONE)
 		{				
 		   mCurrentState 	= States::BUFFERING;
+		   
 		   cout<< "Completed!"<<endl;
 
 		   #ifdef PROFILER_ENABLED
@@ -127,11 +128,11 @@ int StateMachine::spin()
 		if (mPtrBufferingState->currentStatus == StateStatus::INACTIVE)
 		{
 		      mPtrBufferingState->setupDAG(std::ref(*mPtrTemplates), 5);
+		      mPtrFrameFeeder->Paused.store(false);
 		}
 		if (mPtrBufferingState->currentStatus == StateStatus::ACTIVE)
 		{
-		    mPtrFrameFeeder->produceFrames();
-		    mPtrBufferingState->run(mPtrFrameFeeder->getFrameGRAY());
+		    mPtrBufferingState->run(mPtrFrameFeeder->dequeueFrameGRAY());
 		}
 		if( mPtrBufferingState->currentStatus == StateStatus::DONE)
 		{
@@ -173,10 +174,8 @@ int StateMachine::spin()
 		}
 		if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
 		{
-		   mPtrFrameFeeder->produceFrames();
-		   mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->getFrameGRAY());
-		   mPtrFrameRenderer->drawLane(mPtrFrameFeeder->getFrame(), mLaneModel);
-		   
+		   mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeueFrameGRAY());
+		   mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueFrame(), mLaneModel);
 		}
 		if( (mPtrTrackingState->currentStatus == StateStatus::DONE) )
 		{

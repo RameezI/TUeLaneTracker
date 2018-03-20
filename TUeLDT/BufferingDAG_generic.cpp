@@ -239,10 +239,6 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 
 
 
-	mTemplatesReady = false;	
-	mBufferReady    = false;
-	
-
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl

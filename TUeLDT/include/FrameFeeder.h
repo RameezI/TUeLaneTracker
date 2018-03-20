@@ -23,23 +23,155 @@
 * ****************************************************************************/ 
 
 #include "opencv2/opencv.hpp"
+#include "LDT_logger.h"
 #include <iostream>
+#include <thread>
+#include <mutex>
+#include <chrono>
+#include <atomic>
 
 using namespace std;
+using WriteLock = std::unique_lock<std::mutex>;
 
+struct cvFrames
+{
+  cv::Mat	Frame;
+  cv::Mat	FrameGRAY;
+  cv::string	FrameInfo;
+
+ cvFrames(cv::Mat& frame, cv::Mat& frameGRAY, const string&  frameInfo)
+ : Frame(frame),
+   FrameGRAY(frameGRAY),
+   FrameInfo(frameInfo){}
+
+}
+
+/* ^TODO: Hint make a copy of this file with specialisation, in case of vsdkFrames */
+template<typename T>
 class FrameFeeder
 {
 
-public:
-   virtual cv::Mat	getFrameGRAY()  	= 0;
-   virtual cv::Mat	getFrame()  		= 0;
-   virtual void  	produceFrames()		= 0;
-
 protected:
-   virtual void parseSettings(string& srcStr)  = 0;	
-   vector<cv::Mat>	mFramesGRAY;
-   vector<cv::Mat>	mFrames;
+
+   const std::size_t	mMAX_BUFFER_SIZE;
+   const std::size_t	mMAX_RETRY;
+   std::mutex 		mMutex;
+   vector<cv::Mat>	mQueueFrame;
+   vector<cv::Mat>	mQueueFrameGRAY;
+	
+
+   FrameFeeder(): mMAX_BUFFER_SIZE(3), mMAX_RETRY(10), Stopped(false), Paused(true)
+   {
+
+   }
+
+   void enqueue(cv::Mat& frame, vector<cv::Mat>& queue)
+   {
+      WriteLock  lLock(mMutex, std::defer_lock);	
+
+      lLock.lock(); //Protect queue from race-condition
+
+        queue.push_back(frame);
+
+	if(queue.size() >  mMAX_BUFFER_SIZE)
+	{
+          queue.erase(queue.begin());
+      	  #ifdef PROFILER_ENABLED
+	  LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	   <<"******************************"<<endl
+	   <<  "WARNING!! "<<endl
+	   <<  "Droping frames in the queue, cannot keep-up with the frame production rate"<<endl
+	   <<"******************************"<<endl<<endl;
+          #endif
+	}
+      lLock.unlock();
+   }
+ 
+   virtual void    parseSettings(string& srcStr)  = 0;	
+
+public:	
+
+   std::atomic<bool> Stopped;
+   std::atomic<bool> Paused; 
+
+
+   cv::Mat dequeueFrame()
+   {
+      WriteLock  lLock(mMutex, std::defer_lock);	
+      size_t lTryGrab = 0;
+
+      lLock.lock(); //Protect queue from race-condition
+      while (mQueueFrame.empty() && lTryGrab < mMAX_RETRY)
+      { 
+	lLock.unlock();
+	lTryGrab ++ ;
+	std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	lLock.lock();
+      }
+      if(mQueueFrame.empty())
+      {
+     	throw "No images in the queue, the producer is too slow or down! [Empty Frame Queue] ";
+      }
+
+      cv::Mat lFrame = mQueueFrame[0];
+      mQueueFrame.erase(mQueueFrame.begin());
+      lLock.unlock();
+
+      #ifdef PROFILER_ENABLED
+       LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+       <<"******************************"<<endl
+       <<  "Frame dequeued:"<<endl
+       <<  "[Attempt count: "<<lTryGrab<<"/"<<mMAX_RETRY<<"]"<<endl
+       <<"******************************"<<endl<<endl;
+      #endif
+
+
+      if(lFrame.empty())
+        throw "Failed to get the frame from mQueueFrame! [Empty Frame Exception] ";
+
+      return lFrame;
+   }
+ 
+   cv::Mat dequeueFrameGRAY()
+   {
+      WriteLock  lLock(mMutex, std::defer_lock);	
+      size_t lTryGrab = 0;
+
+      lLock.lock(); //Protect queue from race-condition
+      while (mQueueFrameGRAY.empty() && lTryGrab < mMAX_RETRY)
+      { 
+	lLock.unlock();
+	lTryGrab ++ ;
+	std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	lLock.lock();
+      }
+
+      if(mQueueFrameGRAY.empty())
+      {
+     	throw "No images in the queue, the producer is too slow or down! [Empty Frame Queue] ";
+      }
+
+      cv::Mat lFrame = mQueueFrameGRAY[0];
+      mQueueFrameGRAY.erase(mQueueFrameGRAY.begin());
+      lLock.unlock();
+
+      #ifdef PROFILER_ENABLED
+       LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+       <<"******************************"<<endl
+       <<  "Frame dequeued:"<<endl
+       <<  "[Attempt count: "<<lTryGrab<<"/"<<mMAX_RETRY<<"]"<<endl
+       <<"******************************"<<endl<<endl;
+      #endif
+
+      if(lFrame.empty())
+        throw "Failed to get the frame from mQueueFrame! [Empty Frame Exception] ";
+
+      return lFrame;
+   }
+
 };
+
+
 
 class ImgStoreFeeder: public FrameFeeder
 {
@@ -49,137 +181,13 @@ private:
 	int 	        	mSkipFrames;
 	uint32_t 		mFrameCount;
 	vector< cv::String> 	mFiles;
+	std::thread		mAsyncGrabber;
 
 public:
 	
 	ImgStoreFeeder(string sourceStr);
+	~ImgStoreFeeder();
 	void parseSettings(string& srcStr) override;
-	void produceFrames() override;
-	cv::Mat getFrame() override;
-	cv::Mat getFrameGRAY() override;
 };
+
 #endif
-
-/*
-
-	else if(lSource == FrameSource::STREAM)
-	{
-		#ifdef PROFILER_ENABLED
-		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		 <<"******************************"<<endl
-		 << "Setting up the Frame Source" <<endl
-		 << "MODE: "<< FrameSource::STREAM<<endl
-		 <<"******************************"<<endl<<endl;
-		#endif
-
-		mGraph.mSource = lSource;
-	   	mGraph.mFrameCount = 0;
-		
-		try
-		{
-		   if(!mGraph.mCAPTURE.open(lSourceStr))
-		   lReturn = -1;
-		}
-
-		catch(...)
-		{
-		    lReturn = -1;
-		}
-	}
-
-	else if (lSource == FrameSource::GMSL)
-	{
-
-		#ifdef PROFILER_ENABLED
-		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		 <<"******************************"<<endl
-		 << "Setting up the Frame Source" <<endl
-		 << "MODE: "<< FrameSource::GMSL<<endl
-		 <<"******************************"<<endl<<endl;
-		#endif
-
-		mGraph.mSource = lSource;
-	   	mGraph.mFrameCount = 0;
-	
-		throw "GMSL function not implemented";
-		lReturn =-1;
-	}
-
-	else
-	{
-
-		#ifdef PROFILER_ENABLED
-		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		 <<"******************************"<<endl
-		 << "Setting up the Frame Source" <<endl
-		 << "MODE: NOT RECOGNIZED"<<endl
-		 << "Exiting"<<endl
-		 <<"******************************"<<endl<<endl;
-		#endif
-
-		lReturn =-1;
-	}
-
-	return lReturn;
-
-}
-uint_fast8_t 	mRetryGrab;
-int  	setSource(FrameSource, string);
-
-//^TODO: Move to BuffeingState.h -> Localise Frame Input Code
-int BufferingDAG_generic::grabFrame()	
-{
-	int lReturn = 0;
-		
-	#ifdef PROFILER_ENABLED
-	mProfiler.start("IMAGE_READ");
-	#endif 
-
-
-	   if(mSource == FrameSource::DIRECTORY)
-	   {
-		 mFrameRGB = imread(mFiles[mFrameCount]);
-		
-		 #ifdef PROFILER_ENABLED
-		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		  <<"Processing Frame: "<<mFrameCount<<endl;
-		 #endif
-
-		 if (mFrameCount+1 < mFiles.size())
-	   	  mFrameCount ++;
-	   }
-
-	   else if (mSource == FrameSource::STREAM)
-	   {
-		 mCAPTURE >> mFrameRGB;
-
-		 #ifdef PROFILER_ENABLED
-		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		  <<"Processing Frame: "<<mFrameCount<<endl;
-		 #endif
-
-	   	 mFrameCount ++;
-	   }
-
-	   else if (mSource == FrameSource::GMSL)
-	   {
-		 #ifdef PROFILER_ENABLED
-		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		  <<"Undefined Input Mode: "<<endl;
-		 #endif
-
-		lReturn = -1;
-	   }
-
-	   else
-	   {
-		 #ifdef PROFILER_ENABLED
-		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		  <<"Undefined Input Mode: "<<endl;
-
-*/
-
-
-
-
-

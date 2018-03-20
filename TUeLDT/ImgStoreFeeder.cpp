@@ -25,12 +25,39 @@ ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
   mSkipFrames(0),
   mFrameCount(0)
 {
+
    parseSettings(sourceStr);
+  
+   mAsyncGrabber = std::thread([this]
+   {
+     WriteLock  lLock(mMutex, std::defer_lock);	
+
+     while(!Stopped.load())
+     {	
+	if(!Paused.load())
+	{
+          cv::Mat lMat, lMatGRAY;
+
+	  lMat = imread(mFiles[mFrameCount]);
+          cv::cvtColor(lMat,lMatGRAY, cv::COLOR_RGB2GRAY );
+
+	  //Put the frames in the queue for the stateMachine
+          enqueue(lMat,     mQueueFrame);
+          enqueue(lMatGRAY, mQueueFrameGRAY);
+
+          if(mFrameCount+1 < mFiles.size());
+            mFrameCount ++;
+	}
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(20));
+     }
+
+  });
 }
+
 
 void ImgStoreFeeder::parseSettings(string& srcStr)
 {
-   cout << srcStr<<endl;
    string lDelimiter = ",";
    size_t lPos	     =  0 ;
 
@@ -60,39 +87,10 @@ void ImgStoreFeeder::parseSettings(string& srcStr)
  
 }
 
-void ImgStoreFeeder::produceFrames()
+ImgStoreFeeder::~ImgStoreFeeder()
 {
-   cv::Mat lMatGRAY;
-   mFrames.push_back( imread(mFiles[mFrameCount]) );
-   cv::cvtColor(mFrames.back(),lMatGRAY, cv::COLOR_RGB2GRAY );
-   mFramesGRAY.push_back(lMatGRAY);
-
-  if (mFrameCount+1 < mFiles.size());
-     mFrameCount ++;
-}
-
-
-cv::Mat ImgStoreFeeder::getFrame()
-{	
-  assert(!mFrames.empty());
-  cv::Mat lFrame = mFrames[0];
-  mFrames.erase(mFrames.begin());
-
-  if (lFrame.empty())
-     throw "Failed to get the frame! [Empty Frame Exception] ";
-
-  return lFrame;
-}
-
-
-cv::Mat ImgStoreFeeder::getFrameGRAY()
-{
-  assert(!mFramesGRAY.empty());
-  cv::Mat lFrame = mFramesGRAY[0];
-  mFramesGRAY.erase(mFramesGRAY.begin());
-
-  if (lFrame.empty())
-     throw "Failed to get the frame! [Empty Frame Exception] ";
-
-  return lFrame;
+	if(mAsyncGrabber.joinable())
+	{
+	  mAsyncGrabber.join();
+	}
 }

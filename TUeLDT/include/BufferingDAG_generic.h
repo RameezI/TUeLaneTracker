@@ -21,13 +21,8 @@
 * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
-
-#include <thread>
 #include <mutex>
-#include <condition_variable>
 #include <future>
-
-
 #include "State.h"		//implicit include of profiling and logging headers
 #include "Templates.h"
 #include "LaneModel.h"		//implicit include of LaneFilter and VanishingPtFilter
@@ -57,22 +52,16 @@ public:
 	BufferingDAG_generic ();
 
 protected:
-
-	
 	std::mutex 			_mutex;
-	condition_variable  		_sateChange;
-
-
 	std::future<void>		mFuture;
-	bool 				mTemplatesReady;
-	bool 				mBufferReady;
 
 
 	#ifdef PROFILER_ENABLED
     	 ProfilerLDT         		mProfiler;
 	#endif
 
-	size_t 		mBufferPos;
+	size_t 		mBufferPos;		/**< Active Buffer Position */
+
 	int		mHORIZON_ICCS; 		/**< /brief Position of Horizon in the Image-Center-CS [pixels]
 				 	  	*  /n +ve value implies that the ROI is below the center line.
 					  	*  /n -ve value implies that the ROI is above the center line. */
@@ -149,8 +138,6 @@ public:
 	
 	   WriteLock  lLock(_mutex);
 	
-	     mTemplatesReady      	= std::move(bufferingGraph.mTemplatesReady);
-       	     mBufferReady             	= std::move(bufferingGraph.mBufferReady);
 	     mBufferPos			= std::move(bufferingGraph.mBufferPos);
 
 	     mHORIZON_ICCS		= std::move(bufferingGraph.mHORIZON_ICCS);
