@@ -43,11 +43,11 @@ public:
 
 		const Vector2i	RES_VH; 	    		/**< Resolution of the camera image */
 		const Vector2f  FOV_VH;				/**< Field-of-View of the camera */
-		const float PITCH_ANGLE;
+		const float 	PITCH_ANGLE;			/**< Pitch angle of the camera */
 		const int32_t	HORIZON;			/**< Location of Horizon in Image-Center-CS */
 
-		const float FOV_HORIZON;			/**< Field-of-View of the road up to the horizon*/
-		const float RES_HORIZON;			/**< Vertical resolution of image up to the horizon*/
+		const float 	FOV_HORIZON;			/**< Field-of-View of the road up to the horizon*/
+		const float 	RES_HORIZON;			/**< Vertical resolution of image up to the horizon*/
 
 		const cv::Point O_ICCS_ICS;			/**< Origin of Image-Center-CS in Image-CS*/
 		const cv::Point O_ICS_ICCS;			/**< Origin of Image-CS in Image-Center-CS*/
@@ -61,7 +61,7 @@ public:
 			 FOV_VH(Vector2f(2*atan( (RES_VH(0)/2.0) / (MATRIX_INTRINSIC.at<float>(1,1)) )*180/M_PI ,
 					 2*atan( (RES_VH(1)/2.0) / (MATRIX_INTRINSIC.at<float>(0,0)) )*180/M_PI )),
 			 PITCH_ANGLE(atan2(MATRIX_EXTRINSIC.at<float>(1,0),MATRIX_EXTRINSIC.at<float>(0,0)) * 180/M_PI),
-			 HORIZON(PITCH_ANGLE * RES_VH(0) / FOV_VH(0)), //Need to be computed from the Camera Matrix ^TODO: Calculate from Exrinsic Matrix
+			 HORIZON( round((PITCH_ANGLE * RES_VH(0)) / FOV_VH(0) ) ),
 			 FOV_HORIZON(FOV_VH(0) / 2 + PITCH_ANGLE),
 			 RES_HORIZON(FOV_HORIZON / FOV_VH(0) * RES_VH(0)),			 
 			 O_ICCS_ICS( cv::Point( RES_VH[1]/2,  RES_VH[0]/2) ), 

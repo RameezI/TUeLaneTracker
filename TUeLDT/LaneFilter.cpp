@@ -23,6 +23,7 @@
 #include "LaneFilter.h"
 #include "ScalingFactors.h"
 #include <opencv2/core/eigen.hpp>
+
 #ifdef NEWPIXELBINS
 	///cm to pixel conversion, for a particular row in the image, of the #BINS_cm [Vehicle-Symmetry-CS <---> Image-Center-CS]
 cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const int Y_ICCS )
@@ -48,8 +49,7 @@ cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const
 
 	return lMat;
 }
-#endif
-#ifndef NEWPIXELBINS
+#else
 ///cm to pixel conversion, for a particular row in the image, of the #BINS_cm [Vehicle-Symmetry-CS <---> Image-Center-CS]
 cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const int Y_ICCS )
 {
