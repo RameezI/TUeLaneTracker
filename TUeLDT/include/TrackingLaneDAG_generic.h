@@ -79,7 +79,7 @@ private:
 	LaneModel   		mLaneModel;		/**< The detected Lane-Model */
 
 	// Only Enable in case of Video Recording
-	//VideoWriter mOutputVideo;
+	//cv::VideoWriter mOutputVideo;
 
 	
 public:

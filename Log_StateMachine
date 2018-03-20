@@ -1,0 +1,389 @@
+﻿2018-03-19 12:32:22.843 INFO  [9063] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 12:34:51.648 INFO  [9197] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 12:35:33.424 INFO  [9383] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 12:37:46.873 INFO  [9696] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 12:43:21.894 INFO  [10387] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 12:44:53.971 INFO  [10595] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 13:47:20.825 INFO  [11703] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 13:49:20.603 INFO  [11909] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 13:50:04.974 INFO  [12105] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 13:55:27.544 INFO  [12367] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 13:57:30.850 INFO  [12580] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 13:59:48.669 INFO  [12580] [StateMachine::spin@125] 
+****************************************
+Printing Booting Configuration
+
+[LaneFilter Properties]
+***********************************************************************
+
+[Lane Properties]
+****************************
+Average Width		: 300
+Standard Deviaion 	: 50
+Minimum  Width 	  	: 250
+Maximum  Width 		: 500
+****************************
+
+
+
+[Camera Properties]
+***********************************************
+Name			: BUMBLEBEE_640x480
+Extrinsic Camera Matrix	: 
+[1, 0, 0, 0;
+ 0, 0, -1, 1.5;
+ 0, 1, 0, 0;
+ 0, 0, 0, 1]
+
+Intrinsic Camera Matrix	: 
+[554.25629, 0, 0;
+ 0, 579.41125, 0;
+ 0, 0, 1]
+
+Resolution[VxH]		: [ 480 x 640 ]
+Field-of-View [V, H]	: [ 45 , 60 ]
+Origin-ICCS-ICS		: [320, 240]
+Origin-ICS-ICCS		: [-320, -240]
+***********************************************
+
+Origin of Image-Center-CS in Image-CS:	[320, 240]
+Origin of Image-CS in Image-Center-CS:	[-320, -240]
+Origin of Image-Base-CS in Image-CS:	[0, 480]
+Y-coordinate  of base-line in Image-Center-CS:	 240
+Y-coordinate  of purview-line in Image-Center-CS: 120
+BINS_cm step size:	15
+BINS_cm MAX  value:	495
+Total number of BINS	67
+BINS in cm:		
+-495
+-480
+-465
+-450
+-435
+-420
+-405
+-390
+-375
+-360
+-345
+-330
+-315
+-300
+-285
+-270
+-255
+-240
+-225
+-210
+-195
+-180
+-165
+-150
+-135
+-120
+-105
+ -90
+ -75
+ -60
+ -45
+ -30
+ -15
+   0
+  15
+  30
+  45
+  60
+  75
+  90
+ 105
+ 120
+ 135
+ 150
+ 165
+ 180
+ 195
+ 210
+ 225
+ 240
+ 255
+ 270
+ 285
+ 300
+ 315
+ 330
+ 345
+ 360
+ 375
+ 390
+ 405
+ 420
+ 435
+ 450
+ 465
+ 480
+ 495
+
+Base-line BINS:		
+[-758;
+ -735;
+ -712;
+ -689;
+ -666;
+ -643;
+ -620;
+ -597;
+ -574;
+ -551;
+ -529;
+ -506;
+ -483;
+ -460;
+ -437;
+ -414;
+ -391;
+ -368;
+ -345;
+ -322;
+ -299;
+ -276;
+ -253;
+ -230;
+ -207;
+ -184;
+ -161;
+ -138;
+ -115;
+ -92;
+ -69;
+ -46;
+ -23;
+ 0;
+ 22;
+ 45;
+ 68;
+ 91;
+ 114;
+ 137;
+ 160;
+ 183;
+ 206;
+ 229;
+ 252;
+ 275;
+ 298;
+ 321;
+ 344;
+ 367;
+ 390;
+ 413;
+ 436;
+ 459;
+ 482;
+ 505;
+ 528;
+ 550;
+ 573;
+ 596;
+ 619;
+ 642;
+ 665;
+ 688;
+ 711;
+ 734;
+ 757]
+
+Purview-line BINS:	
+[-364;
+ -353;
+ -342;
+ -331;
+ -320;
+ -309;
+ -298;
+ -287;
+ -276;
+ -265;
+ -254;
+ -243;
+ -232;
+ -221;
+ -210;
+ -199;
+ -188;
+ -177;
+ -166;
+ -155;
+ -144;
+ -133;
+ -122;
+ -111;
+ -100;
+ -89;
+ -78;
+ -67;
+ -56;
+ -45;
+ -34;
+ -23;
+ -12;
+ 0;
+ 11;
+ 22;
+ 33;
+ 44;
+ 55;
+ 66;
+ 77;
+ 88;
+ 99;
+ 110;
+ 121;
+ 132;
+ 143;
+ 154;
+ 165;
+ 176;
+ 187;
+ 198;
+ 209;
+ 220;
+ 231;
+ 242;
+ 253;
+ 264;
+ 275;
+ 286;
+ 297;
+ 308;
+ 319;
+ 330;
+ 341;
+ 352;
+ 363]
+************************************************************************
+
+****************************************
+
+
+2018-03-19 13:59:48.672 INFO  [12580] [BufferingState<T>::setSource@94] 
+******************************
+Setting up the Frame SourceTotal Number of Image Files are Less than SKIP_FRAMES.
+Total Number of Image Files : 0
+...Skipping All
+******************************
+
+
+2018-03-19 13:59:48.672 INFO  [12580] [StateMachine::spin@171] 
+*********************************
+[Failed to Setup the Frame Source]
+Shutting Down the State-Machine
+******************************
+
+2018-03-19 13:59:48.672 INFO  [12580] [StateMachine::spin@199] 
+******************************
+[Buffering State Error]
+Shutting Down the State-Machine.
+******************************
+
+
+2018-03-19 14:39:42.125 INFO  [16154] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 14:40:07.564 INFO  [16154] [Templates::Templates@170] File not found: /home/vedecom/TUeLaneTracker/install/ConfigFiles/Templates/GradientTangent_960x600.yaml
+
+2018-03-19 14:40:07.564 INFO  [16154] [InitState::createTemplates@127] 
+******************************
+EXCEPTION CAUGHT: 
+Templates Instatiation Failed
+******************************
+
+
+2018-03-19 14:40:07.564 INFO  [16154] [StateMachine::spin@136] 
+****************************************
+[Failed to Complete the Booting Process]
+Shutting Down the State-Machine.
+****************************************
+
+
+2018-03-19 14:41:25.825 INFO  [16294] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 14:50:26.946 INFO  [17159] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 16:47:34.121 INFO  [8847] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
+2018-03-19 16:56:10.934 INFO  [11768] [StateMachine::StateMachine@54] 
+******************************
+DIRECTORY_INPUT DEFINED.
+******************************
+
+
