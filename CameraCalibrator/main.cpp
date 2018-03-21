@@ -16,7 +16,7 @@ int main( int argc, char** argv )
   {
 
   #ifndef VEDECOMLOGS
-    Size lRES = cv::Size(640, 480)
+    Size lRES = cv::Size(640, 480);
   #else
     Size lRES = cv::Size(960, 600);    
   #endif
