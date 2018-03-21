@@ -176,6 +176,7 @@ int StateMachine::spin()
 		{
 		   mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
 		   mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
+		   
 		}
 		if( (mPtrTrackingState->currentStatus == StateStatus::DONE) )
 		{

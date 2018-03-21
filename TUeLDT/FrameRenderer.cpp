@@ -29,7 +29,7 @@ void FrameRenderer::drawLane(const cv::Mat& FRAME, const LaneModel& Lane)
    const int 	lBASE_LINE_ICS 		= mLANE_FLTR.BASE_LINE_ICCS 	+ mLANE_FLTR.O_ICCS_ICS.y;
    const int 	lPURVIEW_LINE_ICS 	= mLANE_FLTR.PURVIEW_LINE_ICCS	+ mLANE_FLTR.O_ICCS_ICS.y;
 
-   const float 	lRatioLookAhead 	= 0.35;
+   const float 	lRatioLookAhead 	= 0.1;
 
    vector<Point> lBoundaryPts_L;
    vector<Point> lBoundaryPts_R;

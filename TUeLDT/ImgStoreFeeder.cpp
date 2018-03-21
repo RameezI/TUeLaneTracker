@@ -55,7 +55,7 @@ ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
             <<"******************************"<<endl<<endl;
 	  #endif
 
-          if(mFrameCount+1 < mFiles.size()
+          if(mFrameCount+1 < mFiles.size())
             mFrameCount ++;
 	}
 
