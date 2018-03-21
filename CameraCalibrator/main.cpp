@@ -1,4 +1,4 @@
-#define VEDECOMLOGS
+//#define VEDECOMLOGS
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
