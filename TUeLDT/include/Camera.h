@@ -100,10 +100,10 @@ private:
 		else
 		{
 		   #ifdef PROFILER_ENABLED
-		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
 	    	    <<"******************************"<<endl
 		    <<"Unable to find the path to binary"<<endl
-		    <<"[Searching for Camera configuration files]: "<<endl;
+		    <<"[Searching for Camera configuration files]: "<<endl
 	    	    <<"******************************"<<endl<<endl;
 		   #endif
 		   throw "Camera Instantiation Failed" ;
@@ -118,10 +118,10 @@ private:
 		if ( lSuccess !=0 )
 		{
 		   #ifdef PROFILER_ENABLED
-		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
 	    	    <<"******************************"<<endl
 		    <<"Unable to load camera configuration: "<<endl
-		    << "File not found: " << lFile.c_str() << endl;
+		    << "File not found: " << lFile.c_str() << endl
 	    	    <<"******************************"<<endl<<endl;
 		   #endif
 		   throw "Camera Instantiation Failed" ;
@@ -136,10 +136,10 @@ private:
 		  catch(...)
 		  {
 		     #ifdef PROFILER_ENABLED
-		      LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		      LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
 	    	      <<"******************************"<<endl
 		      <<"ERROR while reading camera file: "<<endl
-		      << "cannot load required data from: " << lFile.c_str() << endl;
+		      << "cannot load required data from: " << lFile.c_str() << endl
 	    	      <<"******************************"<<endl<<endl;
 		     #endif
 		     throw "Camera Instantiation Failed" ;
@@ -170,10 +170,10 @@ private:
 		else
 		{
 		   #ifdef PROFILER_ENABLED
-		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
 	    	     <<"******************************"<<endl
 		     <<"Unable to find the path to binary"<<endl
-		     <<"[Searching for Camera configuration files]: "<<endl;
+		     <<"[Searching for Camera configuration files]: "<<endl
 	    	     <<"******************************"<<endl<<endl;
 		   #endif
 		   throw "Camera Instantiation Failed" ;
@@ -189,10 +189,10 @@ private:
 	    	if ( lSuccess != 0 )
 	    	{
 	       	   #ifdef PROFILER_ENABLED
-		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
 	    	    <<"******************************"<<endl
 		    <<"Unable to load camera configuration: "<<endl
-		    << "File not found: " << lFile.c_str() << endl;
+		    << "File not found: " << lFile.c_str() << endl
 	    	    <<"******************************"<<endl<<endl;
 	           #endif
 		   throw "Camera Instantiation Failed" ;
@@ -207,10 +207,10 @@ private:
 		   catch(...)
 		   {
 		      #ifdef PROFILER_ENABLED
-		       LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		       LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
 	    	       <<"******************************"<<endl
 		       <<"ERROR while reading camera file: "<<endl
-		       << "cannot load required data from: " << lFile.c_str() << endl;
+		       << "cannot load required data from: " << lFile.c_str() << endl
 	    	       <<"******************************"<<endl<<endl;
 		      #endif
 		      throw "Camera Instantiation Failed" ;
