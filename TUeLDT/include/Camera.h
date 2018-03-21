@@ -125,8 +125,21 @@ private:
 		}
 		else
 		{
-		  cv::FileStorage loadFile( lFile, cv::FileStorage::READ);
-		  loadFile[Mat_name]>> lCAMERA_MATRIX;
+		  try
+		  {
+		     cv::FileStorage loadFile( lFile, cv::FileStorage::READ);
+		     loadFile[Mat_name]>> lCAMERA_MATRIX;
+		  }
+		  catch(...)
+		  {
+		     #ifdef PROFILER_ENABLED
+		      LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		      <<"ERROR while reading camera file: "<<endl
+		      << "cannot load required data from: " << lFile.c_str() << endl;
+		     #endif
+
+		      throw "Camera Instantiation Failed" ;
+		  }
 		}
 
 		return lCAMERA_MATRIX;
@@ -178,8 +191,22 @@ private:
 	    	}
 	    	else
 	    	{
-		  cv::FileStorage loadFile( lFile, cv::FileStorage::READ);
-		 loadFile[Mat_name]>> lVec;
+		  try
+		  {
+		    cv::FileStorage loadFile( lFile, cv::FileStorage::READ);
+		    loadFile[Mat_name]>> lVec;
+		  }
+		  catch(...)
+		  {
+
+		     #ifdef PROFILER_ENABLED
+		      LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+		      <<"ERROR while reading camera file: "<<endl
+		      << "cannot load required data from: " << lFile.c_str() << endl;
+		     #endif
+
+		      throw "Camera Instantiation Failed" ;
+		  }
 	    	}
 
 	   	return Vector2f(lVec.at<float>(0,0), lVec.at<float>(0,1));
