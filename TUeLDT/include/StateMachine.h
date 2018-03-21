@@ -21,12 +21,13 @@
 * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
-#include "Config.h"
 #include  <memory>
 #include "State.h"
 #include "InitState.h"
 #include "BufferingState.h"
 #include "TrackingLaneState.h"
+#include "FrameFeeder.h"
+#include "FrameRenderer.h"
 
 using namespace std;
 
@@ -35,28 +36,27 @@ class StateMachine
 	
 private:
 
-	bool 	mInitialized;
 	bool	mQuitRequest;
-
-	const  	FrameSource	mFrameSource;
-	const  	string		mSourceStr;
-
 	States 	mCurrentState;
+
+	unique_ptr<FrameFeeder>			mPtrFrameFeeder;
+	unique_ptr<FrameRenderer>		mPtrFrameRenderer;
 
 	unique_ptr<LaneFilter>  		mPtrLaneFilter;
 	unique_ptr<VanishingPtFilter>  		mPtrVanishingPtFilter;
 	unique_ptr<Templates> 			mPtrTemplates;
+	LaneModel				mLaneModel;
 
-	unique_ptr<InitState>			mPtrBootingState;
 
 	#ifdef S32V2XX
+	 unique_ptr<InitState>						mPtrBootingState;
 	 unique_ptr<BufferingState<BufferingDAG_s32v>>  	 	mPtrBufferingState;
 	 unique_ptr<TrackingLaneState<TrackingLaneDAG_s32v>>  	 	mPtrTrackingState;
 	#else
+	 unique_ptr<InitState>						mPtrBootingState;
 	 unique_ptr<BufferingState<BufferingDAG_generic>>  	 	mPtrBufferingState;
 	 unique_ptr<TrackingLaneState<TrackingLaneDAG_generic>>   	mPtrTrackingState;
 	#endif
-
 
 public:
 
@@ -64,7 +64,7 @@ public:
 	States	getCurrentState();
 	void 	quit();
 
-	StateMachine(FrameSource lFrameSource, string lSourceString);
+	StateMachine(unique_ptr<FrameFeeder> frameFeeder);
 	int spin();
 	~StateMachine();
 };

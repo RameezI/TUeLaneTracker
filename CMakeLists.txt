@@ -4,7 +4,7 @@
 cmake_minimum_required (VERSION 2.8.11)
 project (TUeLaneTracker C CXX)
 
-SET(CMAKE_CXX_FLAGS 	"${CMAKE_CXX_FLAGS} -g -Wall -O1 -std=c++11")
+SET(CMAKE_CXX_FLAGS 	"${CMAKE_CXX_FLAGS} -g -Wall -O0 -std=c++11")
 
 # Recurse into the "TUeLDT" and "LaneTrackerApp" subdirectories.
 set(CMAKE_INSTALL_PREFIX ${TUeLaneTracker_SOURCE_DIR})
@@ -14,3 +14,6 @@ add_subdirectory (LaneTrackerApp ${TUeLaneTracker_SOURCE_DIR}/LaneTrackerApp/bui
 add_subdirectory (CameraCalibrator ${TUeLaneTracker_SOURCE_DIR}/CameraCalibrator/build)
 
 install(DIRECTORY ${TUeLaneTracker_SOURCE_DIR}/Templates DESTINATION install/ConfigFiles) 
+
+File(GLOB YAML_FILES "${TUeLaneTracker_SOURCE_DIR}/CameraCalibrator/build/*.yaml")
+install(FILES  ${YAML_FILES}  DESTINATION install/ConfigFiles/Camera)

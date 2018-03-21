@@ -1,5 +1,5 @@
-#ifndef LANEFILTER_H
-#define LANEFILTER_H
+#ifndef LANE_FILTER_H__
+#define LANE_FILTER_H__
 
 /******************************************************************************
 * NXP Confidential Proprietary
@@ -23,80 +23,100 @@
 * ****************************************************************************/ 
 
 #include <Eigen/Dense>
-#include "opencv2/opencv.hpp"
 #include "Lane.h"
 #include "Camera.h"
+#include "HistogramModels.h"
+
 
 using namespace Eigen;
 
-struct BaseHistogramModel
-{
-	int   	leftOffsetIdx;	 	/**<Offset Index containing distance to left  boundary given the current model [index]*/
-	int   	rightOffsetIdx;	 	/**<Offset Index containing distance to right boundary given the current model [index]*/
-	int   	leftOffset;	 	/**< Distance to the left boundary given the current Model [pixels] */
-	int   	rightOffset;	 	/**< Distance to the right boundary given the current Model [pixels] */
-
-	float 	width_cm;		/**< Width of the Lane given the current model [cm] */
-		
-	int  	binID_leftBoundary;	/**<Histogram Index representing left left boundary given the current model [index]*/
-	int  	binID_rightBoundary;	/**<Histogram Index representing left left boundary given the current model [index]*/
-	
-	int  	binID_NegBoundaryLeft;	/**<Histogram Index representing left bin of non-boundary region */
-	int  	nbNonBoundaryBinsLeft;	/**<Number of non-boundary bins to the left of the center-line */
-	int  	binID_NegBoundaryRight;	/**<Histogram Index representing right bin of non-boundary region */
-	int  	nbNonBoundaryBinsRight;	/**<Number of non-boundary bins to the right of the center-line*/
-		
-	
-	BaseHistogramModel()
-	: leftOffsetIdx(-1),
-	  rightOffsetIdx(-1),
-	  leftOffset(-1),
-	  rightOffset(-1),
-	  width_cm(0),
-	  binID_leftBoundary(-1),
-	  binID_rightBoundary(-1)
-	{
-
-	}
-	
-};
-
-
-/* This class provides LaneFilter expressed in Vanishing point coordinate system. */
+/* This class provides Base and Purview Histograms expressed in Image-Center-Coordinate-System. */
 class LaneFilter
 {
 
-friend ostream& operator<<(ostream& os, const LaneFilter& laneFilter);
-	
+friend 		ostream& operator<<(ostream& os, const LaneFilter& lLaneFilter);
+
 private:	
 		const LaneProperties   	mLANE;	  /*< Describes Lane properties for example average lane widths and its standard deviation*/
 		const Camera 		mCAMERA;  /*< Describes Camera properties and configuration */
-		const int		mSTEP_CM; /*< BaseHistogram and PurviewHistogram step size [cm] */
+		void  createPrior();	
 
-public:	 //Public Interface 
-		const int   		mNb_HISTOGRAM_BINS;    	/*< Number of bins in the base Histogram */
-		const VectorXf		BINS_CM;			
-		const int 		STEP;   		/*< BaseHistogram step [Pixels] */
-		const int 		mBIN_MAX;		/*< BaseHistogram max bin value [Pixels] */
-		const int   		mNb_OFFSET_BINS;	/*< Number of bins in offsets vector [Half of the mNb_HISTOGRAM_BINS] */
-		
-public:	 //Public Interface of the class	
 
-		const int 		OFFSET_V;   		/*< Vertical Offset of BaseHistogram in VP coordinate System */
-		const VectorXi  	HISTOGRAM_BINS;    	/*< -PX_MAX	:	STEP	: PX_MAX 	*/
-		const VectorXi  	OFFSET_BINS;       	/*<  0 		: 	STEP 	: PX_MAX	*/
-		
-		cv::Mat prior;
-		cv::Mat filter;
+public:	 	//Public Interface 
 
-		std::vector<BaseHistogramModel>  baseHistogramModels; 	
 
-private:	
-		void  createHistogramModels();	
-
-public:	
+		/** Constructs LaneFilter from Camera and LaneProperties */
 		LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA);
-	   	~LaneFilter();
-};
 	
-#endif // LANEFILTER_H
+		const cv::Point O_ICCS_ICS;		/** Origin of Image-Center-CS in the Image-CS*/
+		const cv::Point O_ICS_ICCS;		/** Origin of Image-CS in the Image-Center-CS*/
+		const cv::Point O_IBCS_ICS;		/** Origin of Image-Base-CS in the Image-CS*/
+		
+
+  		const int 	BASE_LINE_ICCS;		/**< Base line in Image-Center-CS [pixel-lines] */
+  		const int 	PURVIEW_LINE_ICCS;	/**< Base line in Image-Center-CS [pixel-lines] */
+
+		const size_t	BINS_STEP_cm;  		/**< Step size for the Histogram BINS [cm] */
+  		const size_t	BINS_MAX_cm;		/**< Max value of the #BINS_cm **/
+		const size_t   	COUNT_BINS;   		/**< Number of bins in each Histogram */
+
+		const VectorXi	BINS_cm;		/**<Describes the Histogram BINS in the Vehicle-Symmetry-CS [cm] */
+
+		const cv::Mat   BASE_BINS;    		/**<Describes the Histogram BINS, in Image-Center-CS, at BASE line [pixels] */
+		const cv::Mat   PURVIEW_BINS; 		/**<Describes the Histogram BINS, in Image-Center-CS, at PURVIEW line [pixels] */
+
+
+		cv::Mat 	prior;			/**< \brief This 2D-filter provides prior prbobility for a certain 
+							combination of left and right offsets representing the Lane.
+     
+ 							rowIndex: Offset of left  boundary, in #BINS_STEPS_cm,
+						   		  from Vehicle-Symmetry-CS Origin.
+
+							colIndex: Offset of right boundary, in #BINS_STEPS_cm,
+								   from Vehicle-Symmetry-CS Origin.*/
+
+
+		cv::Mat 	filter;			/**< \brief This 2D-filter provides posterior prbobility for a certain
+							 combination of left and right offsets representing the Lane.
+								
+ 							rowIndex: Offset of left  boundary, in #BINS_STEPS_cm,
+						   		  from Vehicle-Symmetry-CS Origin.
+
+							colIndex: Offset of right boundary, in #BINS_STEPS_cm,
+								   from Vehicle-Symmetry-CS Origin.
+							*/
+
+
+		std::vector<BaseHistogramModel>  	baseHistogramModels; /** <Provides a filtered list of Lane models 
+									  	constructed from a multimodal base histogram.*/
+};
+
+
+		
+inline ostream& operator<<(ostream& os, const LaneFilter& laneFilter)
+{
+  os<<endl<<"[LaneFilter Properties]"<<endl;
+  os<<"***********************************************************************"<<endl;
+  os<<endl<<laneFilter.mLANE<<endl;
+  os<<endl<<laneFilter.mCAMERA<<endl;
+
+  os<<"Origin of Image-Center-CS in Image-CS:	"<<laneFilter.O_ICCS_ICS<<endl;
+  os<<"Origin of Image-CS in Image-Center-CS:	"<<laneFilter.O_ICS_ICCS<<endl;
+  os<<"Origin of Image-Base-CS in Image-CS:	"<<laneFilter.O_IBCS_ICS<<endl;
+
+  os<<"Y-coordinate  of base-line in Image-Center-CS:	 "<<laneFilter.BASE_LINE_ICCS<<endl;		
+  os<<"Y-coordinate  of purview-line in Image-Center-CS: "<<laneFilter.PURVIEW_LINE_ICCS<<endl;  
+
+  os<<"BINS_cm step size:	"<<laneFilter.BINS_STEP_cm<<endl;
+  os<<"BINS_cm MAX  value:	"<<laneFilter.BINS_MAX_cm<<endl;
+  os<<"Total number of BINS	"<<laneFilter.COUNT_BINS<<endl;
+  os<<"BINS in cm:		"<<endl<<laneFilter.BINS_cm<<endl<<endl;	
+  os<<"Base-line BINS:		"<<endl<<laneFilter.BASE_BINS<<endl<<endl;
+  os<<"Purview-line BINS:	"<<endl<<laneFilter.PURVIEW_BINS<<endl;
+
+  os<<"************************************************************************"<<endl;
+
+  return os;
+}
+
+#endif // LANE_FILTER_H

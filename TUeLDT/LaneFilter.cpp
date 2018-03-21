@@ -18,126 +18,168 @@
 * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
+#define NEWPIXELBINS
 
 #include "LaneFilter.h"
 #include "ScalingFactors.h"
+#include <opencv2/core/eigen.hpp>
+
+///cm to pixel conversion, for a particular row in the image, of the #BINS_cm [Vehicle-Symmetry-CS <---> Image-Center-CS]
+cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const int Y_ICCS )
+{
+
+	cv::Mat  lMat = cv::Mat(BINS_cm.size(),1,CV_32S);
+
+	{
+	   cv::Mat  lIMG_TO_W;	//Image-Center-CS to Vehicle-Symmetry-CS tranformation, planar homography
+	   cv::Mat  lW_TO_IMG;	//Vehicle-Symmetry-CS to Image-Center-CS transformation 
+
+	   cv::Mat  lImgPt	= cv::Mat(3,1, CV_32F);
+	   cv::Mat  lWorldPt	= cv::Mat(3,1, CV_32F);
+
+
+	   // 3x3 Planar-Homography from the 4x4 Extrinsic Matrix and 3x3 Intrinsic Matrix
+	   cv::Mat a = CAM.MATRIX_EXTRINSIC(cv::Range(0,3), cv::Range(0,2));
+	   cv::Mat b = CAM.MATRIX_EXTRINSIC(cv::Range(0,3), cv::Range(3,4));
+	   cv::hconcat(a, b, lW_TO_IMG);
+
+	   lW_TO_IMG = CAM.MATRIX_INTRINSIC * lW_TO_IMG;
+
+	   lIMG_TO_W = lW_TO_IMG.inv();
+
+	   lImgPt.at<float>(0,0) = 0;
+	   lImgPt.at<float>(1,0) = (float)Y_ICCS; 
+	   lImgPt.at<float>(2,0) = 1;
+
+	   lWorldPt = lIMG_TO_W * lImgPt;
+	   lWorldPt = lWorldPt/lWorldPt.at<float>(2);
+	   
+	   VectorXi lPixelBins;
+	   lPixelBins = BINS_cm;
+
+	   for(int i=0; i< BINS_cm.size(); i++)
+	   {
+		  lWorldPt.at<float>(0)	= BINS_cm[i];
+		  lImgPt = lW_TO_IMG * lWorldPt;
+	 	  lMat.at<int32_t>(i,0) = floor( lImgPt.at<float>(0,0)/(lImgPt.at<float>(0,2)*100.0 ) ) ;
+	   }
+
+	}
+
+	return lMat;
+}
+
 
 LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
 
 : mLANE(LANE),
 
   mCAMERA(CAMERA),
+
+  O_ICCS_ICS(mCAMERA.O_ICCS_ICS),
+
+  O_ICS_ICCS(mCAMERA.O_ICS_ICCS),
+
+  O_IBCS_ICS(cv::Point(0, mCAMERA.RES_VH(0))),
+
+  BASE_LINE_ICCS(-BASE_LINE_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),  
+
+  PURVIEW_LINE_ICCS(-PURVIEW_LINE_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),
   
-  mSTEP_CM(10),
-
-  mNb_HISTOGRAM_BINS(2*round(mLANE.MAX_WIDTH/mSTEP_CM) +1),
-
-  BINS_CM(VectorXf::LinSpaced(mNb_HISTOGRAM_BINS,-mLANE.MAX_WIDTH, mLANE.MAX_WIDTH)),
-
-  STEP(mSTEP_CM*mCAMERA.CM_TO_PIXEL),
-
-  mBIN_MAX(round((mLANE.MAX_WIDTH*mCAMERA.CM_TO_PIXEL)/STEP)*STEP ),
+  BINS_STEP_cm(15), // This value must be above 10 for the current implementation.
   
-  mNb_OFFSET_BINS(floor((mNb_HISTOGRAM_BINS-1)/2) +1),
+  BINS_MAX_cm(round(mLANE.MAX_WIDTH/BINS_STEP_cm)*BINS_STEP_cm),
 
-  OFFSET_V(240),
+  COUNT_BINS( (int)( (2*BINS_MAX_cm)/BINS_STEP_cm ) + 1),
 
-  HISTOGRAM_BINS((BINS_CM*mCAMERA.CM_TO_PIXEL).cast<int32_t>()),
+  BINS_cm( VectorXi::LinSpaced( COUNT_BINS, -BINS_MAX_cm, BINS_MAX_cm) ),
   
-  OFFSET_BINS(HISTOGRAM_BINS.tail(mNb_OFFSET_BINS)),
+  BASE_BINS(toPixelBINS(BINS_cm, mCAMERA, BASE_LINE_ICCS)),
+
+  PURVIEW_BINS(toPixelBINS(BINS_cm, mCAMERA, PURVIEW_LINE_ICCS)),
+
+  prior( cv::Mat::zeros( (int)(BINS_MAX_cm/BINS_STEP_cm) +1, (int)(BINS_MAX_cm/BINS_STEP_cm) +1 , CV_32SC1) ),
   
-  prior(  cv::Mat::zeros( (int)(mBIN_MAX/this->STEP) +1, (int)(mBIN_MAX/this->STEP) +1 , CV_32SC1) ),
-  
-  filter( cv::Mat::zeros( (int)(mBIN_MAX/this->STEP) +1, (int)(mBIN_MAX/this->STEP) +1 , CV_32SC1) )
+  filter(cv::Mat::zeros( (int)(BINS_MAX_cm/BINS_STEP_cm) +1, (int)(BINS_MAX_cm/BINS_STEP_cm) +1 , CV_32SC1) )
   
   {
-	createHistogramModels();
-	this->filter = this->prior.clone();
+	createPrior();
+	filter = prior.clone(); // Initially the posterior probabilities are equal to the prior estimate.
   }
 
 
-void LaneFilter::createHistogramModels()
+
+void LaneFilter::createPrior()
 {
+
+ 	VectorXi  lBINS_RHP_cm(BINS_cm.tail(prior.rows));  //Take only the bins in the right half plane [only the +ve BINS]
+
 	/* Create Histogram Models for the BaseHistogram */
 	/* Assign probabilities to States  */
 		
-	VectorXf bins_cm = OFFSET_BINS.cast<float>()*(1/mCAMERA.CM_TO_PIXEL);
+	const float 	 lMean =  mLANE.AVG_WIDTH/2;
+	const float    	 lSigma = mLANE.STD_WIDTH;
 	
-	float 	 hmean =  mLANE.AVG_WIDTH/2;
-	float    sigmaL = mLANE.STD_WIDTH;
+	float lProb_left, lProb_right, lWidth_cm;
 	
-	float pL, pR, width;
-	
-	for (int left = 0; left < bins_cm.size(); left++)
+	for (int left = 0; left < lBINS_RHP_cm.size(); left++)
 	{
-	  for (int right = 0; right < bins_cm.size(); right++)
+	  for (int right = 0; right < lBINS_RHP_cm.size(); right++)
 	  {
-		 // prior on location
-		 pL = (exp( -pow(hmean-bins_cm(left), 2) / (2*pow(8*sigmaL,2)) ) / ( sqrt(2*M_PI)*8*sigmaL ) )*SCALE_FILTER;
+	     // prior on location
+	     lProb_left  = (exp( -pow(lMean-lBINS_RHP_cm(left), 2) / (2*pow(8*lSigma,2)) )  / ( sqrt(2*M_PI)*8*lSigma ) )*SCALE_FILTER;
 
-		 pR = (exp( -pow(hmean-bins_cm(right), 2) / (2*pow(8*sigmaL,2)) ) / ( sqrt(2*M_PI)*8*sigmaL ))*SCALE_FILTER;
+	     lProb_right = (exp( -pow(lMean-lBINS_RHP_cm(right), 2) / (2*pow(8*lSigma,2)) ) / ( sqrt(2*M_PI)*8*lSigma ) )*SCALE_FILTER;
 
-		 //prior on lane width
-		 width = bins_cm(left)+bins_cm(right);
+ 	    //prior on lane width
+	     lWidth_cm = lBINS_RHP_cm(left)+lBINS_RHP_cm(right);
 
-		 if (mLANE.MIN_WIDTH <= width && width <= mLANE.MAX_WIDTH)
-		 {
-		    /* TO Histogram Bins-IDs*/
-		    int idxL = (mNb_OFFSET_BINS-1) - left;
-		    int idxR = (mNb_OFFSET_BINS-1) + right;
+	    if (mLANE.MIN_WIDTH <= lWidth_cm && lWidth_cm <= mLANE.MAX_WIDTH)
+	    {
+	       /* To Histogram Bins-IDs*/
+	       size_t idxL = (lBINS_RHP_cm.size()  -1) - left;
+	       size_t idxR = (lBINS_RHP_cm.size()  -1) + right;
 
-		    int idxM = round((idxL+idxR)/2.0);
+	       size_t idxM = round((idxL+idxR)/2.0);
 
-		    int nbLeftNonBoundaryBins  = (idxM-3) - (idxL +2);
-		    int nbRightNonBoundaryBins = (idxR-2) - (idxM +3);
+	       size_t lNonBoundaryBinsCount_left  = (idxM-3) - (idxL +2);
+	       size_t lNonBoundaryBinsCount_right = (idxR-2) - (idxM +3);
 
-		    if( 0 < idxL && idxR < mNb_HISTOGRAM_BINS-1 )
-		    {
-			   baseHistogramModels.push_back( BaseHistogramModel());
+	       if( 0 < idxL && idxR < COUNT_BINS-1 )
+	       {
+		   baseHistogramModels.push_back( BaseHistogramModel());
 
-			   baseHistogramModels.back().leftOffsetIdx  			= left;
-			   baseHistogramModels.back().rightOffsetIdx 			= right;
+		   baseHistogramModels.back().rowIdxFilter  			= left;
+		   baseHistogramModels.back().colIdxFilter 			= right;
 
-			   baseHistogramModels.back().leftOffset 				= OFFSET_BINS(left);
-			   baseHistogramModels.back().rightOffset 				= OFFSET_BINS(right);
-			   baseHistogramModels.back().width_cm = width;
+		   baseHistogramModels.back().binIdxBoundary_left 		= idxL;
+		   baseHistogramModels.back().binIdxBoundary_right		= idxR;
+		
+		   //^TODO: Make non-boundary index dependent on the bin size
+		   baseHistogramModels.back().binIdxNonBoundary_left  		= idxL+2;
+		   baseHistogramModels.back().nonBoundaryBinsCount_left  	= lNonBoundaryBinsCount_left;
 
-			   baseHistogramModels.back().binID_leftBoundary  		= idxL;
-			   baseHistogramModels.back().binID_rightBoundary 		= idxR;
-			
-			   baseHistogramModels.back().binID_NegBoundaryLeft  	= idxL+2;
-			   baseHistogramModels.back().nbNonBoundaryBinsLeft  	= nbLeftNonBoundaryBins;
-			
-			   baseHistogramModels.back().binID_NegBoundaryRight  	= idxM+4;
-			   baseHistogramModels.back().nbNonBoundaryBinsRight 	= nbRightNonBoundaryBins;
-			
-			   baseHistogramModels.back().width_cm					= width;
+		   //^TODO: Make non-boundary index dependent on the bin size
+		   baseHistogramModels.back().binIdxNonBoundary_right  		= idxM+4;
+		   baseHistogramModels.back().nonBoundaryBinsCount_right 	= lNonBoundaryBinsCount_right;
 
-			   this->prior.at<int>(left,right) = (int)(std::round(pL*pR));
-		    }
-		 }
+		   baseHistogramModels.back().boundary_left 			=  BASE_BINS.at<int32_t>(idxL,0);
+		   baseHistogramModels.back().boundary_right 			=  BASE_BINS.at<int32_t>(idxR,0);
+
+		   baseHistogramModels.back().boundary_left_cm 			=  BINS_cm(idxL);
+		   baseHistogramModels.back().boundary_right_cm 		=  BINS_cm(idxR);
+		   baseHistogramModels.back().width_cm				=  lWidth_cm;
+
+		   this->prior.at<int>(left,right)				= (int)(std::round(lProb_left*lProb_right));
+	       }
+	    }
 
 	  } //for ends
 	}//for ends
+
     
-    // Normalize
+    	// Normalize
 	int32_t SUM = cv::sum(this->prior)[0];
 	this->prior.convertTo(this->prior,CV_32SC1,SCALE_FILTER);
-    this->prior = this->prior/(SUM);
-}
-
-ostream& operator<<(ostream& os, const LaneFilter& laneFilter)
-{
-  os<<endl<<"LaneFilter Cofiguration:"<<endl;
-  os << "STEP size in cm: "<< laneFilter.mSTEP_CM<<endl;
-
-  return os;
-
-}
-
-
-
-LaneFilter::~LaneFilter()
-{
-	
+    	this->prior = this->prior/(SUM);
 }

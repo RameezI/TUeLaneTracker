@@ -1,5 +1,5 @@
-#ifndef TRACKINGLANESTATE_H
-#define TRACKINGLANESTATE_H
+#ifndef TRACKING_LANE_STATE_H
+#define TRACKING_LANE_STATE_H
 
 /******************************************************************************
 * NXP Confidential Proprietary
@@ -22,10 +22,8 @@
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
 
-#include <thread>
 #include "State.h"
 #include "ScalingFactors.h"
-
 
 #ifdef   S32V2XX
  #include "TrackingLaneDAG_s32v.h"
@@ -40,24 +38,17 @@ class TrackingLaneState: public State
 	
 private:
 	uint_fast8_t mRetryGrab;
-	std::thread mSideExecutor;
-
-public:
-	GRAPH 	mGraph;
+	std::thread  mSideExecutor;
+	GRAPH 	     mGraph;
 
 
 public:	
-	void run();
-	void setupDAG(LaneFilter* laneFilter, VanishingPtFilter* vpFilter);
-	
+	const LaneModel& run(cv::Mat Frame);
+	void setupDAG(LaneFilter* laneFilters, VanishingPtFilter* vpFilter);
+
 	template<typename GRAPH_BASE>
 	TrackingLaneState(GRAPH_BASE&& lBaseGraph);
-
-	~TrackingLaneState();
 };
-
-
-
 
 
 //******************************************************************/*
@@ -78,71 +69,25 @@ TrackingLaneState<GRAPH>::TrackingLaneState(GRAPH_BASE&& lBaseGraph)
 template<typename GRAPH>
 void TrackingLaneState<GRAPH>::setupDAG(LaneFilter* laneFilter, VanishingPtFilter* vpFilter)
 {
-	//Setting Up observing Filters for the Graph	
-	 mGraph.mLaneFilter = laneFilter;
-	 mGraph.mVpFilter   = vpFilter;
-	 
-	mGraph.mLOWER_LIMIT_IntBase =   SCALE_INTSEC*laneFilter->HISTOGRAM_BINS(0);
-	mGraph.mLOWER_LIMIT_IntPurview = SCALE_INTSEC*vpFilter->HISTOGRAM_BINS(0);
-
-	mGraph.mUPPER_LIMIT_IntBase 	=   SCALE_INTSEC*laneFilter->HISTOGRAM_BINS(laneFilter->mNb_HISTOGRAM_BINS-1);
-	mGraph.mUPPER_LIMIT_IntPurview 	=   SCALE_INTSEC*vpFilter->HISTOGRAM_BINS(laneFilter->mNb_HISTOGRAM_BINS-1) ;
-
-
-	mGraph.mSCALED_STEP_LANE_FILTER		= laneFilter->STEP*SCALE_INTSEC;
-	mGraph.mSCALED_STEP_VP_FILTER      	= vpFilter->STEP*SCALE_INTSEC;
-	mGraph.mSCALED_START_LANE_FILTER   	= laneFilter->HISTOGRAM_BINS(0)*SCALE_INTSEC;
-	mGraph.mSCALED_START_VP_FILTER		= vpFilter->HISTOGRAM_BINS(0)*SCALE_INTSEC;
-	
-	if (0== mGraph.init_DAG())
-	 this->currentStatus= StateStatus::ACTIVE;	
+   if (0 == mGraph.init_DAG(laneFilter, vpFilter))
+   this->currentStatus= StateStatus::ACTIVE;	
 }
 
 
 template<typename GRAPH>
-void TrackingLaneState<GRAPH>::run()
+const LaneModel& TrackingLaneState<GRAPH>::run(cv::Mat Frame)
 {
+   try
+   {
+      mGraph.execute(Frame);
+      StateCounter++;
+   }
+   catch(...)
+   {
+     currentStatus = StateStatus::ERROR;
+   }
 
-#ifdef PROFILER_ENABLED
-mProfiler.start("SingleRun_TRACK");
-#endif
-		
-	if (0==mGraph.grabFrame())
-	{
-
-	  if (mSideExecutor.joinable())
-	     mSideExecutor.join();
-		 
-	  mSideExecutor = std::thread(&GRAPH::runAuxillaryTasks, std::ref(mGraph));
-	  mGraph.buffer();
-	  mGraph.extractLanes();
-	  this->StateCounter++;
-	}
-			
-	else
-	{
-	   mRetryGrab ++;
-	   if(mRetryGrab >3)
-	    currentStatus = StateStatus::ERROR;
-	}
-
-		
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
-				<<"******************************"<<endl
-				<<  "Completing a TrackingLanes run." <<endl
-				<<  "Complete run Time: " << mProfiler.getAvgTime("SingleRun_TRACK")<<endl
-				<<"******************************"<<endl<<endl;	
-				#endif	
+   return mGraph.mLaneModel;
 }
 
-template<typename GRAPH>
-TrackingLaneState<GRAPH>::~TrackingLaneState()
-{
-	if (mSideExecutor.joinable())
-	   mSideExecutor.join();	
-}
-
-
-#endif // TRACKINGLANESTATE_H
+#endif // TRACKING_LANE_STATE_H

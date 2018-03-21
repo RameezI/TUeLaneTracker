@@ -26,77 +26,64 @@
 
 class TrackingLaneDAG_generic: public BufferingDAG_generic
 {
-	
+
 template<typename T>
 friend class TrackingLaneState;
 	
 private:
+	int32_t		mMAX_PIXELS_ROI;
+	
+	float   	mLikelihood_LB;
+	float 		mLikelihood_RB;
+	float   	mLikelihood_NB;
+    	float		mLikelihood_W;
 
-	bool            mStartBufferShift;
-	bool    	mStartFiltering;
-	bool 		mFiltersReady;
-	
-	
-	const int	mMAX_PIXELS_ROI;
+	float 		mConditionalProb;
+	float		mPosterior;
+	float		mMaxPosterior;
+	int32_t		mCorrelationNB;
 
-	int  		mLOWER_LIMIT_IntBase;
-	int 		mUPPER_LIMIT_IntBase;
-	
-	int  		mLOWER_LIMIT_IntPurview;
-	int 		mUPPER_LIMIT_IntPurview;
-	
-	int		mSCALED_STEP_LANE_FILTER;
-	int 		mSCALED_STEP_VP_FILTER;
-	int 		mSCALED_START_LANE_FILTER;
-	int 		mSCALED_START_VP_FILTER;
-	
-	
-	int   		mLikelihoodLeftBoundary;
-	int 		mLikelihoodRightBoundary;
-	float        	mLikelihoodNegBoundary;
-	int        	mPosteriorProbBase;
-	
-	
-	int   		mLikelihoodVP_LBoundary;
-	int   		mLikelihoodVP_RBoundary;
-	float     	mLikelihoodVP_NegBoundary;
-    	float		mLikelihoodVP_Width;
-	int       	mPosteriorProbVP;
-	
+	int32_t 	mLOWER_LIMIT_BASE;
+	int32_t 	mLOWER_LIMIT_PURVIEW;
+
+	int32_t 	mUPPER_LIMIT_BASE;
+	int32_t 	mUPPER_LIMIT_PURVIEW;
+
+	int32_t 	mSTEP_BASE;
+	int32_t 	mSTEP_PURVIEW;
+
+
 	LaneFilter* 		mLaneFilter;
 	VanishingPtFilter*	mVpFilter;
-	
-	
-	cv::Mat 		mX_ICCS_SCALED;	
-	cv::Mat 		mIntBase;           
-	cv::Mat			mIntPurview;
-	cv::Mat 		mIntWeights;
-	
-	cv::Mat			mHistBase;
-	cv::Mat			mHistPurview;
-	
-	cv::Mat			mProbMapFocussed;
-	cv::Mat 		mGradTanFocussed;
-	
-	cv::Mat 		mTransitLaneFilter;
-	cv::Mat 		mTransitVpFilter;
 
-	LaneModel   		mLaneModel;
+	cv::Mat		mBASE_BINS_SCALED;
+	cv::Mat		mPURVIEW_BINS_SCALED;
+	cv::Mat 	mX_ICCS_SCALED;	
+
+	cv::Mat		mProbMapFocussed;
+	cv::Mat 	mGradTanFocussed;
+
+	cv::Mat 	mIntBase;           
+	cv::Mat		mIntPurview;
+	cv::Mat 	mIntWeights;
 	
+	cv::Mat		mHistBase;
+	cv::Mat		mHistPurview;
+	
+	cv::Mat 	mTransitLaneFilter;
+	cv::Mat 	mTransitVpFilter;
+
+	BaseHistogramModel	mBaseHistModel;  	/**< Selected Base-Histogram Model */
+	LaneModel   		mLaneModel;		/**< The detected Lane-Model */
 
 	// Only Enable in case of Video Recording
-	//VideoWriter mOutputVideo;
+	//cv::VideoWriter mOutputVideo;
 
 	
 public:
-
 	TrackingLaneDAG_generic(BufferingDAG_generic&& bufferingGraph);
-	int  init_DAG();
-	void runAuxillaryTasks();
-	void extractLanes();
-	void extractControllerInputs();
-	~TrackingLaneDAG_generic();
-
+	int  init_DAG(LaneFilter* laneFilter, VanishingPtFilter* vpFilter);
+	void execute(cv::Mat FrameGRAY);
 };
 
 #endif // TRACKINGLANESDAG_GENERIC_H

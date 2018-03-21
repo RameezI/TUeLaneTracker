@@ -1,5 +1,5 @@
-#ifndef INITSTATE_H
-#define INITSTATE_H
+#ifndef FRAME_RENDERER_H
+#define FRAME_RENDERER_H
 
 /******************************************************************************
 * NXP Confidential Proprietary
@@ -20,45 +20,28 @@
 * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 * THE POSSIBILITY OF SUCH DAMAGE.
-*
 * ****************************************************************************/ 
 
-#include <memory>
-#include "State.h"
-#include "LaneModel.h"
-#include "Templates.h"
+#include "LaneModel.h"		//implicit include of LaneFilter and VanishingPtFilter
+#include "opencv2/opencv.hpp"
+#include <iostream>
 
-using namespace std;
+using namespace cv;
 
-class InitState: public State
-{	
+class FrameRenderer
+{
+   const int 		mHORIZON;
+   const LaneFilter& 	mLANE_FLTR;
 
-private :
+public:
+   FrameRenderer(const int HORIZON, const LaneFilter& LANE_FLTR)
+   : mHORIZON(HORIZON), mLANE_FLTR(LANE_FLTR)
+   {
 
-		bool  mLaneFilterCreated;
-		bool  mVpFilterCreated;
-		bool  mTemplatesCreated;
-        	bool  checkCreationStatus();
-		
-public	:
-		/* These methods create instances and also keep record of the already created objects
-		 * Make sure all objects are created before indicating "StateStatus::DONE". */
-		 
-		unique_ptr<LaneFilter> 			createLaneFilter();
-		unique_ptr<VanishingPtFilter> 		createVanishingPtFilter();
-		unique_ptr<Templates> 			createTemplates();
-		
-		InitState():
-			    mLaneFilterCreated(false),
-  		  	    mVpFilterCreated  (false),
-  		  	    mTemplatesCreated (false)
-		{	
-		  this->currentStatus = StateStatus::ACTIVE;
-		}
-
-	   	~InitState() {}
+   }
+   void drawLane(const cv::Mat& FRAME, const LaneModel& Lane);
 };
 
 
 
-#endif // INITSTATE_H
+#endif

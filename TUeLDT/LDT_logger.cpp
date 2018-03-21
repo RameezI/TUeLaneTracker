@@ -27,8 +27,8 @@ void Logger::Init()
 	{
 	  if (mProfilerStatus==ProfilerStatus::NOT_INITIALISED)
 	  {		
-		plog::init<LDTLog::STATE_MACHINE_LOG>(plog::info,   "Log_StateMachine"); //Initialize the logger.
-		plog::init<LDTLog::TIMING_PROFILE>(plog::debug,     "Profile_ExecutionTime"); 		   				 		  
+		plog::init<LDTLog::STATE_MACHINE_LOG>(plog::debug,   "Log_StateMachine"); //Initialize the logger.
+		plog::init<LDTLog::TIMING_PROFILE>(plog::info,       "Profile_ExecutionTime"); 		   				 		  
 		mProfilerStatus = ProfilerStatus::INITIALISED;
 	  }
 		

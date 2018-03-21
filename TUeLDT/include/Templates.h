@@ -46,37 +46,36 @@ struct Templates
 	
 public:
 
-	const int MARGIN;  		/**< /brief Vertical margin between the image center and ROI [pixels]
-					/n +ve Margin implies that the ROI is below the center line.
-					/n -ve Margin implies that the ROI is above the center line. */
+	const int HORIZON_ICCS;  	/**< /brief Position of Horizon in the Image-Center-CS [pixels]
+				 	  *  /n +ve value implies that the ROI is below the center line.
+					  *  /n -ve value implies that the ROI is above the center line. */
 
+	const int VP_RANGE_V;   	/**< Vertical range of the vanishing-point in either direction [pixels] */
 
-	const int VP_RANGE_V;   	/**< Vertical range of the vanishing-point in each direction [pixels] */
 	const int SPAN;			/**< Vertical size  of the ROI [pixels]
-					/n Automatically calculated from  /em MARGIN and /em VP_RANGE_V */
+					/n Automatically calculated from  #HORIZON_ICCS and #VP_RANGE_V */
 
-
-	cv::Mat FOCUS_MASK_ROOT;    	/**< /brief ROOT-TEMPLATE for extracting mask to compensate vehicle pitch movements.
-					/n The size of /em FOCUS ROOT is [SPAN+(2xVP_RANGE_V), RES_H]
-				     	/n Normal activation all elements in rowrange /em (SPAN-VP_RANGE) = 255
- 				     	/n Best   activation all elements in /em SPAN = 255
-				     	/n Worst  activation all elements in rowrange /em (SPAN-2*VP_RANGE) = 255 */
+	cv::Mat FOCUS_MASK_ROOT;  	/**< /brief ROOT-TEMPLATE for extracting mask to compensate vehicle pitch movements.
+					/n The size of /em FOCUS ROOT is [#SPAN + (2x#VP_RANGE_V), #RES_H]
+				     	/n Normal activation all elements in rowrange (#SPAN - #VP_RANGE) = 255
+ 				     	/n Best   activation all elements in #SPAN = 255
+				     	/n Worst  activation all elements in rowrange (#SPAN - 2x#VP_RANGE) = 255 */
 
 
 	cv::Mat GRADIENT_TAN_ROOT;	/**< ROOT-TEMPLATE for extracting gradient tangents reference.
-				  	/n The size of /em GRADIENT_TAN_ROOT is [2xRES_V +1 , 2xRES_H +1] */
+				  	/n The size of /em GRADIENT_TAN_ROOT is [2x#RES_V +1 , 2x#RES_H +1] */
 
 
 	cv::Mat DEPTH_MAP_ROOT;		/**< ROOT-TEMPLATE for assigning perspective weights to the pixels.
-				     	/n The size of /em DEPTH_MAP_ROOT is [RES_V, RES_H] */
+				     	/n The size of /em DEPTH_MAP_ROOT is [#RES_V, #RES_H] */
 
 
-	cv::Mat X_ICS;			/**< ROOT-TEMPLATE containing the X pixel indices in Image Coordinate System.
-				   	/n The size of /em X_ICS is [RES_V, RES_H] */
+	cv::Mat X_ICS;			/**< X-Coordinates of the ROI in the Image-Coordinate-System.
+				   	/n The size of /em X_ICS is [#SPAN, #RES_H] */
 
 
-	cv::Mat Y_ICS;			/**< ROOT-TEMPLATE containing the Y pixel indices in Image Coordinate System.
-				   	/n The size of /em Y_ICS is [RES_V, RES_H] */
+	cv::Mat Y_ICS;			/**< Y-Coordinates of the ROI in the Image-Coordinate-System.
+				   	/n The size of /em Y_ICS is [#SPAN, #RES_H] */
 
 
 
@@ -87,10 +86,10 @@ public:
  	*  /param  FOV_V is an integer argument representing field of view of the camera. [degrees]
  	*  /parame VP_RANGE_ROWS is an integer argument representing vertical range of the vanishing-point. [pixels]
  	*   ****************************************************/
-	Templates(const int RES_V, const int RES_H, const float FOV_V, const int VP_RANGE_ROWS)
-	: MARGIN(78), 
+	Templates(const int RES_V, const int RES_H, const float FOV_V, const int Horizon, const int VP_RANGE_ROWS)
+	: HORIZON_ICCS(Horizon), 
 	  VP_RANGE_V(VP_RANGE_ROWS), 
-	  SPAN((RES_V/2)-MARGIN + VP_RANGE_ROWS) 
+	  SPAN((RES_V/2)- HORIZON_ICCS + VP_RANGE_ROWS) 
 
 	{
 		/* Create Focus Template */
@@ -118,21 +117,20 @@ public:
 			DEPTH_MAP_ROOT.convertTo(DEPTH_MAP_ROOT, CV_16U);
 
 		/* Create X Template */
-			cv::Mat Row = cv::Mat(1, RES_H, CV_16S);
-			int16_t* ptr = Row.ptr<int16_t>(0);
+			cv::Mat Row = cv::Mat(1, RES_H, CV_32S);
+			int32_t* ptr = Row.ptr<int32_t>(0);
 			for (int i=0; i<RES_H; i++)
 			{
 				ptr[i]= i;			
 			}
 			repeat(Row,SPAN,1 ,X_ICS);
-			X_ICS.convertTo(X_ICS, CV_16S);
 
 		/* Create Y Template */
-			cv::Mat Col = cv::Mat(SPAN, 1, CV_16S);
-			ptr = Col.ptr<int16_t>(0);
+			cv::Mat Col = cv::Mat(SPAN, 1, CV_32S);
+			ptr = Col.ptr<int32_t>(0);
 			for (int i=0; i<SPAN; i++)
 			{
-				ptr[i]= i;			
+				ptr[i]= (RES_V-SPAN) + i;			
 			}
 			repeat(Col,1, RES_H ,Y_ICS);
 
@@ -159,24 +157,25 @@ public:
 
 			prefix= "GradientTangent_";
 
-			formattedString<<path<<"/ConfigFiles/Templates/"<<prefix<<std::to_string(RES_H)<<"x"<<std::to_string(RES_V)<<".yaml";
+			formattedString<<path<<"/ConfigFiles/Templates/"<<prefix
+			<<std::to_string(RES_H)<<"x"<<std::to_string(RES_V)<<".yaml";
+
 			templateFile = formattedString.str();
 
 			struct stat buf;
 			int statResult = stat(templateFile.c_str(),&buf);
 			if (statResult != 0) 
 			{
-				
-				#ifdef PROFILER_ENABLED
-				 LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-				 <<"File not found: "<<templateFile.c_str()<<endl;
-				#endif
+			  #ifdef PROFILER_ENABLED
+			   LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+			   <<"File not found: "<<templateFile.c_str()<<endl;
+		 	  #endif
 			}
 			else
 			{
-				cv::FileStorage loadGradientTemplate( templateFile, cv::FileStorage::READ);
-				loadGradientTemplate["ROOT_DIR_TEMPLATE"]>> GRADIENT_TAN_ROOT;
-				GRADIENT_TAN_ROOT.convertTo(GRADIENT_TAN_ROOT,CV_16SC1);
+			  cv::FileStorage loadGradientTemplate( templateFile, cv::FileStorage::READ);
+			  loadGradientTemplate["ROOT_DIR_TEMPLATE"]>> GRADIENT_TAN_ROOT;
+			  GRADIENT_TAN_ROOT.convertTo(GRADIENT_TAN_ROOT,CV_16SC1);
 			}
 
 			//Check if every template is non-empty and throw an exception if not.

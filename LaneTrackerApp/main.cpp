@@ -1,5 +1,6 @@
 /** \file */ 
 #include "SigInit.h"
+#include "FrameFeeder.h"
 #include "StateMachine.h"
 #include "boost/program_options.hpp"
 
@@ -7,7 +8,8 @@ using namespace std;
 namespace po = boost::program_options;
 
 
-
+//Fucntion definitions
+unique_ptr<FrameFeeder> createFrameFeeder(FrameSource srcMode, string srcString);
 
 
 int main(int argc, char* argv[]) /**  
@@ -15,12 +17,11 @@ int main(int argc, char* argv[]) /**
 	- Initialises the sigInit handler
 	- Creates a stateMachine and spins it until user issues a quit signal through the sigInit handler. 		
 	*/
-
 {
 	int lReturn 	= 0;
 
-	FrameSource 	lFrameSource;
-	string 		lSourceStr;	
+	FrameSource 		 lFrameSource;
+	std::string 		 lSourceStr;
 	
 	po::options_description	lDesc("Options");
 
@@ -51,13 +52,29 @@ int main(int argc, char* argv[]) /**
 	  cout <<endl<<endl<< "	Examples:"<<endl;
 	  cout<< "	./TUeLaneTracker -m " << FrameSource::DIRECTORY << " -s " << "/home/DataSet" <<endl;
 	  cout<<endl<<endl;
-	  return -1;
+	  return 0;
 	}
+	
+	#ifdef PROFILER_ENABLED
+	  Logger::Init();
+	  if(lFrameSource == FrameSource::DIRECTORY)
+	  {
+	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	    <<"******************************"<<endl
+	    << "State-Machine Log Created..."
+	    <<"******************************"<<endl<<endl;
+	  }
+	#endif
+
+
+	unique_ptr<FrameFeeder>  lPtrFeeder = createFrameFeeder(lFrameSource, lSourceStr);
+	if(lPtrFeeder == nullptr)
+	  lReturn = -1;
 
 	shared_ptr<SigInit> sigInit= make_shared<SigInit>();
-
 	if(sigInit->sStatus == SigStatus::FAILURE)
-	  lReturn|= -1;
+	  lReturn = -1;
+
 
 	if (lReturn==0)
 	{
@@ -65,17 +82,19 @@ int main(int argc, char* argv[]) /**
 		std::cout<<"******************************"<<std::endl;
 		std::cout<<" Press Ctrl + c to terminate."<<std::endl;
 		std::cout<<"******************************"<<std::endl;
-
+		
+		//^TODO: Replace by State.h member variable.
 		uint64_t nbCycles = 0;
-
-		StateMachine stateMachine(lFrameSource, lSourceStr);
-	
-
-		cout<<stateMachine.getCurrentState();
-		States lPreviousState = stateMachine.getCurrentState();
-
-		while (stateMachine.getCurrentState() != States::DISPOSED)
+		
+		try
 		{
+		   StateMachine stateMachine(move(lPtrFeeder));
+
+		   cout<<stateMachine.getCurrentState();
+	 	   States lPreviousState = stateMachine.getCurrentState();
+
+		   while (stateMachine.getCurrentState() != States::DISPOSED)
+		   {
 			if (sigInit->sStatus == SigStatus::STOP)
 			stateMachine.quit();
 
@@ -97,10 +116,85 @@ int main(int argc, char* argv[]) /**
 			  cout <<"state cycle-count = " << nbCycles;
 			}
 
+		    }
 		}
+
+		catch(const char* msg)
+		{	
+	   	   #ifdef PROFILER_ENABLED
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+		    <<"******************************"<<endl
+		    << "State-Machine Failure."
+		    << msg <<endl
+		    <<"******************************"<<endl<<endl;
+		   #endif
+
+		   lReturn = -1;
+		}
+		catch(...)
+		{
+	   	   #ifdef PROFILER_ENABLED
+	    	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	    	    <<"******************************"<<endl
+	    	    <<  "State-Machine Failure. "<<endl
+	    	    <<  "Unknown Exception!"<<endl
+	    	    <<"******************************"<<endl<<endl;
+	  	    #endif
+	   	    lReturn = -1; 
+		}
+
+	
 	}
 
-	cout<<"Completed!"<<endl<<"program ended with exit code " <<lReturn<<endl;
+	cout<<endl<<"The program ended with exit code " <<lReturn<<endl;
 	return(lReturn);
 	
+}
+
+
+
+unique_ptr<FrameFeeder> createFrameFeeder(FrameSource srcMode, string srcString)
+{
+
+	unique_ptr<FrameFeeder>	lPtrFeeder;
+
+	cout<<srcString<<endl;
+
+	/** Create Image Feeder */
+	try
+	{
+	   lPtrFeeder=  unique_ptr<FrameFeeder>( new ImgStoreFeeder(srcString) );
+
+	   #ifdef PROFILER_ENABLED
+	      LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	      <<"******************************"<<endl
+	      << "Frame Input Mode: "<<srcMode<<endl
+	      << "Source String: "<<srcString<<endl
+	      <<"******************************"<<endl<<endl;
+	   #endif
+	}
+	catch(const char* msg)
+	{
+	   #ifdef PROFILER_ENABLED
+	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	    <<"******************************"<<endl
+	    << msg <<endl
+	    <<"******************************"<<endl<<endl;
+	   #endif
+	   lPtrFeeder = nullptr; 
+	}
+	catch (...)
+	{
+	   #ifdef PROFILER_ENABLED
+	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	    <<"******************************"<<endl
+	    <<  "FrameFeeder Instantiation Failed. "<<endl
+	    <<  "Unknown Exception!"<<endl
+	    <<"******************************"<<endl<<endl;
+	   #endif
+	   lPtrFeeder = nullptr; 
+	}
+
+	return lPtrFeeder;
+
 }

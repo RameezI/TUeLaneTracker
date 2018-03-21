@@ -21,67 +21,94 @@
 
 #include "BufferingDAG_generic.h"
 
-BufferingDAG_generic::BufferingDAG_generic()
-:mTemplatesReady(false),
- mBufferReady(false),
- mFrameCount(0)
+BufferingDAG_generic::BufferingDAG_generic() : mBufferPos(0)
 {
 	
 }
 
-
-int BufferingDAG_generic::init_DAG()
+int BufferingDAG_generic::init_DAG(const Templates & TEMPLATES, const size_t & BUFFER_SIZE)
 {
-        int16_t   ORIGIN_Y_CRS   =  mCAMERA.FRAME_CENTER(0) - mSpan;
-        int16_t   ORIGIN_X_CRS   = -mCAMERA.FRAME_CENTER(1);
-
-        mY_ICCS   =   mY_ICS + ORIGIN_Y_CRS;
-        mX_ICCS   =   mX_ICS + ORIGIN_X_CRS;
+	const int RES_H 	= mCAMERA.RES_VH(1);
+	mVP_RANGE_V   		= TEMPLATES.VP_RANGE_V;
+	mSPAN			= TEMPLATES.SPAN;
+	mHORIZON_ICCS		= TEMPLATES.HORIZON_ICCS;
 	
+	mBufferPool.reset(new BufferPool<BufferingDAG_generic>(mSPAN, RES_H, BUFFER_SIZE));
+
+	mGRADIENT_TAN_ROOT 	= TEMPLATES.GRADIENT_TAN_ROOT;
+	mDEPTH_MAP_ROOT    	= TEMPLATES.DEPTH_MAP_ROOT;
+	mFOCUS_MASK_ROOT   	= TEMPLATES.FOCUS_MASK_ROOT;
+	mY_ICS	 	  	= TEMPLATES.Y_ICS;
+	mX_ICS    	  	= TEMPLATES.X_ICS;
+
+        mX_ICCS   		= mX_ICS + mCAMERA.O_ICS_ICCS.x;
+        mY_ICCS   		= mY_ICS + mCAMERA.O_ICS_ICCS.y;
+
 	return 0;
 }
 
 
-void BufferingDAG_generic::buffer( )
+void BufferingDAG_generic::execute(cv::Mat& FrameGRAY )
 {
 
-
 #ifdef PROFILER_ENABLED
-mProfiler.start("GRAY_FRAME_CONVERSION");
+mProfiler.start("SETUP_ASYNC_TEMPLATES");
 #endif
-				
-	cvtColor(mFrameRGB, mFrameGRAY, CV_BGR2GRAY);
+	mFuture = std::async([this]
+	{
+	   //Local Variables
+	   WriteLock  lLock(_mutex, std::defer_lock);	
+	   int lRowIndex;
+	   cv::Rect lROI;
+
+	   //Extract Depth Template
+	   lRowIndex = mCAMERA.RES_VH(0) -  mSPAN; 
+	   lROI = cv::Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSPAN);
+	
+	   lLock.lock();
+	    mDEPTH_MAP_ROOT(lROI).copyTo(mDepthTemplate);
+	   lLock.unlock();
+
+	   //Extract Focus Template
+	   lRowIndex = mVP_RANGE_V	 - mVanishPt.V;
+	   lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
+
+	   lLock.lock();
+	    mFOCUS_MASK_ROOT(lROI).copyTo(mFocusTemplate);	
+	   lLock.unlock();
+	});
 
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<"******************************"<<endl
-				<<  "GRAY Frame Conversion." <<endl
-				<<  "Max Time: " << mProfiler.getMaxTime("GRAY_FRAME_CONVERSION")<<endl
-				<<  "Avg Time: " << mProfiler.getAvgTime("GRAY_FRAME_CONVERSION")<<endl
-				<<  "Min Time: " << mProfiler.getMinTime("GRAY_FRAME_CONVERSION")<<endl
+				<<  "Extract ROI and Shift Buffer." <<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("SETUP_ASYNC_TEMPLATES")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("SETUP_ASYNC_TEMPLATES")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("SETUP_ASYNC_TEMPLATES")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
+
 
 
 
 #ifdef PROFILER_ENABLED
 mProfiler.start("EXTRACT_ROI");
 #endif
-	 int lRowIndex= mCAMERA.RES_VH(0) - mSpan;
+	 int lRowIndex	= mCAMERA.RES_VH(0) -mSPAN;
 	 int lColIndex;
 	 cv::Rect lROI;
 
 	 //Define ROI from the Input Image
-	 lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
-	 mFrameGRAY_ROI = mFrameGRAY(lROI);
+	 lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
+	 mFrameGRAY_ROI = FrameGRAY(lROI);
 
-	 lRowIndex 	=  mCAMERA.RES_VH(0) - (mVP_Range_V + mVanishPt.V);
-	 lColIndex	=  mCAMERA.RES_VH(1) - (mCAMERA.FRAME_CENTER(1) - mVanishPt.H) ;
-
-	 //Extract Gradient Orientation Template
-	 lROI = cv::Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSpan);
+	 //Extract Corrseponding Gradient Orientation Template
+	 lRowIndex =  mCAMERA.RES_VH(0) - (mVP_RANGE_V + mVanishPt.V);
+	 lColIndex =  mCAMERA.RES_VH(1) - (mCAMERA.O_ICCS_ICS.x - mVanishPt.H) ;
+	 lROI	   =  cv::Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
 	 mGRADIENT_TAN_ROOT(lROI).copyTo(mGradTanTemplate);
+
 
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -98,33 +125,11 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 #ifdef PROFILER_ENABLED
-mProfiler.start("TEMPLATES_WAIT");
-#endif 							
-
-		WriteLock  wrtLock(_mutex);
-		_sateChange.wait(wrtLock,[this]{return (mTemplatesReady && mBufferReady) ;} );
-				
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
-				<<"******************************"<<endl
-				<<  "Waiting For Worker thread." <<endl
-				<<  "Max Time: " << mProfiler.getMaxTime("TEMPLATES_WAIT")<<endl
-				<<  "Avg Time: " << mProfiler.getAvgTime("TEMPLATES_WAIT")<<endl
-				<<  "Min Time: " << mProfiler.getMinTime("TEMPLATES_WAIT")<<endl
-				<<"******************************"<<endl<<endl;	
-				#endif	
-
-
-
-
-#ifdef PROFILER_ENABLED
 mProfiler.start("GAUSSIAN_BLUR");
 #endif 
 	
 	 GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, cv::Size( 5, 5 ), 2, 2, cv::BORDER_REPLICATE | cv::BORDER_ISOLATED  );
 
-				
  #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
@@ -173,8 +178,7 @@ mProfiler.start("GRADIENT_COMPUTATION");
 	//convertScaleAbs(mFrameGradMag, mFrameGradMag);
 	mFrameGradMag.convertTo(mFrameGradMag, CV_8U);
 
-	int bufferPos = mBufferPool->GradientTangent.size()-1;
-	cv::divide(mGradX, mGradY, mBufferPool->GradientTangent[bufferPos], 128, -1);
+	cv::divide(mGradX, mGradY, mBufferPool->GradientTangent[mBufferPos], 128, -1);
 
  #ifdef PROFILER_ENABLED
  mProfiler.end();
@@ -212,13 +216,13 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 
 
 	// Intermediate Probability Map
-	mBufferPool->Probability[bufferPos] = mProbMap_GradMag + mProbMap_Gray;
-	mMask = mBufferPool->Probability[bufferPos] <0 ;
-	mBufferPool->Probability[bufferPos].setTo(0,mMask);
+	mBufferPool->Probability[mBufferPos] = mProbMap_GradMag + mProbMap_Gray;
+	mMask = mBufferPool->Probability[mBufferPos] <0 ;
+	mBufferPool->Probability[mBufferPos].setTo(0,mMask);
 
 
 	//Gradient Tangent Probability Map
-	subtract(mGradTanTemplate, mBufferPool->GradientTangent[bufferPos], mTempProbMat, cv::noArray(), CV_32S);
+	subtract(mGradTanTemplate, mBufferPool->GradientTangent[mBufferPos], mTempProbMat, cv::noArray(), CV_32S);
 	mTempProbMat= abs(mTempProbMat);
 	mTempProbMat.copyTo(mProbMap_GradDir);
 	mTempProbMat = mTempProbMat + 60;
@@ -227,16 +231,9 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 
 	
 	//Final Probability Map
-	multiply(mBufferPool->Probability[bufferPos], mProbMap_GradDir, mBufferPool->Probability[bufferPos]);
-	mBufferPool->Probability[bufferPos].convertTo(mBufferPool->Probability[bufferPos], CV_8U, 1.0/255, 0);
+	multiply(mBufferPool->Probability[mBufferPos], mProbMap_GradDir, mBufferPool->Probability[mBufferPos]);
+	mBufferPool->Probability[mBufferPos].convertTo(mBufferPool->Probability[mBufferPos], CV_8U, 1.0/255, 0);
 
-	bitwise_and(mBufferPool->Probability[bufferPos], mFocusTemplate, mBufferPool->Probability[bufferPos]);
-
-
-	mTemplatesReady = false;	
-	mBufferReady    = false;
-	
-	wrtLock.unlock();
 
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -248,130 +245,26 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<  "Min Time: " << mProfiler.getMinTime("COMPUTE_PROBABILITIES")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
-}
 
 
+#ifdef PROFILER_ENABLED
+mProfiler.start("FOCUS");
+#endif 							
 
-/** 
-Parallel Execution Path for Buffering Graph.
-Description of Modes:
-*/
-void BufferingDAG_generic::runAuxillaryTasks()
-{
+	mFuture.wait();
+	bitwise_and(mBufferPool->Probability[mBufferPos], mFocusTemplate, mBufferPool->Probability[mBufferPos]);
 
-	//Local Variables
-	WriteLock  wrtLock(_mutex, std::defer_lock);	
-	int lRowIndex;
-	cv::Rect lROI;
-
-
-/* MODE: (A + C) */	
-
-		//Extract Depth Template
-		lRowIndex = mCAMERA.RES_VH(0) -  mSpan; 
-		lROI = cv::Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSpan);
-		
-		wrtLock.lock();
-		 mDEPTH_MAP_ROOT(lROI).copyTo(mDepthTemplate);
-		wrtLock.unlock();
-
-		//Extract Focus Template
-		lRowIndex = mVP_Range_V	 - mVanishPt.V;
-		lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSpan);
-
-		wrtLock.lock();
-		 mFOCUS_MASK_ROOT(lROI).copyTo(mFocusTemplate);	
-		wrtLock.unlock();
-
-
-		wrtLock.lock();
-		  // Shift Buffers
-		  for ( std::size_t i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
-		  {
-			
-		    mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
-		    mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);
-		  }	
-		  mTemplatesReady = true;
-		  mBufferReady    = true;
-		wrtLock.unlock();
-
-
-	_sateChange.notify_one();
-
-}
-
-
-
-int BufferingDAG_generic::grabFrame()	
-{
-
-
-	int lReturn = 0;
-		
-	#ifdef PROFILER_ENABLED
-	mProfiler.start("IMAGE_READ");
-	#endif 
-
-
-	   if(mSource == FrameSource::DIRECTORY)
-	   {
-		 mFrameRGB = imread(mFiles[mFrameCount]);
-		
-		 #ifdef PROFILER_ENABLED
-		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		  <<"Processing Frame: "<<mFrameCount<<endl;
-		 #endif
-
-		 if (mFrameCount+1 < mFiles.size())
-	   	  mFrameCount ++;
-	   }
-
-	   else if (mSource == FrameSource::STREAM)
-	   {
-		 mCAPTURE >> mFrameRGB;
-
-		 #ifdef PROFILER_ENABLED
-		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		  <<"Processing Frame: "<<mFrameCount<<endl;
-		 #endif
-
-	   	 mFrameCount ++;
-	   }
-
-	   else if (mSource == FrameSource::GMSL)
-	   {
-		 #ifdef PROFILER_ENABLED
-		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		  <<"Undefined Input Mode: "<<endl;
-		 #endif
-
-		lReturn = -1;
-	   }
-
-	   else
-	   {
-		 #ifdef PROFILER_ENABLED
-		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		  <<"Undefined Input Mode: "<<endl;
-		 #endif
-
-		 lReturn =-1;
-	   }
+	if(mBufferPos < ((mBufferPool->Probability.size())-1) )
+	mBufferPos ++;
 				
-
-	   if(!mFrameRGB.data)
-	   	lReturn = -1;
-
-
-	#ifdef PROFILER_ENABLED
-	mProfiler.end();
-	LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
+#ifdef PROFILER_ENABLED
+mProfiler.end();
+LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				<<"******************************"<<endl
-				<<  "Frame Source:   "<<endl<<mSource<<endl
-				<<  "Read time: " << mProfiler.getAvgTime("IMAGE_READ")<<endl
-				<<"******************************"<<endl<<endl;
-				#endif 
-
-	return lReturn;
+				<<  "Waiting for async task, focussing and adjusting buffer position." <<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("FOCUS")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("FOCUS")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("FOCUS")<<endl
+				<<"******************************"<<endl<<endl;	
+				#endif	
 }

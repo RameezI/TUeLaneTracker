@@ -1,5 +1,5 @@
-#ifndef VANSIHINGPOINFILTER_H
-#define VANSIHINGPOINFILTER_H
+#ifndef VANSIHING_POINT_FILTER_H__
+#define VANSIHING_POINT_FILTER_H__
 
 /******************************************************************************
 * NXP Confidential Proprietary
@@ -22,86 +22,44 @@
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
 
-#include  "LaneFilter.h"
 #include <Eigen/Dense>
+#include "opencv2/opencv.hpp"
 
 using namespace Eigen;
 typedef Matrix<int, 6, 1> Vector6i;
 
+///This class represents ad 2D-Filter expressed in Image-Center-Coordiante-System
+/*
 
-struct VanishingPt
-{
-  int  V;
-  int  H;
-  int  V_prev;
-  int  H_prev;
-  VanishingPt()
-  : V(0),H(0),V_prev(0),H_prev(0){}
-};
-
-struct PurviewHistogramModel
-{
-	int  binID_leftBoundary;
-	int  binID_rightBoundary;
-	
-	int  binID_NegBoundaryLeft;
-	int  binID_NegBoundaryRight;
-	int  nbNonBoundaryBinsLeft;
-	int  nbNonBoundaryBinsRight;
-	
-	PurviewHistogramModel()
-	: binID_leftBoundary(-1),binID_rightBoundary(-1),
-	 binID_NegBoundaryLeft(-1),binID_NegBoundaryRight(-1),
-	 nbNonBoundaryBinsLeft(0), nbNonBoundaryBinsRight(0)
-	{
-
-	}
-	
-};
-
-
-
-
+*/
 class VanishingPtFilter
 {
 
-		
+private:
+		void  createPrior();
+
 public:
 
-	VanishingPtFilter(const Ref<const VectorXi>& LANE_HISTOGRAM_BINS, const int&  LANE_FILTER_OFFSET_V);
-	~VanishingPtFilter();
+		VanishingPtFilter();
 
+        	const int       STEP;         	/*< Step for VanishinPtFilter [pixels] */
 
+		const int 	RANGE_V;  	/*< Vertical   range of the VanishingPtFilter [pixels] */
+		const int 	RANGE_H;	/*< Horizental range of the VanishingPtFilter [pixels] */
 
-
-private: 
-        	const int       mVP_STEP;         // Step for VP Bins
-
-public: 
-		const int 	VP_RANGE_V;
-		const int 	VP_RANGE_H;
 					
-		const int    	mNb_VP_BINS_V;    // number of bins in the  vertical   direction.
-		const int    	mNb_VP_BINS_H;    // number of bins in the horizental direction.
+		const int    	COUNT_BINS_V;    /*< Number of bins in the  vertical   direction of VanishinPtFilter */
+		const int    	COUNT_BINS_H;    /*< Number of bins in the  horizental direction of VanishinPtFilter */
 
-		const VectorXi 	VP_BINS_V;	 //Histogram Bins in Pixels.
-		const VectorXi 	VP_BINS_H;     	 //Histogram Bins in Pixels.
-		const int  	OFFSET_V;
-		
-		const float     mVP_LANE_RATIO;			
-
-
-public:			
+		const VectorXi 	BINS_V;	 	/*< Horizental  bins of the VanishinPtFiltere [pixels].*/
+		const VectorXi 	BINS_H;     	/*< Vertical    bins of the VanishinPtFilter  [pixels].*/
 			
-		const VectorXi  HISTOGRAM_BINS;	    //Purview Histogram Bins in Pixels.
-		const int    	STEP;  		    //Purview Histogram STEP
 		      
-	    	cv::Mat  prior;
-	    	cv::Mat  filter;
+	    	cv::Mat  prior;			/*< prior probabilities of the 2D VanishinPtFilter */
+	    	cv::Mat  filter;		/*< posterior probabilities of the 2D VanishinPtFilter */
 
 				  		
-private:		 
-		void  createPrior();
+		~VanishingPtFilter();
 
 };
 	
