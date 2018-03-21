@@ -42,12 +42,22 @@ ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
           cv::cvtColor(lMat,lMatGRAY, cv::COLOR_RGB2GRAY );
 
 	  //Put the frames in the queue for the stateMachine
-          enqueue(lMat,     mQueueFrame);
-          enqueue(lMatGRAY, mQueueFrameGRAY);
+          enqueue(lMatGRAY, mProcessQueue);
+          enqueue(lMat,     mDisplayQueue);
+
+          #ifdef PROFILER_ENABLED
+            LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+            <<"******************************"<<endl
+            <<  "Frame enqueued:"<<endl
+            << (std::string)(mFiles[mFrameCount])<<endl
+	    << mFrameCount<<"/"<<mFiles.size()<<endl
+            <<"******************************"<<endl<<endl;
+	  #endif
 
           if(mFrameCount+1 < mFiles.size());
             mFrameCount ++;
 	}
+
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(20));
      }

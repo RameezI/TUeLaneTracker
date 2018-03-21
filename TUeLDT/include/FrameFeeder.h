@@ -22,8 +22,9 @@
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
 
-#include "opencv2/opencv.hpp"
+#include "Config.h"
 #include "LDT_logger.h"
+#include "opencv2/opencv.hpp"
 #include <iostream>
 #include <thread>
 #include <mutex>
@@ -33,21 +34,7 @@
 using namespace std;
 using WriteLock = std::unique_lock<std::mutex>;
 
-struct cvFrames
-{
-  cv::Mat	Frame;
-  cv::Mat	FrameGRAY;
-  cv::string	FrameInfo;
 
- cvFrames(cv::Mat& frame, cv::Mat& frameGRAY, const string&  frameInfo)
- : Frame(frame),
-   FrameGRAY(frameGRAY),
-   FrameInfo(frameInfo){}
-
-}
-
-/* ^TODO: Hint make a copy of this file with specialisation, in case of vsdkFrames */
-template<typename T>
 class FrameFeeder
 {
 
@@ -56,8 +43,8 @@ protected:
    const std::size_t	mMAX_BUFFER_SIZE;
    const std::size_t	mMAX_RETRY;
    std::mutex 		mMutex;
-   vector<cv::Mat>	mQueueFrame;
-   vector<cv::Mat>	mQueueFrameGRAY;
+   vector<cv::Mat>	mDisplayQueue;
+   vector<cv::Mat>	mProcessQueue;
 	
 
    FrameFeeder(): mMAX_BUFFER_SIZE(3), mMAX_RETRY(10), Stopped(false), Paused(true)
@@ -94,80 +81,80 @@ public:
    std::atomic<bool> Stopped;
    std::atomic<bool> Paused; 
 
-
-   cv::Mat dequeueFrame()
+   cv::Mat dequeue()
    {
       WriteLock  lLock(mMutex, std::defer_lock);	
       size_t lTryGrab = 0;
 
       lLock.lock(); //Protect queue from race-condition
-      while (mQueueFrame.empty() && lTryGrab < mMAX_RETRY)
+      while (mProcessQueue.empty() && lTryGrab < mMAX_RETRY)
       { 
 	lLock.unlock();
 	lTryGrab ++ ;
 	std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	lLock.lock();
       }
-      if(mQueueFrame.empty())
+
+      if(mProcessQueue.empty())
       {
-     	throw "No images in the queue, the producer is too slow or down! [Empty Frame Queue] ";
+     	throw "No images in the process queue, the producer is too slow or down! [Empty Frame Queue] ";
       }
 
-      cv::Mat lFrame = mQueueFrame[0];
-      mQueueFrame.erase(mQueueFrame.begin());
+      cv::Mat lFrame = mProcessQueue[0];
+      mProcessQueue.erase(mProcessQueue.begin());
       lLock.unlock();
 
       #ifdef PROFILER_ENABLED
        LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
        <<"******************************"<<endl
-       <<  "Frame dequeued:"<<endl
+       <<  "Frame dequeued for processing:"<<endl
+       <<  "[Attempt count: "<<lTryGrab<<"/"<<mMAX_RETRY<<"]"<<endl
+       <<"******************************"<<endl<<endl;
+      #endif
+
+      if(lFrame.empty())
+        throw "Failed to get the frame from the process queue! [Empty Frame Exception] ";
+
+      return lFrame;
+   }
+
+   cv::Mat dequeueDisplay()
+   {
+      WriteLock  lLock(mMutex, std::defer_lock);	
+      size_t lTryGrab = 0;
+
+      lLock.lock(); //Protect queue from race-condition
+      while (mDisplayQueue.empty() && lTryGrab < mMAX_RETRY)
+      { 
+	lLock.unlock();
+	lTryGrab ++ ;
+	std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	lLock.lock();
+      }
+      if(mDisplayQueue.empty())
+      {
+     	throw "No images in the display queue, the producer is too slow or down! [Empty Frame Queue] ";
+      }
+
+      cv::Mat lFrame = mDisplayQueue[0];
+      mDisplayQueue.erase(mDisplayQueue.begin());
+      lLock.unlock();
+
+      #ifdef PROFILER_ENABLED
+       LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+       <<"******************************"<<endl
+       <<  "Frame dequeued for display:"<<endl
        <<  "[Attempt count: "<<lTryGrab<<"/"<<mMAX_RETRY<<"]"<<endl
        <<"******************************"<<endl<<endl;
       #endif
 
 
       if(lFrame.empty())
-        throw "Failed to get the frame from mQueueFrame! [Empty Frame Exception] ";
+        throw "Failed to get the frame from the display Queue! [Empty Frame Exception] ";
 
       return lFrame;
    }
  
-   cv::Mat dequeueFrameGRAY()
-   {
-      WriteLock  lLock(mMutex, std::defer_lock);	
-      size_t lTryGrab = 0;
-
-      lLock.lock(); //Protect queue from race-condition
-      while (mQueueFrameGRAY.empty() && lTryGrab < mMAX_RETRY)
-      { 
-	lLock.unlock();
-	lTryGrab ++ ;
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	lLock.lock();
-      }
-
-      if(mQueueFrameGRAY.empty())
-      {
-     	throw "No images in the queue, the producer is too slow or down! [Empty Frame Queue] ";
-      }
-
-      cv::Mat lFrame = mQueueFrameGRAY[0];
-      mQueueFrameGRAY.erase(mQueueFrameGRAY.begin());
-      lLock.unlock();
-
-      #ifdef PROFILER_ENABLED
-       LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-       <<"******************************"<<endl
-       <<  "Frame dequeued:"<<endl
-       <<  "[Attempt count: "<<lTryGrab<<"/"<<mMAX_RETRY<<"]"<<endl
-       <<"******************************"<<endl<<endl;
-      #endif
-
-      if(lFrame.empty())
-        throw "Failed to get the frame from mQueueFrame! [Empty Frame Exception] ";
-
-      return lFrame;
-   }
 
 };
 

@@ -132,7 +132,7 @@ int StateMachine::spin()
 		}
 		if (mPtrBufferingState->currentStatus == StateStatus::ACTIVE)
 		{
-		    mPtrBufferingState->run(mPtrFrameFeeder->dequeueFrameGRAY());
+		    mPtrBufferingState->run(mPtrFrameFeeder->dequeue());
 		}
 		if( mPtrBufferingState->currentStatus == StateStatus::DONE)
 		{
@@ -174,8 +174,8 @@ int StateMachine::spin()
 		}
 		if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
 		{
-		   mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeueFrameGRAY());
-		   mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueFrame(), mLaneModel);
+		   mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
+		   mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
 		}
 		if( (mPtrTrackingState->currentStatus == StateStatus::DONE) )
 		{
