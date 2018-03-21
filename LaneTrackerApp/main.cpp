@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) /**
 	  {
 	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 	    <<"******************************"<<endl
-	    << "State-Machine Log Created..."
+	    << "State-Machine Log Created..."<<endl
 	    <<"******************************"<<endl<<endl;
 	  }
 	#endif
@@ -157,8 +157,6 @@ unique_ptr<FrameFeeder> createFrameFeeder(FrameSource srcMode, string srcString)
 {
 
 	unique_ptr<FrameFeeder>	lPtrFeeder;
-
-	cout<<srcString<<endl;
 
 	/** Create Image Feeder */
 	try
