@@ -99,13 +99,14 @@ private:
 		}
 		else
 		{
-		  #ifdef PROFILER_ENABLED
-		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		   <<"Unable to find the path to binary"<<endl
-		   <<"[Searching for Camera configuration files]: "<<endl;
-		  #endif
-
-		  throw "Camera Instantiation Failed" ;
+		   #ifdef PROFILER_ENABLED
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+	    	    <<"******************************"<<endl
+		    <<"Unable to find the path to binary"<<endl
+		    <<"[Searching for Camera configuration files]: "<<endl;
+	    	    <<"******************************"<<endl<<endl;
+		   #endif
+		   throw "Camera Instantiation Failed" ;
 		}
 
 		lFormattedString<<lPath<<"/ConfigFiles/Camera/"<<NAME<<".yaml";
@@ -116,12 +117,14 @@ private:
 
 		if ( lSuccess !=0 )
 		{
-		  #ifdef PROFILER_ENABLED
-		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		   <<"Unable to load camera configuration: "<<endl
-		   << "File not found: " << lFile.c_str() << endl;
-		  #endif
-		  throw "Camera Instantiation Failed" ;
+		   #ifdef PROFILER_ENABLED
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+	    	    <<"******************************"<<endl
+		    <<"Unable to load camera configuration: "<<endl
+		    << "File not found: " << lFile.c_str() << endl;
+	    	    <<"******************************"<<endl<<endl;
+		   #endif
+		   throw "Camera Instantiation Failed" ;
 		}
 		else
 		{
@@ -134,11 +137,12 @@ private:
 		  {
 		     #ifdef PROFILER_ENABLED
 		      LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+	    	      <<"******************************"<<endl
 		      <<"ERROR while reading camera file: "<<endl
 		      << "cannot load required data from: " << lFile.c_str() << endl;
+	    	      <<"******************************"<<endl<<endl;
 		     #endif
-
-		      throw "Camera Instantiation Failed" ;
+		     throw "Camera Instantiation Failed" ;
 		  }
 		}
 
@@ -159,18 +163,20 @@ private:
 
 		if (lLen!=-1)
 		{
-		  lPath = std::string(lBuff);
-		  std::string::size_type Idx = lPath.find_last_of("/");
-		  lPath = lPath.substr(0,Idx);
+		   lPath = std::string(lBuff);
+		   std::string::size_type Idx = lPath.find_last_of("/");
+		   lPath = lPath.substr(0,Idx);
 		}
 		else
 		{
-		  #ifdef PROFILER_ENABLED
-		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		   <<"Unable to find the path to binary"<<endl
-		   <<"[Searching for Camera configuration files]: "<<endl;
-		  #endif
-		  throw "Camera Instantiation Failed" ;
+		   #ifdef PROFILER_ENABLED
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+	    	     <<"******************************"<<endl
+		     <<"Unable to find the path to binary"<<endl
+		     <<"[Searching for Camera configuration files]: "<<endl;
+	    	     <<"******************************"<<endl<<endl;
+		   #endif
+		   throw "Camera Instantiation Failed" ;
 		}
 
 		lFormattedString<<lPath<<"/ConfigFiles/Camera/"<<NAME<<".yaml";
@@ -182,31 +188,33 @@ private:
 
 	    	if ( lSuccess != 0 )
 	    	{
-	       	  #ifdef PROFILER_ENABLED
-		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		  <<"Unable to load camera configuration: "<<endl
-		  << "File not found: " << lFile.c_str() << endl;
-	          #endif
-		  throw "Camera Instantiation Failed" ;
+	       	   #ifdef PROFILER_ENABLED
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+	    	    <<"******************************"<<endl
+		    <<"Unable to load camera configuration: "<<endl
+		    << "File not found: " << lFile.c_str() << endl;
+	    	    <<"******************************"<<endl<<endl;
+	           #endif
+		   throw "Camera Instantiation Failed" ;
 	    	}
 	    	else
 	    	{
-		  try
-		  {
-		    cv::FileStorage loadFile( lFile, cv::FileStorage::READ);
-		    loadFile[Mat_name]>> lVec;
-		  }
-		  catch(...)
-		  {
-
-		     #ifdef PROFILER_ENABLED
-		      LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		      <<"ERROR while reading camera file: "<<endl
-		      << "cannot load required data from: " << lFile.c_str() << endl;
-		     #endif
-
+		   try
+		   {
+		      cv::FileStorage loadFile( lFile, cv::FileStorage::READ);
+		      loadFile[Mat_name]>> lVec;
+		   }
+		   catch(...)
+		   {
+		      #ifdef PROFILER_ENABLED
+		       LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
+	    	       <<"******************************"<<endl
+		       <<"ERROR while reading camera file: "<<endl
+		       << "cannot load required data from: " << lFile.c_str() << endl;
+	    	       <<"******************************"<<endl<<endl;
+		      #endif
 		      throw "Camera Instantiation Failed" ;
-		  }
+		   }
 	    	}
 
 	   	return Vector2f(lVec.at<float>(0,0), lVec.at<float>(0,1));
