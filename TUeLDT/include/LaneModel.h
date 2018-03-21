@@ -49,7 +49,9 @@ class  LaneModel
 
 private:
 
-	float   mLookAheadError_m; 	/*< Look-ahead-Error of center-line in Vehicle-Symmetry-CS [m] */
+	float    mLookAheadError_m; 	/*< Look-ahead-Error of center-line in Vehicle-Symmetry-CS [m] */
+	cv::Mat  mImg2W;		/*< Transformation matrix for Img to world transformation*/
+        cv::Mat  mW2Img;		/*< Transformation matrix for world to image transformation*/
 
 public:
 	int 	boundaryLeft;	  	/*< Selected, according to max-posterior, distance to left boundary in Image-Center-CS [pixel] */
@@ -75,8 +77,9 @@ public:
 	  vanishingPt	  	= vanishPt;
 	}
 
-	float getLateralError(float look_ahead_distance)
+	float getLateralError(float look_ahead_distance_m)
 	{
+	  
 	  mLookAheadError_m =-100;
 	  return mLookAheadError_m;
 	}
@@ -86,7 +89,11 @@ public:
 		   boundaryLeft(-1),
 		   boundaryRight(-1),
 		   boundaryLeft_cm(-1),
-		   boundaryRight_cm(-1){}
+		   boundaryRight_cm(-1)
+		   {
+
+
+		   }
 
 };
 

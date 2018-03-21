@@ -30,12 +30,27 @@ using namespace cv;
 
 class FrameRenderer
 {
-   const int 		mHORIZON;
-   const LaneFilter& 	mLANE_FLTR;
+
+private:
+
+   const cv::Mat        mBASE_BINS;
+   const cv::Mat	mPURVIEW_BINS;
+   const cv::Point	mO_ICCS_ICS;
+   const int 		mBASE_LINE_ICS;
+   const int 		mPURVIEW_LINE_ICS;
+   const size_t		mCOUNT_BINS;
+   const int      	mHORIZON_V;
 
 public:
-   FrameRenderer(const int HORIZON, const LaneFilter& LANE_FLTR)
-   : mHORIZON(HORIZON), mLANE_FLTR(LANE_FLTR)
+   FrameRenderer(const LaneFilter& LANE_FLTR)
+   : 
+     mBASE_BINS(LANE_FLTR.BASE_BINS),
+     mPURVIEW_BINS(LANE_FLTR.PURVIEW_BINS),
+     mO_ICCS_ICS(LANE_FLTR.O_ICCS_ICS),
+     mBASE_LINE_ICS(LANE_FLTR.BASE_LINE_ICCS + mO_ICCS_ICS.y),
+     mPURVIEW_LINE_ICS(LANE_FLTR.PURVIEW_LINE_ICCS + mO_ICCS_ICS.y),
+     mCOUNT_BINS(mBASE_BINS.rows),
+     mHORIZON_V(LANE_FLTR.CAMERA.HORIZON_VH(0))
    {
 
    }

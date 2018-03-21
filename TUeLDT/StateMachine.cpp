@@ -170,7 +170,7 @@ int StateMachine::spin()
 		if (mPtrTrackingState->currentStatus == StateStatus::INACTIVE)
 		{
 		   mPtrTrackingState->setupDAG(mPtrLaneFilter.get(), mPtrVanishingPtFilter.get());
-		   mPtrFrameRenderer.reset(new FrameRenderer(mPtrTemplates->HORIZON_ICCS, *mPtrLaneFilter));
+		   mPtrFrameRenderer.reset(new FrameRenderer(*mPtrLaneFilter));
 		}
 		if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
 		{

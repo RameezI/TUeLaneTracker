@@ -49,8 +49,8 @@ private:
 	int32_t 	mUPPER_LIMIT_BASE;
 	int32_t 	mUPPER_LIMIT_PURVIEW;
 
-	int32_t 	mSTEP_BASE;
-	int32_t 	mSTEP_PURVIEW;
+	int32_t 	mSTEP_BASE_SCALED;
+	int32_t 	mSTEP_PURVIEW_SCALED;
 
 
 	LaneFilter* 		mLaneFilter;

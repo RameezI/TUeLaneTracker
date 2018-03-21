@@ -36,8 +36,8 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
   mLOWER_LIMIT_PURVIEW(0),
   mUPPER_LIMIT_BASE(0),
   mUPPER_LIMIT_PURVIEW(0),
-  mSTEP_BASE(0),
-  mSTEP_PURVIEW(0)
+  mSTEP_BASE_SCALED(0),
+  mSTEP_PURVIEW_SCALED(0)
 {	
 	//Write Images to a video file
 	//mOutputVideo.open("TUeLaneTracker.avi", CV_FOURCC('M','P','4','V'), 30, mFrameRGB.size());
@@ -56,17 +56,15 @@ int TrackingLaneDAG_generic::init_DAG(LaneFilter* laneFilter, VanishingPtFilter*
 	mBASE_BINS_SCALED  	 =  SCALE_INTSEC*mLaneFilter->BASE_BINS;
 	mPURVIEW_BINS_SCALED	 =  SCALE_INTSEC*mLaneFilter->PURVIEW_BINS;
 
+	mSTEP_BASE_SCALED	 =  SCALE_INTSEC*mLaneFilter->BASE_STEP;
+	mSTEP_PURVIEW_SCALED	 =  SCALE_INTSEC*mLaneFilter->PURVIEW_STEP;
+
 	mLOWER_LIMIT_BASE	 =  mBASE_BINS_SCALED.at<int32_t>(0,0);
 	mLOWER_LIMIT_PURVIEW  	 =  mPURVIEW_BINS_SCALED.at<int32_t>(0,0);
 
 	mUPPER_LIMIT_BASE	 =  mBASE_BINS_SCALED.at<int32_t>(lCOUNT-1,0);
 	mUPPER_LIMIT_PURVIEW  	 =  mPURVIEW_BINS_SCALED.at<int32_t>(lCOUNT-1,0);
 
-	mSTEP_BASE	 	 =  mBASE_BINS_SCALED.at<int32_t>(1,0)
-				   -mBASE_BINS_SCALED.at<int32_t>(0,0) ;
-
-	mSTEP_PURVIEW	 	 =  mPURVIEW_BINS_SCALED.at<int32_t>(1,0)
-				   -mPURVIEW_BINS_SCALED.at<int32_t>(0,0) ;
 
         mHistBase      		 =  cv::Mat::zeros(lCOUNT,  1 ,  CV_32S);
         mHistPurview   		 =  cv::Mat::zeros(lCOUNT,  1 ,  CV_32S);
@@ -100,7 +98,7 @@ mProfiler.start("SETUP_ASYNC_FILTERING");
 	    lSUM = sum(mTransitLaneFilter)[0];
 	    mTransitLaneFilter= mTransitLaneFilter*SCALE_FILTER;
 	    mTransitLaneFilter.convertTo(mTransitLaneFilter, CV_32S, 1.0/lSUM);
-	    mTransitLaneFilter = 	mTransitLaneFilter + 0.1*mLaneFilter->prior;
+	    mTransitLaneFilter = 	mTransitLaneFilter + 0.2*mLaneFilter->prior;
 	   lLock.unlock();
 
 
@@ -113,7 +111,7 @@ mProfiler.start("SETUP_ASYNC_FILTERING");
 	    lSUM = sum(mTransitVpFilter)[0];
 	    mTransitVpFilter= mTransitVpFilter*SCALE_FILTER;
 	    mTransitVpFilter.convertTo(mTransitVpFilter, CV_32S, 1.0/lSUM);	
-	    mTransitVpFilter = mTransitVpFilter + 0.1*mVpFilter->prior;
+	    mTransitVpFilter = mTransitVpFilter + 0.2*mVpFilter->prior;
 	   lLock.unlock();
 	   //Local Variables
 
@@ -248,9 +246,9 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 	   {
 	      if(!(*lPtrMask ==0) )
 	      {		
-		 lBaseBinIdx	= (*lPtrIntBase    - mLOWER_LIMIT_BASE    + (mSTEP_BASE/2))/mSTEP_BASE;
+		 lBaseBinIdx	= (*lPtrIntBase    - mLOWER_LIMIT_BASE    + (mSTEP_BASE_SCALED/2))/mSTEP_BASE_SCALED;
 
-		 lPurviewBinIdx	= (*lPtrIntPurview - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW/2))/mSTEP_PURVIEW;
+		 lPurviewBinIdx	= (*lPtrIntPurview - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW_SCALED/2))/mSTEP_PURVIEW_SCALED;
 		
 	         lWeightBin 	= *lPtrWeights;
 		
@@ -478,8 +476,8 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		   lIntSecLeft  = SCALE_INTSEC*( ((binH - lBaseLB)/(float)(binV - lBaseLine))*(lPurviewLine - binV) +binH );
 		   lIntSecRight = SCALE_INTSEC*( ((binH - lBaseRB)/(float)(binV - lBaseLine))*(lPurviewLine - binV) +binH );
 
-		   lIdx_BL 	= ( lIntSecLeft  - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW/2.0))/mSTEP_PURVIEW;
-		   lIdx_BR 	= ( lIntSecRight - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW/2.0))/mSTEP_PURVIEW;
+		   lIdx_BL 	= ( lIntSecLeft  - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW_SCALED/2.0))/mSTEP_PURVIEW_SCALED;
+		   lIdx_BR 	= ( lIntSecRight - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW_SCALED/2.0))/mSTEP_PURVIEW_SCALED;
 		   lIdx_Mid  	= round((lIdx_BL+ lIdx_BR)/2.0 );
 
 		   //^TODO:start=> Make non-boundary region dependent on the binwidth

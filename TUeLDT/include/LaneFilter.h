@@ -36,13 +36,11 @@ class LaneFilter
 
 friend 		ostream& operator<<(ostream& os, const LaneFilter& lLaneFilter);
 
-private:	
-		const LaneProperties   	mLANE;	  /*< Describes Lane properties for example average lane widths and its standard deviation*/
-		const Camera 		mCAMERA;  /*< Describes Camera properties and configuration */
-		void  createPrior();	
-
-
 public:	 	//Public Interface 
+
+		const LaneProperties   	LANE;	  /*< Describes Lane properties for example average lane widths and its standard deviation*/
+		const Camera 		CAMERA;   /*< Describes Camera properties and configuration */
+		void  createPrior();	
 
 
 		/** Constructs LaneFilter from Camera and LaneProperties */
@@ -56,11 +54,15 @@ public:	 	//Public Interface
   		const int 	BASE_LINE_ICCS;		/**< Base line in Image-Center-CS [pixel-lines] */
   		const int 	PURVIEW_LINE_ICCS;	/**< Base line in Image-Center-CS [pixel-lines] */
 
-		const size_t	BINS_STEP_cm;  		/**< Step size for the Histogram BINS [cm] */
+		const float	BINS_STEP_cm;  		/**< Step size for the Histogram BINS [cm] */
   		const size_t	BINS_MAX_cm;		/**< Max value of the #BINS_cm **/
 		const size_t   	COUNT_BINS;   		/**< Number of bins in each Histogram */
 
 		const VectorXi	BINS_cm;		/**<Describes the Histogram BINS in the Vehicle-Symmetry-CS [cm] */
+
+		
+		const float	BASE_STEP;		/**< Step size for the base bins */
+		const float 	PURVIEW_STEP;		/**< Step size for the purview bins */
 
 		const cv::Mat   BASE_BINS;    		/**<Describes the Histogram BINS, in Image-Center-CS, at BASE line [pixels] */
 		const cv::Mat   PURVIEW_BINS; 		/**<Describes the Histogram BINS, in Image-Center-CS, at PURVIEW line [pixels] */
@@ -97,8 +99,8 @@ inline ostream& operator<<(ostream& os, const LaneFilter& laneFilter)
 {
   os<<endl<<"[LaneFilter Properties]"<<endl;
   os<<"***********************************************************************"<<endl;
-  os<<endl<<laneFilter.mLANE<<endl;
-  os<<endl<<laneFilter.mCAMERA<<endl;
+  os<<endl<<laneFilter.LANE<<endl;
+  os<<endl<<laneFilter.CAMERA<<endl;
 
   os<<"Origin of Image-Center-CS in Image-CS:	"<<laneFilter.O_ICCS_ICS<<endl;
   os<<"Origin of Image-CS in Image-Center-CS:	"<<laneFilter.O_ICS_ICCS<<endl;
@@ -108,6 +110,8 @@ inline ostream& operator<<(ostream& os, const LaneFilter& laneFilter)
   os<<"Y-coordinate  of purview-line in Image-Center-CS: "<<laneFilter.PURVIEW_LINE_ICCS<<endl;  
 
   os<<"BINS_cm step size:	"<<laneFilter.BINS_STEP_cm<<endl;
+  os<<"Base step size		"<<laneFilter.BASE_STEP<<endl;
+  os<<"Purview step size	"<<laneFilter.PURVIEW_STEP<<endl;
   os<<"BINS_cm MAX  value:	"<<laneFilter.BINS_MAX_cm<<endl;
   os<<"Total number of BINS	"<<laneFilter.COUNT_BINS<<endl;
   os<<"BINS in cm:		"<<endl<<laneFilter.BINS_cm<<endl<<endl;	
