@@ -31,6 +31,7 @@ ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
    mAsyncGrabber = std::thread([this]
    {
      WriteLock  lLock(mMutex, std::defer_lock);	
+     mFrameCount = mSkipFrames;
 
      while(!Stopped.load())
      {	
@@ -54,7 +55,7 @@ ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
             <<"******************************"<<endl<<endl;
 	  #endif
 
-          if(mFrameCount+1 < mFiles.size());
+          if(mFrameCount+1 < mFiles.size()
             mFrameCount ++;
 	}
 
