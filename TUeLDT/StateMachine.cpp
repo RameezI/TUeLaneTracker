@@ -49,6 +49,15 @@ StateMachine::StateMachine(unique_ptr<FrameFeeder> frameFeeder)
 
 	if (mPtrFrameFeeder == nullptr)
 	     throw "State-Machine is missing an instance of FrameFeeder";
+
+
+	#ifdef PROFILER_ENABLED
+	  Logger::Init();
+	  LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	  <<"******************************"<<endl
+	  << "State-Machine sucessfully Created..."<<endl
+	  <<"******************************"<<endl<<endl;
+	#endif
 }
 
 
@@ -176,7 +185,6 @@ int StateMachine::spin()
 		{
 		   mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
 		   mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
-		   
 		}
 		if( (mPtrTrackingState->currentStatus == StateStatus::DONE) )
 		{
