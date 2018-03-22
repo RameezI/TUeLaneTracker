@@ -24,7 +24,7 @@
 
 VanishingPtFilter::VanishingPtFilter()
 : 
-  STEP(10),
+  STEP(5),
   
   RANGE_V(25), 
  

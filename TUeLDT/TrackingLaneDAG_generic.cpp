@@ -37,7 +37,9 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
   mUPPER_LIMIT_BASE(0),
   mUPPER_LIMIT_PURVIEW(0),
   mSTEP_BASE_SCALED(0),
-  mSTEP_PURVIEW_SCALED(0)
+  mSTEP_PURVIEW_SCALED(0),
+  mIdxPurview_LB(0),
+  mIdxPurview_RB(0)
 {	
 	//Write Images to a video file
 	//mOutputVideo.open("TUeLaneTracker.avi", CV_FOURCC('M','P','4','V'), 30, mFrameRGB.size());
@@ -422,9 +424,13 @@ mProfiler.start("HISTOGRAM_MATCHING");
 	   } //Loop over all BaseHistogram Models
 		
 	   if (mMaxPosterior == 0)
+	   {
 	      return;
+	   }
 	   else
+	   {
 	      mBaseHistModel = Models[lBestModelIdx];
+	   }
 
 	}//Scope End
 
@@ -476,8 +482,8 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		   lIntSecLeft  = SCALE_INTSEC*( ((binH - lBaseLB)/(float)(binV - lBaseLine))*(lPurviewLine - binV) +binH );
 		   lIntSecRight = SCALE_INTSEC*( ((binH - lBaseRB)/(float)(binV - lBaseLine))*(lPurviewLine - binV) +binH );
 
-		   lIdx_BL 	= ( lIntSecLeft  - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW_SCALED/2.0))/mSTEP_PURVIEW_SCALED;
-		   lIdx_BR 	= ( lIntSecRight - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW_SCALED/2.0))/mSTEP_PURVIEW_SCALED;
+		   lIdx_BL 	= ( lIntSecLeft  - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW_SCALED/2))/mSTEP_PURVIEW_SCALED;
+		   lIdx_BR 	= ( lIntSecRight - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW_SCALED/2))/mSTEP_PURVIEW_SCALED;
 		   lIdx_Mid  	= round((lIdx_BL+ lIdx_BR)/2.0 );
 
 		   //^TODO:start=> Make non-boundary region dependent on the binwidth
@@ -532,6 +538,8 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 			mMaxPosterior	= mPosterior;
 			mVanishPt.V 	= binV;
 			mVanishPt.H 	= binH;
+  			mIdxPurview_LB  = lIdx_BL;
+  			mIdxPurview_RB  = lIdx_BR;
 		      }//end, if posterior is greater than existing Max
 
 		   } //end, if Intersections are not in the BIN-Range 
@@ -565,11 +573,13 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("ASSIGN_LANE_MODEL");
 #endif
-	mLaneModel.setModel(mBaseHistModel.boundary_left,
-			    mBaseHistModel.boundary_right,
-			    mBaseHistModel.boundary_left_cm,
-			    mBaseHistModel.boundary_right_cm,
-			    mVanishPt);
+	{
+	   float lLookAheadError_cm = mLaneFilter->BINS_cm(round((mIdxPurview_LB + mIdxPurview_RB)/2.0));
+	   mLaneModel.setModel(mBaseHistModel.boundary_left,
+			       mBaseHistModel.boundary_right,
+			       mVanishPt,
+			       lLookAheadError_cm/100.0 );
+	}
 #ifdef PROFILER_ENABLED
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl

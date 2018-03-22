@@ -51,6 +51,10 @@ private:
 
 	int32_t 	mSTEP_BASE_SCALED;
 	int32_t 	mSTEP_PURVIEW_SCALED;
+	
+	size_t		mIdxPurview_LB;
+	size_t		mIdxPurview_RB;
+	
 
 
 	LaneFilter* 		mLaneFilter;
