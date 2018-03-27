@@ -31,6 +31,10 @@
  #include "TrackingLaneDAG_generic.h"
 #endif
 
+#ifdef	ENABLE_ROS_INTERFACE
+#include "RosPublisher.h"
+#endif
+
 StateMachine::StateMachine(unique_ptr<FrameFeeder> frameFeeder)
  : mQuitRequest(false),
    mCurrentState(States::BOOTING),
