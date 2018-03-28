@@ -33,6 +33,14 @@ class FrameRenderer
    const int 		mHORIZON;
    const LaneFilter& 	mLANE_FLTR;
 
+   private:
+
+    vector<Point> lBoundaryPts_L;
+    vector<Point> lBoundaryPts_R;
+    vector<Point> lBoundaryPts_M;
+    float lSlopeLeft;
+    float lSlopeRight;
+
 public:
    FrameRenderer(const int HORIZON, const LaneFilter& LANE_FLTR)
    : mHORIZON(HORIZON), mLANE_FLTR(LANE_FLTR)
@@ -40,6 +48,7 @@ public:
 
    }
    void drawLane(const cv::Mat& FRAME, const LaneModel& Lane);
+   vector<float> getDirectionalParameters();
 };
 
 

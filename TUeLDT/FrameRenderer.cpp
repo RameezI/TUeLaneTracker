@@ -1,3 +1,4 @@
+
 /******************************************************************************
 * NXP Confidential Proprietary
 * 
@@ -20,6 +21,8 @@
 * ****************************************************************************/ 
 
 #include "FrameRenderer.h"
+#include "UnitConversion.h"
+#include <iostream>
 
 using namespace cv;
 
@@ -29,23 +32,24 @@ void FrameRenderer::drawLane(const cv::Mat& FRAME, const LaneModel& Lane)
    const int 	lBASE_LINE_ICS 		= mLANE_FLTR.BASE_LINE_ICCS 	+ mLANE_FLTR.O_ICCS_ICS.y;
    const int 	lPURVIEW_LINE_ICS 	= mLANE_FLTR.PURVIEW_LINE_ICCS	+ mLANE_FLTR.O_ICCS_ICS.y;
 
-   const float 	lRatioLookAhead 	= 0.3;
-
-   vector<Point> lBoundaryPts_L;
-   vector<Point> lBoundaryPts_R;
-   vector<Point> lBoundaryPts_M;
+   const float 	lRatioLookAhead 	= 0.35;
 
    //Transform VP to Image Coordianate System
    int VP_V =  Lane.vanishingPt.V + mLANE_FLTR.O_ICCS_ICS.y;
    int VP_H =  Lane.vanishingPt.H + mLANE_FLTR.O_ICCS_ICS.x;
 
-   //Lane Bundaries
+    //clear the vectors
+    lBoundaryPts_L.clear();
+    lBoundaryPts_R.clear();
+    lBoundaryPts_M.clear();
+
+   //Lane Boundaries
    lBoundaryPts_L.push_back( Point( Lane.boundaryLeft  + mLANE_FLTR.O_ICCS_ICS.x, lBASE_LINE_ICS) );
    lBoundaryPts_R.push_back( Point( Lane.boundaryRight + mLANE_FLTR.O_ICCS_ICS.x, lBASE_LINE_ICS) );
    lBoundaryPts_M.push_back( (lBoundaryPts_L[0] + lBoundaryPts_R[0])/2.0 );
 
-   float lSlopeLeft =  (float)( VP_V - 	lBASE_LINE_ICS ) /(VP_H - lBoundaryPts_L[0].x);
-   float lSlopeRight = (float)( VP_V -	lBASE_LINE_ICS ) /(VP_H - lBoundaryPts_R[0].x);
+   lSlopeLeft  = (float)( VP_V - 	lBASE_LINE_ICS ) /(VP_H - lBoundaryPts_L[0].x);
+   lSlopeRight = (float)( VP_V -	lBASE_LINE_ICS ) /(VP_H - lBoundaryPts_R[0].x);
 
    lBoundaryPts_L.push_back(lBoundaryPts_L[0]);
    lBoundaryPts_L[1].x  += 	-round((lBASE_LINE_ICS * lRatioLookAhead) / lSlopeLeft);
@@ -106,6 +110,7 @@ void FrameRenderer::drawLane(const cv::Mat& FRAME, const LaneModel& Lane)
    }
 
    imshow( "Display window", FRAME);
+   //vector<float> params = getDirectionalParameters();
    
    if ( (char)32 == (char) waitKey(10) )
    {
@@ -114,4 +119,35 @@ void FrameRenderer::drawLane(const cv::Mat& FRAME, const LaneModel& Lane)
 
 	while ((char)32 != (char)waitKey(1));
    }
+}
+
+vector<float> FrameRenderer::getDirectionalParameters(){
+    float a;  //Angle of the road direction compared to car logitudinal direction.
+    float b1; //Distance to right lane
+    float b2; //Distance to left lane
+    Camera mCAM;
+    UnitConversion mUnit;
+
+    float center = mUnit.getPixToCm(lBoundaryPts_M[0].y,mCAM) * mCAM.RES_VH(1) / 2 + mCAM.MATRIX_EXTRINSIC.at<float>(0,3) * 100; //Take from x translation from extrinsic matrix
+    b1 =  lBoundaryPts_R[0].x * mUnit.getPixToCm(lBoundaryPts_R[0].y,mCAM) - center;
+    b2 = -lBoundaryPts_L[0].x * mUnit.getPixToCm(lBoundaryPts_L[0].y,mCAM) + center;
+
+
+    float aligned = (mUnit.getDistance(lBoundaryPts_M[1].y,mCAM) - mUnit.getDistance(lBoundaryPts_M[0].y,mCAM));
+    float opposite = (lBoundaryPts_M[1].x-lBoundaryPts_M[0].x) * mUnit.getPixToCm(lBoundaryPts_M[0].y,mCAM);
+
+    if (opposite != 0 && aligned != 0){
+      a = atan(opposite/aligned) * 180 / M_PI;
+    } else {
+      a = 0;
+    }
+    //std::cout << "a: " << a << "\tb1: " << b1 << "\tb2: " << b2 << "\tc: " << center << endl;
+
+    vector<float> directionalParams;
+    directionalParams.push_back(a);
+    directionalParams.push_back(b1);
+    directionalParams.push_back(b2);
+    //directionalParams.push_back(center);
+    return directionalParams;
+
 }
