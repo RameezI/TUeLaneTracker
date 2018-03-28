@@ -18,26 +18,19 @@
 * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
-#define NEWPIXELBINS
 
 #include "LaneFilter.h"
 #include "ScalingFactors.h"
+#include "UnitConversion.h"
 #include <opencv2/core/eigen.hpp>
 
-#ifdef NEWPIXELBINS
 	///cm to pixel conversion, for a particular row in the image, of the #BINS_cm [Vehicle-Symmetry-CS <---> Image-Center-CS]
 cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const int Y_ICCS )
 {
-
-	float Z, W, thetaY, cm2px;
-	float ty;
-	ty = 1.5; //CAM.MATRIX_EXTRINSIC.at<float>(3,1);
-
-	thetaY = CAM.FOV_HORIZON * (Y_ICCS / CAM.RES_HORIZON);
-	Z = ty * 100 / tan(thetaY * M_PI / 180);
-	W = 2 * Z * tan(CAM.FOV_VH(1) / 2 * M_PI / 180);
-
-	cm2px = CAM.RES_VH(1) / W;
+	float cm2px;
+	UnitConversion mUnit;
+	cm2px = 1/mUnit.getPixToCm(Y_ICCS, CAM);
+	cout << "cm2px " << cm2px << endl;
 
 	cv::Mat  lMat = cv::Mat(BINS_cm.size(),1,CV_32S);
 	cv::Mat  lWorldPt	= cv::Mat(3,1, CV_32F);
@@ -49,53 +42,6 @@ cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const
 
 	return lMat;
 }
-#else
-///cm to pixel conversion, for a particular row in the image, of the #BINS_cm [Vehicle-Symmetry-CS <---> Image-Center-CS]
-cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const int Y_ICCS )
-{
-
-	cv::Mat  lMat = cv::Mat(BINS_cm.size(),1,CV_32S);
-
-	{
-	   cv::Mat  lIMG_TO_W;	//Image-Center-CS to Vehicle-Symmetry-CS tranformation, planar homography
-	   cv::Mat  lW_TO_IMG;	//Vehicle-Symmetry-CS to Image-Center-CS transformation 
-
-	   cv::Mat  lImgPt	= cv::Mat(3,1, CV_32F);
-	   cv::Mat  lWorldPt	= cv::Mat(3,1, CV_32F);
-
-
-	   // 3x3 Planar-Homography from the 4x4 Extrinsic Matrix and 3x3 Intrinsic Matrix
-	   cv::Mat a = CAM.MATRIX_EXTRINSIC(cv::Range(0,3), cv::Range(0,2));
-	   cv::Mat b = CAM.MATRIX_EXTRINSIC(cv::Range(0,3), cv::Range(3,4));
-	   cv::hconcat(a, b, lW_TO_IMG);
-
-	   lW_TO_IMG = CAM.MATRIX_INTRINSIC * lW_TO_IMG;
-
-	   lIMG_TO_W = lW_TO_IMG.inv();
-
-	   lImgPt.at<float>(0,0) = 0;
-	   lImgPt.at<float>(1,0) = (float)Y_ICCS; 
-	   lImgPt.at<float>(2,0) = 1;
-
-	   lWorldPt = lIMG_TO_W * lImgPt;
-	   lWorldPt = lWorldPt/lWorldPt.at<float>(2);
-	   
-	   VectorXi lPixelBins;
-	   lPixelBins = BINS_cm;
-
-	   for(int i=0; i< BINS_cm.size(); i++)
-	   {
-		  lWorldPt.at<float>(0)	= BINS_cm[i];
-		  lImgPt = lW_TO_IMG * lWorldPt;
-	 	  lMat.at<int32_t>(i,0) = floor( lImgPt.at<float>(0,0)/(lImgPt.at<float>(0,2)*100.0 ) ) ;
-	   }
-
-	}
-
-	return lMat;
-}
-#endif
-
 
 LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
 
