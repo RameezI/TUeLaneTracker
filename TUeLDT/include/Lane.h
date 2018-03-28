@@ -38,7 +38,7 @@ public:
 	const float MAX_WIDTH;  /*< Maximum width of a Lane [cm] */
 	
 	LaneProperties() //Lane Widths in cm
-	: AVG_WIDTH(300),STD_WIDTH(50),MIN_WIDTH(250),MAX_WIDTH(500) {}
+	: AVG_WIDTH(400),STD_WIDTH(100),MIN_WIDTH(250),MAX_WIDTH(1000) {}
 };
 
 
