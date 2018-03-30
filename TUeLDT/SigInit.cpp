@@ -50,5 +50,6 @@ SigInit::~SigInit()
 
 void SigInit::handler(int aSigNo)
 {
+  if (aSigNo == aSigNo)
   sStatus = SigStatus::STOP;
 } 

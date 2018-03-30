@@ -77,7 +77,7 @@ public:
 
 	float getLateralError(float look_ahead_distance)
 	{
-	  mLookAheadError_m =-100;
+	  mLookAheadError_m =look_ahead_distance;//-100;
 	  return mLookAheadError_m;
 	}
 
