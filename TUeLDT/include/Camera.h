@@ -60,7 +60,7 @@ public:
 			 RES_VH(getCameraRES("CAMERA_RES")),
 			 FOV_VH(Vector2f(2*atan( (RES_VH(0)/2.0) / (MATRIX_INTRINSIC.at<float>(1,1)) )*180/M_PI ,
 					 2*atan( (RES_VH(1)/2.0) / (MATRIX_INTRINSIC.at<float>(0,0)) )*180/M_PI )),
-			 PITCH_ANGLE(atan2(MATRIX_EXTRINSIC.at<float>(1,0),MATRIX_EXTRINSIC.at<float>(0,0)) * 180/M_PI),
+			 PITCH_ANGLE(atan2(MATRIX_EXTRINSIC.at<float>(1,0),MATRIX_EXTRINSIC.at<float>(0,0)) * 180/M_PI -0.5),
 			 HORIZON( round((PITCH_ANGLE * RES_VH(0)) / FOV_VH(0) ) ),
 			 FOV_HORIZON(FOV_VH(0) / 2 + PITCH_ANGLE),
 			 RES_HORIZON(FOV_HORIZON / FOV_VH(0) * RES_VH(0)),			 

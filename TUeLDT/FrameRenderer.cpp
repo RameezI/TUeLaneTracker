@@ -110,7 +110,7 @@ void FrameRenderer::drawLane(const cv::Mat& FRAME, const LaneModel& Lane)
    }
 
    imshow( "Display window", FRAME);
-   //vector<float> params = getDirectionalParameters();
+   vector<float> params = getDirectionalParameters();
    
    if ( (char)32 == (char) waitKey(10) )
    {
@@ -128,20 +128,22 @@ vector<float> FrameRenderer::getDirectionalParameters(){
     Camera mCAM;
     UnitConversion mUnit;
 
-    float center = mUnit.getPixToCm(lBoundaryPts_M[0].y,mCAM) * mCAM.RES_VH(1) / 2 + mCAM.MATRIX_EXTRINSIC.at<float>(0,3) * 100; //Take from x translation from extrinsic matrix
-    b1 =  lBoundaryPts_R[0].x * mUnit.getPixToCm(lBoundaryPts_R[0].y,mCAM) - center;
-    b2 = -lBoundaryPts_L[0].x * mUnit.getPixToCm(lBoundaryPts_L[0].y,mCAM) + center;
+    float center = mUnit.getPixToCm(lBoundaryPts_M[0].y - mCAM.RES_VH(0)/2,mCAM) * mCAM.RES_VH(1) / 2 + mCAM.MATRIX_EXTRINSIC.at<float>(0,3) * 100; //Take from x translation from extrinsic matrix
+    b1 =  lBoundaryPts_R[0].x * mUnit.getPixToCm(lBoundaryPts_R[0].y - mCAM.RES_VH(0)/2,mCAM) - center;
+    b2 = -lBoundaryPts_L[0].x * mUnit.getPixToCm(lBoundaryPts_L[0].y - mCAM.RES_VH(0)/2,mCAM) + center;
 
 
-    float aligned = (mUnit.getDistance(lBoundaryPts_M[1].y,mCAM) - mUnit.getDistance(lBoundaryPts_M[0].y,mCAM));
-    float opposite = (lBoundaryPts_M[1].x-lBoundaryPts_M[0].x) * mUnit.getPixToCm(lBoundaryPts_M[0].y,mCAM);
+    float aligned = (mUnit.getDistance(lBoundaryPts_M[1].y- mCAM.RES_VH(0)/2,mCAM) - mUnit.getDistance(lBoundaryPts_M[0].y- mCAM.RES_VH(0)/2,mCAM));
+    float opposite = (lBoundaryPts_M[1].x-lBoundaryPts_M[0].x) * mUnit.getPixToCm(lBoundaryPts_M[0].y- mCAM.RES_VH(0)/2,mCAM);
 
     if (opposite != 0 && aligned != 0){
       a = atan(opposite/aligned) * 180 / M_PI;
     } else {
       a = 0;
     }
-    //std::cout << "a: " << a << "\tb1: " << b1 << "\tb2: " << b2 << "\tc: " << center << endl;
+
+      std::cout << "a: " << a << "\tb1: " << b1 << "\tb2: " << b2 << "\tlanew: " << b1 + b2 << endl;
+    //std::cout << "Lane width: " << (b1 + b2) << endl;
 
     vector<float> directionalParams;
     directionalParams.push_back(a);

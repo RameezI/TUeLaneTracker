@@ -38,7 +38,7 @@
 
 //Configuration for LaneFilter
 #define BASE_LINE_IBCS		0      /*< Describes base line in Image-Bottom-Coordinate-System */
-#define PURVIEW_LINE_IBCS	120     /*< Describes purview line in Image-Bottom-Coordinate-System */
+#define PURVIEW_LINE_IBCS	200    /*< Describes purview line in Image-Bottom-Coordinate-System */
 
 #endif
 

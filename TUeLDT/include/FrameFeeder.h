@@ -74,7 +74,7 @@ protected:
       lLock.unlock();
    }
  
-   virtual void    parseSettings(string& srcStr)  = 0;	
+   virtual void    parseSettings(string& srcStr)  = 0;
 
 public:	
 
@@ -176,5 +176,6 @@ public:
 	~ImgStoreFeeder();
 	void parseSettings(string& srcStr) override;
 };
+
 
 #endif

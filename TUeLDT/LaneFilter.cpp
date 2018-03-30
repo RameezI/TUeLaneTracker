@@ -30,7 +30,7 @@ cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const
 	float cm2px;
 	UnitConversion mUnit;
 	cm2px = 1/mUnit.getPixToCm(Y_ICCS, CAM);
-	cout << "cm2px " << cm2px << endl;
+	//cout << "cm2px " << cm2px << endl;
 
 	cv::Mat  lMat = cv::Mat(BINS_cm.size(),1,CV_32S);
 	cv::Mat  lWorldPt	= cv::Mat(3,1, CV_32F);
@@ -70,10 +70,6 @@ LaneFilter::LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA)
   BASE_BINS(toPixelBINS(BINS_cm, mCAMERA, BASE_LINE_ICCS)),
 
   PURVIEW_BINS(toPixelBINS(BINS_cm, mCAMERA, PURVIEW_LINE_ICCS)),
-
-/*^TODO: Calculate using calcPixelWidth */
- // BASE_BINS(),
-  //PURVIEW_BINS(),
   
   prior( cv::Mat::zeros( (int)(BINS_MAX_cm/BINS_STEP_cm) +1, (int)(BINS_MAX_cm/BINS_STEP_cm) +1 , CV_32SC1) ),
   
