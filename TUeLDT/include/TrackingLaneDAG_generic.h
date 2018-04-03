@@ -73,6 +73,9 @@ private:
 	
 	cv::Mat		mHistBase;
 	cv::Mat		mHistPurview;
+
+	cv::Mat		mHistBase_CV64F;
+	cv::Mat		mHistPurview_CV64F;
 	
 	cv::Mat 	mTransitLaneFilter;
 	cv::Mat 	mTransitVpFilter;

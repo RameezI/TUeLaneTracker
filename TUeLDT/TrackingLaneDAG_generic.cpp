@@ -330,16 +330,15 @@ mProfiler.start("NORMALIZE_HISTOGRAM");
 #endif
 	{   
    	    int64_t lSUM = 0;
-
 	    //Normalising Base Histogram
-	    lSUM = sum(mHistBase)[0];
-	    mHistBase.convertTo(mHistBase, CV_64F, SCALE_FILTER);
-	    mHistBase.convertTo(mHistBase, CV_32S, 1.0/lSUM );	 
+	    lSUM = sum(mHistBase)[0] ;
+	    mHistBase.convertTo(mHistBase_CV64F, CV_64F, SCALE_FILTER);
+	    mHistBase_CV64F.convertTo(mHistBase, CV_32S, 1.0/lSUM );	 
 
 	    //Normalising Purview Histogram
 	    lSUM = sum(mHistPurview)[0];
-	    mHistPurview.convertTo(mHistPurview, CV_64F, SCALE_FILTER);
-	    mHistPurview.convertTo(mHistPurview, CV_32S, 1.0/lSUM );
+	    mHistPurview.convertTo(mHistPurview_CV64F, CV_64F, SCALE_FILTER);
+	    mHistPurview_CV64F.convertTo(mHistPurview, CV_32S, 1.0/lSUM );
 	}
 	
 #ifdef PROFILER_ENABLED
@@ -396,7 +395,7 @@ mProfiler.start("HISTOGRAM_MATCHING");
 
 		//TODO:start=> Put this block on the side thread
 		mCorrelationNB	= 0;
-		lRange = mHistBase(cv::Range(lIdx_NLB,  lIdx_NLB  +  lCount_NLB), cv::Range::all());
+		lRange = mHistBase(cv::Range(lIdx_NLB,  lIdx_NLB  +  lCount_NLB ), cv::Range::all());
 		mCorrelationNB +=sum(lRange)[0];
 		
 	    	lRange = mHistBase(cv::Range(lIdx_NRB, lIdx_NRB + lCount_NRB), cv::Range::all());
@@ -423,11 +422,7 @@ mProfiler.start("HISTOGRAM_MATCHING");
 				
 	   } //Loop over all BaseHistogram Models
 		
-	   if (mMaxPosterior == 0)
-	   {
-	      return;
-	   }
-	   else
+	   if (mMaxPosterior != 0)
 	   {
 	      mBaseHistModel = Models[lBestModelIdx];
 	   }
@@ -447,22 +442,27 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
-
 #ifdef PROFILER_ENABLED
 mProfiler.start("VP_HISTOGRAM_MATCHING");
 #endif
 	{
-	   const int& 	lBaseLB  		= mBaseHistModel.boundary_left;	
-	   const int& 	lBaseRB 		= mBaseHistModel.boundary_right;
-	   const int& 	lBaseLine		= mLaneFilter->BASE_LINE_ICCS;
-	   const int& 	lPurviewLine		= mLaneFilter->PURVIEW_LINE_ICCS;
+	   const int& 	  lBASE_LB  		= mBaseHistModel.boundary_left;	
+	   const int& 	  lBASE_RB 		= mBaseHistModel.boundary_right;
+	   const int& 	  lBASE_Y		= mLaneFilter->BASE_LINE_ICCS;
+	   const int& 	  lPURV_Y		= mLaneFilter->PURVIEW_LINE_ICCS;
+		
+	   const float&	  lSTEP_cm		= mLaneFilter->BINS_STEP_cm;
+	   const float&   lMAX_WIDTH		= mLaneFilter->LANE.MAX_WIDTH;
+	   const float&	  lMIN_WIDTH		= mLaneFilter->LANE.MIN_WIDTH;	
+	   const float&   lWIDTH_MARK		= mLaneFilter->LANE.AVG_WIDTH_LM;
 	
-	   int32_t	lIntSecLeft, lIntSecRight, lWidth_cm;
-	   int32_t	lIdx_LB, lIdx_RB;
+	   int32_t	  lIntSecLeft, lIntSecRight, lWidth_cm;
+	   int32_t	  lIdx_LB, lIdx_RB;
+	   size_t  	  lIdx_Mid, lIdx_NLB, lIdx_NRB, lCount_NLB, lCount_NRB;
+	   
+	   cv::Mat   	  lRange;
 
-	   size_t  	lIdx_Mid, lIdx_NLB, lIdx_NRB, lCount_NLB, lCount_NRB;
-
-	   cv::Mat   	lRange;
+	   const size_t   lIDX_MARK = floor(lWIDTH_MARK/lSTEP_cm) ;
 
 	   mPosterior	 = 0;	
 	   mMaxPosterior = 0;
@@ -476,74 +476,76 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 	   for(int v=0; v < mVpFilter->COUNT_BINS_V;v++)
 	   {	for(int h=0; h < mVpFilter->COUNT_BINS_H; h++)
 		{
-		   const int&   binV 	= mVpFilter->BINS_V(v);
-		   const int&   binH 	= mVpFilter->BINS_H(h);
+
+		   const int&   lBIN_V 	= mVpFilter->BINS_V(v);
+		   const int&   lBIN_H 	= mVpFilter->BINS_H(h);
 		   const auto&  lSTEP	= mSTEP_PURVIEW_SCALED;
 		
-		   lIntSecLeft  = SCALE_INTSEC*( ((binH - lBaseLB)/(float)(binV - lBaseLine))*(lPurviewLine - binV) +binH );
-		   lIntSecRight = SCALE_INTSEC*( ((binH - lBaseRB)/(float)(binV - lBaseLine))*(lPurviewLine - binV) +binH );
+		   lIntSecLeft  = SCALE_INTSEC*( ((lBIN_H - lBASE_LB)/(float)(lBIN_V - lBASE_Y))*(lPURV_Y - lBIN_V) +lBIN_H );
+		   lIntSecRight = SCALE_INTSEC*( ((lBIN_H - lBASE_RB)/(float)(lBIN_V - lBASE_Y))*(lPURV_Y - lBIN_V) +lBIN_H );
 
-		   lIdx_LB 	= ( lIntSecLeft  - mLOWER_LIMIT_PURVIEW + (lSTEP/2))/lSTEP;
-		   lIdx_RB 	= ( lIntSecRight - mLOWER_LIMIT_PURVIEW + (lSTEP/2))/lSTEP;
-
-		   lIdx_Mid  	= round((lIdx_LB+ lIdx_RB)/2.0 );
-
-		   //^TODO:start=> Make non-boundary region dependent on the binwidth
-		   lIdx_NLB   	= lIdx_LB   + 2;
-		   lIdx_NRB 	= lIdx_Mid  + 4;	
-		   lCount_NLB   = (lIdx_Mid - 3) - (lIdx_LB  + 2) ;        
-		   lCount_NRB   = (lIdx_RB  - 2) - (lIdx_Mid + 3) ;
-		   //(TODO:end)
+		   lIdx_LB 	= ( lIntSecLeft  - mLOWER_LIMIT_PURVIEW + (lSTEP/2) )/lSTEP;
+		   lIdx_RB 	= ( lIntSecRight - mLOWER_LIMIT_PURVIEW + (lSTEP/2) )/lSTEP;
 
 					   
-		   if (lIdx_LB > 0 && lIdx_RB < (int32_t) (mLaneFilter->COUNT_BINS -2) )
+		   if ( (lIdx_LB > 0) &&  (lIdx_RB < (int32_t)(mLaneFilter->COUNT_BINS -1) ) )
 		   {			
 
 		      lWidth_cm= mLaneFilter->BINS_cm(lIdx_RB) - mLaneFilter->BINS_cm(lIdx_LB);
 
-		      // VP Probability over lane width difference between base and purview line
-		      mLikelihood_W  	= mLaneMembership.WIDTH_DIFF_NORMA;
-		      mLikelihood_W    *= exp(-pow(mBaseHistModel.width_cm - lWidth_cm, 2) / mLaneMembership.WIDTH_DIFF_NOMIN );
+		      if(lMIN_WIDTH< lWidth_cm && lWidth_cm < lMAX_WIDTH)
+		      {
+		   	 lIdx_Mid    = round((lIdx_LB + lIdx_RB)/2.0 );
+
+	           	 lCount_NLB  = (lIdx_Mid - lIDX_MARK) - (lIdx_LB  + lIDX_MARK) -1;
+	           	 lCount_NRB  = (lIdx_RB  - lIDX_MARK) - (lIdx_Mid + lIDX_MARK) -1;
+
+		   	 lIdx_NLB    = lIdx_LB   + lIDX_MARK;
+		   	 lIdx_NRB    = lIdx_RB   - lCount_NRB;	
+
+		         // VP Probability over lane width difference between base and purview line
+		         mLikelihood_W     = mLaneMembership.WIDTH_DIFF_NORMA;
+		         mLikelihood_W    *= exp(-pow(mBaseHistModel.width_cm - lWidth_cm, 2) / mLaneMembership.WIDTH_DIFF_NOMIN );
 		
-		      // VP Probability over left lane boundary
-		      mLikelihood_LB 	=  round(lPtrHistPurview[lIdx_LB-1]*0.25
+		         // VP Probability over left lane boundary
+		         mLikelihood_LB       =  round(lPtrHistPurview[lIdx_LB-1]*0.25
 					      + lPtrHistPurview[lIdx_LB]
 				  	      + lPtrHistPurview[lIdx_LB+1]*0.25);
 												  
-		      // VP Probability over Right LaneBoundary 				 
-		      mLikelihood_RB 	= round(lPtrHistPurview[lIdx_RB-1]*0.25
+		         // VP Probability over Right LaneBoundary 				 
+		         mLikelihood_RB       = round(lPtrHistPurview[lIdx_RB-1]*0.25
 					      + lPtrHistPurview[lIdx_RB]
 					      + lPtrHistPurview[lIdx_RB+1]*0.25);
 					
-		      mConditionalProb  =  (mLikelihood_LB*mLikelihood_RB) /(float)SCALE_FILTER;
+		     	 mConditionalProb     =  (mLikelihood_LB*mLikelihood_RB) /(float)SCALE_FILTER;
 		
-		      //VP Probability over Non-Boundary Region
-		      mCorrelationNB = 0;
-		      lRange 		= mHistPurview(cv::Range(lIdx_NLB, lIdx_NLB + lCount_NLB), cv::Range::all());
-		      mCorrelationNB   +=sum(lRange)[0];
+		      	 //VP Probability over Non-Boundary Region
+		      	 mCorrelationNB   = 0;
+		      	 lRange 	  = mHistPurview(cv::Range(lIdx_NLB, lIdx_NLB + lCount_NLB), cv::Range::all());
+		      	 mCorrelationNB   +=sum(lRange)[0];
 			
-		      lRange 		= mHistPurview(cv::Range(lIdx_NRB, lIdx_NRB + lCount_NRB), cv::Range::all());
-		      mCorrelationNB   +=sum(lRange)[0];
+		         lRange 	  = mHistPurview(cv::Range(lIdx_NRB, lIdx_NRB + lCount_NRB), cv::Range::all());
+		         mCorrelationNB   +=sum(lRange)[0];
 		
-		      mLikelihood_NB	= mLaneMembership.NEG_BOUNDARY_NORMA;
-		      mLikelihood_NB   *= exp(-pow( mCorrelationNB/(float)SCALE_FILTER , 2)/mLaneMembership.NEG_BOUNDARY_NOMIN);
+		         mLikelihood_NB	   = mLaneMembership.NEG_BOUNDARY_NORMA;
+		         mLikelihood_NB   *= exp(-pow( mCorrelationNB/(float)SCALE_FILTER , 2)/mLaneMembership.NEG_BOUNDARY_NOMIN);
 											 				 
-		      //Conditional Probability			 
-		      mConditionalProb  =   mConditionalProb* mLikelihood_NB * mLikelihood_W;
-					
-		      mPosterior 	= round(mConditionalProb * mTransitVpFilter.at<int32_t>(v ,h));
+		         //Conditional Probability			 
+		         mConditionalProb  =   mConditionalProb* mLikelihood_NB * mLikelihood_W;		
+		         mPosterior 	   = round(mConditionalProb * mTransitVpFilter.at<int32_t>(v ,h));
 			
-		      mVpFilter->filter.at<int32_t>(v, h) = mPosterior;
+		         mVpFilter->filter.at<int32_t>(v, h) = mPosterior;
 
-		      if(mPosterior > mMaxPosterior)
-		      {
-			mMaxPosterior	= mPosterior;
-			mVanishPt.V 	= binV;
-			mVanishPt.H 	= binH;
-  			mIdxPurview_LB  = lIdx_LB;
-  			mIdxPurview_RB  = lIdx_RB;
-		      }//end, if posterior is greater than existing Max
+		         if(mPosterior > mMaxPosterior)
+		         {
+			    mMaxPosterior	= mPosterior;
+			    mVanishPt.V 	= lBIN_V;
+			    mVanishPt.H 	= lBIN_H;
+  			    mIdxPurview_LB  	= lIdx_LB;
+  			    mIdxPurview_RB  	= lIdx_RB;
+		          }//end, if posterior is greater than existing Max
 
+		      }//end, if Lane Width is in Range
 		   } //end, if Intersections are not in the BIN-Range 
 				
 		 }//for-end			
@@ -553,7 +555,6 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 	     {
 		mVanishPt.V = mVanishPt.V_prev;
 		mVanishPt.H = mVanishPt.H_prev;
-		return;
 	     }
 		
 	} // Scope Ends

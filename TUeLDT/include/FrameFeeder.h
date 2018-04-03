@@ -45,6 +45,7 @@ protected:
    std::mutex 		mMutex;
    vector<cv::Mat>	mDisplayQueue;
    vector<cv::Mat>	mProcessQueue;
+  
 	
 
    FrameFeeder(): mMAX_BUFFER_SIZE(3), mMAX_RETRY(10), Stopped(false), Paused(true)
@@ -86,7 +87,7 @@ public:
       WriteLock  lLock(mMutex, std::defer_lock);	
       size_t lTryGrab = 0;
 
-      lLock.lock(); //Protect queue from race-condition
+      lLock.lock(); //Protect queue from any race-condition
       while (mProcessQueue.empty() && lTryGrab < mMAX_RETRY)
       { 
 	lLock.unlock();
@@ -133,7 +134,10 @@ public:
       }
       if(mDisplayQueue.empty())
       {
+
+     	cout<<"No images in the display queue, the producer is too slow or down! [Empty Frame Queue] "<<endl;
      	throw "No images in the display queue, the producer is too slow or down! [Empty Frame Queue] ";
+
       }
 
       cv::Mat lFrame = mDisplayQueue[0];
@@ -154,7 +158,8 @@ public:
 
       return lFrame;
    }
- 
+
+   virtual  ~FrameFeeder(){}
 
 };
 
@@ -173,8 +178,8 @@ private:
 public:
 	
 	ImgStoreFeeder(string sourceStr);
-	~ImgStoreFeeder();
 	void parseSettings(string& srcStr) override;
+	~ImgStoreFeeder();
 };
 
 #endif

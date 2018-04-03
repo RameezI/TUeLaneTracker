@@ -31,9 +31,6 @@
  #include "TrackingLaneDAG_generic.h"
 #endif
 
-#ifdef	ENABLE_ROS_INTERFACE
-#include "RosPublisher.h"
-#endif
 
 StateMachine::StateMachine(unique_ptr<FrameFeeder> frameFeeder)
  : mQuitRequest(false),
@@ -98,17 +95,19 @@ int StateMachine::spin()
 		}
 		if (mPtrBootingState->currentStatus == StateStatus::DONE)
 		{				
-		   mCurrentState 	= States::BUFFERING;
-		   
-		   cout<< "Completed!"<<endl;
 
 		   #ifdef PROFILER_ENABLED
 		     LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 		     <<"****************************************"<<endl
+		     << "Booting State Completed"
 		     << "Printing Booting Configuration"<<endl
 		     <<  *(mPtrLaneFilter)<<endl
 		     <<"****************************************"<<endl<<endl;
 		   #endif
+	
+		   mCurrentState 	= States::BUFFERING;	   
+		   cout<< "Completed!"<<endl;
+
 		}
 		else
 		{
@@ -123,9 +122,7 @@ int StateMachine::spin()
 		      mCurrentState 	= States::DISPOSED;
 		      lReturn 		= -1;
 		}
-	}
-	break; //BOOTING PROCESS SCOPE ENDS
-
+	} break; //BOOTING PROCESS SCOPE ENDS
 
 
 	case States::BUFFERING :
@@ -140,15 +137,38 @@ int StateMachine::spin()
 		}
 		if (mPtrBufferingState->currentStatus == StateStatus::INACTIVE)
 		{
-		      mPtrBufferingState->setupDAG(std::ref(*mPtrTemplates), 5);
+		      mPtrBufferingState->setupDAG(std::ref(*mPtrTemplates), BUFFER_COUNT);
 		      mPtrFrameFeeder->Paused.store(false);
 		}
 		if (mPtrBufferingState->currentStatus == StateStatus::ACTIVE)
 		{
-		    mPtrBufferingState->run(mPtrFrameFeeder->dequeue());
+		   try
+		   {
+		     mPtrBufferingState->run(mPtrFrameFeeder->dequeue());
+		   }
+		   catch(const char* msg)
+		   {
+	   	     #ifdef PROFILER_ENABLED
+	              LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	              <<"******************************"<<endl
+	              << "Exception while Buffering: "<<endl
+	              << msg <<endl
+		      << "Shutting Down the State-Machine."<<endl
+	              <<"******************************"<<endl<<endl;
+	             #endif
+		      mCurrentState 	= States::DISPOSED;
+		      lReturn 		= -1;
+		   }
 		}
 		if( mPtrBufferingState->currentStatus == StateStatus::DONE)
 		{
+		   #ifdef PROFILER_ENABLED
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+		    <<"******************************"<<endl
+		    << "[Buffering State Completed]"<<endl
+		    <<"******************************"<<endl<<endl;
+		   #endif
+
 		   mCurrentState = States::DETECTING_LANES;
 		   cout<<"Completed!"<<endl;
 		}
@@ -165,8 +185,7 @@ int StateMachine::spin()
 		   mCurrentState 	= States::DISPOSED;
 		   lReturn 	        = -1;
 		}
-	}
-	break; // BUFFERING PROCESS SCOPE ENDS
+	} break; // BUFFERING PROCESS SCOPE ENDS
 
 
 	case States::DETECTING_LANES :
@@ -209,24 +228,21 @@ int StateMachine::spin()
 		}
 
 
-	}
-	break; // TRACKING STATE SCOPE ENDS
+	} break; // TRACKING STATE SCOPE ENDS 
 	
 
-	case States::DISPOSED:
+	case States::DISPOSED :
 	{
-		#ifdef S32V2XX
-		 OAL_Deinitialize();
-		#endif
+		
+	   #ifdef PROFILER_ENABLED
+	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	    <<  "********************************"<<endl
+	    <<  "[STATE MACHINE IS IN DISPOSED STATE]"<<endl
+	    <<  "Witing for destruction..."<<endl
+	    <<"******************************"<<endl<<endl;
+	   #endif
 
-		#ifdef PROFILER_ENABLED
-		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		 << "State Machine is Disposed"<< endl;
-		#endif
-
-		cout<<endl<<"State Machine Ended with return code: "<< lReturn <<endl;
-	}
-	break; } // END SWITCH
+	} break; } // END SWITCH
 
 	return lReturn;
 
@@ -243,7 +259,18 @@ States StateMachine::getCurrentState()
 	return mCurrentState;
 }
 
+
 StateMachine::~StateMachine()
 {
-	
+   #ifdef S32V2XX
+    OAL_Deinitialize();
+   #endif
+
+   #ifdef PROFILER_ENABLED
+     LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+     <<  "********************************"<<endl
+     <<  "[State-Machine Distroyed]"<<endl
+     <<"******************************"<<endl<<endl;
+   #endif
+
 }

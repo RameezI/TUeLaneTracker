@@ -53,7 +53,7 @@ float  getPixelStep(const float STEP_cm, const Camera& CAM, const int Y_ICCS )
    return lImgPt.at<float>(0,0)/(lImgPt.at<float>(0,2)*100.0 ) ;
 }
 
-cv::Mat	 getBins(const Ref<const VectorXi>& BINS_cm, const float& STEP_cm, const float& STEP)
+cv::Mat	 getBins(const Ref<const VectorXf>& BINS_cm, const float& STEP_cm, const float& STEP)
 {	
    cv::Mat lMat(BINS_cm.size(), 1, CV_32S);
 
@@ -81,13 +81,13 @@ LaneFilter::LaneFilter(const LaneProperties& LAN,  const Camera& CAM)
 
   PURVIEW_LINE_ICCS(-PURVIEW_LINE_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),
   
-  BINS_STEP_cm(15),
+  BINS_STEP_cm(STEP_LANE_FILTER_CM),
   
   BINS_MAX_cm(round(LANE.MAX_WIDTH/BINS_STEP_cm)*BINS_STEP_cm),
 
   COUNT_BINS( (int)( (2*BINS_MAX_cm)/BINS_STEP_cm ) + 1),
 
-  BINS_cm( VectorXi::LinSpaced( COUNT_BINS, -BINS_MAX_cm, BINS_MAX_cm) ),
+  BINS_cm( VectorXf::LinSpaced( COUNT_BINS, -BINS_MAX_cm, BINS_MAX_cm) ),
 
   BASE_STEP(getPixelStep(BINS_STEP_cm, CAMERA, BASE_LINE_ICCS)),
 
@@ -111,13 +111,14 @@ LaneFilter::LaneFilter(const LaneProperties& LAN,  const Camera& CAM)
 void LaneFilter::createPrior()
 {
 
- 	VectorXi  lBINS_RHP_cm(BINS_cm.tail(prior.rows));  //Take only the bins in the right half plane [only the +ve BINS]
+ 	VectorXf  lBINS_RHP_cm(BINS_cm.tail(prior.rows));  //Take only the bins in the right half plane [only the +ve BINS]
 
 	/* Create Histogram Models for the BaseHistogram */
 	/* Assign probabilities to States  */
 		
-	const float 	 lMean =  LANE.AVG_WIDTH/2;
-	const float    	 lSigma = LANE.STD_WIDTH;
+	const float 	 lMean  	= LANE.AVG_WIDTH/2;
+	const float    	 lSigma 	= LANE.STD_WIDTH;
+	const float  	 lWidthMarking	= LANE.AVG_WIDTH_LM;
 	
 	float lProb_left, lProb_right, lWidth_cm;
 	
@@ -136,13 +137,20 @@ void LaneFilter::createPrior()
 	    if (LANE.MIN_WIDTH <= lWidth_cm && lWidth_cm <= LANE.MAX_WIDTH)
 	    {
 	       /* To Histogram Bins-IDs*/
-	       size_t idxL = (lBINS_RHP_cm.size()  -1) - left;
-	       size_t idxR = (lBINS_RHP_cm.size()  -1) + right;
+	       size_t idxL 	= (lBINS_RHP_cm.size()  -1) - left;
+	       size_t idxR 	= (lBINS_RHP_cm.size()  -1) + right;
+	       size_t idxM 	= round((idxL+idxR)/2.0);
+	 	
+	       //cout << "Left: "<< idxL <<"	Right: "<< idxR << "	Mid: "<< idxM << "	CM_WIDTH:"<< lWidth_cm<<endl;
+	
+	       if(!( (idxM - idxL >=1) && (idxR - idxM >=1) ) )
+		throw "Select a smaller step-size. Not enough bins for calculating the Histograms";
+	
+	
+	       size_t idxMark 	= floor(lWidthMarking/BINS_STEP_cm) ;
 
-	       size_t idxM = round((idxL+idxR)/2.0);
-
-	       size_t lNonBoundaryBinsCount_left  = (idxM-3) - (idxL +2);
-	       size_t lNonBoundaryBinsCount_right = (idxR-2) - (idxM +3);
+	       size_t lNonBoundaryBinsCount_left  = (idxM-idxMark) - (idxL + idxMark) -1;
+	       size_t lNonBoundaryBinsCount_right = (idxR-idxMark) - (idxM + idxMark) -1;
 
 	       if( 0 < idxL && idxR < COUNT_BINS-1 )
 	       {
@@ -154,13 +162,11 @@ void LaneFilter::createPrior()
 		   baseHistogramModels.back().binIdxBoundary_left 		= idxL;
 		   baseHistogramModels.back().binIdxBoundary_right		= idxR;
 		
-		   //^TODO: Make non-boundary index dependent on the bin size
-		   baseHistogramModels.back().binIdxNonBoundary_left  		= idxL+2;
+		   baseHistogramModels.back().binIdxNonBoundary_left  		= idxL + idxMark;
 		   baseHistogramModels.back().nonBoundaryBinsCount_left  	= lNonBoundaryBinsCount_left;
 
-		   //^TODO: Make non-boundary index dependent on the bin size
-		   baseHistogramModels.back().binIdxNonBoundary_right  		= idxM+4;
 		   baseHistogramModels.back().nonBoundaryBinsCount_right 	= lNonBoundaryBinsCount_right;
+		   baseHistogramModels.back().binIdxNonBoundary_right  		= idxR - lNonBoundaryBinsCount_right;
 
 		   baseHistogramModels.back().boundary_left 			=  BASE_BINS.at<int32_t>(idxL,0);
 		   baseHistogramModels.back().boundary_right 			=  BASE_BINS.at<int32_t>(idxR,0);

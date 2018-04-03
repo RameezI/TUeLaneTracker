@@ -179,11 +179,11 @@ public:
 			}
 
 			//Check if every template is non-empty and throw an exception if not.
-			if (GRADIENT_TAN_ROOT.empty() | 
-			      FOCUS_MASK_ROOT.empty() | 
-                               DEPTH_MAP_ROOT.empty() | 
-                                        X_ICS.empty() | 
-                                        Y_ICS.empty() ) throw "Templates Instatiation Failed" ;
+			if (GRADIENT_TAN_ROOT.empty() ) throw "Gradient_TAN_ROOT is empty" ; 
+			if (FOCUS_MASK_ROOT.empty()   ) throw "FOCUS_MASK_ROOT is empty" ;
+                        if (DEPTH_MAP_ROOT.empty() )    throw "DEPTH_MAP_ROOT is empty";
+                        if (X_ICS.empty() ) 		throw "X_ICS is Empty";
+                        if (Y_ICS.empty() ) 		throw "Y_ICS is Empty";
 					
 	}	
 }; 

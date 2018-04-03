@@ -31,14 +31,21 @@
 
 /** Provide target camera and resolution [Required for loading corresponding callibration file] */
 #define CAMERA_NAME "BUMBLEBEE_640x480"
-//#define CAMERA_NAME "BUMBLEBEE_960x600"
 
-//^TODO: Move it to sourceString
-#define SKIP_FRAMES 0 			//Skip frames in case of directory input
+// Confifure FrameFeeder
 
-//Configuration for LaneFilter
-#define BASE_LINE_IBCS		0      /*< Describes base line in Image-Bottom-Coordinate-System */
-#define PURVIEW_LINE_IBCS	160    /*< Describes purview line in Image-Bottom-Coordinate-System */
+//Configuration for Algorithm
+#define BASE_LINE_IBCS		0      /**< Describes base line in Image-Bottom-Coordinate-System */
+#define PURVIEW_LINE_IBCS	160    /**< Describes purview line in Image-Bottom-Coordinate-System */
+
+#define STEP_LANE_FILTER_CM	20    /**< Provide bin-size for the 1D lane filters (At base and purview lines) [cm]*/
+#define STEP_VP_FILTER		10     /**< Provide bin-size for 2D vanishing point filter [pixels]*/
+
+#define VP_RANGE_VER		25     /**< Vertical range of VP on either side of the Horizon Line [pixels] */
+#define VP_RANGE_HOR		300    /**< Horizental range of VP on either side of center point on the horizon line [pixels] */
+
+#define BUFFER_COUNT		5      /**<  Provide number of probabiltiy frames to buffer for Max-Pooling operations [Temporal Filtering]*/
+
 
 #endif
 

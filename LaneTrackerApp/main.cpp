@@ -110,7 +110,8 @@ int main(int argc, char* argv[]) /**
 		  cout <<endl<<stateMachine.getCurrentState();
 		  cout <<"state cycle-count = " << lCyclesCount;
 		}
-	    }// End spinning
+	   }// End spinning
+	   
 	}
 
 	cout<<endl<<"The program ended with exit code " <<lReturn<<endl;

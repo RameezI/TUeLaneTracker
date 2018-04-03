@@ -49,7 +49,7 @@ unique_ptr<LaneFilter> InitState::createLaneFilter()
 	   #ifdef PROFILER_ENABLED
 	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 	    <<"******************************"<<endl
-	    <<  "EXCEPTION CAUGHT: "<<endl
+	    <<  "Lane-Filter Instantiation Failed: "<<endl
 	    << msg <<endl
 	    <<"******************************"<<endl<<endl;
 	   #endif
@@ -85,7 +85,7 @@ unique_ptr<VanishingPtFilter> InitState::createVanishingPtFilter()
 	   #ifdef PROFILER_ENABLED
 	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 	    <<"******************************"<<endl
-	    <<  "EXCEPTION CAUGHT: "<<endl
+	    <<  "Vanishing-Point-Filter Instantiation Failed: "<<endl
 	    << msg <<endl
 	    <<"******************************"<<endl<<endl;
 	   #endif
@@ -126,7 +126,7 @@ unique_ptr<Templates> InitState::createTemplates()
 	   #ifdef PROFILER_ENABLED
 	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 	    <<"******************************"<<endl
-	    <<  "EXCEPTION CAUGHT: "<<endl
+	    <<  "Templates Instantiation Failed: "<<endl
 	    << msg <<endl
 	    <<"******************************"<<endl<<endl;
 	   #endif

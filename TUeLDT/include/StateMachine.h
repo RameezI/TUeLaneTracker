@@ -60,7 +60,6 @@ private:
 
 public:
 
-	bool	isInitialized();
 	States	getCurrentState();
 	void 	quit();
 

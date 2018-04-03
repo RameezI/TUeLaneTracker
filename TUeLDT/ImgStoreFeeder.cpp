@@ -61,7 +61,7 @@ ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
            }
 
  	 }
-	 std::this_thread::sleep_for(std::chrono::milliseconds(20));
+	 std::this_thread::sleep_for(std::chrono::milliseconds(2000));
      }
 
   });
@@ -101,8 +101,26 @@ void ImgStoreFeeder::parseSettings(string& srcStr)
 
 ImgStoreFeeder::~ImgStoreFeeder()
 {
+	Stopped.store(true);
+
+
 	if(mAsyncGrabber.joinable())
 	{
 	  mAsyncGrabber.join();
+
+   	  #ifdef PROFILER_ENABLED
+     	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+     	    <<  "********************************"<<endl
+    	    <<  "[ImgStoreFeeder is Joined]"<<endl
+     	    <<"******************************"<<endl<<endl;
+  	  #endif
 	}
+
+
+   	#ifdef PROFILER_ENABLED
+     	 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+     	 <<  "********************************"<<endl
+    	 <<  "[ImgStoreFeeder is Destroyed]"<<endl
+     	 <<"******************************"<<endl<<endl;
+  	#endif
 }
