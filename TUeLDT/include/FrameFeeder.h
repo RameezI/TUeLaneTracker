@@ -43,8 +43,6 @@ protected:
    const std::size_t	mMAX_BUFFER_SIZE;
    const std::size_t	mMAX_RETRY;
    std::mutex 		mMutex;
-   vector<cv::Mat>	mDisplayQueue;
-   vector<cv::Mat>	mProcessQueue;
 	
 
    FrameFeeder(): mMAX_BUFFER_SIZE(3), mMAX_RETRY(10), Stopped(false), Paused(true)
@@ -52,7 +50,12 @@ protected:
 
    }
 
-   void enqueue(cv::Mat& frame, vector<cv::Mat>& queue)
+   virtual void    parseSettings(string& srcStr)  = 0;
+
+public:
+   vector<cv::Mat>	mDisplayQueue;
+   vector<cv::Mat>	mProcessQueue;
+   virtual void enqueue(cv::Mat& frame, vector<cv::Mat>& queue)
    {
       WriteLock  lLock(mMutex, std::defer_lock);	
 
@@ -67,21 +70,19 @@ protected:
 	  LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 	   <<"******************************"<<endl
 	   <<  "WARNING!! "<<endl
-	   <<  "Droping frames in the queue, cannot keep-up with the frame production rate"<<endl
+	   <<  "Dropping frames in the queue, cannot keep-up with the frame production rate"<<endl
 	   <<"******************************"<<endl<<endl;
           #endif
 	}
       lLock.unlock();
    }
- 
-   virtual void    parseSettings(string& srcStr)  = 0;
-
-public:	
 
    std::atomic<bool> Stopped;
    std::atomic<bool> Paused; 
 
-   cv::Mat dequeue()
+   virtual void setImageLinker(cv::Mat imgLink) = 0;
+
+   virtual cv::Mat dequeue()
    {
       WriteLock  lLock(mMutex, std::defer_lock);	
       size_t lTryGrab = 0;
@@ -118,7 +119,7 @@ public:
       return lFrame;
    }
 
-   cv::Mat dequeueDisplay()
+   virtual cv::Mat dequeueDisplay()
    {
       WriteLock  lLock(mMutex, std::defer_lock);	
       size_t lTryGrab = 0;
@@ -164,18 +165,41 @@ class ImgStoreFeeder: public FrameFeeder
 {
 
 private:
-	string			mFolder;
-	int 	        	mSkipFrames;
-	uint32_t 		mFrameCount;
+	string			          mFolder;
+	int 	        	      mSkipFrames;
+	uint32_t 		          mFrameCount;
 	vector< cv::String> 	mFiles;
-	std::thread		mAsyncGrabber;
+	std::thread		        mAsyncGrabber;
 
 public:
 	
 	ImgStoreFeeder(string sourceStr);
 	~ImgStoreFeeder();
 	void parseSettings(string& srcStr) override;
+	void setImageLinker(cv::Mat imgLink) override;
 };
 
+class RTMapsFeeder: public FrameFeeder
+{
+
+private:
+	string			          mFolder;
+	int 	        	      mSkipFrames;
+	uint32_t 		          mFrameCount;
+	vector< cv::String> 	mFiles;
+  bool                  m_firstTime;
+  cv::Mat*              ptrImgInput;
+  cv::Mat               mImgCurrent;
+
+public:
+	
+	RTMapsFeeder(string sourceStr);
+	~RTMapsFeeder();
+	void parseSettings(string& srcStr) override;
+	void setImageLinker(cv::Mat imgLink) override;
+  cv::Mat dequeue() override;
+  cv::Mat dequeueDisplay() override;
+  void enqueue(cv::Mat& frame, vector<cv::Mat>& queue) override;
+};
 
 #endif

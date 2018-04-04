@@ -109,8 +109,10 @@ void FrameRenderer::drawLane(const cv::Mat& FRAME, const LaneModel& Lane)
 	line(FRAME, cvPoint(x, lPURVIEW_LINE_ICS), cvPoint(x, lPURVIEW_LINE_ICS - 30), cvScalar(0,0,0), 1);
    }
 
-   imshow( "Display window", FRAME);
-   vector<float> params = getDirectionalParameters();
+   mMatCurrent = FRAME;
+   //imshow("Lane",getLaneFrame(getDirectionalParameters()));
+   //imshow( "Display window", FRAME);
+   //vector<float> params = getDirectionalParameters();
    
    if ( (char)32 == (char) waitKey(10) )
    {
@@ -137,7 +139,7 @@ vector<float> FrameRenderer::getDirectionalParameters(){
     float opposite = (lBoundaryPts_M[1].x-lBoundaryPts_M[0].x) * mUnit.getPixToCm(lBoundaryPts_M[0].y- mCAM.RES_VH(0)/2,mCAM);
 
     if (opposite != 0 && aligned != 0){
-      a = atan(opposite/aligned) * 180 / M_PI;
+      a = -atan(opposite/aligned) * 180 / M_PI;
     } else {
       a = 0;
     }
@@ -152,4 +154,28 @@ vector<float> FrameRenderer::getDirectionalParameters(){
     //directionalParams.push_back(center);
     return directionalParams;
 
+}
+
+cv::Mat FrameRenderer::getCurrentFrame()
+{
+  std::cout<<"grabbingframeatframerenderer"<<endl;
+  return mMatCurrent;
+}
+
+cv::Mat FrameRenderer::getLaneFrame(vector<float> dirParams)
+{
+  cv::Mat mLaneFrame(600,960,CV_8UC3,Scalar(0,0,0));
+
+	line(mLaneFrame, cvPoint(60, 0), cvPoint(60,600), cvScalar(255,255,255), 5);
+  line(mLaneFrame, cvPoint(900, 0), cvPoint(900, 600), cvScalar(255,255,255), 5);
+
+  float cstart,cend;
+
+  cstart = 60 + dirParams[2]/(dirParams[1]+dirParams[2])*840; //(960/2);// * (dirParams[2]+dirParams[1]);
+  cend = cstart + 600 * tan(dirParams[0]*M_PI/180);
+
+  line(mLaneFrame, cvPoint(cstart,600), cvPoint(cend, 0), cvScalar(0,255,0), 5);
+
+  //std::cout<<"Lane Frame"<<endl;
+  return mLaneFrame;
 }

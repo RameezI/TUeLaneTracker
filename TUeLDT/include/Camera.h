@@ -80,10 +80,12 @@ private:
 		// Read location of Binary
 		char lBuff[65536];
 		ssize_t lLen = ::readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
+		//ssize_t lLen = ::readlink("/home/vedecom/TUeLaneTracker/install/", lBuff, sizeof(lBuff)-1);
 
 		if (lLen!=-1)
 		{
 		  lPath = std::string(lBuff);
+		  //std::cout << "Path: " << lPath << endl;
 		  std::string::size_type Idx = lPath.find_last_of("/");
 		  lPath = lPath.substr(0,Idx);
 		}
@@ -95,6 +97,7 @@ private:
 		   <<"[Searching for Camera configuration files]: "<<endl;
 		  #endif
 
+		  std::cout<<"Unable to find the path to binary"<<endl;
 		  throw "Camera Instantiation Failed" ;
 		}
 
@@ -111,6 +114,7 @@ private:
 		   <<"Unable to load camera configuration: "<<endl
 		   << "File not found: " << lFile.c_str() << endl;
 		  #endif
+		  std::cout<<"Unable to load camera configuration: "<<endl;
 		  throw "Camera Instantiation Failed" ;
 		}
 		else
@@ -138,10 +142,12 @@ private:
 		// Read location of Binary
 		char lBuff[65536];
 		ssize_t lLen = ::readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
+		//ssize_t lLen = ::readlink("/home/vedecom/TUeLaneTracker/install/", lBuff, sizeof(lBuff)-1);
 
 		if (lLen!=-1)
 		{
 		  lPath = std::string(lBuff);
+		  //std::cout << "Path: " << lPath << endl;
 		  std::string::size_type Idx = lPath.find_last_of("/");
 		  lPath = lPath.substr(0,Idx);
 		}
@@ -152,6 +158,7 @@ private:
 		   <<"Unable to find the path to binary"<<endl
 		   <<"[Searching for Camera configuration files]: "<<endl;
 		  #endif
+		  std::cout<<"Unable to find the path to binary:"<<endl;
 		  throw "Camera Instantiation Failed" ;
 		}
 
@@ -169,6 +176,7 @@ private:
 		  <<"Unable to load camera configuration: "<<endl
 		  << "File not found: " << lFile.c_str() << endl;
 	          #endif
+		  std::cout<<"Unable to load camera configuration: "<<endl;
 		  throw "Camera Instantiation Failed" ;
 	    	}
 	    	else

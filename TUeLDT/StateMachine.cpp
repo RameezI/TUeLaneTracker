@@ -106,6 +106,7 @@ int StateMachine::spin()
 	       	     <<  "Shutting Down the State-Machine."<<endl
 	       	     <<"****************************************"<<endl<<endl;
 	      	   #endif
+				 std::cout << "[Failed to Complete the Booting Process]"<<endl;
 			
 		      mCurrentState 	= States::DISPOSED;
 		      lReturn 		= -1;
@@ -175,7 +176,8 @@ int StateMachine::spin()
 		if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
 		{
 		   mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
-		   mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
+		   mDisplayFrame = mPtrFrameFeeder->dequeueDisplay();
+		   mPtrFrameRenderer->drawLane(mDisplayFrame, mLaneModel);
 		   
 		}
 		if( (mPtrTrackingState->currentStatus == StateStatus::DONE) )
@@ -234,4 +236,25 @@ States StateMachine::getCurrentState()
 StateMachine::~StateMachine()
 {
 	
+}
+
+void StateMachine::forwardImage(cv::Mat inputImage)
+{
+	mPtrFrameFeeder->setImageLinker(inputImage);
+}
+
+cv::Mat StateMachine::getCurrentFrame()
+{
+	cv::Mat frameout;
+	if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
+	{
+		   frameout = mDisplayFrame;
+		   //frameout = mPtrFrameRenderer->getLaneFrame(mPtrFrameRenderer->getDirectionalParameters());
+	}
+	else
+	{	
+			 frameout = cv::Mat(600,960,CV_8UC3,Scalar(0,0,0));
+	}
+	return frameout;
+
 }

@@ -8,11 +8,12 @@
 
 #include "../local_interfaces/maps_LaneTracker.h"	// Includes the header of this component
 
-//#define IMAGEOUTPUT
+#define IMAGEOUTPUT
 
 // Use the macros to declare the inputs
 MAPS_BEGIN_INPUTS_DEFINITION(MAPSLaneTracker)
     MAPS_INPUT("matSrcIn",MAPS::FilterIplImage,MAPS::FifoReader)
+	//MAPS_INPUT("cameraconfigfile",MAPS::FilterTextUTF16, MAPS::FifoReader)
     //MAPS_INPUT("iName",MAPS::FilterInteger32,MAPS::FifoReader)
 MAPS_END_INPUTS_DEFINITION
 
@@ -20,8 +21,7 @@ MAPS_END_INPUTS_DEFINITION
 MAPS_BEGIN_OUTPUTS_DEFINITION(MAPSLaneTracker)
     MAPS_OUTPUT("cycleCount",MAPS::Integer32,NULL,NULL,1)
 	#ifdef IMAGEOUTPUT
-
-    MAPS_OUTPUT("iplimage",MAPS::IplImage,NULL,NULL,0)
+    	MAPS_OUTPUT("iplimage",MAPS::IplImage,NULL,NULL,0)
 	#endif
 MAPS_END_OUTPUTS_DEFINITION
 
@@ -65,7 +65,7 @@ void MAPSLaneTracker::Birth()
 
 	if (lReturn==0)
 	{
-
+		//lPtrFeeder->setImageLinker(lImgPtr);
 		std::cout<<endl<<endl;
 		std::cout<<"******************************"<<std::endl;
 		std::cout<<" Press Ctrl + c to terminate."<<std::endl;
@@ -107,6 +107,10 @@ void MAPSLaneTracker::Birth()
 
 	
 	}
+	else
+	{
+		std::cout << "Failed creating the FrameFeeder" << endl;
+	}
 }
 
 void MAPSLaneTracker::Core() 
@@ -119,52 +123,38 @@ void MAPSLaneTracker::Core()
     IplImage& imgIn = ioEltIn->IplImage();
 	cv::Mat tempImg = cv::cvarrToMat(&imgIn);
 
-	imshow("input",tempImg);
-	//std::cout<<"Setting image"<<endl;
-	lImgPtr = &tempImg;
+	lPtrStateMachine->forwardImage(tempImg);
 
-	if (lImgPtr == NULL){
-		std::cout<<"NULL POINTER!"<<endl;
-		return;
-	}
+	//std::cout<<"Setting image succeeded!"<<endl;
+	// if (lImgPtr == NULL){
+	// 	std::cout<<"NULL POINTER!"<<endl;
+	// 	return;
+	// }
 
-	if (lImgPtr->empty()){
-		std::cout << "Empty input!" << endl;
-		ReportInfo("Empty!");
-	}
+	// if (lImgPtr->empty()){
+	// 	std::cout << "Empty input!" << endl;
+	// 	ReportInfo("Empty!");
+	// }
 
+	nbCycles++;
 
     //ReportInfo("Passing through Core() method");
 	//Same as multiplier3 (manual allocation of the output buffers).
 	if (m_firstTime) {
+		std::cout<<"Setting first time settings"<<endl;
 		m_firstTime = false;
 		//Example of how to test the incoming images color format,
 		//and abort if the input images color format is not supported.
+		#ifdef IMAGEOUTPUT
 		if (MAPS_FC_STR(imgIn.channelSeq) != MAPS_CHANNELSEQ_GRAY &&
 			MAPS_FC_STR(imgIn.channelSeq) != MAPS_CHANNELSEQ_BGR &&
 			MAPS_FC_STR(imgIn.channelSeq) != MAPS_CHANNELSEQ_RGB)
-			//The Error method will throw an exception, which will be caught by the RTMaps
-			//engine outside of the Core() function, so that execution of this component
-			//will stop and the Death function will be called immediately.
-			//The error message is displayed in red in the console as it is with the ReportError method.
-			//(All the other components in the diagram keep-on working).
 			Error("Unsupported image format.");
 
 		Output(1).AllocOutputBufferIplImage(imgIn);
+		#endif
 	}
 
-nbCycles++;
-std::cout << nbCycles << endl;
-// --------------------------------------------------------------------------------------------------------------------------
-//
-// --------------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------------
-//
-// --------------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------------
-//
-// --------------------------------------------------------------------------------------------------------------------------
-
 
 // --------------------------------------------------------------------------------------------------------------------------
 //
@@ -175,7 +165,38 @@ std::cout << nbCycles << endl;
 // --------------------------------------------------------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------------------------------------------------------
-	
+	//std::cout<<"Going for a spin"<<endl;
+
+	if (lPtrStateMachine->getCurrentState() != States::DISPOSED)
+	{
+		lReturn = lPtrStateMachine->spin();
+		//nbCycles ++;
+		
+		if(lPreviousState != lPtrStateMachine->getCurrentState())
+		{
+			cout<<endl;	
+			cout<<lPtrStateMachine->getCurrentState();
+			lPreviousState = lPtrStateMachine->getCurrentState();
+
+			std::cout.flush();
+		}
+		else if (nbCycles%100==0)
+		{
+			cout <<endl;
+			cout <<lPtrStateMachine->getCurrentState();
+			cout <<"state cycle-count = " << nbCycles;
+		}
+	}
+
+// --------------------------------------------------------------------------------------------------------------------------
+//
+// --------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------
+//
+// --------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------
+//
+// --------------------------------------------------------------------------------------------------------------------------
 	
 	//std::cout<<"Start Writing number..."<<endl;
 
@@ -189,53 +210,26 @@ std::cout << nbCycles << endl;
 
 
 #ifdef IMAGEOUTPUT
-	// IplImage * imgSrc = &imgIn;
-	// std::cout<<"Create empty image..."<<endl;
-	// IplImage* imgScribble = cvCreateImage(cvSize(320, 240), 8, 3);
+	if (lPtrStateMachine->getCurrentState() == DETECTING_LANES && nbCycles > 10)
+	{
+		//std::cout<<"Start Writing..."<<endl;
+		MAPSIOElt* ioEltOut2 = StartWriting(Output(1));
 
-	
+		//std::cout<<"Linking To Output..."<<endl;
+		IplImage& imageOut = ioEltOut2->IplImage();
 
-	//std::cout<<"Start Writing..."<<endl;
-	MAPSIOElt* ioEltOut2 = StartWriting(Output(1));
+		//std::cout <<"Getting frame" << endl;
+		cv::Mat imgLane = lPtrStateMachine->getCurrentFrame();
+		//std::cout <<"Copying frame to output" << endl;
 
-	//std::cout<<"Linking To Output..."<<endl;
-	IplImage& imageOut = ioEltOut2->IplImage();
+		IplImage iplout = imgLane;
 
-	//std::cout<<"Setting output image value..."<<endl;
+		imageOut = iplout; //tempImg;
 
-
-	IplImage * imgDst = &imageOut;
-
-	// int depthdiff = imgSrc->depth - imgDst->depth;
-	// int widthdiff = imgSrc->width - imgDst->width;
-	// int heightdiff = imgSrc->height - imgSrc->height;
-
-	//cv::Mat frame = lPtrStateMachine->getFrame();
-	//IplImage imgTmp = frame;
-	//imgDst = cvCloneImage(&imgTmp);
-
-	//std::cout<<"Src Depth: " << imgSrc->depth << " Width: " << imgSrc->width << " Height: " << imgSrc->height << endl;
-	//std::cout<<"Dst Depth: " << imgDst->depth << " Width: " << imgDst->width << " Height: " << imgDst->height << endl;
-	cvCopy(imgSrc,imgDst);
-	//imageOut = cvCloneImage(&imgIn);
-
-	//imageOut = *imgScribble;
-
-	// std::cout<<"Setting Dst Ptr..."<<endl;
-	// IplImage* ptrDstIm = &imageOut;
-
-	// std::cout<<"Setting Dst Value..."<<endl;
-	// *ptrDstIm = *imgScribble; //This is the error
-
-
-	//IplImage* iplImg = new IplImage(lPtrStateMachine->getFrame());
-	//IplImage* iplImg = new IplImage(*lImgPtr);
-
-	//dstPtrIm = *imgScribble;
-	//ioEltOut2->Timestamp() = ioEltIn->Timestamp();
-	//std::cout<<"Stop Writing..."<<endl;
-	StopWriting(ioEltOut2);
+		StopWriting(ioEltOut2);
+	}
 #endif
+
 }
 
 //De-initialization: Death() will be called once at diagram execution shutdown.
@@ -256,7 +250,9 @@ unique_ptr<FrameFeeder> MAPSLaneTracker::createFrameFeeder(FrameSource srcMode, 
 	/** Create Image Feeder */
 	try
 	{
-	   lPtrFeeder=  unique_ptr<FrameFeeder>( new ImgStoreFeeder(srcString) );
+		std::cout << "Try creating FrameFeeder" << endl;
+	   lPtrFeeder=  unique_ptr<FrameFeeder>( new RTMapsFeeder(srcString) );
+	   //lPtrFeeder->setImageLinker(lImgPtr);
 
 	   #ifdef PROFILER_ENABLED
 	      LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
@@ -268,6 +264,7 @@ unique_ptr<FrameFeeder> MAPSLaneTracker::createFrameFeeder(FrameSource srcMode, 
 	}
 	catch(const char* msg)
 	{
+		std::cout << "Creating frame feeder failed" << endl;
 	   #ifdef PROFILER_ENABLED
 	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 	    <<"******************************"<<endl
@@ -278,6 +275,7 @@ unique_ptr<FrameFeeder> MAPSLaneTracker::createFrameFeeder(FrameSource srcMode, 
 	}
 	catch (...)
 	{
+		std::cout << "Creating frame feeder failed" << endl;
 	   #ifdef PROFILER_ENABLED
 	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 	    <<"******************************"<<endl

@@ -40,7 +40,7 @@ private :
 	int nbCycles;
 	int lReturn;
 
-	cv::Mat* lImgPtr = NULL;
+	cv::Mat* lImgPtr;
 public:
 	unique_ptr<FrameFeeder> createFrameFeeder(FrameSource srcMode, string srcString);
 };
