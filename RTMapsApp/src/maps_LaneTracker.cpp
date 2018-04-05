@@ -21,7 +21,9 @@ MAPS_END_INPUTS_DEFINITION
 MAPS_BEGIN_OUTPUTS_DEFINITION(MAPSLaneTracker)
     MAPS_OUTPUT("cycleCount",MAPS::Integer32,NULL,NULL,1)
 	#ifdef IMAGEOUTPUT
-    	MAPS_OUTPUT("iplimage",MAPS::IplImage,NULL,NULL,0)
+    	MAPS_OUTPUT("videoOverlay",MAPS::IplImage,NULL,NULL,0)
+    	MAPS_OUTPUT("topDown",MAPS::IplImage,NULL,NULL,0)
+		MAPS_OUTPUT("directionalParams",MAPS::Float32,NULL,NULL,3)
 	#endif
 MAPS_END_OUTPUTS_DEFINITION
 
@@ -152,6 +154,7 @@ void MAPSLaneTracker::Core()
 			Error("Unsupported image format.");
 
 		Output(1).AllocOutputBufferIplImage(imgIn);
+		Output(2).AllocOutputBufferIplImage(imgIn);
 		#endif
 	}
 
@@ -212,21 +215,29 @@ void MAPSLaneTracker::Core()
 #ifdef IMAGEOUTPUT
 	if (lPtrStateMachine->getCurrentState() == DETECTING_LANES && nbCycles > 10)
 	{
-		//std::cout<<"Start Writing..."<<endl;
+		//Video overlay
 		MAPSIOElt* ioEltOut2 = StartWriting(Output(1));
-
-		//std::cout<<"Linking To Output..."<<endl;
-		IplImage& imageOut = ioEltOut2->IplImage();
-
-		//std::cout <<"Getting frame" << endl;
-		cv::Mat imgLane = lPtrStateMachine->getCurrentFrame();
-		//std::cout <<"Copying frame to output" << endl;
-
-		IplImage iplout = imgLane;
-
-		imageOut = iplout; //tempImg;
-
+		ioEltOut2->IplImage() = lPtrStateMachine->getCurrentFrame();
+		ioEltOut2->Timestamp() = ioEltIn->Timestamp();
 		StopWriting(ioEltOut2);
+
+		//Top Down View
+		MAPSIOElt* ioEltOut3 = StartWriting(Output(2));
+		ioEltOut3->IplImage() = lPtrStateMachine->getTopDownFrame();
+		ioEltOut3->Timestamp() = ioEltIn->Timestamp();
+		StopWriting(ioEltOut3);
+
+		//Dir Params
+		MAPSIOElt* ioEltOut4 = StartWriting(Output(3));
+		vector<float> dirParams = lPtrStateMachine->getDirectionalParams();
+		int vectorsize = dirParams.size();
+		for (int i=0; i<vectorsize; i++) {
+			ioEltOut4->Float32(i) = dirParams[i];
+		}
+		ioEltOut4->VectorSize() = vectorsize;
+		ioEltOut4->Timestamp() = ioEltIn->Timestamp();
+		StopWriting(ioEltOut4);
+		//*dstPtrCnt[0] = 
 	}
 #endif
 

@@ -100,6 +100,10 @@ int main(int argc, char* argv[]) /**
 
 			lReturn = stateMachine.spin();
 			nbCycles ++;
+			if (nbCycles > 10){
+				imshow("Output",stateMachine.getCurrentFrame());
+				vector<float> dirParams = stateMachine.getDirectionalParams();
+			}
 			
 			if(lPreviousState != stateMachine.getCurrentState())
 			{

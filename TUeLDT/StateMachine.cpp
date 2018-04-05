@@ -258,3 +258,30 @@ cv::Mat StateMachine::getCurrentFrame()
 	return frameout;
 
 }
+cv::Mat StateMachine::getTopDownFrame()
+{
+	cv::Mat frameout;
+	if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
+	{
+		   //frameout = mDisplayFrame;
+		   frameout = mPtrFrameRenderer->getLaneFrame(mPtrFrameRenderer->getDirectionalParameters());
+	}
+	else
+	{	
+			 frameout = cv::Mat(600,960,CV_8UC3,Scalar(0,0,0));
+	}
+	return frameout;
+
+}
+
+vector<float> StateMachine::getDirectionalParams()
+{
+	vector<float> paramsOut;
+	if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
+	{
+		   //frameout = mDisplayFrame;
+		   paramsOut = mPtrFrameRenderer->getDirectionalParameters();
+	}
+	return paramsOut;
+
+}

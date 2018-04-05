@@ -164,17 +164,25 @@ cv::Mat FrameRenderer::getCurrentFrame()
 
 cv::Mat FrameRenderer::getLaneFrame(vector<float> dirParams)
 {
-  cv::Mat mLaneFrame(600,960,CV_8UC3,Scalar(0,0,0));
+  int resH = 960;
+  int resV = 600;
+  cv::Mat mLaneFrame(resV,resH,CV_8UC3,Scalar(0,0,0));
 
-	line(mLaneFrame, cvPoint(60, 0), cvPoint(60,600), cvScalar(255,255,255), 5);
-  line(mLaneFrame, cvPoint(900, 0), cvPoint(900, 600), cvScalar(255,255,255), 5);
+  float widthR = 600;
 
   float cstart,cend;
 
-  cstart = 60 + dirParams[2]/(dirParams[1]+dirParams[2])*840; //(960/2);// * (dirParams[2]+dirParams[1]);
-  cend = cstart + 600 * tan(dirParams[0]*M_PI/180);
+  cstart = resH / 2;
+  cend = cstart + resV * tan(dirParams[0]*M_PI/180);
 
-  line(mLaneFrame, cvPoint(cstart,600), cvPoint(cend, 0), cvScalar(0,255,0), 5);
+  int pxl = cstart + dirParams[1]*resH/widthR;
+  int pxr = cstart - dirParams[2]*resH/widthR;
+
+
+	line(mLaneFrame, cvPoint(pxl, 0), cvPoint(pxl,resV), cvScalar(0,255,0), 3);
+  line(mLaneFrame, cvPoint(pxr, 0), cvPoint(pxr, resV), cvScalar(0,255,0), 3);
+  line(mLaneFrame, cvPoint((pxr+pxl)/2, 0), cvPoint((pxr+pxl)/2, resV), cvScalar(255,0,0), 3);
+  line(mLaneFrame, cvPoint(cstart,resV), cvPoint(cend, 0), cvScalar(0,0,255), 5);
 
   //std::cout<<"Lane Frame"<<endl;
   return mLaneFrame;

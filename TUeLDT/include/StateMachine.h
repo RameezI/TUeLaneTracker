@@ -67,6 +67,8 @@ public:
 	void 	forwardImage(cv::Mat inputImage);
 	//cv::Mat getCurrentFrame(){std::cout<<"grabbingframewithstatemachine"<<endl;return mPtrFrameRenderer->getCurrentFrame();};
 	cv::Mat getCurrentFrame();
+	cv::Mat getTopDownFrame();
+	vector<float> getDirectionalParams();
 
 	StateMachine(unique_ptr<FrameFeeder> frameFeeder);
 	int spin();
