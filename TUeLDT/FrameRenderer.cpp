@@ -55,6 +55,7 @@ void FrameRenderer::drawLane(const cv::Mat& FRAME, const LaneModel& Lane)
 
    lBoundaryPts_M.push_back( (lBoundaryPts_L[1] + lBoundaryPts_R[1])/2.0);
 
+
    // Draw Left Boundary Line
    line(FRAME, lBoundaryPts_L[0], lBoundaryPts_L[1], CvScalar(0,255,0),3);
 
@@ -100,7 +101,10 @@ void FrameRenderer::drawLane(const cv::Mat& FRAME, const LaneModel& Lane)
 	line(FRAME, cvPoint(x, mPURVIEW_LINE_ICS), cvPoint(x, mPURVIEW_LINE_ICS - 30), cvScalar(0,0,0), 1);
    }
 
+
+
    imshow( "Display window", FRAME);
+   waitKey(1);
    
    if ( (char)32 == (char) waitKey(10) )
    {

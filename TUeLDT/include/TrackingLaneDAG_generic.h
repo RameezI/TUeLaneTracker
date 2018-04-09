@@ -90,7 +90,7 @@ private:
 public:
 	TrackingLaneDAG_generic(BufferingDAG_generic&& bufferingGraph);
 	int  init_DAG(LaneFilter* laneFilter, VanishingPtFilter* vpFilter);
-	void execute(cv::Mat FrameGRAY);
+	void execute(cv::Mat& FrameGRAY);
 };
 
 #endif // TRACKINGLANESDAG_GENERIC_H

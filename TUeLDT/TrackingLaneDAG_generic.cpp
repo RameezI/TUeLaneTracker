@@ -75,11 +75,11 @@ int TrackingLaneDAG_generic::init_DAG(LaneFilter* laneFilter, VanishingPtFilter*
 }
 
 
-void TrackingLaneDAG_generic::execute(cv::Mat FrameGRAY)
+void TrackingLaneDAG_generic::execute(cv::Mat& FrameGRAY)
 {
 
-
 	BufferingDAG_generic::execute(FrameGRAY);
+
 
 
 #ifdef PROFILER_ENABLED
@@ -88,6 +88,7 @@ mProfiler.start("SETUP_ASYNC_FILTERING");
 	mFuture = std::async([this]
 	{
 	   int64_t lSUM;
+
 
 	   WriteLock  lLock(_mutex, std::defer_lock);	
 
@@ -98,14 +99,13 @@ mProfiler.start("SETUP_ASYNC_FILTERING");
     	    mLaneFilter->filter.convertTo(mLaneFilter->filter, CV_32S);
 
 	    lSUM = sum(mTransitLaneFilter)[0];
+
 	    mTransitLaneFilter= mTransitLaneFilter*SCALE_FILTER;
 	    mTransitLaneFilter.convertTo(mTransitLaneFilter, CV_32S, 1.0/lSUM);
 	    mTransitLaneFilter = 	mTransitLaneFilter + 0.2*mLaneFilter->prior;
-	   lLock.unlock();
 
 
 	   //Predict VP States
-	   lLock.lock();	
 	    mVpFilter->filter.convertTo(mVpFilter->filter, CV_64F);
 	    boxFilter(mVpFilter->filter, mTransitVpFilter, -1, cv::Size(3,3), cv::Point(-1,-1), false, cv::BORDER_REPLICATE );
     	    mVpFilter->filter.convertTo(mVpFilter->filter, CV_32S);
@@ -115,7 +115,6 @@ mProfiler.start("SETUP_ASYNC_FILTERING");
 	    mTransitVpFilter.convertTo(mTransitVpFilter, CV_32S, 1.0/lSUM);	
 	    mTransitVpFilter = mTransitVpFilter + 0.2*mVpFilter->prior;
 	   lLock.unlock();
-	   //Local Variables
 
 	});
 
@@ -129,6 +128,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<  "Min Time: " << mProfiler.getMinTime("SETUP_ASYNC_FILTERING")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
+
 
 
 
@@ -191,7 +191,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
-
 #ifdef PROFILER_ENABLED
 mProfiler.start("MASK_INVALID_BIN_IDS");
 #endif
@@ -226,6 +225,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
+
 #ifdef PROFILER_ENABLED
 mProfiler.start("COMPUTE_HISTOGRAMS");
 #endif
@@ -249,16 +249,18 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 	      if(!(*lPtrMask ==0) )
 	      {		
 		 lBaseBinIdx	= (*lPtrIntBase    - mLOWER_LIMIT_BASE    + (mSTEP_BASE_SCALED/2))/mSTEP_BASE_SCALED;
-
 		 lPurviewBinIdx	= (*lPtrIntPurview - mLOWER_LIMIT_PURVIEW + (mSTEP_PURVIEW_SCALED/2))/mSTEP_PURVIEW_SCALED;
-		
+
 	         lWeightBin 	= *lPtrWeights;
-		
-	         *(lPtrHistBase     + lBaseBinIdx   )  	+= lWeightBin;
-	         *(lPtrHistPurview  + lPurviewBinIdx) 	+= lWeightBin;
-	      }	
+
+		 assert((0<=lBaseBinIdx)&&(lBaseBinIdx<mHistBase.rows ));
+
+		 *(lPtrHistBase       + lBaseBinIdx   )  += lWeightBin;
+	         *(lPtrHistPurview    + lPurviewBinIdx)  += lWeightBin;
+	    }	
+	
 	   }
-		
+	
 	}//Block Ends
 
 #ifdef PROFILER_ENABLED
@@ -271,6 +273,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<  "Min Time: " << mProfiler.getMinTime("COMPUTE_HISTOGRAMS")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
+
 
 
 
@@ -611,7 +614,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<  "Min Time: " << mProfiler.getMinTime("BUFFER_SHIFT_WAIT")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif	
-
 
 }//extractLanes
 

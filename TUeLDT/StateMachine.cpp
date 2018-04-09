@@ -41,6 +41,7 @@ StateMachine::StateMachine(unique_ptr<FrameFeeder> frameFeeder)
    mPtrVanishingPtFilter(nullptr),
    mPtrTemplates(nullptr)
 {
+
 	#ifdef S32V2XX
 	  int  lSuccess |= OAL_Initialize();
 	  if(lSuccess!=0)
@@ -49,7 +50,7 @@ StateMachine::StateMachine(unique_ptr<FrameFeeder> frameFeeder)
 	#endif
 
 	if (mPtrFrameFeeder == nullptr)
-	     throw "State-Machine is missing an instance of FrameFeeder";
+	  throw "State-Machine is missing an instance of FrameFeeder";
 
 
 	#ifdef PROFILER_ENABLED
@@ -83,7 +84,7 @@ int StateMachine::spin()
 
 	case States::BOOTING :
 	{
-		if (mPtrBufferingState == nullptr)
+		if (mPtrBootingState == nullptr)
 	  	{
 		   mPtrBootingState   = unique_ptr<InitState>(new InitState());
 		}
@@ -134,6 +135,7 @@ int StateMachine::spin()
 		   #else
 		    mPtrBufferingState.reset(new BufferingState<BufferingDAG_generic>());
 		   #endif
+		   mPtrBootingState = nullptr;
 		}
 		if (mPtrBufferingState->currentStatus == StateStatus::INACTIVE)
 		{
@@ -169,7 +171,7 @@ int StateMachine::spin()
 		    <<"******************************"<<endl<<endl;
 		   #endif
 
-		   mCurrentState = States::DETECTING_LANES;
+		   mCurrentState = States::DETECTING_LANES; 
 		   cout<<"Completed!"<<endl;
 		}
 		if( mPtrBufferingState->currentStatus == StateStatus::ERROR)
@@ -206,8 +208,25 @@ int StateMachine::spin()
 		}
 		if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
 		{
-		   mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
-		   mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
+		  try
+		  {
+		    mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
+		    mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
+		  }
+		  catch(const char* msg)
+		  {
+
+	   	     #ifdef PROFILER_ENABLED
+	              LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	              <<"******************************"<<endl
+	              << "Exception while Tracking: "<<endl
+	              << msg <<endl
+		      << "Shutting Down the State-Machine."<<endl
+	              <<"******************************"<<endl<<endl;
+	             #endif
+		      mCurrentState 	= States::DISPOSED;
+		      lReturn 		= -1;
+		  }
 		}
 		if( (mPtrTrackingState->currentStatus == StateStatus::DONE) )
 		{
@@ -233,14 +252,13 @@ int StateMachine::spin()
 
 	case States::DISPOSED :
 	{
-		
-	   #ifdef PROFILER_ENABLED
-	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-	    <<  "********************************"<<endl
-	    <<  "[STATE MACHINE IS IN DISPOSED STATE]"<<endl
-	    <<  "Witing for destruction..."<<endl
-	    <<"******************************"<<endl<<endl;
-	   #endif
+	        #ifdef PROFILER_ENABLED
+	    	 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	    	 <<  "********************************"<<endl
+	     	 <<  "[STATE MACHINE IS IN DISPOSED STATE]"<<endl
+	    	 <<  "Waiting for destruction..."<<endl
+	    	 <<"******************************"<<endl<<endl;
+	        #endif
 
 	} break; } // END SWITCH
 
@@ -262,6 +280,9 @@ States StateMachine::getCurrentState()
 
 StateMachine::~StateMachine()
 {
+
+   mPtrFrameFeeder.reset(nullptr);
+
    #ifdef S32V2XX
     OAL_Deinitialize();
    #endif

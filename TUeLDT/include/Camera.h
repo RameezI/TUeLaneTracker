@@ -88,7 +88,7 @@ private:
 		string 		lFile, lPath;
 
 		// Read location of Binary
-		char lBuff[65536];
+		char lBuff[65536] = {"\0"};
 		ssize_t lLen = ::readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
 
 		if (lLen!=-1)
@@ -158,7 +158,7 @@ private:
 		string 		lFile, lPath;
 
 		// Read location of Binary
-		char lBuff[65536];
+		char lBuff[65536] = {"\0"};
 		ssize_t lLen = ::readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
 
 		if (lLen!=-1)

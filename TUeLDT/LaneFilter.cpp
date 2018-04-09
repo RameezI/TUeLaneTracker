@@ -102,8 +102,14 @@ LaneFilter::LaneFilter(const LaneProperties& LAN,  const Camera& CAM)
   filter(cv::Mat::zeros( (int)(BINS_MAX_cm/BINS_STEP_cm) +1, (int)(BINS_MAX_cm/BINS_STEP_cm) +1 , CV_32SC1) )
   
   {
+
+	if(PURVIEW_STEP<1)
+	throw "Step size is too small,the algorithm could run into possible memory errors => Increase step-size or lower the purview line";
+
 	createPrior();
 	filter = prior.clone(); // Initially the posterior probabilities are equal to the prior estimate.
+
+	
   }
 
 

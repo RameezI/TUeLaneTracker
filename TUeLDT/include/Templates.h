@@ -137,8 +137,8 @@ public:
 	 	/* Load Gradient Tangent Template */
 			std::stringstream formattedString;
 			string templateFile, path, prefix, format;
-			char lBuff[65536];
 
+			char lBuff[65536] = {"\0"};
 			ssize_t len = ::readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
 			if (len!=-1)
 			{

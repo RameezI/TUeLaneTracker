@@ -48,7 +48,7 @@ protected:
   
 	
 
-   FrameFeeder(): mMAX_BUFFER_SIZE(3), mMAX_RETRY(10), Stopped(false), Paused(true)
+   FrameFeeder(): mMAX_BUFFER_SIZE(3), mMAX_RETRY(10000000), Stopped(false), Paused(true)
    {
 
    }
