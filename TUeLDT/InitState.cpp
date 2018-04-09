@@ -49,7 +49,7 @@ unique_ptr<LaneFilter> InitState::createLaneFilter()
 	   #ifdef PROFILER_ENABLED
 	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 	    <<"******************************"<<endl
-	    <<  "EXCEPTION CAUGHT: "<<endl
+	    <<  "Lane-Filter Instantiation Failed: "<<endl
 	    << msg <<endl
 	    <<"******************************"<<endl<<endl;
 	   #endif
@@ -86,7 +86,7 @@ unique_ptr<VanishingPtFilter> InitState::createVanishingPtFilter()
 	   #ifdef PROFILER_ENABLED
 	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 	    <<"******************************"<<endl
-	    <<  "EXCEPTION CAUGHT: "<<endl
+	    <<  "Vanishing-Point-Filter Instantiation Failed: "<<endl
 	    << msg <<endl
 	    <<"******************************"<<endl<<endl;
 	   #endif
@@ -116,7 +116,7 @@ unique_ptr<Templates> InitState::createTemplates()
 
 	
 	  lTemplates	 = unique_ptr<Templates>
-	  ( new  Templates (lCamera.RES_VH(0), lCamera.RES_VH(1), lCamera.FOV_VH(0), lCamera.HORIZON,  lVanishingPtFilter.RANGE_V) );
+	  ( new  Templates (lCamera.RES_VH(0), lCamera.RES_VH(1), lCamera.FOV_VH(0), lCamera.HORIZON_VH(0),  lVanishingPtFilter.RANGE_V) );
 	
 	   mTemplatesCreated	= true;
 	
@@ -128,7 +128,7 @@ unique_ptr<Templates> InitState::createTemplates()
 	   #ifdef PROFILER_ENABLED
 	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 	    <<"******************************"<<endl
-	    <<  "EXCEPTION CAUGHT: "<<endl
+	    <<  "Templates Instantiation Failed: "<<endl
 	    << msg <<endl
 	    <<"******************************"<<endl<<endl;
 	   #endif

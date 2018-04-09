@@ -49,8 +49,12 @@ private:
 	int32_t 	mUPPER_LIMIT_BASE;
 	int32_t 	mUPPER_LIMIT_PURVIEW;
 
-	int32_t 	mSTEP_BASE;
-	int32_t 	mSTEP_PURVIEW;
+	int32_t 	mSTEP_BASE_SCALED;
+	int32_t 	mSTEP_PURVIEW_SCALED;
+	
+	size_t		mIdxPurview_LB;
+	size_t		mIdxPurview_RB;
+	
 
 
 	LaneFilter* 		mLaneFilter;
@@ -69,11 +73,12 @@ private:
 	
 	cv::Mat		mHistBase;
 	cv::Mat		mHistPurview;
+
+	cv::Mat		mHistBase_CV64F;
+	cv::Mat		mHistPurview_CV64F;
 	
 	cv::Mat 	mTransitLaneFilter;
 	cv::Mat 	mTransitVpFilter;
-
-
 
 	BaseHistogramModel	mBaseHistModel;  	/**< Selected Base-Histogram Model */
 	LaneModel   		mLaneModel;		/**< The detected Lane-Model */
@@ -85,7 +90,7 @@ private:
 public:
 	TrackingLaneDAG_generic(BufferingDAG_generic&& bufferingGraph);
 	int  init_DAG(LaneFilter* laneFilter, VanishingPtFilter* vpFilter);
-	void execute(cv::Mat FrameGRAY);
+	void execute(cv::Mat& FrameGRAY);
 };
 
 #endif // TRACKINGLANESDAG_GENERIC_H

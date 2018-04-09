@@ -1,5 +1,3 @@
-#define VEDECOMLOGS
-
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
 #include <iostream>
@@ -8,6 +6,11 @@
 using namespace cv;
 using namespace std;
 
+#define  RES_V	480   // Vertical Resolution in pixels.
+#define  RES_H  640   // Horizental Resoluttion in pixels.
+#define  PITCH  0.0    // Pitch angle in degrees.
+#define  YAW    0.0    // Yaw angle in degrees.
+
 int main( int argc, char** argv )
 {
   int lReturn =0;
@@ -15,14 +18,12 @@ int main( int argc, char** argv )
   if(argc >= 2)
   {
 
-  #ifndef VEDECOMLOGS
-    Size lRES = cv::Size(640, 480);
-  #else
-    Size lRES = cv::Size(960, 600);    
-  #endif
+    Mat lRES_VH	= (Mat_<float>(1,2) << RES_V, RES_H );
+    Mat lROT_PY = (Mat_<float>(1,2) << PITCH, YAW );
+
 
     ostringstream lStringStream;
-    lStringStream <<argv[1]<<"_"<<lRES.width<<"x"<<lRES.height<<".yaml";
+    lStringStream <<argv[1]<<"_"<<RES_H<<"x"<<RES_V<<".yaml";
 
 
     FileStorage fs (lStringStream.str(), FileStorage::WRITE);
@@ -30,33 +31,24 @@ int main( int argc, char** argv )
     time_t rawtime; time(&rawtime);
     fs<< "callibrationDate" << asctime(localtime(&rawtime));
 
-  #ifndef VEDECOMLOGS
     // 3x3 Intrinsic Parameters
+    // This Matrix is for performing calculations in Image-Center-CS
     Mat CameraMatrixIntrinsic = (Mat_<float>(3,3) << 554.25626,    0,  		0,
 						     	0,  	579.41125,  	0,
 						    	0,  	   0,  		1 );
 
     // 4x4  Extrinsic Parameters [Homogenous Transformation]
+    // This Matrix is specific to the world coordinates definition
+    // set the value of camera pitch and yaw to calculate this matrix acoordingly
+    // ^TODO: calculate from Pitch and Yaw 
     Mat CameraMatrixExtrinsic = (Mat_<float>(4,4)<< 1,  0,  0,   0,
 						    0,  0, -1,  1.5,
 						    0,  1,  0,   0,
 						    0,  0,  0,   1);
-  #else
-// 3x3 Intrinsic Parameters
-    Mat CameraMatrixIntrinsic = (Mat_<float>(3,3) << 1039.232,    0,  		488.58893,
-						     	0,  	1049.1925,  	309.27204,
-						    	0,  	   0,  		1 );
-    float pitchAngle = 0.5 / 180 * M_PI;
-    // 4x4  Extrinsic Parameters [Homogenous Transformation]
-    Mat CameraMatrixExtrinsic = (Mat_<float>(4,4)<< cos(pitchAngle),  -sin(pitchAngle),  0,   0.195,
-						    sin(pitchAngle),  cos(pitchAngle), 0,  1.115,
-						    0,  0,  1,   1.809,
-						    0,  0,  0,   1);
-  #endif
-
 
     // Store Camera Parameters in a file
-    fs << "CAMERA_RES"<< lRES;  	
+    fs << "CAMERA_RES"<< lRES_VH;  	
+    fs << "CAMERA_ROT_PY"<<lROT_PY;  	
     fs << "CAMERA_MATRIX_INTRINSIC" << CameraMatrixIntrinsic;
     fs << "CAMERA_MATRIX_EXTRINSIC" << CameraMatrixExtrinsic;
    

@@ -47,46 +47,36 @@ struct VanishingPt
 class  LaneModel
 {
 
-private:
-
-	float   mLookAheadError_m; 	/*< Look-ahead-Error of center-line in Vehicle-Symmetry-CS [m] */
-
 public:
 	int 	boundaryLeft;	  	/*< Selected, according to max-posterior, distance to left boundary in Image-Center-CS [pixel] */
 	int 	boundaryRight;  	/*< Selected, according to max-posterior, distance to left boundary in Image-Center-CS [pixel] */
 
-	int 	boundaryLeft_cm;	/*< Selected, according to max-posterior, distance to left boundary in Vehicle-Symmetry-CS [cm] */
-	int 	boundaryRight_cm;  	/*< Selected, according to max-posterior, distance to left boundary in Vehicle-Symmetry-CS [cm] */
-
 	VanishingPt vanishingPt; 	/*< Selected, according to max-posterior, distance to VanishingPoint in Image-Center-CS [pixel] */
+
+	float 	lookAheadErr_m;		/*< The mid-Line at the purview line in Vehicle-Symmetery-CS [m]*/
 	
 
-	void setModel(const int&  boundaryL, 	const int& boundaryR,
-		      const int&  boundaryL_cm, const int& boundaryR_cm,
-		      const VanishingPt& vanishPt)
+	void setModel(const int&  boundaryL, 	const int& boundaryR, const VanishingPt& vanishPt, const float& Err)
 	{
 
 	  boundaryLeft  	= boundaryL;
 	  boundaryRight 	= boundaryR;
-
-	  boundaryLeft_cm  	= boundaryL_cm;
-	  boundaryRight_cm 	= boundaryR_cm;
-
 	  vanishingPt	  	= vanishPt;
+	  lookAheadErr_m	= Err;
 	}
 
-	float getLateralError(float look_ahead_distance)
+	float getLateralError()
 	{
-	  mLookAheadError_m =look_ahead_distance;//-100;
-	  return mLookAheadError_m;
+	  return lookAheadErr_m;
 	}
 
 	LaneModel():
-		   mLookAheadError_m(-1),
 		   boundaryLeft(-1),
 		   boundaryRight(-1),
-		   boundaryLeft_cm(-1),
-		   boundaryRight_cm(-1){}
+		   lookAheadErr_m(0)
+		   {
+
+		   }
 
 };
 

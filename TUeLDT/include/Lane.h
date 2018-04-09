@@ -32,13 +32,14 @@ struct LaneProperties
 friend ostream& operator<<(ostream& os, const LaneProperties& laneProperties);
 
 public:
-	const float AVG_WIDTH;	/*< Average with of a Lane [cm]	*/
-	const float STD_WIDTH;	/*< Standard deviation in Lane width [cm] */
-	const float MIN_WIDTH;	/*< Minimum width of a Lane [cm] */
-	const float MAX_WIDTH;  /*< Maximum width of a Lane [cm] */
+	const float AVG_WIDTH;		/**< Average with of a Lane [cm] */
+	const float STD_WIDTH;		/**< Standard deviation in Lane width [cm] */
+	const float MIN_WIDTH;		/**< Minimum width of a Lane [cm] */
+	const float MAX_WIDTH;  	/*< Maximum width of a Lane [cm] */
+	const float AVG_WIDTH_LM;  	/**< Average Width of the Lane Markings on the lane */
 	
 	LaneProperties() //Lane Widths in cm
-	: AVG_WIDTH(300),STD_WIDTH(50),MIN_WIDTH(200),MAX_WIDTH(600) {}
+	: AVG_WIDTH(300),STD_WIDTH(50),MIN_WIDTH(250),MAX_WIDTH(500), AVG_WIDTH_LM(30){}
 };
 
 
@@ -75,7 +76,7 @@ struct LaneMembership
 		 WIDTH_DIFF_NORMA( (1/sqrt( 2*M_PI*pow(WIDTH_STD,2) )) ),
 		 WIDTH_DIFF_NOMIN( 2*pow(WIDTH_STD,2) ),
 		 
-		 NEG_BOUNDARY_STD(0.2),
+		 NEG_BOUNDARY_STD(0.1),
 		 NEG_BOUNDARY_NORMA( (2/sqrt(2*M_PI*pow(NEG_BOUNDARY_STD,2)))),
 		 NEG_BOUNDARY_NOMIN(2*pow(NEG_BOUNDARY_STD,2)){}
 	};
@@ -90,6 +91,7 @@ inline ostream& operator<<(ostream& os, const LaneProperties& laneProperties)
   os<<"Standard Deviaion 	: "<< laneProperties.STD_WIDTH<<endl;
   os<<"Minimum  Width 	  	: "<< laneProperties.MIN_WIDTH<<endl;
   os<<"Maximum  Width 		: "<< laneProperties.MAX_WIDTH<<endl;
+  os<<"Lane Marking  Width 	: "<< laneProperties.AVG_WIDTH_LM<<endl;
   os<<"****************************"<<endl;
   return os;
 }

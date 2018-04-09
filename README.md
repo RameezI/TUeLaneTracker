@@ -1,8 +1,8 @@
 # TUeLaneTracker
 
-This is a software application that detects and tracks lanes on the road. The underlying algorithm is a probabilistic classifier which is originally develope, under the strategic area of Smart Mobility, at Eindhoven University of Technology (TU/e). The algorithm exploits the concept of hierarchical classification from deep learning, however, unlike deep learning, classification at each hierarchical level is engineered instead of being trained through images. This make it more predictable as well as verifiable. The software application is completely object oriented and follows various software design principles recommended by the safety standard ISO26262. 
+This is a software application that detects and tracks lanes on the road. The underlying algorithm is a probabilistic classifier which is originally develope, under the strategic area of Smart Mobility, at Eindhoven University of Technology (TU/e). The algorithm exploits the concept of hierarchical classification from deep learning, however, unlike deep learning, classification at each hierarchical level is engineered instead of being trained through images. The software application is completely object oriented and follows various software design principles recommended by the safety standard ISO26262. 
 
-This application provide a loose coupling between the software control flow and the algorithm, making it possible to generate various target specific implementations of the algorithm. Current version of the software applicataion is developed in cooperation with NXP Semiconductors. NXP provides a low-poverded, high perfomance embedded platform, named as BlueBox, to  enable highly automated driving. The BlueBox provides various hardware accelrators to speed-up the vision processing. This repository provides only a generic implementation of the algorithm using OpenCV library. However, an accelrated version of the algorithm is also available which make use of the hardware accelrators in the BlueBox.
+This application provide a loose coupling between the software control flow and the algorithm, making it possible to generate various target specific implementations of the algorithm. This software applicataion is developed in cooperation with NXP Semiconductors. An accelrated version of the algorithm is also available for NXP-BlueBox, which makes use of the hardware accelrators in the platform. NXP-BlueBox is an energy efficient and high perfomance embedded platform, designed by NXP to enable highly automated driving. The BlueBox provides various hardware accelrators to speed-up the vision processing. However, this repository provides only a generic implementation of the algorithm using OpenCV library.
 
 
 ## Getting Started
@@ -17,9 +17,15 @@ What things you need to install the software and how to install them
 * OpenCv-3.1.0
 * Boostv-1.62.0
 ```
-[OpenCV Installaion Guide](http://docs.opencv.org/3.1.0/d7/d9f/tutorial_linux_install.html)
+[OpenCV Installation Guide](http://docs.opencv.org/3.1.0/d7/d9f/tutorial_linux_install.html)
+
 [Boost Library Sources](http://www.boost.org/users/history/version_1_62_0.html)
 
+Ubuntu 17.10 Installation:
+```
+sudo apt-get install libboost-dev-all
+```
+[Ubuntu 16.04 Installation Guide](https://askubuntu.com/questions/859333/how-to-install-libboost-version1-59-or-newer-on-ubuntu16-04)
 
 
 ### Build, Install and Run the Application
@@ -101,7 +107,7 @@ Currently, the callibration is parameterized in the corresponding header files. 
 * [OpenCV3.1](http://docs.opencv.org/3.1.0/index.html) - Copmputer vision library
 * [CMake](https://maven.apache.org/) - Dependency management and makefiles generation
 * [Eigen 3.3.3](http://eigen.tuxfamily.org/index.php?title=Main_Page) - Linear Algebra  library
-* [Boost 1.62.0]((http://www.boost.org/users/history/version_1_62_0.html) - Provides Program Options
+* [Boost 1.62.0](http://www.boost.org/users/history/version_1_62_0.html) - Provides Program Options
 
 
 ## Contributing

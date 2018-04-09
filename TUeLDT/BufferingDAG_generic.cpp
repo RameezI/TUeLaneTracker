@@ -95,7 +95,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("EXTRACT_ROI");
 #endif
-
 	 int lRowIndex	= mCAMERA.RES_VH(0) -mSPAN;
 	 int lColIndex;
 	 cv::Rect lROI;
@@ -130,7 +129,6 @@ mProfiler.start("GAUSSIAN_BLUR");
 #endif 
 	
 	 GaussianBlur( mFrameGRAY_ROI, mFrameGRAY_ROI, cv::Size( 5, 5 ), 2, 2, cv::BORDER_REPLICATE | cv::BORDER_ISOLATED  );
-
 
  #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -170,7 +168,6 @@ mProfiler.start("GRADIENT_COMPUTATION");
 	mMask = mGradY ==0;
 	mGradY.setTo(1, mMask);
 			
-							
 	//convert to absolute scale and add weighted absolute gradients 
 	mGradX_abs = abs(mGradX);
 	mGradY_abs = abs(mGradY );
@@ -236,7 +233,6 @@ mProfiler.start("COMPUTE_PROBABILITIES");
 	//Final Probability Map
 	multiply(mBufferPool->Probability[mBufferPos], mProbMap_GradDir, mBufferPool->Probability[mBufferPos]);
 	mBufferPool->Probability[mBufferPos].convertTo(mBufferPool->Probability[mBufferPos], CV_8U, 1.0/255, 0);
-
 
 
 #ifdef PROFILER_ENABLED

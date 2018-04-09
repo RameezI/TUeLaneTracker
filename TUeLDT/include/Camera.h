@@ -41,34 +41,49 @@ public:
 		const cv::Mat	MATRIX_INTRINSIC;		/**<  Camera Intrinsic Parameters 3x3 */
 		const cv::Mat	MATRIX_EXTRINSIC;		/**<  Camera Extrinsic Parameters 4x4 */
 
-		const Vector2i	RES_VH; 	    		/**< Resolution of the camera image */
-		const Vector2f  FOV_VH;				/**< Field-of-View of the camera */
-		const float 	PITCH_ANGLE;			/**< Pitch angle of the camera */
-		const int32_t	HORIZON;			/**< Location of Horizon in Image-Center-CS */
+		const Vector2i	RES_VH; 	    		/**< Resolution of the camera image [pixels]*/
+		const Vector2f 	ROT_PY;				/**< Pitch and Yaw angle of the camera [degrees]*/
+		const Vector2f  FOV_VH;				/**< Field-of-View of the camera [degrees]*/
+		const Vector2i	HORIZON_VH; 	    		/**< Location of Horizon in Image-Center-CS [pixels]*/
 
-		const float 	FOV_HORIZON;			/**< Field-of-View of the road up to the horizon*/
-		const float 	RES_HORIZON;			/**< Vertical resolution of image up to the horizon*/
 
-		const cv::Point O_ICCS_ICS;			/**< Origin of Image-Center-CS in Image-CS*/
-		const cv::Point O_ICS_ICCS;			/**< Origin of Image-CS in Image-Center-CS*/
+		const cv::Point O_ICCS_ICS;			/**< Origin of Image-Center-CS in Image-CS [pixels]*/
+		const cv::Point O_ICS_ICCS;			/**< Origin of Image-CS in Image-Center-CS [pixels]*/
 
 
 		Camera():
 			 NAME (CAMERA_NAME),
-			 MATRIX_INTRINSIC(getCameraMatrix("CAMERA_MATRIX_INTRINSIC")),
-			 MATRIX_EXTRINSIC(getCameraMatrix("CAMERA_MATRIX_EXTRINSIC")), 
-			 RES_VH(getCameraRES("CAMERA_RES")),
+
+			 MATRIX_INTRINSIC(getMatrix("CAMERA_MATRIX_INTRINSIC")),
+
+			 MATRIX_EXTRINSIC(getMatrix("CAMERA_MATRIX_EXTRINSIC")), 
+
+			 RES_VH(getVector2f("CAMERA_RES").cast<int>()),
+
+			 ROT_PY(getVector2f("CAMERA_ROT_PY")),
+
 			 FOV_VH(Vector2f(2*atan( (RES_VH(0)/2.0) / (MATRIX_INTRINSIC.at<float>(1,1)) )*180/M_PI ,
 					 2*atan( (RES_VH(1)/2.0) / (MATRIX_INTRINSIC.at<float>(0,0)) )*180/M_PI )),
+      // From dev branch
+			 HORIZON_VH(Vector2i( round((ROT_PY(0)* RES_VH(0)) / FOV_VH(0) ) ,
+			                      round((ROT_PY(1)* RES_VH(1)) / FOV_VH(1) ) )), 
+      // From Tijs RTMaps Branch
 			 PITCH_ANGLE(atan2(MATRIX_EXTRINSIC.at<float>(1,0),MATRIX_EXTRINSIC.at<float>(0,0)) * 180/M_PI -0.5),
 			 HORIZON( round((PITCH_ANGLE * RES_VH(0)) / FOV_VH(0) ) ),
 			 FOV_HORIZON(FOV_VH(0) / 2 + PITCH_ANGLE),
 			 RES_HORIZON(FOV_HORIZON / FOV_VH(0) * RES_VH(0)),			 
+  
 			 O_ICCS_ICS( cv::Point( RES_VH[1]/2,  RES_VH[0]/2) ), 
+
 			 O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) ){ }
 
+
+
+
+
+
 private:
-	   cv::Mat getCameraMatrix(std::string Mat_name)
+	   cv::Mat getMatrix(std::string Mat_name)
 	   {
 		int lSuccess = 0;
 
@@ -78,7 +93,7 @@ private:
 		string 		lFile, lPath;
 
 		// Read location of Binary
-		char lBuff[65536];
+		char lBuff[65536] = {"\0"};
 		ssize_t lLen = ::readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
 		//ssize_t lLen = ::readlink("/home/vedecom/TUeLaneTracker/install/", lBuff, sizeof(lBuff)-1);
 
@@ -91,14 +106,14 @@ private:
 		}
 		else
 		{
-		  #ifdef PROFILER_ENABLED
-		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		   <<"Unable to find the path to binary"<<endl
-		   <<"[Searching for Camera configuration files]: "<<endl;
-		  #endif
-
-		  std::cout<<"Unable to find the path to binary"<<endl;
-		  throw "Camera Instantiation Failed" ;
+		   #ifdef PROFILER_ENABLED
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
+	    	    <<"******************************"<<endl
+		    <<"Unable to find the path to binary"<<endl
+		    <<"[Searching for Camera configuration files]: "<<endl
+	    	    <<"******************************"<<endl<<endl;
+		   #endif
+		   throw "Camera Instantiation Failed" ;
 		}
 
 		lFormattedString<<lPath<<"/ConfigFiles/Camera/"<<NAME<<".yaml";
@@ -109,57 +124,67 @@ private:
 
 		if ( lSuccess !=0 )
 		{
-		  #ifdef PROFILER_ENABLED
-		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		   <<"Unable to load camera configuration: "<<endl
-		   << "File not found: " << lFile.c_str() << endl;
-		  #endif
-		  std::cout<<"Unable to load camera configuration: "<<endl;
-		  throw "Camera Instantiation Failed" ;
+		   #ifdef PROFILER_ENABLED
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
+	    	    <<"******************************"<<endl
+		    <<"Unable to load camera configuration: "<<endl
+		    << "File not found: " << lFile.c_str() << endl
+	    	    <<"******************************"<<endl<<endl;
+		   #endif
+		   throw "Camera Instantiation Failed" ;
 		}
 		else
 		{
-		  cv::FileStorage loadFile( lFile, cv::FileStorage::READ);
-		  loadFile[Mat_name]>> lCAMERA_MATRIX;
+		  try
+		  {
+		     cv::FileStorage loadFile( lFile, cv::FileStorage::READ);
+		     loadFile[Mat_name]>> lCAMERA_MATRIX;
+		  }
+		  catch(...)
+		  {
+		     #ifdef PROFILER_ENABLED
+		      LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
+	    	      <<"******************************"<<endl
+		      <<"ERROR while reading camera file: "<<endl
+		      << "cannot load required data from: " << lFile.c_str() << endl
+	    	      <<"******************************"<<endl<<endl;
+		     #endif
+		     throw "Camera Instantiation Failed" ;
+		  }
 		}
 
 		return lCAMERA_MATRIX;
 	   }
 
-
-
-	  Vector2i getCameraRES(std::string Mat_name)
+	  Vector2f getVector2f(std::string Mat_name)
 	  {
-
 	     	int 		lSuccess = 0; 
-	     	cv::Size	lRES(0,0);
-
-		
+	     	cv::Mat		lVec(1,2, CV_32FC1);
 
 		stringstream 	lFormattedString;
 		string 		lFile, lPath;
 
 		// Read location of Binary
-		char lBuff[65536];
+		char lBuff[65536] = {"\0"};
 		ssize_t lLen = ::readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
 		//ssize_t lLen = ::readlink("/home/vedecom/TUeLaneTracker/install/", lBuff, sizeof(lBuff)-1);
 
 		if (lLen!=-1)
 		{
-		  lPath = std::string(lBuff);
-		  //std::cout << "Path: " << lPath << endl;
-		  std::string::size_type Idx = lPath.find_last_of("/");
-		  lPath = lPath.substr(0,Idx);
+		   lPath = std::string(lBuff);
+		   std::string::size_type Idx = lPath.find_last_of("/");
+		   lPath = lPath.substr(0,Idx);
 		}
 		else
 		{
-		  #ifdef PROFILER_ENABLED
-		   LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		   <<"Unable to find the path to binary"<<endl
-		   <<"[Searching for Camera configuration files]: "<<endl;
-		  #endif
-		  std::cout<<"Unable to find the path to binary:"<<endl;
-		  throw "Camera Instantiation Failed" ;
+		   #ifdef PROFILER_ENABLED
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
+	    	     <<"******************************"<<endl
+		     <<"Unable to find the path to binary"<<endl
+		     <<"[Searching for Camera configuration files]: "<<endl
+	    	     <<"******************************"<<endl<<endl;
+		   #endif
+		   throw "Camera Instantiation Failed" ;
 		}
 
 		lFormattedString<<lPath<<"/ConfigFiles/Camera/"<<NAME<<".yaml";
@@ -171,21 +196,37 @@ private:
 
 	    	if ( lSuccess != 0 )
 	    	{
-	       	  #ifdef PROFILER_ENABLED
-		  LOG_INFO_(LDTLog::STATE_MACHINE_LOG)
-		  <<"Unable to load camera configuration: "<<endl
-		  << "File not found: " << lFile.c_str() << endl;
-	          #endif
-		  std::cout<<"Unable to load camera configuration: "<<endl;
-		  throw "Camera Instantiation Failed" ;
+	       	   #ifdef PROFILER_ENABLED
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
+	    	    <<"******************************"<<endl
+		    <<"Unable to load camera configuration: "<<endl
+		    << "File not found: " << lFile.c_str() << endl
+	    	    <<"******************************"<<endl<<endl;
+	           #endif
+		   throw "Camera Instantiation Failed" ;
+
 	    	}
 	    	else
 	    	{
-		  cv::FileStorage loadFile( lFile, cv::FileStorage::READ);
-		  loadFile[Mat_name]>> lRES;
+		   try
+		   {
+		      cv::FileStorage loadFile( lFile, cv::FileStorage::READ);
+		      loadFile[Mat_name]>> lVec;
+		   }
+		   catch(...)
+		   {
+		      #ifdef PROFILER_ENABLED
+		       LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
+	    	       <<"******************************"<<endl
+		       <<"ERROR while reading camera file: "<<endl
+		       << "cannot load required data from: " << lFile.c_str() << endl
+	    	       <<"******************************"<<endl<<endl;
+		      #endif
+		      throw "Camera Instantiation Failed" ;
+		   }
 	    	}
 
-	   	return Vector2i(lRES.height, lRES.width);
+	   	return Vector2f(lVec.at<float>(0,0), lVec.at<float>(0,1));
 	 }
 };
 
@@ -198,6 +239,7 @@ inline ostream& operator<<(ostream& os, const Camera& lCamera)
   os<<"Extrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_EXTRINSIC<<endl<<endl;
   os<<"Intrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_INTRINSIC<<endl<<endl;
   os<<"Resolution[VxH]		: "<<"[ "<<lCamera.RES_VH[0]<<" x "<<lCamera.RES_VH[1]<<" ]"<<endl;
+  os<<"Pitch-Yaw[P,Y]		: "<<"[ "<<lCamera.ROT_PY[0]<<" x "<<lCamera.ROT_PY[1]<<" ]"<<endl;
   os<<"Field-of-View [V, H]	: "<<"[ "<<lCamera.FOV_VH[0]<<" , "<<lCamera.FOV_VH[1]<<" ]"<<endl;
   os<<"Origin-ICCS-ICS		: "<<lCamera.O_ICCS_ICS<<endl;
   os<<"Origin-ICS-ICCS		: "<<lCamera.O_ICS_ICCS<<endl;

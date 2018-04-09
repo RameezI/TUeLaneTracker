@@ -37,30 +37,33 @@ ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
      {	
 	if(!Paused.load())
 	{
-          cv::Mat lMat, lMatGRAY;
+           cv::Mat lMat, lMatGRAY;
 
-	  lMat = imread(mFiles[mFrameCount]);
-          cv::cvtColor(lMat,lMatGRAY, cv::COLOR_RGB2GRAY );
+	   lLock.lock(); //protecting mFiles and mFrameCount shared variables.
+	   lMat  	= imread(mFiles[mFrameCount]);
+	   lMatGRAY  	= imread(mFiles[mFrameCount], cv::IMREAD_GRAYSCALE);
+	   lLock.unlock();
 
-	  //Put the frames in the queue for the stateMachine
-          enqueue(lMatGRAY, mProcessQueue);
-          enqueue(lMat,     mDisplayQueue);
+	   //Put the frames in the queue for the stateMachine
+           enqueue(lMatGRAY, mProcessQueue); //Thread-safe method for enqueuing processing Frames
+           enqueue(lMat,     mDisplayQueue); //Thread-safe method for enqueuing display Frmaes
 
-          #ifdef PROFILER_ENABLED
-            LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-            <<"******************************"<<endl
-            <<  "Frame enqueued:"<<endl
-            << (std::string)(mFiles[mFrameCount])<<endl
-	    << mFrameCount<<"/"<<mFiles.size()<<endl
-            <<"******************************"<<endl<<endl;
-	  #endif
+           #ifdef PROFILER_ENABLED
+             LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+             <<"******************************"<<endl
+             <<  "Frame enqueued:"<<endl
+             << (std::string)(mFiles[mFrameCount])<<endl
+	     << mFrameCount<<"/"<<mFiles.size()<<endl
+             <<"******************************"<<endl<<endl;
+	   #endif
 
-          if(mFrameCount+1 < mFiles.size())
+           if(mFrameCount+1 < mFiles.size())
+	   {
             mFrameCount ++;
-	}
+           }
 
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(20));
+ 	 }
+	 std::this_thread::sleep_for(std::chrono::milliseconds(1));
      }
 
   });
@@ -100,10 +103,26 @@ void ImgStoreFeeder::parseSettings(string& srcStr)
 
 ImgStoreFeeder::~ImgStoreFeeder()
 {
+	Stopped.store(true);
+
 	if(mAsyncGrabber.joinable())
 	{
-	  mAsyncGrabber.join();
+	   mAsyncGrabber.join();
+
+   	  #ifdef PROFILER_ENABLED
+     	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+     	    <<  "********************************"<<endl
+    	    <<  "[ImgStoreFeeder is Joined]"<<endl
+     	    <<"******************************"<<endl<<endl;
+  	  #endif
 	}
+
+   	#ifdef PROFILER_ENABLED
+     	 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+     	 <<  "********************************"<<endl
+    	 <<  "[ImgStoreFeeder is Destroyed]"<<endl
+     	 <<"******************************"<<endl<<endl;
+  	#endif
 }
 
 void ImgStoreFeeder::setImageLinker(cv::Mat imgLink)

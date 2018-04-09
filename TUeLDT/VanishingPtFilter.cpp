@@ -20,15 +20,16 @@
 * ****************************************************************************/ 
 
 #include "VanishingPtFilter.h"
+#include "Config.h"
 #include "ScalingFactors.h"
 
 VanishingPtFilter::VanishingPtFilter()
 : 
-  STEP(10),
+  STEP((STEP_VP_FILTER > 0) ? STEP_VP_FILTER : throw "VP filter step-size must be a positive integer"),
   
-  RANGE_V(25), 
+  RANGE_V(VP_RANGE_VER), 
  
-  RANGE_H(300),
+  RANGE_H(VP_RANGE_HOR),
   
   COUNT_BINS_V(floor((2*RANGE_V)/STEP) +1),
   

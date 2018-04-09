@@ -1,5 +1,5 @@
-#ifndef STATEMACHINE_H
-#define STATEMACHINE_H
+#ifndef STATE_MACHINE_H
+#define STATE_MACHINE_H
 
 /******************************************************************************
 * NXP Confidential Proprietary
@@ -61,7 +61,6 @@ private:
 
 public:
 
-	bool	isInitialized();
 	States	getCurrentState();
 	void 	quit();
 	void 	forwardImage(cv::Mat inputImage);

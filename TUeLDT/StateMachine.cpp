@@ -31,6 +31,7 @@
  #include "TrackingLaneDAG_generic.h"
 #endif
 
+
 StateMachine::StateMachine(unique_ptr<FrameFeeder> frameFeeder)
  : mQuitRequest(false),
    mCurrentState(States::BOOTING),
@@ -40,6 +41,7 @@ StateMachine::StateMachine(unique_ptr<FrameFeeder> frameFeeder)
    mPtrVanishingPtFilter(nullptr),
    mPtrTemplates(nullptr)
 {
+
 	#ifdef S32V2XX
 	  int  lSuccess |= OAL_Initialize();
 	  if(lSuccess!=0)
@@ -48,7 +50,16 @@ StateMachine::StateMachine(unique_ptr<FrameFeeder> frameFeeder)
 	#endif
 
 	if (mPtrFrameFeeder == nullptr)
-	     throw "State-Machine is missing an instance of FrameFeeder";
+	  throw "State-Machine is missing an instance of FrameFeeder";
+
+
+	#ifdef PROFILER_ENABLED
+	  Logger::Init();
+	  LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	  <<"******************************"<<endl
+	  << "State-Machine sucessfully Created..."<<endl
+	  <<"******************************"<<endl<<endl;
+	#endif
 }
 
 
@@ -73,7 +84,7 @@ int StateMachine::spin()
 
 	case States::BOOTING :
 	{
-		if (mPtrBufferingState == nullptr)
+		if (mPtrBootingState == nullptr)
 	  	{
 		   mPtrBootingState   = unique_ptr<InitState>(new InitState());
 		}
@@ -85,17 +96,19 @@ int StateMachine::spin()
 		}
 		if (mPtrBootingState->currentStatus == StateStatus::DONE)
 		{				
-		   mCurrentState 	= States::BUFFERING;
-		   
-		   cout<< "Completed!"<<endl;
 
 		   #ifdef PROFILER_ENABLED
 		     LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 		     <<"****************************************"<<endl
+		     << "Booting State Completed"
 		     << "Printing Booting Configuration"<<endl
 		     <<  *(mPtrLaneFilter)<<endl
 		     <<"****************************************"<<endl<<endl;
 		   #endif
+	
+		   mCurrentState 	= States::BUFFERING;	   
+		   cout<< "Completed!"<<endl;
+
 		}
 		else
 		{
@@ -111,9 +124,7 @@ int StateMachine::spin()
 		      mCurrentState 	= States::DISPOSED;
 		      lReturn 		= -1;
 		}
-	}
-	break; //BOOTING PROCESS SCOPE ENDS
-
+	} break; //BOOTING PROCESS SCOPE ENDS
 
 
 	case States::BUFFERING :
@@ -125,19 +136,43 @@ int StateMachine::spin()
 		   #else
 		    mPtrBufferingState.reset(new BufferingState<BufferingDAG_generic>());
 		   #endif
+		   mPtrBootingState = nullptr;
 		}
 		if (mPtrBufferingState->currentStatus == StateStatus::INACTIVE)
 		{
-		      mPtrBufferingState->setupDAG(std::ref(*mPtrTemplates), 5);
+		      mPtrBufferingState->setupDAG(std::ref(*mPtrTemplates), BUFFER_COUNT);
 		      mPtrFrameFeeder->Paused.store(false);
 		}
 		if (mPtrBufferingState->currentStatus == StateStatus::ACTIVE)
 		{
-		    mPtrBufferingState->run(mPtrFrameFeeder->dequeue());
+		   try
+		   {
+		     mPtrBufferingState->run(mPtrFrameFeeder->dequeue());
+		   }
+		   catch(const char* msg)
+		   {
+	   	     #ifdef PROFILER_ENABLED
+	              LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	              <<"******************************"<<endl
+	              << "Exception while Buffering: "<<endl
+	              << msg <<endl
+		      << "Shutting Down the State-Machine."<<endl
+	              <<"******************************"<<endl<<endl;
+	             #endif
+		      mCurrentState 	= States::DISPOSED;
+		      lReturn 		= -1;
+		   }
 		}
 		if( mPtrBufferingState->currentStatus == StateStatus::DONE)
 		{
-		   mCurrentState = States::DETECTING_LANES;
+		   #ifdef PROFILER_ENABLED
+		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+		    <<"******************************"<<endl
+		    << "[Buffering State Completed]"<<endl
+		    <<"******************************"<<endl<<endl;
+		   #endif
+
+		   mCurrentState = States::DETECTING_LANES; 
 		   cout<<"Completed!"<<endl;
 		}
 		if( mPtrBufferingState->currentStatus == StateStatus::ERROR)
@@ -153,8 +188,7 @@ int StateMachine::spin()
 		   mCurrentState 	= States::DISPOSED;
 		   lReturn 	        = -1;
 		}
-	}
-	break; // BUFFERING PROCESS SCOPE ENDS
+	} break; // BUFFERING PROCESS SCOPE ENDS
 
 
 	case States::DETECTING_LANES :
@@ -171,14 +205,30 @@ int StateMachine::spin()
 		if (mPtrTrackingState->currentStatus == StateStatus::INACTIVE)
 		{
 		   mPtrTrackingState->setupDAG(mPtrLaneFilter.get(), mPtrVanishingPtFilter.get());
-		   mPtrFrameRenderer.reset(new FrameRenderer(mPtrTemplates->HORIZON_ICCS, *mPtrLaneFilter));
+		   mPtrFrameRenderer.reset(new FrameRenderer(*mPtrLaneFilter));
 		}
 		if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
 		{
-		   mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
+		  try
+		  {
+		    mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
 		   mDisplayFrame = mPtrFrameFeeder->dequeueDisplay();
-		   mPtrFrameRenderer->drawLane(mDisplayFrame, mLaneModel);
-		   
+		    mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
+		  }
+		  catch(const char* msg)
+		  {
+
+	   	     #ifdef PROFILER_ENABLED
+	              LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	              <<"******************************"<<endl
+	              << "Exception while Tracking: "<<endl
+	              << msg <<endl
+		      << "Shutting Down the State-Machine."<<endl
+	              <<"******************************"<<endl<<endl;
+	             #endif
+		      mCurrentState 	= States::DISPOSED;
+		      lReturn 		= -1;
+		  }
 		}
 		if( (mPtrTrackingState->currentStatus == StateStatus::DONE) )
 		{
@@ -199,24 +249,20 @@ int StateMachine::spin()
 		}
 
 
-	}
-	break; // TRACKING STATE SCOPE ENDS
+	} break; // TRACKING STATE SCOPE ENDS 
 	
 
-	case States::DISPOSED:
+	case States::DISPOSED :
 	{
-		#ifdef S32V2XX
-		 OAL_Deinitialize();
-		#endif
+	        #ifdef PROFILER_ENABLED
+	    	 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	    	 <<  "********************************"<<endl
+	     	 <<  "[STATE MACHINE IS IN DISPOSED STATE]"<<endl
+	    	 <<  "Waiting for destruction..."<<endl
+	    	 <<"******************************"<<endl<<endl;
+	        #endif
 
-		#ifdef PROFILER_ENABLED
-		 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		 << "State Machine is Disposed"<< endl;
-		#endif
-
-		cout<<endl<<"State Machine Ended with return code: "<< lReturn <<endl;
-	}
-	break; } // END SWITCH
+	} break; } // END SWITCH
 
 	return lReturn;
 
@@ -233,9 +279,23 @@ States StateMachine::getCurrentState()
 	return mCurrentState;
 }
 
+
 StateMachine::~StateMachine()
 {
-	
+
+   mPtrFrameFeeder.reset(nullptr);
+
+   #ifdef S32V2XX
+    OAL_Deinitialize();
+   #endif
+
+   #ifdef PROFILER_ENABLED
+     LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+     <<  "********************************"<<endl
+     <<  "[State-Machine Distroyed]"<<endl
+     <<"******************************"<<endl<<endl;
+   #endif
+
 }
 
 void StateMachine::forwardImage(cv::Mat inputImage)

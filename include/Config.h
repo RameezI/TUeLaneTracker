@@ -23,22 +23,30 @@
 * ****************************************************************************/
 
 
- #define PROFILER_ENABLED 	/**< If program is compiled with this defined, the program logs and profiles its execution*/
- #define DISPLAY_GRAPHICS 	/**< If program is compiled with this degined, the program renders the results on to a selected display */  
+#define PROFILER_ENABLED 	/**< If program is compiled with this defined, the program logs and profiles its execution*/
+#define DISPLAY_GRAPHICS 	/**< If program is compiled with this degined, the program renders the results on to a selected display */  
 
 //#define DISPLAY_GRAPHICS_DCU /**< Define this when the graphics need to be rendered on the s32v23 DCU*/
 #define TEST_APEX_CODE	       /**< S32V234 test specific flags */
 
 /** Provide target camera and resolution [Required for loading corresponding callibration file] */
+
 //#define CAMERA_NAME "BUMBLEBEE_640x480"
 #define CAMERA_NAME "BUMBLEBEE_960x600"
 
-//^TODO: Move it to sourceString
-#define SKIP_FRAMES 0 			//Skip frames in case of directory input
+// Confifure FrameFeeder
 
-//Configuration for LaneFilter
-#define BASE_LINE_IBCS		0      /*< Describes base line in Image-Bottom-Coordinate-System */
-#define PURVIEW_LINE_IBCS	200    /*< Describes purview line in Image-Bottom-Coordinate-System */
+//Configuration for Algorithm
+#define BASE_LINE_IBCS		0     /**< Describes base line in Image-Bottom-Coordinate-System */
+#define PURVIEW_LINE_IBCS	150   /**< Describes purview line in Image-Bottom-Coordinate-System */
+
+#define STEP_LANE_FILTER_CM	5    /**< Provide bin-size for the 1D lane filters (At base and purview lines) [cm]*/
+#define STEP_VP_FILTER		10    /**< Provide bin-size for 2D vanishing point filter [pixels]*/
+
+#define VP_RANGE_VER		25    /**< Vertical range of VP on either side of the Horizon Line [pixels] */
+#define VP_RANGE_HOR		300   /**< Horizental range of VP on either side of center point on the horizon line [pixels] */
+
+#define BUFFER_COUNT		5     /**<  Provide number of probabiltiy frames to buffer for Max-Pooling operations [Temporal Filtering]*/
 
 #endif
 
