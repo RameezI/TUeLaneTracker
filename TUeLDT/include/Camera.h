@@ -64,10 +64,15 @@ public:
 
 			 FOV_VH(Vector2f(2*atan( (RES_VH(0)/2.0) / (MATRIX_INTRINSIC.at<float>(1,1)) )*180/M_PI ,
 					 2*atan( (RES_VH(1)/2.0) / (MATRIX_INTRINSIC.at<float>(0,0)) )*180/M_PI )),
-
+      // From dev branch
 			 HORIZON_VH(Vector2i( round((ROT_PY(0)* RES_VH(0)) / FOV_VH(0) ) ,
-			                      round((ROT_PY(1)* RES_VH(1)) / FOV_VH(1) ) )),
-
+			                      round((ROT_PY(1)* RES_VH(1)) / FOV_VH(1) ) )), 
+      // From Tijs RTMaps Branch
+			 PITCH_ANGLE(atan2(MATRIX_EXTRINSIC.at<float>(1,0),MATRIX_EXTRINSIC.at<float>(0,0)) * 180/M_PI -0.5),
+			 HORIZON( round((PITCH_ANGLE * RES_VH(0)) / FOV_VH(0) ) ),
+			 FOV_HORIZON(FOV_VH(0) / 2 + PITCH_ANGLE),
+			 RES_HORIZON(FOV_HORIZON / FOV_VH(0) * RES_VH(0)),			 
+  
 			 O_ICCS_ICS( cv::Point( RES_VH[1]/2,  RES_VH[0]/2) ), 
 
 			 O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) ){ }
@@ -90,10 +95,12 @@ private:
 		// Read location of Binary
 		char lBuff[65536] = {"\0"};
 		ssize_t lLen = ::readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
+		//ssize_t lLen = ::readlink("/home/vedecom/TUeLaneTracker/install/", lBuff, sizeof(lBuff)-1);
 
 		if (lLen!=-1)
 		{
 		  lPath = std::string(lBuff);
+		  //std::cout << "Path: " << lPath << endl;
 		  std::string::size_type Idx = lPath.find_last_of("/");
 		  lPath = lPath.substr(0,Idx);
 		}
@@ -160,6 +167,7 @@ private:
 		// Read location of Binary
 		char lBuff[65536] = {"\0"};
 		ssize_t lLen = ::readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
+		//ssize_t lLen = ::readlink("/home/vedecom/TUeLaneTracker/install/", lBuff, sizeof(lBuff)-1);
 
 		if (lLen!=-1)
 		{
@@ -196,6 +204,7 @@ private:
 	    	    <<"******************************"<<endl<<endl;
 	           #endif
 		   throw "Camera Instantiation Failed" ;
+
 	    	}
 	    	else
 	    	{

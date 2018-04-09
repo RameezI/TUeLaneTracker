@@ -29,7 +29,7 @@
 
 enum States{BOOTING, BUFFERING, DETECTING_LANES, DISPOSED };
 enum StateStatus {DONE, ACTIVE, INACTIVE, ERROR };
-enum FrameSource {DIRECTORY, STREAM, GMSL};
+enum FrameSource {DIRECTORY, STREAM, GMSL, RTMAPS};
 
 inline std::ostream& operator<<(std::ostream& out, const States& state)
 {

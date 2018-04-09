@@ -12,6 +12,7 @@ set(CMAKE_INSTALL_PREFIX ${TUeLaneTracker_SOURCE_DIR})
 add_subdirectory (TUeLDT ${TUeLaneTracker_SOURCE_DIR}/TUeLDT/build)
 add_subdirectory (LaneTrackerApp ${TUeLaneTracker_SOURCE_DIR}/LaneTrackerApp/build)
 add_subdirectory (CameraCalibrator ${TUeLaneTracker_SOURCE_DIR}/CameraCalibrator/build)
+add_subdirectory (RTMapsApp ${TUeLaneTracker_SOURCE_DIR}/RTMapsApp/build)
 
 install(DIRECTORY ${TUeLaneTracker_SOURCE_DIR}/Templates DESTINATION install/ConfigFiles) 
 

@@ -56,6 +56,7 @@ unique_ptr<LaneFilter> InitState::createLaneFilter()
 	   lLaneFilter.reset(nullptr);				
 	   mLaneFilterCreated = false;
 	   currentStatus= StateStatus::ERROR;
+	   std::cout << msg << endl;
 	}
 	return lLaneFilter;	
 }
@@ -93,6 +94,7 @@ unique_ptr<VanishingPtFilter> InitState::createVanishingPtFilter()
 	  lVanishingPtFilter.reset(nullptr);
 	  mVpFilterCreated	= false;
 	  currentStatus		= StateStatus::ERROR;
+	   std::cout << msg << endl;
 	}
 
 	return lVanishingPtFilter; 	
@@ -134,6 +136,7 @@ unique_ptr<Templates> InitState::createTemplates()
 	   lTemplates.reset(nullptr);
 	   mTemplatesCreated	= false;
 	   currentStatus	= StateStatus::ERROR;
+	   std::cout << msg << endl;
 	}
 
 	return lTemplates;

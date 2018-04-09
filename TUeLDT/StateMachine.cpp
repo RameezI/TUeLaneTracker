@@ -119,6 +119,7 @@ int StateMachine::spin()
 	       	     <<  "Shutting Down the State-Machine."<<endl
 	       	     <<"****************************************"<<endl<<endl;
 	      	   #endif
+				 std::cout << "[Failed to Complete the Booting Process]"<<endl;
 			
 		      mCurrentState 	= States::DISPOSED;
 		      lReturn 		= -1;
@@ -211,6 +212,7 @@ int StateMachine::spin()
 		  try
 		  {
 		    mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
+		   mDisplayFrame = mPtrFrameFeeder->dequeueDisplay();
 		    mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
 		  }
 		  catch(const char* msg)
@@ -293,5 +295,53 @@ StateMachine::~StateMachine()
      <<  "[State-Machine Distroyed]"<<endl
      <<"******************************"<<endl<<endl;
    #endif
+
+}
+
+void StateMachine::forwardImage(cv::Mat inputImage)
+{
+	mPtrFrameFeeder->setImageLinker(inputImage);
+}
+
+cv::Mat StateMachine::getCurrentFrame()
+{
+	cv::Mat frameout;
+	if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
+	{
+		   frameout = mDisplayFrame;
+		   //frameout = mPtrFrameRenderer->getLaneFrame(mPtrFrameRenderer->getDirectionalParameters());
+	}
+	else
+	{	
+			 frameout = cv::Mat(600,960,CV_8UC3,Scalar(0,0,0));
+	}
+	return frameout;
+
+}
+cv::Mat StateMachine::getTopDownFrame()
+{
+	cv::Mat frameout;
+	if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
+	{
+		   //frameout = mDisplayFrame;
+		   frameout = mPtrFrameRenderer->getLaneFrame(mPtrFrameRenderer->getDirectionalParameters());
+	}
+	else
+	{	
+			 frameout = cv::Mat(600,960,CV_8UC3,Scalar(0,0,0));
+	}
+	return frameout;
+
+}
+
+vector<float> StateMachine::getDirectionalParams()
+{
+	vector<float> paramsOut;
+	if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
+	{
+		   //frameout = mDisplayFrame;
+		   paramsOut = mPtrFrameRenderer->getDirectionalParameters();
+	}
+	return paramsOut;
 
 }

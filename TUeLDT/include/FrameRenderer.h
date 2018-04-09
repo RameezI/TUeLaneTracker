@@ -41,6 +41,15 @@ private:
    const size_t		mCOUNT_BINS;
    const int      	mHORIZON_V;
 
+   private:
+
+    vector<Point> lBoundaryPts_L;
+    vector<Point> lBoundaryPts_R;
+    vector<Point> lBoundaryPts_M;
+    float lSlopeLeft;
+    float lSlopeRight;
+    cv::Mat mMatCurrent;
+
 public:
    FrameRenderer(const LaneFilter& LANE_FLTR)
    : 
@@ -52,9 +61,12 @@ public:
      mCOUNT_BINS(mBASE_BINS.rows),
      mHORIZON_V(LANE_FLTR.CAMERA.HORIZON_VH(0))
    {
-
+       
    }
    void drawLane(const cv::Mat& FRAME, const LaneModel& Lane);
+   vector<float> getDirectionalParameters();
+   cv::Mat getCurrentFrame();
+   cv::Mat getLaneFrame(vector<float> dirParams);
 };
 
 

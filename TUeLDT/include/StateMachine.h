@@ -46,6 +46,7 @@ private:
 	unique_ptr<VanishingPtFilter>  		mPtrVanishingPtFilter;
 	unique_ptr<Templates> 			mPtrTemplates;
 	LaneModel				mLaneModel;
+	cv::Mat mDisplayFrame;
 
 
 	#ifdef S32V2XX
@@ -62,6 +63,11 @@ public:
 
 	States	getCurrentState();
 	void 	quit();
+	void 	forwardImage(cv::Mat inputImage);
+	//cv::Mat getCurrentFrame(){std::cout<<"grabbingframewithstatemachine"<<endl;return mPtrFrameRenderer->getCurrentFrame();};
+	cv::Mat getCurrentFrame();
+	cv::Mat getTopDownFrame();
+	vector<float> getDirectionalParams();
 
 	StateMachine(unique_ptr<FrameFeeder> frameFeeder);
 	int spin();

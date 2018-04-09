@@ -30,7 +30,9 @@
 #define TEST_APEX_CODE	       /**< S32V234 test specific flags */
 
 /** Provide target camera and resolution [Required for loading corresponding callibration file] */
-#define CAMERA_NAME "BUMBLEBEE_640x480"
+
+//#define CAMERA_NAME "BUMBLEBEE_640x480"
+#define CAMERA_NAME "BUMBLEBEE_960x600"
 
 // Confifure FrameFeeder
 
@@ -45,7 +47,6 @@
 #define VP_RANGE_HOR		300   /**< Horizental range of VP on either side of center point on the horizon line [pixels] */
 
 #define BUFFER_COUNT		5     /**<  Provide number of probabiltiy frames to buffer for Max-Pooling operations [Temporal Filtering]*/
-
 
 #endif
 

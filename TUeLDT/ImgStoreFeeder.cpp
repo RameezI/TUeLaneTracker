@@ -25,7 +25,7 @@ ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
   mSkipFrames(0),
   mFrameCount(0)
 {
-
+    std::cout << "Creating ImgStoreFeeder" << endl;
    parseSettings(sourceStr);
   
    mAsyncGrabber = std::thread([this]
@@ -123,4 +123,11 @@ ImgStoreFeeder::~ImgStoreFeeder()
     	 <<  "[ImgStoreFeeder is Destroyed]"<<endl
      	 <<"******************************"<<endl<<endl;
   	#endif
+}
+
+void ImgStoreFeeder::setImageLinker(cv::Mat imgLink)
+{
+    if (imgLink.empty()){
+      std::cout << "Pointer is not supported for ImgStore" << endl;
+    }
 }

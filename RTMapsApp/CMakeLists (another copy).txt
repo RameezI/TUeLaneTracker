@@ -1,0 +1,151 @@
+cmake_minimum_required(VERSION 2.8.12)
+
+# USAGE
+#
+# 1. Windows and Linux: CLion / QtCreator / KDevelop / Visual Studio Code
+#     * These IDEs natively support CMake-based projects on Windows and Linux
+#     * Simply open this folder in the IDE
+#     * Use the IDE's interface to add a CMake cache variable named RTMAPS_SDKDIR
+#     * that contains the path to the RTMaps installation directory
+#     * On Windows, configure the IDE to use Visual C++ (MSVC) as the compiler
+#
+# 2. Windows: Visual Studio
+#     1. Configuring the project: Open a command prompt in your project's directory then:
+#         mkdir build
+#         cd build
+#         cmake -G"<generator name>" [ -D"RTMAPS_SDKDIR=<RTMaps Install Dir>" ] ..
+#         * <generator name>
+#             A supported Visual Studio-based generator (e.g. "Visual Studio 14 2015 Win64")
+#             Use "cmake --help" to get the list of valid generators
+#         * <RTMaps Install Dir>
+#             Path to the RTMaps installation directory (e.g. "C:/Program Files/Intempora/RTMaps 4")
+#             If this argument is not specified, the value of the RTMAPS_SDKDIR "environment variable" will be used
+#
+#     2. Compiling the project:
+#         1. Either using the Visual Studio IDE:
+#             Simply open the generated .sln file in the Visual Studio IDE
+#         1. Or using the command line:
+#             cmake --build . [ --config (Release|Debug|RelWithDebInfo) ] [ --target <target name> ]
+#             * <target name>
+#                 Name of the package's CMake target name
+#
+# 3. Linux: Command Line
+#     1. Configuring the project: Open a shell in your project's directory then:
+#         mkdir build
+#         cd build
+#         cmake [ -D"RTMAPS_SDKDIR=<RTMaps install dir>" ] [ -DCMAKE_BUILD_TYPE=(Release|Debug|RelWithDebInfo) ] ..
+#         * <RTMaps Install Dir>
+#             Path to the RTMaps installation directory (e.g. "/opt/rtmaps")
+#             If this argument is not specified, the value of the RTMAPS_SDKDIR "environment variable" will be used
+#
+#     2. Compiling the project using the command line
+#         cmake --build . [ --config (Release|Debug|RelWithDebInfo) ] [ --target <target name> ]
+#         * <target name>
+#             Name of the package's target name in the CMakeLists.txt file
+
+# Package Name
+set(PCK maketestpkg)
+project("${PCK}.u")
+
+SET(CMAKE_CXX_FLAGS 	"${CMAKE_CXX_FLAGS} -g -Wall -O0 -std=c++11")
+
+# IMPORTANT: Set the RTMaps SDK directory (i.e. path the RTMaps install directory). There are 3 methods for doing so:
+# * Pass -D"RTMAPS_SDKDIR=<RTMaps Install Dir>" to the "cmake" command
+# * Define an environment variable called "RTMAPS_SDKDIR"
+# * Call set(RTMAPS_SDKDIR "<RTMaps Install Dir>") in this file
+# For all methods, make sure that the path uses FORWARD SLASHES "/" as a directory separator
+if (NOT DEFINED RTMAPS_SDKDIR)
+    if (DEFINED ENV{RTMAPS_SDKDIR})
+        set(RTMAPS_SDKDIR "$ENV{RTMAPS_SDKDIR}" CACHE PATH "")  # Use the default RTMaps installation
+    else()
+        message(FATAL_ERROR "RTMAPS_SDKDIR not defined. Either pass -D\"RTMAPS_SDKDIR=...\" to CMake or define an RTMAPS_SDKDIR environment variable")
+    endif()
+endif()
+
+# IMPORTANT: Include the RTMaps CMake configuration file
+include("${RTMAPS_SDKDIR}/templates.u/rtmaps.cmake")
+
+# OPTIONAL: Search for third-party libraries that are "natively" supported by CMake
+# * https://cmake.org/Wiki/CMake:How_To_Find_Libraries
+# * https://cmake.org/cmake/help/v3.0/command/find_package.html
+#
+#     # Example 1: Boost http://www.boost.org/
+#     set(BOOST_ROOT "path/to/boost")  # OPTIONAL: force CMake to search for Boost in that directory
+#     find_package(Boost REQUIRED)
+#
+#     # Example 2: OpenCV
+#     find_package(OpenCV 3.3.0 REQUIRED PATHS "path/to/OpenCVConfig.cmake/directory")  # OPTIONAL: require version 3.3.0 and specify the DIRECTORY of OpenCVConfig.cmake
+
+# OPTIONAL: Import third-party libraries that do not provide CMake configuration files
+# * https://cmake.org/Wiki/CMake/Tutorials/Exporting_and_Importing_Targets
+# * https://cmake.org/cmake/help/latest/command/add_library.html
+#
+#     # Example 1: A STATIC library called "foo"
+#     add_library(foo STATIC IMPORTED)
+#     set(foo_INCLUDE_DIR "path/to/foo/include")
+#     if (MSVC)
+#         set_property(TARGET foo PROPERTY IMPORTED_LOCATION "path/to/foo.lib")
+#     else()
+#         set_property(TARGET foo PROPERTY IMPORTED_LOCATION "path/to/libfoo.a")
+#     endif()
+#
+#     # Example 2: A SHARED library called "bar"
+#     add_library(bar SHARED IMPORTED)
+#     set(bar_INCLUDE_DIR "path/to/bar/include")
+#     if (MSVC)
+#         set_property(TARGET bar PROPERTY IMPORTED_LOCATION "path/to/bar.dll")
+#         set_property(TARGET bar PROPERTY IMPORTED_IMPLIB   "path/to/bar.lib")
+#     else()
+#         set_property(TARGET bar PROPERTY IMPORTED_LOCATION "path/to/libbar.so")
+#     endif()
+
+# Create the pck target
+# The following folders will be automatically added to the list of include directories
+# * local_interfaces, protected_interfaces and public_interfaces
+
+add_rtmaps_package(${PCK} PCKINFO "${PCK}.pckinfo"
+    # add sources, headers and/or directories
+    # NB: if you add and/or remove files to a directory, you must re-generate the CMake project
+
+    "local_interfaces"                    # NB: if you add and/or remove files to a directory, you must re-generate the CMake project
+    "src"                                 # NB: if you add and/or remove files to a directory, you must re-generate the CMake project
+	"TUeLaneTracker/3rdPartyLibs"
+	"TUeLaneTracker/3rdPartyLibs/eigen3/Eigen"
+	"TUeLaneTracker/3rdPartyLibs/gtest"
+	"TUeLaneTracker/include"
+	"TUeLaneTracker/TUeLDT"
+	"TUeLaneTracker/Templates"
+    # other examples
+    # "src_generated/some_file.hpp"
+    # "src_generated/another_file.cpp"
+    # "../external_directory"             # NB: if you add and/or remove files to a directory, you must re-generate the CMake project
+)
+
+# OPTIONAL: Set the version of the C++ standard to use (e.g. C++11)
+# set_target_properties(${PCK} PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
+
+# OPTIONAL: Use third-party libraries
+#
+#     # Example: Using multiple libraries
+#     target_include_directories(${PCK} PRIVATE
+#         "${Boost_INCLUDE_DIR}"
+#         ${OpenCV_INCLUDE_DIRS}
+#         "${foo_INCLUDE_DIR}"
+#         "${bar_INCLUDE_DIR}"
+#     )
+#     target_link_libraries(${PCK}
+#         ${Boost_LIBRARIES}
+#         ${OpenCV_LIBS}
+#         foo
+#         bar
+#     )
+
+# HIGHLY RECOMMENDED: Append useful compiler flags
+if (MSVC)
+    # MSVC https://msdn.microsoft.com/en-us/library/thxezb7y.aspx
+    target_compile_options(${PCK} PRIVATE /W4 /WX)
+else()
+    # Gcc   https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
+    # Clang http://clang.llvm.org/docs/UsersManual.html
+    target_compile_options(${PCK} PRIVATE -fdiagnostics-show-option -Wall -Wextra -pedantic -Werror)
+endif()

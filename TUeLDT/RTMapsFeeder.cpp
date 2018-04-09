@@ -1,4 +1,3 @@
-
 /******************************************************************************
 * NXP Confidential Proprietary
 * 
@@ -19,37 +18,55 @@
 * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
+#include "FrameFeeder.h"
 
-
-#include "SigInit.h"
-
-
-SigStatus SigInit::sStatus= SigStatus::INIT;
-
-SigInit::SigInit() 
+RTMapsFeeder::RTMapsFeeder(string sourceStr)
+: mFolder(""),
+  mSkipFrames(0),
+  mFrameCount(0)
 {
-	 // prepare internal signal handler
-  struct sigaction lSa;
-  memset(&lSa, 0, sizeof(lSa));
-  lSa.sa_handler = handler;
-  
-  if( sigaction(SIGINT, &lSa, NULL) != 0)
-  {
-	#ifdef PROFILER_ENABLED   
-    VDB_LOG_ERROR("Failed to register signal handler.\n");
-	#endif
-	sStatus= SigStatus::FAILURE;
-  } // if signal not registered
-	
-}
-SigInit::~SigInit()
-{
-	sStatus = SigStatus::INIT;
-	
+    parseSettings(sourceStr);
 }
 
-void SigInit::handler(int aSigNo)
+
+void RTMapsFeeder::parseSettings(string& srcStr)
 {
-  if (aSigNo == aSigNo)
-  sStatus = SigStatus::STOP;
-} 
+    if (srcStr != "")
+        std::cout << "RTMaps does not require parseSettings" << endl;
+}
+
+RTMapsFeeder::~RTMapsFeeder()
+{
+
+}
+
+
+void RTMapsFeeder::setImageLinker(cv::Mat imgLink)
+{
+    mImgCurrent = imgLink;
+    //ptrImgInput = imgLink;
+    //std::cout<<"Image linked!"<<endl;
+}
+
+cv::Mat RTMapsFeeder::dequeue()
+{
+    //std::cout <<" Dequeue gray" << endl;
+    cv::Mat gray;
+    cv::cvtColor(mImgCurrent,gray, cv::COLOR_RGB2GRAY);
+    //cv::cvtColor(*ptrImgInput,gray, cv::COLOR_RGB2GRAY);
+    return gray;
+}
+
+cv::Mat RTMapsFeeder::dequeueDisplay()
+{
+    //std::cout<<"dequeue disp" <<endl;
+    //imshow("dequeue",mImgCurrent);
+    return  mImgCurrent; // *ptrImgInput;//
+}
+
+void RTMapsFeeder::enqueue(cv::Mat& frame, vector<cv::Mat>& queue)
+{
+    std::cout<<"enqueue"<<endl;
+    if (false)
+        queue.push_back(frame);
+}
