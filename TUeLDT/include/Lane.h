@@ -76,7 +76,7 @@ struct LaneMembership
 		 WIDTH_DIFF_NORMA( (1/sqrt( 2*M_PI*pow(WIDTH_STD,2) )) ),
 		 WIDTH_DIFF_NOMIN( 2*pow(WIDTH_STD,2) ),
 		 
-		 NEG_BOUNDARY_STD(0.1),
+		 NEG_BOUNDARY_STD(0.2),
 		 NEG_BOUNDARY_NORMA( (2/sqrt(2*M_PI*pow(NEG_BOUNDARY_STD,2)))),
 		 NEG_BOUNDARY_NOMIN(2*pow(NEG_BOUNDARY_STD,2)){}
 	};
