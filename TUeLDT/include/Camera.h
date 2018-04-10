@@ -73,7 +73,7 @@ public:
 			 HORIZON_VH(Vector2i( round((ROT_PY(0)* RES_VH(0)) / FOV_VH(0) ) ,
 			                      round((ROT_PY(1)* RES_VH(1)) / FOV_VH(1) ) )), 
       // From Tijs RTMaps Branch
-			 PITCH_ANGLE(atan2(MATRIX_EXTRINSIC.at<float>(1,0),MATRIX_EXTRINSIC.at<float>(0,0)) * 180/M_PI -0.5),
+			 PITCH_ANGLE(round(ROT_PY(0))), //atan2(MATRIX_EXTRINSIC.at<float>(1,0),MATRIX_EXTRINSIC.at<float>(0,0)) * 180/M_PI -0.5),
 			 HORIZON( round((PITCH_ANGLE * RES_VH(0)) / FOV_VH(0) ) ),
 			 FOV_HORIZON(FOV_VH(0) / 2 + PITCH_ANGLE),
 			 RES_HORIZON(FOV_HORIZON / FOV_VH(0) * RES_VH(0)),			 

@@ -39,6 +39,7 @@ private :
 		bool  mVpFilterCreated;
 		bool  mTemplatesCreated;
         	bool  checkCreationStatus();
+		LaneProperties		mLane;
 		
 public	:
 		/* These methods create instances and also keep record of the already created objects
@@ -57,6 +58,8 @@ public	:
 		}
 
 	   	~InitState() {}
+
+		void setLaneProperties(vector<int> newLaneParams);
 };
 
 

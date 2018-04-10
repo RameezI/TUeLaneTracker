@@ -88,6 +88,9 @@ int main(int argc, char* argv[]) /**
 
 	  StateMachine stateMachine(move(lPtrFeeder));
 
+		//vector<int> newLaneParams = {300,50,250,500,30};
+		stateMachine.setLaneParameters({350,50,250,500,30});
+
 	  cout<<stateMachine.getCurrentState();
 	  States lPreviousState = stateMachine.getCurrentState();
 
@@ -97,6 +100,8 @@ int main(int argc, char* argv[]) /**
 		stateMachine.quit();
 
 		lReturn = stateMachine.spin();
+		if (lCyclesCount > 10)
+			imshow("output",stateMachine.getCurrentFrame());
 		lCyclesCount ++;
 		
 		if(lPreviousState != stateMachine.getCurrentState())

@@ -29,17 +29,17 @@ using namespace std;
 struct LaneProperties
 {
 
-friend ostream& operator<<(ostream& os, const LaneProperties& laneProperties);
+friend ostream& operator<<(ostream& os, LaneProperties& laneProperties);
 
 public:
-	const float AVG_WIDTH;		/**< Average with of a Lane [cm] */
-	const float STD_WIDTH;		/**< Standard deviation in Lane width [cm] */
-	const float MIN_WIDTH;		/**< Minimum width of a Lane [cm] */
-	const float MAX_WIDTH;  	/*< Maximum width of a Lane [cm] */
-	const float AVG_WIDTH_LM;  	/**< Average Width of the Lane Markings on the lane */
+	float AVG_WIDTH;		/**< Average with of a Lane [cm] */
+	float STD_WIDTH;		/**< Standard deviation in Lane width [cm] */
+	float MIN_WIDTH;		/**< Minimum width of a Lane [cm] */
+	float MAX_WIDTH;  	/*< Maximum width of a Lane [cm] */
+	float AVG_WIDTH_LM;  	/**< Average Width of the Lane Markings on the lane */
 	
 	LaneProperties() //Lane Widths in cm
-	: AVG_WIDTH(300),STD_WIDTH(50),MIN_WIDTH(250),MAX_WIDTH(500), AVG_WIDTH_LM(30){}
+	: AVG_WIDTH(300),STD_WIDTH(50),MIN_WIDTH(300),MAX_WIDTH(500), AVG_WIDTH_LM(30){}
 };
 
 

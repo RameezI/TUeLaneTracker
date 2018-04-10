@@ -120,14 +120,15 @@ vector<float> FrameRenderer::getDirectionalParameters(){
     float b2; //Distance to left lane
     Camera mCAM;
     UnitConversion mUnit;
-
-    float center = mUnit.getPixToCm(lBoundaryPts_M[0].y - mCAM.RES_VH(0)/2,mCAM) * mCAM.RES_VH(1) / 2 + mCAM.MATRIX_EXTRINSIC.at<float>(0,3) * 100; //Take from x translation from extrinsic matrix
+  
+    float yc_cm = mUnit.getPixToCm(lBoundaryPts_M[0].y - mCAM.RES_VH(0)/2,mCAM);
+    float center = yc_cm * mCAM.RES_VH(1) / 2 + mCAM.MATRIX_EXTRINSIC.at<float>(0,3) * 100; //Take from x translation from extrinsic matrix
     b1 =  lBoundaryPts_R[0].x * mUnit.getPixToCm(lBoundaryPts_R[0].y - mCAM.RES_VH(0)/2,mCAM) - center;
     b2 = -lBoundaryPts_L[0].x * mUnit.getPixToCm(lBoundaryPts_L[0].y - mCAM.RES_VH(0)/2,mCAM) + center;
 
 
     float aligned = (mUnit.getDistance(lBoundaryPts_M[1].y- mCAM.RES_VH(0)/2,mCAM) - mUnit.getDistance(lBoundaryPts_M[0].y- mCAM.RES_VH(0)/2,mCAM));
-    float opposite = (lBoundaryPts_M[1].x-lBoundaryPts_M[0].x) * mUnit.getPixToCm(lBoundaryPts_M[0].y- mCAM.RES_VH(0)/2,mCAM);
+    float opposite = (lBoundaryPts_M[1].x-lBoundaryPts_M[0].x) * yc_cm;
 
     if (opposite != 0 && aligned != 0){
       a = -atan(opposite/aligned) * 180 / M_PI;
@@ -149,7 +150,6 @@ vector<float> FrameRenderer::getDirectionalParameters(){
 
 cv::Mat FrameRenderer::getCurrentFrame()
 {
-  std::cout<<"grabbingframeatframerenderer"<<endl;
   return mMatCurrent;
 }
 

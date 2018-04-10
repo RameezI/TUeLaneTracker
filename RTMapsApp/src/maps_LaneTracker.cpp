@@ -29,7 +29,11 @@ MAPS_END_OUTPUTS_DEFINITION
 
 // Use the macros to declare the properties
 MAPS_BEGIN_PROPERTIES_DEFINITION(MAPSLaneTracker)
-    //MAPS_PROPERTY("pName",128,false,false)
+    MAPS_PROPERTY("AVG_WIDTH",300,false,false)
+    MAPS_PROPERTY("STD_WIDTH",50,false,false)
+    MAPS_PROPERTY("MIN_WIDTH",250,false,false)
+    MAPS_PROPERTY("MAX_WIDTH",500,false,false)
+    MAPS_PROPERTY("AVG_WIDTH_LM",30,false,false)
 MAPS_END_PROPERTIES_DEFINITION
 
 // Use the macros to declare the actions
@@ -42,7 +46,7 @@ MAPS_COMPONENT_DEFINITION(MAPSLaneTracker,"LaneTracker","1.0",128,
 			  MAPS::Threaded,MAPS::Threaded,
 			  -1, // Nb of inputs. Leave -1 to use the number of declared input definitions
 			  -1, // Nb of outputs. Leave -1 to use the number of declared output definitions
-			  0, // Nb of properties. Leave -1 to use the number of declared property definitions
+			  -1, // Nb of properties. Leave -1 to use the number of declared property definitions
 			  0) // Nb of actions. Leave -1 to use the number of declared action definitions
 
 //Initialization: Birth() will be called once at diagram execution startup.			  
@@ -79,6 +83,14 @@ void MAPSLaneTracker::Birth()
 		try
 		{
             lPtrStateMachine = new StateMachine(move(lPtrFeeder));
+
+			int AVG_WIDTH = (int)GetIntegerProperty("AVG_WIDTH");
+			int STD_WIDTH = (int)GetIntegerProperty("STD_WIDTH");
+			int MIN_WIDTH = (int)GetIntegerProperty("MIN_WIDTH");
+			int MAX_WIDTH = (int)GetIntegerProperty("MAX_WIDTH");
+			int AVG_WIDTH_LM = (int)GetIntegerProperty("AVG_WIDTH_LM");
+
+			lPtrStateMachine->setLaneParameters({AVG_WIDTH,STD_WIDTH,MIN_WIDTH,MAX_WIDTH,AVG_WIDTH_LM});
 		    cout<<lPtrStateMachine->getCurrentState();
 	 	    lPreviousState = lPtrStateMachine->getCurrentState();
 		}
@@ -202,7 +214,7 @@ void MAPSLaneTracker::Core()
 
 
 #ifdef IMAGEOUTPUT
-	if (lPtrStateMachine->getCurrentState() == DETECTING_LANES && nbCycles > 10)
+	if (lPtrStateMachine->getCurrentState() == DETECTING_LANES && nbCycles > 6)
 	{
 		//Video overlay
 		MAPSIOElt* ioEltOut2 = StartWriting(Output(1));

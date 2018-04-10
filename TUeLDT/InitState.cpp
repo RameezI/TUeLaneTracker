@@ -34,9 +34,8 @@ unique_ptr<LaneFilter> InitState::createLaneFilter()
 	try
 	{
 	  Camera 			lCamera;
-	  LaneProperties		lLane;
 
-	  lLaneFilter =	unique_ptr<LaneFilter>(new LaneFilter(lLane, lCamera));
+	  lLaneFilter =	unique_ptr<LaneFilter>(new LaneFilter(mLane, lCamera));
 
 	  mLaneFilterCreated 	= true;
 
@@ -70,8 +69,7 @@ unique_ptr<VanishingPtFilter> InitState::createVanishingPtFilter()
 	try
 	{
 	  Camera 		lCamera;
-	  LaneProperties   	lLane;
-	  LaneFilter 		lLaneFilter(lLane, lCamera);
+	  LaneFilter 		lLaneFilter(mLane, lCamera);
 	
 	  lVanishingPtFilter 	= unique_ptr<VanishingPtFilter>(new VanishingPtFilter() ); 
 	   
@@ -110,8 +108,7 @@ unique_ptr<Templates> InitState::createTemplates()
 	try
 	{
 	  Camera 		lCamera;
-	  LaneProperties    	lLane;
-	  LaneFilter 		lLaneFilter(lLane, lCamera);
+	  LaneFilter 		lLaneFilter(mLane, lCamera);
 	  VanishingPtFilter 	lVanishingPtFilter;
 
 	
@@ -149,4 +146,13 @@ bool InitState::checkCreationStatus()
 	 return true;
 	else
 	return false;
+}
+
+void InitState::setLaneProperties(vector<int> newLaneParams)
+{
+	mLane.AVG_WIDTH = newLaneParams[0];
+	mLane.STD_WIDTH = newLaneParams[1];
+	mLane.MIN_WIDTH = newLaneParams[2];
+	mLane.MAX_WIDTH = newLaneParams[3];
+	mLane.AVG_WIDTH_LM = newLaneParams[4];
 }

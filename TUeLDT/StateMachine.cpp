@@ -90,6 +90,7 @@ int StateMachine::spin()
 		}
 	   	if (mPtrBootingState->currentStatus  != StateStatus::ERROR)
 		{
+			mPtrBootingState->setLaneProperties(mLaneParams);
 	      	   mPtrLaneFilter 	 = mPtrBootingState->createLaneFilter();
 		   mPtrVanishingPtFilter = mPtrBootingState->createVanishingPtFilter();
 		   mPtrTemplates 	 = mPtrBootingState->createTemplates();
@@ -212,8 +213,8 @@ int StateMachine::spin()
 		  try
 		  {
 		    mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
-		   mDisplayFrame = mPtrFrameFeeder->dequeueDisplay();
 		    mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
+		   	mDisplayFrame = mPtrFrameRenderer->getCurrentFrame(); //mPtrFrameFeeder->dequeueDisplay();
 		  }
 		  catch(const char* msg)
 		  {
@@ -322,4 +323,25 @@ vector<float> StateMachine::getDirectionalParams()
 	}
 	return paramsOut;
 
+}
+
+void StateMachine::setLaneParameters(vector<int> newLaneParameters)
+{
+	if (newLaneParameters.size() == 5)
+	{
+		mLaneParams.push_back(newLaneParameters[0]);
+		mLaneParams.push_back(newLaneParameters[1]);
+		mLaneParams.push_back(newLaneParameters[2]);
+		mLaneParams.push_back(newLaneParameters[3]);
+		mLaneParams.push_back(newLaneParameters[4]);
+	}
+	else
+	{
+		std::cout<<"Alternative Lane Parameters not found! Using standard..."<<endl;
+		mLaneParams.push_back(300);
+		mLaneParams.push_back(50);
+		mLaneParams.push_back(250);
+		mLaneParams.push_back(500);
+		mLaneParams.push_back(30);
+	}
 }
