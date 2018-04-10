@@ -106,6 +106,7 @@ void FrameRenderer::drawLane(const cv::Mat& FRAME, const LaneModel& Lane)
    }
 
    mMatCurrent = FRAME;
+   imshow("output",mMatCurrent);
    
    if ( (char)32 == (char) waitKey(10) )
    {

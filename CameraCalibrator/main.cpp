@@ -6,9 +6,9 @@
 using namespace cv;
 using namespace std;
 
-#define  RES_V	480   // Vertical Resolution in pixels.
-#define  RES_H  640   // Horizental Resoluttion in pixels.
-#define  PITCH  0.0    // Pitch angle in degrees.
+#define  RES_V	600   // Vertical Resolution in pixels.
+#define  RES_H  960   // Horizental Resoluttion in pixels.
+#define  PITCH  0.5    // Pitch angle in degrees.
 #define  YAW    0.0    // Yaw angle in degrees.
 
 int main( int argc, char** argv )

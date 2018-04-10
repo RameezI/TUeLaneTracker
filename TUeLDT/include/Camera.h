@@ -46,6 +46,11 @@ public:
 		const Vector2f  FOV_VH;				/**< Field-of-View of the camera [degrees]*/
 		const Vector2i	HORIZON_VH; 	    		/**< Location of Horizon in Image-Center-CS [pixels]*/
 
+		const float PITCH_ANGLE;
+		const int HORIZON;
+		const float FOV_HORIZON;
+		const int RES_HORIZON;
+
 
 		const cv::Point O_ICCS_ICS;			/**< Origin of Image-Center-CS in Image-CS [pixels]*/
 		const cv::Point O_ICS_ICCS;			/**< Origin of Image-CS in Image-Center-CS [pixels]*/

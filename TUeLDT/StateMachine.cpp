@@ -305,33 +305,11 @@ void StateMachine::forwardImage(cv::Mat inputImage)
 
 cv::Mat StateMachine::getCurrentFrame()
 {
-	cv::Mat frameout;
-	if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
-	{
-		   frameout = mDisplayFrame;
-		   //frameout = mPtrFrameRenderer->getLaneFrame(mPtrFrameRenderer->getDirectionalParameters());
-	}
-	else
-	{	
-			 frameout = cv::Mat(600,960,CV_8UC3,Scalar(0,0,0));
-	}
-	return frameout;
-
+	return mDisplayFrame;
 }
 cv::Mat StateMachine::getTopDownFrame()
 {
-	cv::Mat frameout;
-	if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
-	{
-		   //frameout = mDisplayFrame;
-		   frameout = mPtrFrameRenderer->getLaneFrame(mPtrFrameRenderer->getDirectionalParameters());
-	}
-	else
-	{	
-			 frameout = cv::Mat(600,960,CV_8UC3,Scalar(0,0,0));
-	}
-	return frameout;
-
+	return mPtrFrameRenderer->getLaneFrame(mPtrFrameRenderer->getDirectionalParameters());;
 }
 
 vector<float> StateMachine::getDirectionalParams()

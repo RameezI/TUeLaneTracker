@@ -33,7 +33,7 @@ add_rtmaps_package(${PCK} PCKINFO "${PCK}.pckinfo"
     "src"                                 # NB: if you add and/or remove files to a directory, you must re-generate the CMake project
 	"../TUeLDT"
 	"../TUeLDT/include"
-	"../3rdPartyLibs/eigen3/Eigen"
+	"../3rdPartyLibs/Eigen"
 	"../3rdPartyLibs/gtest"
 	"../3rdPartyLibs/gmock"
     "../include"

@@ -22,8 +22,8 @@ MAPS_BEGIN_OUTPUTS_DEFINITION(MAPSLaneTracker)
     MAPS_OUTPUT("cycleCount",MAPS::Integer32,NULL,NULL,1)
 	#ifdef IMAGEOUTPUT
     	MAPS_OUTPUT("videoOverlay",MAPS::IplImage,NULL,NULL,0)
-    	MAPS_OUTPUT("topDown",MAPS::IplImage,NULL,NULL,0)
-		MAPS_OUTPUT("directionalParams",MAPS::Float32,NULL,NULL,3)
+    	//MAPS_OUTPUT("topDown",MAPS::IplImage,NULL,NULL,0)
+		//MAPS_OUTPUT("directionalParams",MAPS::Float32,NULL,NULL,3)
 	#endif
 MAPS_END_OUTPUTS_DEFINITION
 
@@ -154,7 +154,7 @@ void MAPSLaneTracker::Core()
 			Error("Unsupported image format.");
 
 		Output(1).AllocOutputBufferIplImage(imgIn);
-		Output(2).AllocOutputBufferIplImage(imgIn);
+		//Output(2).AllocOutputBufferIplImage(imgIn);
 		#endif
 	}
 
@@ -221,22 +221,22 @@ void MAPSLaneTracker::Core()
 		ioEltOut2->Timestamp() = ioEltIn->Timestamp();
 		StopWriting(ioEltOut2);
 
-		//Top Down View
-		MAPSIOElt* ioEltOut3 = StartWriting(Output(2));
-		ioEltOut3->IplImage() = lPtrStateMachine->getTopDownFrame();
-		ioEltOut3->Timestamp() = ioEltIn->Timestamp();
-		StopWriting(ioEltOut3);
+		// //Top Down View
+		// MAPSIOElt* ioEltOut3 = StartWriting(Output(2));
+		// ioEltOut3->IplImage() = lPtrStateMachine->getTopDownFrame();
+		// ioEltOut3->Timestamp() = ioEltIn->Timestamp();
+		// StopWriting(ioEltOut3);
 
-		//Dir Params
-		MAPSIOElt* ioEltOut4 = StartWriting(Output(3));
-		vector<float> dirParams = lPtrStateMachine->getDirectionalParams();
-		int vectorsize = dirParams.size();
-		for (int i=0; i<vectorsize; i++) {
-			ioEltOut4->Float32(i) = dirParams[i];
-		}
-		ioEltOut4->VectorSize() = vectorsize;
-		ioEltOut4->Timestamp() = ioEltIn->Timestamp();
-		StopWriting(ioEltOut4);
+		// //Dir Params
+		// MAPSIOElt* ioEltOut4 = StartWriting(Output(3));
+		// vector<float> dirParams = lPtrStateMachine->getDirectionalParams();
+		// int vectorsize = dirParams.size();
+		// for (int i=0; i<vectorsize; i++) {
+		// 	ioEltOut4->Float32(i) = dirParams[i];
+		// }
+		// ioEltOut4->VectorSize() = vectorsize;
+		// ioEltOut4->Timestamp() = ioEltIn->Timestamp();
+		// StopWriting(ioEltOut4);
 		//*dstPtrCnt[0] = 
 	}
 #endif

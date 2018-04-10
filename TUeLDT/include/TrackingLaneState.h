@@ -38,7 +38,7 @@ class TrackingLaneState: public State
 	
 private:
 	uint_fast8_t mRetryGrab;
-	std::thread  mSideExecutor;
+	//std::thread  mSideExecutor;
 	GRAPH 	     mGraph;
 
 

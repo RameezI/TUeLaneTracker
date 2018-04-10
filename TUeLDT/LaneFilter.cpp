@@ -64,24 +64,24 @@ cv::Mat	 getBins(const Ref<const VectorXf>& BINS_cm, const float& STEP_cm, const
    return lMat;
 }
 
-	///cm to pixel conversion, for a particular row in the image, of the #BINS_cm [Vehicle-Symmetry-CS <---> Image-Center-CS]
-cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const int Y_ICCS )
-{
-	float cm2px;
-	UnitConversion mUnit;
-	cm2px = 1/mUnit.getPixToCm(Y_ICCS, CAM);
-	//cout << "cm2px " << cm2px << endl;
+// 	///cm to pixel conversion, for a particular row in the image, of the #BINS_cm [Vehicle-Symmetry-CS <---> Image-Center-CS]
+// cv::Mat toPixelBINS(const Ref<const VectorXi>& BINS_cm, const Camera& CAM, const int Y_ICCS )
+// {
+// 	float cm2px;
+// 	UnitConversion mUnit;
+// 	cm2px = 1/mUnit.getPixToCm(Y_ICCS, CAM);
+// 	//cout << "cm2px " << cm2px << endl;
 
-	cv::Mat  lMat = cv::Mat(BINS_cm.size(),1,CV_32S);
-	cv::Mat  lWorldPt	= cv::Mat(3,1, CV_32F);
-	for(int i=0; i< BINS_cm.size(); i++)
-	   {
-		  lWorldPt.at<float>(0)	= BINS_cm[i];
-	 	  lMat.at<int32_t>(i,0) = floor(lWorldPt.at<float>(0,0) * cm2px) ;
-	   }
+// 	cv::Mat  lMat = cv::Mat(BINS_cm.size(),1,CV_32S);
+// 	cv::Mat  lWorldPt	= cv::Mat(3,1, CV_32F);
+// 	for(int i=0; i< BINS_cm.size(); i++)
+// 	   {
+// 		  lWorldPt.at<float>(0)	= BINS_cm[i];
+// 	 	  lMat.at<int32_t>(i,0) = floor(lWorldPt.at<float>(0,0) * cm2px) ;
+// 	   }
 
-	return lMat;
-}
+// 	return lMat;
+// }
 
 LaneFilter::LaneFilter(const LaneProperties& LAN,  const Camera& CAM)
 
