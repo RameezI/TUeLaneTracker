@@ -23,7 +23,7 @@
 * ****************************************************************************/
 
 
-#define PROFILER_ENABLED 	/**< If program is compiled with this defined, the program logs and profiles its execution*/
+//#define PROFILER_ENABLED 	/**< If program is compiled with this defined, the program logs and profiles its execution*/
 #define DISPLAY_GRAPHICS 	/**< If program is compiled with this degined, the program renders the results on to a selected display */  
 
 //#define DISPLAY_GRAPHICS_DCU /**< Define this when the graphics need to be rendered on the s32v23 DCU*/

@@ -22,8 +22,8 @@ MAPS_BEGIN_OUTPUTS_DEFINITION(MAPSLaneTracker)
     MAPS_OUTPUT("cycleCount",MAPS::Integer32,NULL,NULL,1)
 	#ifdef IMAGEOUTPUT
     	MAPS_OUTPUT("videoOverlay",MAPS::IplImage,NULL,NULL,0)
-    	//MAPS_OUTPUT("topDown",MAPS::IplImage,NULL,NULL,0)
-		//MAPS_OUTPUT("directionalParams",MAPS::Float32,NULL,NULL,3)
+    	MAPS_OUTPUT("topDown",MAPS::IplImage,NULL,NULL,0)
+		MAPS_OUTPUT("directionalParams",MAPS::Float32,NULL,NULL,3)
 	#endif
 MAPS_END_OUTPUTS_DEFINITION
 
@@ -61,7 +61,7 @@ void MAPSLaneTracker::Birth()
     lReturn = 0;
 
 
-	lPtrFeeder = createFrameFeeder(lFrameSource, lSourceStr);
+	lPtrFeeder = createFrameFeeder();
 	if(lPtrFeeder == nullptr)
 	  lReturn = -1;
 
@@ -127,17 +127,6 @@ void MAPSLaneTracker::Core()
 
 	lPtrStateMachine->forwardImage(tempImg);
 
-	//std::cout<<"Setting image succeeded!"<<endl;
-	// if (lImgPtr == NULL){
-	// 	std::cout<<"NULL POINTER!"<<endl;
-	// 	return;
-	// }
-
-	// if (lImgPtr->empty()){
-	// 	std::cout << "Empty input!" << endl;
-	// 	ReportInfo("Empty!");
-	// }
-
 	nbCycles++;
 
     //ReportInfo("Passing through Core() method");
@@ -154,7 +143,7 @@ void MAPSLaneTracker::Core()
 			Error("Unsupported image format.");
 
 		Output(1).AllocOutputBufferIplImage(imgIn);
-		//Output(2).AllocOutputBufferIplImage(imgIn);
+		Output(2).AllocOutputBufferIplImage(imgIn);
 		#endif
 	}
 
@@ -221,23 +210,22 @@ void MAPSLaneTracker::Core()
 		ioEltOut2->Timestamp() = ioEltIn->Timestamp();
 		StopWriting(ioEltOut2);
 
-		// //Top Down View
-		// MAPSIOElt* ioEltOut3 = StartWriting(Output(2));
-		// ioEltOut3->IplImage() = lPtrStateMachine->getTopDownFrame();
-		// ioEltOut3->Timestamp() = ioEltIn->Timestamp();
-		// StopWriting(ioEltOut3);
+		//Top Down View
+		MAPSIOElt* ioEltOut3 = StartWriting(Output(2));
+		ioEltOut3->IplImage() = lPtrStateMachine->getTopDownFrame();
+		ioEltOut3->Timestamp() = ioEltIn->Timestamp();
+		StopWriting(ioEltOut3);
 
-		// //Dir Params
-		// MAPSIOElt* ioEltOut4 = StartWriting(Output(3));
-		// vector<float> dirParams = lPtrStateMachine->getDirectionalParams();
-		// int vectorsize = dirParams.size();
-		// for (int i=0; i<vectorsize; i++) {
-		// 	ioEltOut4->Float32(i) = dirParams[i];
-		// }
-		// ioEltOut4->VectorSize() = vectorsize;
-		// ioEltOut4->Timestamp() = ioEltIn->Timestamp();
-		// StopWriting(ioEltOut4);
-		//*dstPtrCnt[0] = 
+		//Dir Params
+		MAPSIOElt* ioEltOut4 = StartWriting(Output(3));
+		vector<float> dirParams = lPtrStateMachine->getDirectionalParams();
+		int vectorsize = dirParams.size();
+		for (int i=0; i<vectorsize; i++) {
+			ioEltOut4->Float32(i) = dirParams[i];
+		}
+		ioEltOut4->VectorSize() = vectorsize;
+		ioEltOut4->Timestamp() = ioEltIn->Timestamp();
+		StopWriting(ioEltOut4);
 	}
 #endif
 
@@ -251,18 +239,16 @@ void MAPSLaneTracker::Death()
 }
 
 
-unique_ptr<FrameFeeder> MAPSLaneTracker::createFrameFeeder(FrameSource srcMode, string srcString)
+unique_ptr<FrameFeeder> MAPSLaneTracker::createFrameFeeder()
 {
 
 	unique_ptr<FrameFeeder>	lPtrFeeder;
-
-	cout<<srcString<<endl;
 
 	/** Create Image Feeder */
 	try
 	{
 		std::cout << "Try creating FrameFeeder" << endl;
-	   lPtrFeeder=  unique_ptr<FrameFeeder>( new RTMapsFeeder(srcString) );
+	   lPtrFeeder=  unique_ptr<FrameFeeder>( new RTMapsFeeder("") );
 	   //lPtrFeeder->setImageLinker(lImgPtr);
 
 	   #ifdef PROFILER_ENABLED

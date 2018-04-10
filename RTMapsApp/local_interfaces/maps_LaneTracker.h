@@ -42,7 +42,7 @@ private :
 
 	cv::Mat* lImgPtr;
 public:
-	unique_ptr<FrameFeeder> createFrameFeeder(FrameSource srcMode, string srcString);
+	unique_ptr<FrameFeeder> createFrameFeeder();
 };
 
 #endif
