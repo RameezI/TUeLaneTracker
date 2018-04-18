@@ -33,7 +33,7 @@ int BufferingDAG_generic::init_DAG(const Templates & TEMPLATES, const size_t & B
 	mSPAN			= TEMPLATES.SPAN;
 	mHORIZON_ICCS		= TEMPLATES.HORIZON_ICCS;
 	
-	mBufferPool.reset(new BufferPool<BufferingDAG_generic>(mSPAN, RES_H, BUFFER_SIZE));
+	mBufferPool.reset(new BufferPool(mSPAN, RES_H, BUFFER_SIZE));
 
 	mGRADIENT_TAN_ROOT 	= TEMPLATES.GRADIENT_TAN_ROOT;
 	mDEPTH_MAP_ROOT    	= TEMPLATES.DEPTH_MAP_ROOT;
@@ -48,7 +48,7 @@ int BufferingDAG_generic::init_DAG(const Templates & TEMPLATES, const size_t & B
 }
 
 
-void BufferingDAG_generic::execute(cv::Mat& FrameGRAY )
+void BufferingDAG_generic::execute(cv::UMat& FrameGRAY )
 {
 
 #ifdef PROFILER_ENABLED
@@ -101,7 +101,7 @@ mProfiler.start("EXTRACT_ROI");
 
 	 //Define ROI from the Input Image
 	 lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
-	 mFrameGRAY_ROI = FrameGRAY(lROI);
+	 FrameGRAY(lROI).copyTo(mFrameGRAY_ROI);
 
 	 //Extract Corrseponding Gradient Orientation Template
 	 lRowIndex =  mCAMERA.RES_VH(0) - (mVP_RANGE_V + mVanishPt.V);

@@ -43,7 +43,7 @@ private:
 
 
 public:	
-	const LaneModel& run(cv::Mat Frame);
+	const LaneModel& run(cv::UMat Frame);
 	void setupDAG(LaneFilter* laneFilters, VanishingPtFilter* vpFilter);
 
 	template<typename GRAPH_BASE>
@@ -75,7 +75,7 @@ void TrackingLaneState<GRAPH>::setupDAG(LaneFilter* laneFilter, VanishingPtFilte
 
 
 template<typename GRAPH>
-const LaneModel& TrackingLaneState<GRAPH>::run(cv::Mat Frame)
+const LaneModel& TrackingLaneState<GRAPH>::run(cv::UMat Frame)
 {
    try
    {
