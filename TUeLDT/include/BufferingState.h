@@ -43,7 +43,7 @@ public:
 
 	GRAPH 	mGraph;
 	void 	setupDAG(const Templates& TEMPLATES, const size_t & BUFFER_SIZE);
-	void 	run(cv::Mat Frame);
+	void 	run(cv::UMat Frame);
 };
 
 
@@ -72,7 +72,7 @@ void BufferingState<GRAPH>::setupDAG(const Templates & TEMPLATES, const size_t &
 }
 
 template<typename GRAPH>  
-void BufferingState<GRAPH>::run(cv::Mat Frame)
+void BufferingState<GRAPH>::run(cv::UMat Frame)
 {
   try
   {

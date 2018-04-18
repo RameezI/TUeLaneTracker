@@ -35,7 +35,6 @@
 
 using WriteLock = std::unique_lock<std::mutex>;
 
-template<typename T>
 struct BufferPool;
 
 class BufferingDAG_generic
@@ -90,11 +89,10 @@ protected:
 				   		* /n The size of /em X_ICS is [#SPAN, #RES_H] */
 
 	
-	/**< A buffer, of pre-specified number, for temporal pooling of probability frames and corresponding gradient orientations*/
-	unique_ptr<BufferPool<BufferingDAG_generic>>	mBufferPool;
+	unique_ptr<BufferPool>	mBufferPool; 	/**< A buffer, of pre-specified number, for temporal pooling */
 
 
-	// Needed for graph computations
+	// Miscellaneous; needed for graph computations
 	const Camera 			mCAMERA;
 	const LaneMembership    	mLaneMembership;
 	VanishingPt 			mVanishPt;
@@ -131,7 +129,7 @@ public:
 	int  init_DAG(const Templates & TEMPLATES, const size_t & BUFFER_SIZE);
 
 	/** executes the Directed Acyclic Graph*/
-	void execute(cv::Mat& FrameGRAY);  
+	void execute(cv::UMat& FrameGRAY);  
 	
    	BufferingDAG_generic (BufferingDAG_generic && bufferingGraph)
    	{
@@ -179,8 +177,7 @@ public:
 };
 
 
-template <>
-struct BufferPool<BufferingDAG_generic>
+struct BufferPool
 {
     vector<cv::Mat> Probability;
     vector<cv::Mat> GradientTangent;
@@ -194,7 +191,6 @@ struct BufferPool<BufferingDAG_generic>
 
          Probability.push_back(PROB_MAP);
          GradientTangent.push_back(GRAD_TAN);
-
       }
     }
 };

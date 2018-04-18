@@ -43,8 +43,8 @@ protected:
    const std::size_t	mMAX_BUFFER_SIZE;
    const std::size_t	mMAX_RETRY;
    std::mutex 		mMutex;
-   vector<cv::Mat>	mDisplayQueue;
-   vector<cv::Mat>	mProcessQueue;
+   vector<cv::UMat>	mDisplayQueue;
+   vector<cv::UMat>	mProcessQueue;
   
 	
 
@@ -53,7 +53,7 @@ protected:
 
    }
 
-   void enqueue(cv::Mat& frame, vector<cv::Mat>& queue)
+   void enqueue(cv::UMat& frame, vector<cv::UMat>& queue)
    {
       WriteLock  lLock(mMutex, std::defer_lock);	
 
@@ -82,7 +82,7 @@ public:
    std::atomic<bool> Stopped;
    std::atomic<bool> Paused; 
 
-   cv::Mat dequeue()
+   cv::UMat dequeue()
    {
       WriteLock  lLock(mMutex, std::defer_lock);	
       size_t lTryGrab = 0;
@@ -101,7 +101,7 @@ public:
      	throw "No images in the process queue, the producer is too slow or down! [Empty Frame Queue] ";
       }
 
-      cv::Mat lFrame = mProcessQueue[0];
+      cv::UMat lFrame = mProcessQueue[0];
       mProcessQueue.erase(mProcessQueue.begin());
       lLock.unlock();
 
@@ -119,7 +119,7 @@ public:
       return lFrame;
    }
 
-   cv::Mat dequeueDisplay()
+   cv::UMat dequeueDisplay()
    {
       WriteLock  lLock(mMutex, std::defer_lock);	
       size_t lTryGrab = 0;
@@ -140,7 +140,7 @@ public:
 
       }
 
-      cv::Mat lFrame = mDisplayQueue[0];
+      cv::UMat lFrame = mDisplayQueue[0];
       mDisplayQueue.erase(mDisplayQueue.begin());
       lLock.unlock();
 

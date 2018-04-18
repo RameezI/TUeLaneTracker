@@ -75,7 +75,7 @@ int TrackingLaneDAG_generic::init_DAG(LaneFilter* laneFilter, VanishingPtFilter*
 }
 
 
-void TrackingLaneDAG_generic::execute(cv::Mat& FrameGRAY)
+void TrackingLaneDAG_generic::execute(cv::UMat& FrameGRAY)
 {
 
 	BufferingDAG_generic::execute(FrameGRAY);

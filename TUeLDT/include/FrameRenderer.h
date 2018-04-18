@@ -54,7 +54,7 @@ public:
    {
 
    }
-   void drawLane(const cv::Mat& FRAME, const LaneModel& Lane);
+   void drawLane(const cv::UMat& FRAME, const LaneModel& Lane);
 };
 
 
