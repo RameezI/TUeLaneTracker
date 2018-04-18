@@ -134,7 +134,8 @@ public:
    	BufferingDAG_generic (BufferingDAG_generic && bufferingGraph)
    	{
 	
-	   WriteLock  lLock(_mutex);
+	   WriteLock  lLock(_mutex, std::defer_lock);
+	   lLock.lock();
 	
 	     mBufferPos			= std::move(bufferingGraph.mBufferPos);
 
