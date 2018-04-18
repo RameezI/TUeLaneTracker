@@ -95,6 +95,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("EXTRACT_ROI");
 #endif
+
 	 int lRowIndex	= mCAMERA.RES_VH(0) -mSPAN;
 	 int lColIndex;
 	 cv::Rect lROI;
