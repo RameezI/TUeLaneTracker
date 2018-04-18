@@ -92,18 +92,12 @@ void ImgStoreFeeder::parseSettings(string& srcStr)
      throw "mSkipFrames  must be a postive integer";
    }
 
-   try
-   {
+
     	glob(mFolder, mFiles);
-   }
-   catch(...)
-   {
-	throw "DataSet not Found";
-   }
 
    if (mFiles.size() <= (uint32_t)mSkipFrames)
    {
-      throw "Total number of image files is less than mSkipFrames.";
+      throw "No files found OR the total number of image files is less than mSkipFrames.";
    }
  
 }
