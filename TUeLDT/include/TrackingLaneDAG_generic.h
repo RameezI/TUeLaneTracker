@@ -1,5 +1,5 @@
-#ifndef TRACKINGLANESDAG_GENERIC_H
-#define TRACKINGLANESDAG_GENERIC_H
+#ifndef TRACKING_LANES_DAG_GENERIC_H
+#define TRACKING_LANES_DAG_GENERIC_H
 
 /******************************************************************************
 * NXP Confidential Proprietary

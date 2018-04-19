@@ -24,22 +24,26 @@
 
 
 #define PROFILER_ENABLED 	/**< If program is compiled with this defined, the program logs and profiles its execution*/
-#define DISPLAY_GRAPHICS 	/**< If program is compiled with this degined, the program renders the results on to a selected display */  
+#define DISPLAY_GRAPHICS 	/**< If program is compiled with this defined, the program renders the results on to a selected display */
+#define S32V2XX				/**< If Program is compiled with this defined, the algorithm is accelerated using s32v hardware acceleration */
 
 //#define DISPLAY_GRAPHICS_DCU /**< Define this when the graphics need to be rendered on the s32v23 DCU*/
 #define TEST_APEX_CODE	       /**< S32V234 test specific flags */
 
-/** Provide target camera and resolution [Required for loading corresponding callibration file] */
+/** Provide target camera and resolution [Required for loading corresponding calibration file] */
 #define CAMERA_NAME "BUMBLEBEE_640x480"
 
-// Confifure FrameFeeder
+
+// Configure FrameFeeder
+
+
 
 //Configuration for Algorithm
 #define BASE_LINE_IBCS		0     /**< Describes base line in Image-Bottom-Coordinate-System */
-#define PURVIEW_LINE_IBCS	150   /**< Describes purview line in Image-Bottom-Coordinate-System */
+#define PURVIEW_LINE_IBCS	160   /**< Describes purview line in Image-Bottom-Coordinate-System */
 
-#define STEP_LANE_FILTER_CM	5    /**< Provide bin-size for the 1D lane filters (At base and purview lines) [cm]*/
-#define STEP_VP_FILTER		10    /**< Provide bin-size for 2D vanishing point filter [pixels]*/
+#define STEP_LANE_FILTER_CM	 10    /**< Provide bin-size for the 1D lane filters (At base and purview lines) [cm]*/
+#define STEP_VP_FILTER		 10    /**< Provide bin-size for 2D vanishing point filter [pixels]*/
 
 #define VP_RANGE_VER		25    /**< Vertical range of VP on either side of the Horizon Line [pixels] */
 #define VP_RANGE_HOR		300   /**< Horizental range of VP on either side of center point on the horizon line [pixels] */

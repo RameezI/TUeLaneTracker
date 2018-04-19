@@ -43,7 +43,7 @@ StateMachine::StateMachine(unique_ptr<FrameFeeder> frameFeeder)
 {
 
 	#ifdef S32V2XX
-	  int  lSuccess |= OAL_Initialize();
+	  int  lSuccess = OAL_Initialize();
 	  if(lSuccess!=0)
 	    throw "Failed to initialize s32v OAL context ";
 	  ACF_Init();
@@ -57,7 +57,7 @@ StateMachine::StateMachine(unique_ptr<FrameFeeder> frameFeeder)
 	  Logger::Init();
 	  LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 	  <<"******************************"<<endl
-	  << "State-Machine sucessfully Created..."<<endl
+	  << "State-Machine successfully Created..."<<endl
 	  <<"******************************"<<endl<<endl;
 	#endif
 }
@@ -90,7 +90,7 @@ int StateMachine::spin()
 		}
 	   	if (mPtrBootingState->currentStatus  != StateStatus::ERROR)
 		{
-	      	   mPtrLaneFilter 	 = mPtrBootingState->createLaneFilter();
+	       mPtrLaneFilter 	 = mPtrBootingState->createLaneFilter();
 		   mPtrVanishingPtFilter = mPtrBootingState->createVanishingPtFilter();
 		   mPtrTemplates 	 = mPtrBootingState->createTemplates();
 		}
@@ -210,8 +210,8 @@ int StateMachine::spin()
 		{
 		  try
 		  {
-		    mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
-		    mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
+		       mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
+		   //  mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
 		  }
 		  catch(const char* msg)
 		  {

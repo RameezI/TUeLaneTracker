@@ -54,7 +54,8 @@ void BufferingDAG_generic::execute(cv::UMat& FrameGRAY )
 #ifdef PROFILER_ENABLED
 mProfiler.start("SETUP_ASYNC_TEMPLATES");
 #endif
-	mFuture = std::async([this]
+
+	mFuture = std::async(std::launch::async, [this]
 	{
 	   //Local Variables
 	   WriteLock  lLock(_mutex, std::defer_lock);	
@@ -125,6 +126,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
+
 #ifdef PROFILER_ENABLED
 mProfiler.start("GAUSSIAN_BLUR");
 #endif 
@@ -141,6 +143,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<  "Min Time: " << mProfiler.getMinTime("GAUSSIAN_BLUR")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
+
 
 
 
@@ -248,13 +251,33 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				#endif
 
 
+
+
+#ifdef PROFILER_ENABLED
+mProfiler.start("WAIT_ASYNC_ROI");
+#endif
+
+	mFuture.wait();
+
+#ifdef PROFILER_ENABLED
+mProfiler.end();
+LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
+				<<"******************************"<<endl
+				<<  "Waiting for async task, extracting ROIs." <<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("WAIT_ASYNC_ROI")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("WAIT_ASYNC_ROI")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("WAIT_ASYNC_ROI")<<endl
+				<<"******************************"<<endl<<endl;
+				#endif
+
+
+
+
 #ifdef PROFILER_ENABLED
 mProfiler.start("FOCUS");
 #endif 							
 
-	mFuture.wait();
 	bitwise_and(mBufferPool->Probability[mBufferPos], mFocusTemplate, mBufferPool->Probability[mBufferPos]);
-
 	if(mBufferPos < ((mBufferPool->Probability.size())-1) )
 	mBufferPos ++;
 				
@@ -262,7 +285,7 @@ mProfiler.start("FOCUS");
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				<<"******************************"<<endl
-				<<  "Waiting for async task, focussing and adjusting buffer position." <<endl
+				<<  "Focusing and adjusting buffer position." <<endl
 				<<  "Max Time: " << mProfiler.getMaxTime("FOCUS")<<endl
 				<<  "Avg Time: " << mProfiler.getAvgTime("FOCUS")<<endl
 				<<  "Min Time: " << mProfiler.getMinTime("FOCUS")<<endl

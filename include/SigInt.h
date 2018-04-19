@@ -1,18 +1,18 @@
-#ifndef SIGINIT_H
-#define SIGINIT_H
+#ifndef SIG_INT_H
+#define SIG_INT_H
 #include <signal.h>
 #include "string.h"
 
 enum SigStatus {INIT, STOP, FAILURE=-1};
-class SigInit
+class SigInt
 {
 public:
 	static SigStatus sStatus;
-	SigInit();
-	~SigInit();
+	SigInt();
+	~SigInt();
 	
 private:
 	static void	handler(int);
 };
 
-#endif // SIGINIT_H
+#endif // SIG_INT_H

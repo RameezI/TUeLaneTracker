@@ -87,7 +87,7 @@ public:
  	*  /parame VP_RANGE_ROWS is an integer argument representing vertical range of the vanishing-point. [pixels]
  	*   ****************************************************/
 	Templates(const int RES_V, const int RES_H, const float FOV_V, const int Horizon, const int VP_RANGE_ROWS)
-	: HORIZON_ICCS(Horizon), 
+	: HORIZON_ICCS(Horizon),
 	  VP_RANGE_V(VP_RANGE_ROWS), 
 	  SPAN((RES_V/2)- HORIZON_ICCS + VP_RANGE_ROWS) 
 

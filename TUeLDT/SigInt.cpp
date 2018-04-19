@@ -21,14 +21,14 @@
 * ****************************************************************************/ 
 
 
-#include "SigInit.h"
+#include "SigInt.h"
 
 
-SigStatus SigInit::sStatus= SigStatus::INIT;
+SigStatus SigInt::sStatus= SigStatus::INIT;
 
-SigInit::SigInit() 
+SigInt::SigInt()
 {
-	 // prepare internal signal handler
+  // prepare internal signal handler
   struct sigaction lSa;
   memset(&lSa, 0, sizeof(lSa));
   lSa.sa_handler = handler;
@@ -42,13 +42,13 @@ SigInit::SigInit()
   } // if signal not registered
 	
 }
-SigInit::~SigInit()
+SigInt::~SigInt()
 {
 	sStatus = SigStatus::INIT;
 	
 }
 
-void SigInit::handler(int aSigNo)
+void SigInt::handler(int aSigNo)
 {
   sStatus = SigStatus::STOP;
 } 

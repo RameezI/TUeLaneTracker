@@ -85,7 +85,7 @@ void TrackingLaneDAG_generic::execute(cv::UMat& FrameGRAY)
 #ifdef PROFILER_ENABLED
 mProfiler.start("SETUP_ASYNC_FILTERING");
 #endif
-	mFuture = std::async([this]
+	mFuture = std::async(std::launch::async, [this]
 	{
 	   int64_t lSUM;
 
@@ -232,10 +232,10 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 	//Weights of Intersections
 	multiply(mDepthTemplate, mProbMapFocussed, mIntWeights, 1, CV_32S);	
 	{
-	   int32_t* 	lPtrIntBase 	    	= mIntBase.ptr<int32_t>(0);
+	   int32_t* 	lPtrIntBase 	    = mIntBase.ptr<int32_t>(0);
 	   int32_t* 	lPtrIntPurview   	= mIntPurview.ptr<int32_t>(0);
 	   int32_t* 	lPtrWeights   		= mIntWeights.ptr<int32_t>(0);
-	   uint8_t* 	lPtrMask   		= mMask.ptr<uint8_t>(0);
+	   uint8_t* 	lPtrMask   			= mMask.ptr<uint8_t>(0);
 
 	   int32_t* 	lPtrHistBase    	=  mHistBase.ptr<int32_t>(0);
 	   int32_t* 	lPtrHistPurview 	=  mHistPurview.ptr<int32_t>(0);
@@ -255,7 +255,7 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 
 		 assert((0<=lBaseBinIdx)&&(lBaseBinIdx<mHistBase.rows ));
 
-		 *(lPtrHistBase       + lBaseBinIdx   )  += lWeightBin;
+		 *(lPtrHistBase       + lBaseBinIdx   )  	 += lWeightBin;
 	         *(lPtrHistPurview    + lPurviewBinIdx)  += lWeightBin;
 	    }	
 	
@@ -300,7 +300,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("SETUP_ASYNC_BUFFER_SHIFT");
 #endif
-	mFuture = std::async([this]
+	mFuture = std::async(std::launch::async, [this]
 	{
 	   WriteLock  lLock(_mutex, std::defer_lock);	
 
@@ -591,7 +591,7 @@ mProfiler.start("ASSIGN_LANE_MODEL");
 mProfiler.end();
 LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				<<"******************************"<<endl
-				<<  "Histogram Matching MAP Estimate VanishingPt."<<endl
+				<<  "Assigning Lane Model."<<endl
 				<<  "Max Time: " << mProfiler.getMaxTime("ASSIGN_LANE_MODEL")<<endl
 				<<  "Avg Time: " << mProfiler.getAvgTime("ASSIGN_LANE_MODEL")<<endl
 				<<  "Min Time: " << mProfiler.getMinTime("ASSIGN_LANE_MODEL")<<endl
