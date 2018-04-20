@@ -282,6 +282,9 @@ StateMachine::~StateMachine()
 {
 
    mPtrFrameFeeder.reset(nullptr);
+   mPtrBootingState.reset(nullptr);
+   mPtrBufferingState.reset(nullptr);
+   mPtrTrackingState.reset(nullptr);
 
    #ifdef S32V2XX
     OAL_Deinitialize();
@@ -290,7 +293,7 @@ StateMachine::~StateMachine()
    #ifdef PROFILER_ENABLED
      LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
      <<  "********************************"<<endl
-     <<  "[State-Machine Distroyed]"<<endl
+     <<  "[State-Machine Destroyed]"<<endl
      <<"******************************"<<endl<<endl;
    #endif
 

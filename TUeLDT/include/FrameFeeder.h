@@ -38,147 +38,48 @@ using WriteLock = std::unique_lock<std::mutex>;
 class FrameFeeder
 {
 
+public:
+	   std::atomic<bool> 	Stopped;
+	   std::atomic<bool> 	Paused;
+
 protected:
+   vector<cv::UMat>		mDisplayQueue;
+   vector<cv::UMat>		mProcessQueue;
 
-   const std::size_t	mMAX_BUFFER_SIZE;
-   const std::size_t	mMAX_RETRY;
-   std::mutex 		mMutex;
-   vector<cv::UMat>	mDisplayQueue;
-   vector<cv::UMat>	mProcessQueue;
-  
-	
+   FrameFeeder(): Stopped(false),Paused(true){}
 
-   FrameFeeder(): mMAX_BUFFER_SIZE(3), mMAX_RETRY(10000000), Stopped(false), Paused(true)
-   {
+   virtual  void parseSettings(string& srcStr)  = 0;
+   virtual  void enqueue(cv::UMat& frame, vector<cv::UMat>& queue) = 0;
 
-   }
-
-   void enqueue(cv::UMat& frame, vector<cv::UMat>& queue)
-   {
-      WriteLock  lLock(mMutex, std::defer_lock);	
-
-      lLock.lock(); //Protect queue from race-condition
-
-        queue.push_back(frame);
-
-	if(queue.size() >  mMAX_BUFFER_SIZE)
-	{
-          queue.erase(queue.begin());
-      	  #ifdef PROFILER_ENABLED
-	  LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-	   <<"******************************"<<endl
-	   <<  "WARNING!! "<<endl
-	   <<  "Droping frames in the queue, cannot keep-up with the frame production rate"<<endl
-	   <<"******************************"<<endl<<endl;
-          #endif
-	}
-      lLock.unlock();
-   }
- 
-   virtual void    parseSettings(string& srcStr)  = 0;	
-
-public:	
-
-   std::atomic<bool> Stopped;
-   std::atomic<bool> Paused; 
-
-   cv::UMat dequeue()
-   {
-      WriteLock  lLock(mMutex, std::defer_lock);	
-      size_t lTryGrab = 0;
-
-      lLock.lock(); //Protect queue from any race-condition
-      while (mProcessQueue.empty() && lTryGrab < mMAX_RETRY)
-      { 
-	lLock.unlock();
-	lTryGrab ++ ;
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	lLock.lock();
-      }
-
-      if(mProcessQueue.empty())
-      {
-     	throw "No images in the process queue, the producer is too slow or down! [Empty Frame Queue] ";
-      }
-
-      cv::UMat lFrame = mProcessQueue[0];
-      mProcessQueue.erase(mProcessQueue.begin());
-      lLock.unlock();
-
-      #ifdef PROFILER_ENABLED
-       LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-       <<"******************************"<<endl
-       <<  "Frame dequeued for processing:"<<endl
-       <<  "[Attempt count: "<<lTryGrab<<"/"<<mMAX_RETRY<<"]"<<endl
-       <<"******************************"<<endl<<endl;
-      #endif
-
-      if(lFrame.empty())
-        throw "Failed to get the frame from the process queue! [Empty Frame Exception] ";
-
-      return lFrame;
-   }
-
-   cv::UMat dequeueDisplay()
-   {
-      WriteLock  lLock(mMutex, std::defer_lock);	
-      size_t lTryGrab = 0;
-
-      lLock.lock(); //Protect queue from race-condition
-      while (mDisplayQueue.empty() && lTryGrab < mMAX_RETRY)
-      { 
-	lLock.unlock();
-	lTryGrab ++ ;
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	lLock.lock();
-      }
-      if(mDisplayQueue.empty())
-      {
-
-     	cout<<"No images in the display queue, the producer is too slow or down! [Empty Frame Queue] "<<endl;
-     	throw "No images in the display queue, the producer is too slow or down! [Empty Frame Queue] ";
-
-      }
-
-      cv::UMat lFrame = mDisplayQueue[0];
-      mDisplayQueue.erase(mDisplayQueue.begin());
-      lLock.unlock();
-
-      #ifdef PROFILER_ENABLED
-       LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-       <<"******************************"<<endl
-       <<  "Frame dequeued for display:"<<endl
-       <<  "[Attempt count: "<<lTryGrab<<"/"<<mMAX_RETRY<<"]"<<endl
-       <<"******************************"<<endl<<endl;
-      #endif
-
-
-      if(lFrame.empty())
-        throw "Failed to get the frame from the display Queue! [Empty Frame Exception] ";
-
-      return lFrame;
-   }
-
+public:
+   virtual cv::UMat dequeue() = 0 ;
+   virtual cv::UMat dequeueDisplay() = 0;
    virtual  ~FrameFeeder(){}
 
 };
-
-
 
 class ImgStoreFeeder: public FrameFeeder
 {
 
 private:
-	string			mFolder;
-	int 	        	mSkipFrames;
-	uint32_t 		mFrameCount;
+	const std::size_t		mMAX_BUFFER_SIZE;
+	const std::size_t		mMAX_RETRY;
+	const std::size_t		mSLEEP_ms;
+
+	string					mFolder;
+	int 	        		mSkipFrames;
+	uint32_t 				mFrameCount;
 	vector< cv::String> 	mFiles;
-	std::thread		mAsyncGrabber;
+	std::thread				mAsyncGrabber;
+	std::mutex 				mMutex;
+
+	void enqueue(cv::UMat& frame, vector<cv::UMat>& queue) override;
+	void parseSettings(string& srcStr) override;
 
 public:
-	
 	ImgStoreFeeder(string sourceStr);
-	void parseSettings(string& srcStr) override;
+	cv::UMat dequeue() override;
+	cv::UMat dequeueDisplay() override;
 	~ImgStoreFeeder();
 };
 

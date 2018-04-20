@@ -79,6 +79,17 @@ void BufferingState<GRAPH>::run(cv::UMat Frame)
     mGraph.execute(Frame);
     this->StateCounter++;
   }
+  catch(const char* msg)
+  {
+	#ifdef PROFILER_ENABLED
+	  LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	  <<"******************************"<<endl
+	  << "Buffering Execution Failed" <<endl
+	  << msg <<endl
+	  <<"******************************"<<endl<<endl;
+	 #endif
+	currentStatus = StateStatus::ERROR;
+  }
   catch(...)
   {
     currentStatus = StateStatus::ERROR;

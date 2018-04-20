@@ -59,7 +59,7 @@ mProfiler.start("SETUP_ASYNC_TEMPLATES");
 	{
 	   //Local Variables
 	   WriteLock  lLock(_mutex, std::defer_lock);	
-	   int lRowIndex;
+	   int lRowIndex, lColIndex;
 	   cv::Rect lROI;
 
 	   //Extract Depth Template
@@ -67,7 +67,7 @@ mProfiler.start("SETUP_ASYNC_TEMPLATES");
 	   lROI = cv::Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSPAN);
 	
 	   lLock.lock();
-	    mDEPTH_MAP_ROOT(lROI).copyTo(mDepthTemplate);
+	    mDepthTemplate = cv::Mat(mDEPTH_MAP_ROOT, lROI);
 	   lLock.unlock();
 
 	   //Extract Focus Template
@@ -75,8 +75,18 @@ mProfiler.start("SETUP_ASYNC_TEMPLATES");
 	   lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
 
 	   lLock.lock();
-	    mFOCUS_MASK_ROOT(lROI).copyTo(mFocusTemplate);	
+	    mFocusTemplate  = cv::Mat(mFocusTemplate, lROI);
 	   lLock.unlock();
+
+	   //Extract Corresponding Gradient Orientation Template
+	   lRowIndex =  mCAMERA.RES_VH(0) - (mVP_RANGE_V + mVanishPt.V);
+	   lColIndex =  mCAMERA.RES_VH(1) - (mCAMERA.O_ICCS_ICS.x - mVanishPt.H) ;
+	   lROI	     =  cv::Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
+
+	   lLock.lock();
+	    mGradTanTemplate  = cv::Mat(mGRADIENT_TAN_ROOT, lROI);
+	   lLock.unlock();
+
 	});
 
 #ifdef PROFILER_ENABLED
@@ -104,12 +114,6 @@ mProfiler.start("EXTRACT_ROI");
 	 //Define ROI from the Input Image
 	 lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
 	 FrameGRAY(lROI).copyTo(mFrameGRAY_ROI);
-
-	 //Extract Corrseponding Gradient Orientation Template
-	 lRowIndex =  mCAMERA.RES_VH(0) - (mVP_RANGE_V + mVanishPt.V);
-	 lColIndex =  mCAMERA.RES_VH(1) - (mCAMERA.O_ICCS_ICS.x - mVanishPt.H) ;
-	 lROI	   =  cv::Rect(lColIndex, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
-	 mGRADIENT_TAN_ROOT(lROI).copyTo(mGradTanTemplate);
 
 
 #ifdef PROFILER_ENABLED
