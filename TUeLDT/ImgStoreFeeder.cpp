@@ -39,35 +39,35 @@ ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
     {
 
 	  if(!Paused.load())
+       {
+          cv::UMat lFrame, lFrameGRAY;
+
+          lLock.lock(); //protecting mFiles and mFrameCount shared variables.
+           lFrame  		= imread(mFiles[mFrameCount]).getUMat(cv::ACCESS_READ);
+           lFrameGRAY  	= imread(mFiles[mFrameCount], cv::IMREAD_GRAYSCALE).getUMat(cv::ACCESS_READ);
+          lLock.unlock();
+
+	  //Put the frames in the queue for the stateMachine
+          enqueue(lFrameGRAY, mProcessQueue); //Thread-safe method to enqueue processing Frames
+          enqueue(lFrame,     mDisplayQueue); //Thread-safe method to enqueue display Frames
+
+          #ifdef PROFILER_ENABLED
+           LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+           <<"******************************"<<endl
+           <<  "Frame enqueued:"<<endl
+           << (std::string)(mFiles[mFrameCount])<<endl
+	   << mFrameCount<<"/"<<mFiles.size()<<endl
+           <<"******************************"<<endl<<endl;
+	  #endif
+
+          if(mFrameCount+1 < mFiles.size())
 	  {
-        cv::UMat lFrame, lFrameGRAY;
+             mFrameCount ++;
+          }
+      }
 
-	    lLock.lock(); //protecting mFiles and mFrameCount shared variables.
-	      lFrame  		= imread(mFiles[mFrameCount]).getUMat(cv::ACCESS_READ);
-	      lFrameGRAY  	= imread(mFiles[mFrameCount], cv::IMREAD_GRAYSCALE).getUMat(cv::ACCESS_READ);
-	    lLock.unlock();
 
-	    //Put the frames in the queue for the stateMachine
-        enqueue(lFrameGRAY, mProcessQueue); //Thread-safe method to enqueue processing Frames
-       // enqueue(lFrame,     mDisplayQueue); //Thread-safe method to enqueue display Frames
-
-        #ifdef PROFILER_ENABLED
-          LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-          <<"******************************"<<endl
-          <<  "Frame enqueued:"<<endl
-          << (std::string)(mFiles[mFrameCount])<<endl
-		  << mFrameCount<<"/"<<mFiles.size()<<endl
-          <<"******************************"<<endl<<endl;
-	    #endif
-
-        if(mFrameCount+1 < mFiles.size())
-	    {
-          mFrameCount ++;
-        }
-
-	  }
-
-	  std::this_thread::sleep_for(std::chrono::milliseconds(mSLEEP_ms));
+      std::this_thread::sleep_for(std::chrono::milliseconds(mSLEEP_ms));
    }
 
   });
@@ -109,62 +109,62 @@ void ImgStoreFeeder::parseSettings(string& srcStr)
 
 void ImgStoreFeeder::enqueue(cv::UMat& frame, vector<cv::UMat>& queue)
 {
-	WriteLock  lLock(mMutex, std::defer_lock);
+   WriteLock  lLock(mMutex, std::defer_lock);
 
-	lLock.lock(); //Protect queue from race-condition
+   lLock.lock(); //Protect queue from race-condition
 
-	 queue.push_back(frame);
+   queue.push_back(frame);
 
-	 if(queue.size() >  mMAX_BUFFER_SIZE)
-	 {
-	    queue.erase(queue.begin());
+   if(queue.size() >  mMAX_BUFFER_SIZE)
+   {
+      queue.erase(queue.begin());
 
-	    #ifdef PROFILER_ENABLED
-	      LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-	      <<"******************************"<<endl
-	      <<  "WARNING!! "<<endl
-	      <<  "Dropping frames in the queue, cannot keep-up with the frame production rate"<<endl
-	      <<"******************************"<<endl<<endl;
-	    #endif
-	 }
-	lLock.unlock();
+      #ifdef PROFILER_ENABLED
+       LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+       <<"******************************"<<endl
+       <<  "WARNING!! "<<endl
+       <<  "Dropping frames in the queue, cannot keep-up with the frame production rate"<<endl
+       <<"******************************"<<endl<<endl;
+     #endif
+   }
+   lLock.unlock();
 }
 
 cv::UMat ImgStoreFeeder::dequeue()
 {
-	WriteLock  lLock(mMutex, std::defer_lock);
-	size_t lTryGrab = 0;
+   WriteLock  lLock(mMutex, std::defer_lock);
+   size_t lTryGrab = 0;
 
-	lLock.lock(); //Protect queue from any race-condition
-	 while (mProcessQueue.empty() && lTryGrab < mMAX_RETRY)
-	{
-	   lLock.unlock();
-	   lTryGrab ++ ;
-	   std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	   lLock.lock();
-	}
+   lLock.lock(); //Protect queue from any race-condition
+   while (mProcessQueue.empty() && lTryGrab < mMAX_RETRY)
+   {
+      lLock.unlock();
+      lTryGrab ++ ;
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      lLock.lock();
+   }
 
-	if(mProcessQueue.empty())
-	{
-	   throw "No images in the process queue, the producer is too slow or down! [Empty Frame Queue] ";
-	}
+   if(mProcessQueue.empty())
+   {
+      throw "No images in the process queue, the producer is too slow or down! [Empty Frame Queue] ";
+   }
 
-	cv::UMat lFrame = mProcessQueue[0];
-	mProcessQueue.erase(mProcessQueue.begin());
-	lLock.unlock();
+   cv::UMat lFrame = mProcessQueue[0];
+   mProcessQueue.erase(mProcessQueue.begin());
+   lLock.unlock();
 
-	#ifdef PROFILER_ENABLED
-	  LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-	  <<"******************************"<<endl
-	  <<  "Frame dequeued for processing:"<<endl
-	  <<  "[Attempt count: "<<lTryGrab<<"/"<<mMAX_RETRY<<"]"<<endl
-	  <<"******************************"<<endl<<endl;
-	#endif
+   #ifdef PROFILER_ENABLED
+    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+    <<"******************************"<<endl
+    <<  "Frame dequeued for processing:"<<endl
+    <<  "[Attempt count: "<<lTryGrab<<"/"<<mMAX_RETRY<<"]"<<endl
+    <<"******************************"<<endl<<endl;
+   #endif
 
-	if(lFrame.empty())
-	   throw "Failed to get the frame from the process queue! [Empty Frame Exception] ";
+   if(lFrame.empty())
+    throw "Failed to get the frame from the process queue! [Empty Frame Exception] ";
 
-	return lFrame;
+   return lFrame;
 }
 
 cv::UMat ImgStoreFeeder::dequeueDisplay()
@@ -173,57 +173,57 @@ cv::UMat ImgStoreFeeder::dequeueDisplay()
    size_t lTryGrab = 0;
 
    lLock.lock(); //Protect queue from race-condition
-    while (mDisplayQueue.empty() && lTryGrab < mMAX_RETRY)
-    {
-	   lLock.unlock();
-	   lTryGrab ++ ;
-	   std::this_thread::sleep_for(std::chrono::milliseconds(5));
-	   lLock.lock();
-    }
-    if(mDisplayQueue.empty())
-    {
-  	   cout<<"No images in the display queue, the producer is too slow or down! [Empty Frame Queue] "<<endl;
-  	   throw "No images in the display queue, the producer is too slow or down! [Empty Frame Queue] ";
-    }
+   while (mDisplayQueue.empty() && lTryGrab < mMAX_RETRY)
+   {
+      lLock.unlock();
+      lTryGrab ++ ;
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      lLock.lock();
+   }
+   if(mDisplayQueue.empty())
+   {
+      cout<<"No images in the display queue, the producer is too slow or down! [Empty Frame Queue] "<<endl;
+      throw "No images in the display queue, the producer is too slow or down! [Empty Frame Queue] ";
+   }
 
-    cv::UMat lFrame = mDisplayQueue[0];
-    mDisplayQueue.erase(mDisplayQueue.begin());
-    lLock.unlock();
+   cv::UMat lFrame = mDisplayQueue[0];
+   mDisplayQueue.erase(mDisplayQueue.begin());
+   lLock.unlock();
 
-    #ifdef PROFILER_ENABLED
-     LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-     <<"******************************"<<endl
-     <<  "Frame dequeued for display:"<<endl
-     <<  "[Attempt count: "<<lTryGrab<<"/"<<mMAX_RETRY<<"]"<<endl
-     <<"******************************"<<endl<<endl;
-    #endif
+   #ifdef PROFILER_ENABLED
+    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+    <<"******************************"<<endl
+    <<  "Frame dequeued for display:"<<endl
+    <<  "[Attempt count: "<<lTryGrab<<"/"<<mMAX_RETRY<<"]"<<endl
+    <<"******************************"<<endl<<endl;
+   #endif
 
-    if(lFrame.empty())
-      throw "Failed to get the frame from the display Queue! [Empty Frame Exception] ";
+   if(lFrame.empty())
+   throw "Failed to get the frame from the display Queue! [Empty Frame Exception] ";
 
-    return lFrame;
+   return lFrame;
 }
 
 ImgStoreFeeder::~ImgStoreFeeder()
 {
-	Stopped.store(true);
+   Stopped.store(true);
 
-	if(mAsyncGrabber.joinable())
-	{
-	   mAsyncGrabber.join();
+   if(mAsyncGrabber.joinable())
+   {
+      mAsyncGrabber.join();
 
-   	  #ifdef PROFILER_ENABLED
-		LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-		<<  "********************************"<<endl
-		<<  "[ImgStoreFeeder is Joined]"<<endl
-		<<"******************************"<<endl<<endl;
-  	  #endif
-	}
+      #ifdef PROFILER_ENABLED
+	LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	<<  "********************************"<<endl
+	<<  "[ImgStoreFeeder is Joined]"<<endl
+	<<"******************************"<<endl<<endl;
+      #endif
+   }
 
-   	#ifdef PROFILER_ENABLED
-     	 LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-     	 <<  "********************************"<<endl
-    	 <<  "[ImgStoreFeeder is Destroyed]"<<endl
-     	 <<"******************************"<<endl<<endl;
-  	#endif
+   #ifdef PROFILER_ENABLED
+    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+    <<  "********************************"<<endl
+    <<  "[ImgStoreFeeder is Destroyed]"<<endl
+    <<"******************************"<<endl<<endl;
+   #endif
 }

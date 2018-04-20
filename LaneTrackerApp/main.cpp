@@ -1,5 +1,6 @@
-/** \file */ 
-#include "SigInit.h"
+/** \file */
+
+#include <SigInt.h>
 #include "FrameFeeder.h"
 #include "StateMachine.h"
 #include "boost/program_options.hpp"
@@ -12,10 +13,10 @@ namespace po = boost::program_options;
 unique_ptr<FrameFeeder> createFrameFeeder(FrameSource srcMode, string srcString);
 
 
-int main(int argc, char* argv[]) /**  
+int main(int argc, char* argv[]) /**
 	This is the entry point of the application.
 	- Initialises the sigInit handler
-	- Creates a stateMachine and spins it until user issues a quit signal through the sigInit handler. 		
+	- Creates a stateMachine and spins it until user issues a quit signal through the sigInit handler.
 	*/
 {
 	int lReturn 	= 0;
@@ -24,28 +25,29 @@ int main(int argc, char* argv[]) /**
 	std::string 	lSourceStr;
 
 
-	// Prsing command line options 
-	{
-	   po::options_description	lDesc("Options");
 
-	   lDesc.add_options()
-	   ("help,h", 
+	// Prsing command line options
+	{
+	  po::options_description	lDesc("Options");
+
+	  lDesc.add_options()
+	  ("help,h",
 			"\t produces help message")
 
-	   ("Mode,m", 
+	  ("Mode,m",
 			po::value<FrameSource>(&lFrameSource)->default_value(FrameSource::DIRECTORY),
 			"\t selects frame input mode")
 
-	   ("Source,s",
+	  ("Source,s",
 			po::value<string>(&lSourceStr)->default_value("../DataSet"),
 			"\t provides source configuration");
 
-	   po::variables_map vMap;
-	   po::store(po::parse_command_line(argc, argv, lDesc), vMap);
-	   po::notify(vMap);
+	  po::variables_map vMap;
+	  po::store(po::parse_command_line(argc, argv, lDesc), vMap);
+	  po::notify(vMap);
 
-	   if ( vMap.count("help") )
-	   {
+	  if ( vMap.count("help") )
+	  {
  	     cout << lDesc <<endl;
 	     cout << "	Valid arguments for 'Mode': ";
 	     cout << "["<<FrameSource::DIRECTORY<<" ";
@@ -55,100 +57,130 @@ int main(int argc, char* argv[]) /**
 	     cout <<endl<<endl<< "	Examples:"<<endl;
 	     cout<< "	./TUeLaneTracker -m " << FrameSource::DIRECTORY << " -s " << "/home/DataSet" <<endl;
 	     cout<<endl<<endl;
-	     return 0;
-	   }
+	     lReturn = 1;
+	  }
 
-	} // End parsing command line options 
-	
-
+	} // End parsing command line options
 
 
 
-	unique_ptr<FrameFeeder>  lPtrFeeder = createFrameFeeder(lFrameSource, lSourceStr);
-	if(lPtrFeeder == nullptr)
+	unique_ptr<FrameFeeder> lPtrFeeder;
+	if (lReturn == 0) //create FrameFeeder
 	{
-	  lReturn = -1;
-	}
-
-	shared_ptr<SigInit> sigInit= make_shared<SigInit>();
-	if(sigInit->sStatus == SigStatus::FAILURE)
-	{
-	  lReturn = -1;
+	  lPtrFeeder = createFrameFeeder(lFrameSource, lSourceStr);
+	  if(lPtrFeeder == nullptr)
+	  {
+	    lReturn = -1;
+	  }
 	}
 
 
-	if (lReturn==0)
+	shared_ptr<SigInt> lPtrSigInt;
+	if(lReturn == 0) //create SigInt
 	{
-	  uint64_t lCyclesCount = 0;
+	  lPtrSigInt = make_shared<SigInt>();
+	  if(lPtrSigInt->sStatus == SigStatus::FAILURE)
+	  {
+	    lReturn = -1;
+	  }
+	}
 
+
+	unique_ptr<StateMachine> lPtrStateMachine;
+	if (lReturn==0) //create StateMachine
+	{
 	  std::cout<<endl<<endl;
 	  std::cout<<"******************************"<<std::endl;
 	  std::cout<<" Press Ctrl + c to terminate."<<std::endl;
 	  std::cout<<"******************************"<<std::endl;
 
-	  StateMachine stateMachine(move(lPtrFeeder));
-
-	  cout<<stateMachine.getCurrentState();
-	  States lPreviousState = stateMachine.getCurrentState();
-
-	  while (stateMachine.getCurrentState() != States::DISPOSED)
+	  try
 	  {
-		if (sigInit->sStatus == SigStatus::STOP)
-		stateMachine.quit();
-
-		lReturn = stateMachine.spin();
-		lCyclesCount ++;
-		
-		if(lPreviousState != stateMachine.getCurrentState())
-		{
-		  cout<<endl<<stateMachine.getCurrentState();
-		  std::cout.flush();
-		  lPreviousState = stateMachine.getCurrentState();
-		}
-		else if (lCyclesCount%100==0)
-		{
-		  cout <<endl<<stateMachine.getCurrentState();
-		  cout <<"state cycle-count = " << lCyclesCount;
-		}
-	   }// End spinning
-	   
+	     lPtrStateMachine.reset( new StateMachine(move(lPtrFeeder)) );
+	  }
+	  catch(const char* msg)
+	  {
+	     cout<<"******************************"<<endl
+	     <<"Failed to create the StateMachine!"<<endl
+	     << msg <<endl
+	     <<"******************************"<<endl<<endl;
+	     lReturn =-1;
+	  }
+	  catch(...)
+	  {
+	     lReturn = -1;
+	  }
 	}
 
+
+	States lPreviousState;
+	if (lReturn ==0) //Get current State of the stateMachine
+	{
+	   cout<<lPtrStateMachine->getCurrentState();
+	   lPreviousState = lPtrStateMachine->getCurrentState();
+	}
+
+
+        if(lReturn == 0) //spin the stateMachine
+        {
+    	   uint64_t lCyclesCount = 0;
+    	   StateMachine& stateMachine = *lPtrStateMachine.get();
+
+	   while (stateMachine.getCurrentState() != States::DISPOSED)
+	   {
+
+	      if (lPtrSigInt->sStatus == SigStatus::STOP)
+		  stateMachine.quit();
+
+	      lReturn = stateMachine.spin();
+	      lCyclesCount ++;
+
+	      if(lPreviousState != stateMachine.getCurrentState())
+	      {
+	         cout<<endl<<stateMachine.getCurrentState();
+	         std::cout.flush();
+	         lPreviousState = stateMachine.getCurrentState();
+	      }
+	      else if (lCyclesCount%100==0)
+	      {
+	         cout <<endl<<stateMachine.getCurrentState();
+	         cout <<"state cycle-count = " << lCyclesCount;
+	      }
+
+	   }// End spinning
+        }
+
+	lPtrStateMachine.reset( nullptr);
 	cout<<endl<<"The program ended with exit code " <<lReturn<<endl;
 	return(lReturn);
-	
 }
 
 
 
 unique_ptr<FrameFeeder> createFrameFeeder(FrameSource srcMode, string srcString)
 {
-
 	unique_ptr<FrameFeeder>	lPtrFeeder;
 
 	/** Create Image Feeder */
 	try
 	{
 	   lPtrFeeder=  unique_ptr<FrameFeeder>( new ImgStoreFeeder(srcString) );
-
 	}
 	catch(const char* msg)
 	{
 	    cout<<"******************************"<<endl
-	    <<"Failed to create frame feeder!"<<endl
+	    <<"Failed to create the FrameFeeder!"<<endl
 	    << msg <<endl
 	    <<"******************************"<<endl<<endl;
-	    lPtrFeeder = nullptr; 
+	    lPtrFeeder = nullptr;
 	}
 	catch (...)
 	{
 	    cout<<"******************************"<<endl
-	    <<"Failed to create frame feeder!"<<endl
-	    << "unkown-excepton"<<endl
+	    <<"Failed to create the FrameFeeder!"<<endl
+	    << "Unknown exception"<<endl
 	    <<"******************************"<<endl<<endl;
-	   lPtrFeeder = nullptr; 
+	   lPtrFeeder = nullptr;
 	}
-
 	return lPtrFeeder;
-
 }

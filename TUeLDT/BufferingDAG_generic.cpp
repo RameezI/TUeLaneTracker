@@ -57,6 +57,7 @@ mProfiler.start("SETUP_ASYNC_TEMPLATES");
 
 	mFuture = std::async(std::launch::async, [this]
 	{
+	  
 	   //Local Variables
 	   WriteLock  lLock(_mutex, std::defer_lock);	
 	   int lRowIndex, lColIndex;
@@ -66,16 +67,18 @@ mProfiler.start("SETUP_ASYNC_TEMPLATES");
 	   lRowIndex = mCAMERA.RES_VH(0) -  mSPAN; 
 	   lROI = cv::Rect(0,lRowIndex,mCAMERA.RES_VH(1), mSPAN);
 	
+
 	   lLock.lock();
 	    mDepthTemplate = cv::Mat(mDEPTH_MAP_ROOT, lROI);
 	   lLock.unlock();
+
 
 	   //Extract Focus Template
 	   lRowIndex = mVP_RANGE_V	 - mVanishPt.V;
 	   lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
 
 	   lLock.lock();
-	    mFocusTemplate  = cv::Mat(mFocusTemplate, lROI);
+	    mFocusTemplate  = cv::Mat(mFOCUS_MASK_ROOT, lROI);
 	   lLock.unlock();
 
 	   //Extract Corresponding Gradient Orientation Template
@@ -102,13 +105,29 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
+#ifdef PROFILER_ENABLED
+mProfiler.start("WAIT_ASYNC_ROI");
+#endif
+	  mFuture.wait();
+
+#ifdef PROFILER_ENABLED
+mProfiler.end();
+LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
+				<<"******************************"<<endl
+				<<  "Waiting for async task, extracting ROIs." <<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("WAIT_ASYNC_ROI")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("WAIT_ASYNC_ROI")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("WAIT_ASYNC_ROI")<<endl
+				<<"******************************"<<endl<<endl;
+				#endif
 
 #ifdef PROFILER_ENABLED
 mProfiler.start("EXTRACT_ROI");
 #endif
 
+
+
 	 int lRowIndex	= mCAMERA.RES_VH(0) -mSPAN;
-	 int lColIndex;
 	 cv::Rect lROI;
 
 	 //Define ROI from the Input Image
@@ -126,6 +145,8 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<  "Min Time: " << mProfiler.getMinTime("EXTRACT_ROI")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
+
+
 
 
 
@@ -257,22 +278,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
-#ifdef PROFILER_ENABLED
-mProfiler.start("WAIT_ASYNC_ROI");
-#endif
-
-	mFuture.wait();
-
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
-				<<"******************************"<<endl
-				<<  "Waiting for async task, extracting ROIs." <<endl
-				<<  "Max Time: " << mProfiler.getMaxTime("WAIT_ASYNC_ROI")<<endl
-				<<  "Avg Time: " << mProfiler.getAvgTime("WAIT_ASYNC_ROI")<<endl
-				<<  "Min Time: " << mProfiler.getMinTime("WAIT_ASYNC_ROI")<<endl
-				<<"******************************"<<endl<<endl;
-				#endif
 
 
 
@@ -295,4 +300,5 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				<<  "Min Time: " << mProfiler.getMinTime("FOCUS")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif	
+
 }
