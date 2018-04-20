@@ -105,21 +105,7 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
-#ifdef PROFILER_ENABLED
-mProfiler.start("WAIT_ASYNC_ROI");
-#endif
-	  mFuture.wait();
 
-#ifdef PROFILER_ENABLED
-mProfiler.end();
-LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
-				<<"******************************"<<endl
-				<<  "Waiting for async task, extracting ROIs." <<endl
-				<<  "Max Time: " << mProfiler.getMaxTime("WAIT_ASYNC_ROI")<<endl
-				<<  "Avg Time: " << mProfiler.getAvgTime("WAIT_ASYNC_ROI")<<endl
-				<<  "Min Time: " << mProfiler.getMinTime("WAIT_ASYNC_ROI")<<endl
-				<<"******************************"<<endl<<endl;
-				#endif
 
 #ifdef PROFILER_ENABLED
 mProfiler.start("EXTRACT_ROI");
@@ -149,7 +135,21 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 
 
 
+#ifdef PROFILER_ENABLED
+mProfiler.start("WAIT_ASYNC_ROI");
+#endif
+	  mFuture.wait();
 
+#ifdef PROFILER_ENABLED
+mProfiler.end();
+LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
+				<<"******************************"<<endl
+				<<  "Waiting for async task, extracting ROIs." <<endl
+				<<  "Max Time: " << mProfiler.getMaxTime("WAIT_ASYNC_ROI")<<endl
+				<<  "Avg Time: " << mProfiler.getAvgTime("WAIT_ASYNC_ROI")<<endl
+				<<  "Min Time: " << mProfiler.getMinTime("WAIT_ASYNC_ROI")<<endl
+				<<"******************************"<<endl<<endl;
+				#endif
 
 
 #ifdef PROFILER_ENABLED
