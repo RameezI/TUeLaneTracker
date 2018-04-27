@@ -136,8 +136,7 @@ vector<float> FrameRenderer::getDirectionalParameters(){
       a = 0;
     }
 
-      std::cout << "a: " << a << "\tb1: " << b1 << "\tb2: " << b2 << "\tlanew: " << b1 + b2 << endl;
-    //std::cout << "Lane width: " << (b1 + b2) << endl;
+      //std::cout << "a: " << a << "\tb1: " << b1 << "\tb2: " << b2 << "\tlanew: " << b1 + b2 << endl;
 
     vector<float> directionalParams;
     directionalParams.push_back(a);
@@ -160,15 +159,13 @@ cv::Mat FrameRenderer::getLaneFrame(vector<float> dirParams)
   cv::Mat mLaneFrame(resV,resH,CV_8UC3,Scalar(0,0,0));
 
   float widthR = 600;
-
-  float cstart,cend;
+  float cstart, cend;
 
   cstart = resH / 2;
   cend = cstart + resV * tan(dirParams[0]*M_PI/180);
 
   int pxl = cstart + dirParams[1]*resH/widthR;
   int pxr = cstart - dirParams[2]*resH/widthR;
-
 
 	line(mLaneFrame, cvPoint(pxl, 0), cvPoint(pxl,resV), cvScalar(0,255,0), 3);
   line(mLaneFrame, cvPoint(pxr, 0), cvPoint(pxr, resV), cvScalar(0,255,0), 3);

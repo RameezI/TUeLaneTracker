@@ -85,12 +85,12 @@ private:
 
 	// Only Enable in case of Video Recording
 	//cv::VideoWriter mOutputVideo;
-
 	
 public:
 	TrackingLaneDAG_generic(BufferingDAG_generic&& bufferingGraph);
 	int  init_DAG(LaneFilter* laneFilter, VanishingPtFilter* vpFilter);
 	void execute(cv::Mat& FrameGRAY);
+	int getProbability(){return mMaxPosterior;};
 };
 
 #endif // TRACKINGLANESDAG_GENERIC_H

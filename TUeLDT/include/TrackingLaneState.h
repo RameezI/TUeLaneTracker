@@ -46,6 +46,8 @@ public:
 	const LaneModel& run(cv::Mat Frame);
 	void setupDAG(LaneFilter* laneFilters, VanishingPtFilter* vpFilter);
 
+  int getProbability();
+
 	template<typename GRAPH_BASE>
 	TrackingLaneState(GRAPH_BASE&& lBaseGraph);
 };
@@ -88,6 +90,12 @@ const LaneModel& TrackingLaneState<GRAPH>::run(cv::Mat Frame)
    }
 
    return mGraph.mLaneModel;
+}
+
+template<typename GRAPH>
+int TrackingLaneState<GRAPH>::getProbability()
+{
+  return mGraph.getProbability();
 }
 
 #endif // TRACKING_LANE_STATE_H

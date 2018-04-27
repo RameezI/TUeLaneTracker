@@ -71,4 +71,4 @@ else()
 endif()
 
 
-install(TARGETS  ${PCK} DESTINATION install)
+#install(TARGETS  ${PCK} DESTINATION install)

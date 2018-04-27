@@ -428,6 +428,7 @@ mProfiler.start("HISTOGRAM_MATCHING");
 	   if (mMaxPosterior != 0)
 	   {
 	      mBaseHistModel = Models[lBestModelIdx];
+		  //std::cout<<"Post-Prob: " << mMaxPosterior << endl;
 	   }
 
 	}//Scope End

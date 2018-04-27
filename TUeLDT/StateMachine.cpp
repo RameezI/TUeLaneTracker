@@ -215,6 +215,8 @@ int StateMachine::spin()
 		    mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
 		    mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
 		   	mDisplayFrame = mPtrFrameRenderer->getCurrentFrame(); //mPtrFrameFeeder->dequeueDisplay();
+
+		  	mConfidence = (float)mPtrTrackingState->getProbability() / 300;
 		  }
 		  catch(const char* msg)
 		  {
@@ -318,7 +320,6 @@ vector<float> StateMachine::getDirectionalParams()
 	vector<float> paramsOut;
 	if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
 	{
-		   //frameout = mDisplayFrame;
 		   paramsOut = mPtrFrameRenderer->getDirectionalParameters();
 	}
 	return paramsOut;
@@ -329,6 +330,7 @@ void StateMachine::setLaneParameters(vector<int> newLaneParameters)
 {
 	if (newLaneParameters.size() == 5)
 	{
+		mLaneParams.clear();
 		mLaneParams.push_back(newLaneParameters[0]);
 		mLaneParams.push_back(newLaneParameters[1]);
 		mLaneParams.push_back(newLaneParameters[2]);
@@ -338,10 +340,6 @@ void StateMachine::setLaneParameters(vector<int> newLaneParameters)
 	else
 	{
 		std::cout<<"Alternative Lane Parameters not found! Using standard..."<<endl;
-		mLaneParams.push_back(300);
-		mLaneParams.push_back(50);
-		mLaneParams.push_back(250);
-		mLaneParams.push_back(500);
-		mLaneParams.push_back(30);
+		mLaneParams = {300, 50, 250, 500, 30};
 	}
 }

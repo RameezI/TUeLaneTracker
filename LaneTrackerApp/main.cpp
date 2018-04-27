@@ -102,6 +102,7 @@ int main(int argc, char* argv[]) /**
 		lReturn = stateMachine.spin();
 		if (lCyclesCount > 10)
 			imshow("output",stateMachine.getCurrentFrame());
+			std::cout<<stateMachine.getConfidence() << endl;
 		lCyclesCount ++;
 		
 		if(lPreviousState != stateMachine.getCurrentState())

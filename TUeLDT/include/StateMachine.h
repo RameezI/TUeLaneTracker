@@ -49,6 +49,7 @@ private:
 	cv::Mat mDisplayFrame;
 
 	vector<int> 					mLaneParams;
+	float							mConfidence;
 
 
 	#ifdef S32V2XX
@@ -70,6 +71,7 @@ public:
 	cv::Mat getTopDownFrame();
 	vector<float> getDirectionalParams();
 	void setLaneParameters(vector<int> newLaneParameters);
+	float getConfidence(){return mConfidence;};
 
 	StateMachine(unique_ptr<FrameFeeder> frameFeeder);
 	int spin();

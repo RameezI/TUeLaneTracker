@@ -40,33 +40,25 @@ RTMapsFeeder::~RTMapsFeeder()
 
 }
 
-
 void RTMapsFeeder::setImageLinker(cv::Mat imgLink)
 {
     mImgCurrent = imgLink;
-    //ptrImgInput = imgLink;
-    //std::cout<<"Image linked!"<<endl;
 }
 
 cv::Mat RTMapsFeeder::dequeue()
 {
-    //std::cout <<" Dequeue gray" << endl;
     cv::Mat gray;
     cv::cvtColor(mImgCurrent,gray, cv::COLOR_RGB2GRAY);
-    //cv::cvtColor(*ptrImgInput,gray, cv::COLOR_RGB2GRAY);
     return gray;
 }
 
 cv::Mat RTMapsFeeder::dequeueDisplay()
 {
-    //std::cout<<"dequeue disp" <<endl;
-    //imshow("dequeue",mImgCurrent);
-    return  mImgCurrent; // *ptrImgInput;//
+    return  mImgCurrent;
 }
 
 void RTMapsFeeder::enqueue(cv::Mat& frame, vector<cv::Mat>& queue)
 {
-    std::cout<<"enqueue"<<endl;
     if (false)
         queue.push_back(frame);
 }
