@@ -212,9 +212,9 @@ int StateMachine::spin()
 		  {
 		       mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
 
-			   #ifdef DISPLAY_GRAPHICS
-		        mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
-			   #endif
+			#ifdef DISPLAY_GRAPHICS
+		         mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
+			#endif
 		  }
 		  catch(const char* msg)
 		  {

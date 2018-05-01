@@ -52,6 +52,9 @@ int TrackingLaneDAG_generic::init_DAG(LaneFilter* laneFilter, VanishingPtFilter*
 	mLaneFilter		 = laneFilter;
 	mVpFilter		 = vpFilter;
 
+        mX_ICCS   		= mX_ICS + mCAMERA.O_ICS_ICCS.x;
+        mY_ICCS   		= mY_ICS + mCAMERA.O_ICS_ICCS.y;
+
 	const size_t& lCOUNT 	 = mLaneFilter->COUNT_BINS;
 
 	mX_ICCS_SCALED	 	 =  SCALE_INTSEC*mX_ICCS;
@@ -167,12 +170,12 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 mProfiler.start("COMPUTE_INTERSECTIONS");
 #endif	
 	//Base Intersections
-	subtract(-mLaneFilter->BASE_LINE_ICCS, -mY_ICCS, mIntBase, cv::noArray(), CV_32S);
+	subtract(mY_ICCS, mLaneFilter->BASE_LINE_ICCS, mIntBase, cv::noArray(), CV_32S);
 	divide(mIntBase, mGradTanFocussed, mIntBase, SCALE_INTSEC_TAN, CV_32S);
 	add(mIntBase, mX_ICCS_SCALED, mIntBase);
 	
 	//Purview Intersections
-	subtract(-mLaneFilter->PURVIEW_LINE_ICCS, -mY_ICCS, mIntPurview, cv::noArray(), CV_32S);
+	subtract(mY_ICCS, mLaneFilter->PURVIEW_LINE_ICCS, mIntPurview, cv::noArray(), CV_32S);
 	divide(mIntPurview,mGradTanFocussed, mIntPurview, SCALE_INTSEC_TAN, CV_32S);
 	add(mIntPurview, mX_ICCS_SCALED, mIntPurview);
 

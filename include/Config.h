@@ -26,18 +26,21 @@
 //#define DISPLAY_GRAPHICS 	/**< If defined, the program renders the results on to a display */
 //#define DISPLAY_GRAPHICS_DCU  /**< If defined, the graphics are rendered on the s32v23 DCU*/
 
+
+
 #define S32V2XX			/**< If defined, the program runs s32v-hardware accelerated algorithm */
 #ifdef S32V2XX
  #include "GraphsConfig.h"
 #endif
 
 
+
 /** Provide target camera and resolution [Required for loading corresponding calibration file] */
 #define CAMERA_NAME "BUMBLEBEE_640x480"
 
 
-// Configure FrameFeeder
 
+// Configure FrameFeeder
 
 
 //Configuration for Algorithm
