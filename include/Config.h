@@ -45,15 +45,15 @@
 
 //Configuration for Algorithm
 #define BASE_LINE_IBCS	 	  0     /**< Describes base line in Image-Bottom-Coordinate-System */
-#define PURVIEW_LINE_IBCS	160   /**< Describes purview line in Image-Bottom-Coordinate-System */
+#define PURVIEW_LINE_IBCS	160     /**< Describes purview line in Image-Bottom-Coordinate-System */
 
 #define STEP_LANE_FILTER_CM	 10    /**< Provide bin-size for the 1D lane filters (At base and purview lines) [cm]*/
 #define STEP_VP_FILTER		 10    /**< Provide bin-size for 2D vanishing point filter [pixels]*/
 
 #define VP_RANGE_VER		 25    /**< Vertical range of VP on either side of the Horizon Line [pixels] */
-#define VP_RANGE_HOR		300   /**< Horizental range of VP on either side of center point on the horizon line [pixels] */
+#define VP_RANGE_HOR		300    /**< Horizontal range of VP on either side of center point on the horizon line [pixels] */
 
-#define BUFFER_COUNT		  3     /**<  Provide number of probabiltiy frames to buffer for Max-Pooling operations [Temporal Filtering]*/
+#define BUFFER_COUNT		 3     /**<  Provide number of probability frames to buffer for Max-Pooling operations [Temporal Filtering]*/
 
 
 #endif
