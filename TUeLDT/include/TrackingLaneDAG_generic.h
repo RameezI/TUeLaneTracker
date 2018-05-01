@@ -31,54 +31,58 @@ template<typename T>
 friend class TrackingLaneState;
 	
 private:
-	int32_t		mMAX_PIXELS_ROI;
+	int32_t			mMAX_PIXELS_ROI;
 	
-	float   	mLikelihood_LB;
-	float 		mLikelihood_RB;
-	float   	mLikelihood_NB;
-    	float		mLikelihood_W;
+	float   		mLikelihood_LB;
+	float 			mLikelihood_RB;
+	float   		mLikelihood_NB;
+    	float			mLikelihood_W;
 
-	float 		mConditionalProb;
-	float		mPosterior;
-	float		mMaxPosterior;
-	int32_t		mCorrelationNB;
+	float 			mConditionalProb;
+	float			mPosterior;
+	float			mMaxPosterior;
+	int32_t			mCorrelationNB;
 
-	int32_t 	mLOWER_LIMIT_BASE;
-	int32_t 	mLOWER_LIMIT_PURVIEW;
+	int32_t 		mLOWER_LIMIT_BASE;
+	int32_t 		mLOWER_LIMIT_PURVIEW;
 
-	int32_t 	mUPPER_LIMIT_BASE;
-	int32_t 	mUPPER_LIMIT_PURVIEW;
+	int32_t 		mUPPER_LIMIT_BASE;
+	int32_t 		mUPPER_LIMIT_PURVIEW;
 
-	int32_t 	mSTEP_BASE_SCALED;
-	int32_t 	mSTEP_PURVIEW_SCALED;
+	int32_t 		mSTEP_BASE_SCALED;
+	int32_t 		mSTEP_PURVIEW_SCALED;
 	
-	size_t		mIdxPurview_LB;
-	size_t		mIdxPurview_RB;
+	size_t			mIdxPurview_LB;
+	size_t			mIdxPurview_RB;
 	
 
 
 	LaneFilter* 		mLaneFilter;
 	VanishingPtFilter*	mVpFilter;
 
-	cv::Mat		mBASE_BINS_SCALED;
-	cv::Mat		mPURVIEW_BINS_SCALED;
-	cv::Mat 	mX_ICCS_SCALED;	
 
-	cv::Mat		mProbMapFocussed;
-	cv::Mat 	mGradTanFocussed;
+	cv::Mat			mX_ICCS;
+	cv::Mat			mY_ICCS;
 
-	cv::Mat 	mIntBase;           
-	cv::Mat		mIntPurview;
-	cv::Mat 	mIntWeights;
+	cv::Mat			mBASE_BINS_SCALED;
+	cv::Mat			mPURVIEW_BINS_SCALED;
+	cv::Mat 		mX_ICCS_SCALED;	
+
+	cv::Mat			mProbMapFocussed;
+	cv::Mat 		mGradTanFocussed;
+
+	cv::Mat 		mIntBase;           
+	cv::Mat			mIntPurview;
+	cv::Mat 		mIntWeights;
 	
-	cv::Mat		mHistBase;
-	cv::Mat		mHistPurview;
+	cv::Mat			mHistBase;
+	cv::Mat			mHistPurview;
 
-	cv::Mat		mHistBase_CV64F;
-	cv::Mat		mHistPurview_CV64F;
+	cv::Mat			mHistBase_CV64F;
+	cv::Mat			mHistPurview_CV64F;
 	
-	cv::Mat 	mTransitLaneFilter;
-	cv::Mat 	mTransitVpFilter;
+	cv::Mat 		mTransitLaneFilter;
+	cv::Mat 		mTransitVpFilter;
 
 	BaseHistogramModel	mBaseHistModel;  	/**< Selected Base-Histogram Model */
 	LaneModel   		mLaneModel;		/**< The detected Lane-Model */

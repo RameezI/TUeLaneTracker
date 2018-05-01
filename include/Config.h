@@ -24,8 +24,8 @@
 
 
 #define PROFILER_ENABLED 	/**< When compiled with this defined, the program logs and profiles its execution*/
-//#define DISPLAY_GRAPHICS 	/**< When compiled with this defined, the program renders the results on to a selected display */
-#define S32V2XX			/**< When compiled with this defined, the program run s32v accelerated algorithm */
+#define DISPLAY_GRAPHICS 	/**< When compiled with this defined, the program renders the results on to a selected display */
+//#define S32V2XX			/**< When compiled with this defined, the program run s32v accelerated algorithm */
 
 //#define DISPLAY_GRAPHICS_DCU /**< Define this when the graphics need to be rendered on the s32v23 DCU*/
 #define TEST_APEX_CODE	       /**< S32V234 test specific flags */

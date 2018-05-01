@@ -41,8 +41,6 @@ int BufferingDAG_generic::init_DAG(const Templates & TEMPLATES, const size_t & B
 	mY_ICS	 	  	= TEMPLATES.Y_ICS;
 	mX_ICS    	  	= TEMPLATES.X_ICS;
 
-        mX_ICCS   		= mX_ICS + mCAMERA.O_ICS_ICCS.x;
-        mY_ICCS   		= mY_ICS + mCAMERA.O_ICS_ICCS.y;
 
 	return 0;
 }

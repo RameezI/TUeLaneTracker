@@ -114,8 +114,6 @@ protected:
 	cv::Mat 			mGradTanTemplate;
 	cv::Mat 			mDepthTemplate;
 	cv::Mat 			mFocusTemplate;
-	cv::Mat 			mX_ICCS;
-	cv::Mat 			mY_ICCS;
 
 	// Temporary Probability Maps
 	cv::Mat 			mTempProbMat;
@@ -170,8 +168,6 @@ public:
 	     mProbMap_GradMag		= std::move(bufferingGraph.mProbMap_GradMag);
 	     mProbMap_GradDir		= std::move(bufferingGraph.mProbMap_GradDir);
 	
-	     mX_ICCS			= std::move(bufferingGraph.mX_ICCS);
-	     mY_ICCS			= std::move(bufferingGraph.mY_ICCS);
 
 	   lLock.unlock();
    	}
