@@ -22,13 +22,15 @@
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/
 
+#define PROFILER_ENABLED 	/**< If defined, the program logs and profiles its execution*/
+//#define DISPLAY_GRAPHICS 	/**< If defined, the program renders the results on to a display */
+//#define DISPLAY_GRAPHICS_DCU  /**< If defined, the graphics are rendered on the s32v23 DCU*/
 
-#define PROFILER_ENABLED 	/**< When compiled with this defined, the program logs and profiles its execution*/
-//#define DISPLAY_GRAPHICS 	/**< When compiled with this defined, the program renders the results on to a selected display */
-#define S32V2XX			/**< When compiled with this defined, the program run s32v accelerated algorithm */
+#define S32V2XX			/**< If defined, the program runs s32v-hardware accelerated algorithm */
+#ifdef S32V2XX
+ #include "GraphsConfig.h"
+#endif
 
-//#define DISPLAY_GRAPHICS_DCU /**< Define this when the graphics need to be rendered on the s32v23 DCU*/
-#define TEST_APEX_CODE	       /**< S32V234 test specific flags */
 
 /** Provide target camera and resolution [Required for loading corresponding calibration file] */
 #define CAMERA_NAME "BUMBLEBEE_640x480"
@@ -48,7 +50,7 @@
 #define VP_RANGE_VER		 25    /**< Vertical range of VP on either side of the Horizon Line [pixels] */
 #define VP_RANGE_HOR		300   /**< Horizental range of VP on either side of center point on the horizon line [pixels] */
 
-#define BUFFER_COUNT		  5     /**<  Provide number of probabiltiy frames to buffer for Max-Pooling operations [Temporal Filtering]*/
+#define BUFFER_COUNT		  3     /**<  Provide number of probabiltiy frames to buffer for Max-Pooling operations [Temporal Filtering]*/
 
 
 #endif
