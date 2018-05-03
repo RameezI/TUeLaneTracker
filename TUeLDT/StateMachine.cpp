@@ -90,9 +90,9 @@ int StateMachine::spin()
 		}
 	   	if (mPtrBootingState->currentStatus  != StateStatus::ERROR)
 		{
-	       mPtrLaneFilter 	 = mPtrBootingState->createLaneFilter();
-		   mPtrVanishingPtFilter = mPtrBootingState->createVanishingPtFilter();
-		   mPtrTemplates 	 = mPtrBootingState->createTemplates();
+	   	    mPtrLaneFilter 	        = mPtrBootingState->createLaneFilter();
+	   	    mPtrVanishingPtFilter       = mPtrBootingState->createVanishingPtFilter();
+	   	    mPtrTemplates 	        = mPtrBootingState->createTemplates();
 		}
 		if (mPtrBootingState->currentStatus == StateStatus::DONE)
 		{				
@@ -199,7 +199,7 @@ int StateMachine::spin()
 		   #else
 		   mPtrTrackingState.reset(new TrackingLaneState<TrackingLaneDAG_generic>( move(mPtrBufferingState->mGraph) ));
 		   #endif
-		   mPtrBufferingState 	= nullptr; //BufferingState does not contian graph so make it unuseable.
+		   mPtrBufferingState 	= nullptr; //BufferingState does not contain graph anymore, so make it unusable.
 		}
 		if (mPtrTrackingState->currentStatus == StateStatus::INACTIVE)
 		{
@@ -248,7 +248,6 @@ int StateMachine::spin()
 		   mCurrentState 	= States::DISPOSED;
 		   lReturn 		= -1;
 		}
-
 
 	} break; // TRACKING STATE SCOPE ENDS 
 	

@@ -39,10 +39,9 @@ class TrackingLaneState: public State
 private:
 	uint_fast8_t mRetryGrab;
 	std::thread  mSideExecutor;
-	GRAPH 	     mGraph;
-
 
 public:	
+	GRAPH        mGraph;
 	const LaneModel& run(cv::UMat Frame);
 	void setupDAG(LaneFilter* laneFilters, VanishingPtFilter* vpFilter);
 
@@ -77,6 +76,10 @@ void TrackingLaneState<GRAPH>::setupDAG(LaneFilter* laneFilter, VanishingPtFilte
 template<typename GRAPH>
 const LaneModel& TrackingLaneState<GRAPH>::run(cv::UMat Frame)
 {
+
+  #ifdef PROFILER_ENABLED
+  mProfiler.start("TRACKING_LANES");
+  #endif
    try
    {
       mGraph.execute(Frame);
@@ -86,6 +89,16 @@ const LaneModel& TrackingLaneState<GRAPH>::run(cv::UMat Frame)
    {
      currentStatus = StateStatus::ERROR;
    }
+  #ifdef PROFILER_ENABLED
+  mProfiler.end();
+  LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
+                                  <<"******************************"<<endl
+                                  <<  "Tracking Lanes DAG time." <<endl
+                                  <<  "Max Time: " << mProfiler.getMaxTime("TRACKING_LANES")<<endl
+                                  <<  "Avg Time: " << mProfiler.getAvgTime("TRACKING_LANES")<<endl
+                                  <<  "Min Time: " << mProfiler.getMinTime("TRACKING_LANES")<<endl
+                                  <<"******************************"<<endl<<endl;
+                                  #endif
 
    return mGraph.mLaneModel;
 }

@@ -24,6 +24,7 @@
 
 #include "Config.h"
 #include "LDT_logger.h"
+#include "LDT_Profiler.h"
 #include "opencv2/opencv.hpp"
 #include <iostream>
 #include <thread>
@@ -62,9 +63,11 @@ class ImgStoreFeeder: public FrameFeeder
 {
 
 private:
+        ProfilerLDT                     mProfiler;
 	const std::size_t		mMAX_BUFFER_SIZE;
 	const std::size_t		mMAX_RETRY;
 	const std::size_t		mSLEEP_ms;
+
 
 	string					mFolder;
 	int 	        		mSkipFrames;

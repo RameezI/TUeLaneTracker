@@ -22,28 +22,27 @@
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/
 
-#define PROFILER_ENABLED 	/**< If defined, the program logs and profiles its execution*/
-//#define DISPLAY_GRAPHICS 	/**< If defined, the program renders the results on to a display */
-//#define DISPLAY_GRAPHICS_DCU  /**< If defined, the graphics are rendered on the s32v23 DCU*/
+
+// General definitions
+
+#define CAMERA_NAME "BUMBLEBEE_640x480" /** Target camera and resolution [Loads corresponding calibration file] */
+#define PROFILER_ENABLED 	        /**< If defined, the program logs and profiles its execution*/
+#define DISPLAY_GRAPHICS 	        /**< If defined, the program renders results on to a display */
+#define DISPLAY_GRAPHICS_DCU            /**< If defined, the graphics are rendered on the s32v23 DCU*/
 
 
-
-#define S32V2XX			/**< If defined, the program runs s32v-hardware accelerated algorithm */
+//S32V specific definitions
+#define S32V2XX			        /**< If defined, the program runs s32v-hardware accelerated algorithm */
 #ifdef S32V2XX
  #include "GraphsConfig.h"
 #endif
 
 
 
-/** Provide target camera and resolution [Required for loading corresponding calibration file] */
-#define CAMERA_NAME "BUMBLEBEE_640x480"
-
-
-
 // Configure FrameFeeder
 
 
-//Configuration for Algorithm
+//Configuration for the Algorithm
 #define BASE_LINE_IBCS	 	  0     /**< Describes base line in Image-Bottom-Coordinate-System */
 #define PURVIEW_LINE_IBCS	160     /**< Describes purview line in Image-Bottom-Coordinate-System */
 

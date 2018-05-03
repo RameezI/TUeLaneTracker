@@ -36,8 +36,8 @@ class StateMachine
 	
 private:
 
-	bool	mQuitRequest;
-	States 	mCurrentState;
+	bool	        mQuitRequest;
+	States 	        mCurrentState;
 
 	unique_ptr<FrameFeeder>			mPtrFrameFeeder;
 	unique_ptr<FrameRenderer>		mPtrFrameRenderer;

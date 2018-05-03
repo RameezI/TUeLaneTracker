@@ -21,10 +21,14 @@
 * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
-
+#include "Config.h"
 #include "LaneModel.h"		//implicit include of LaneFilter and VanishingPtFilter
 #include "opencv2/opencv.hpp"
-#include <iostream>
+
+#ifdef DISPLAY_GRAPHICS_DCU
+#include "frame_output_v234fb.h"
+#endif
+
 
 using namespace cv;
 
@@ -41,6 +45,10 @@ private:
    const size_t		mCOUNT_BINS;
    const int      	mHORIZON_V;
 
+   #ifdef DISPLAY_GRAPHICS_DCU
+    io::FrameOutputV234Fb  mDCU;
+   #endif
+
 public:
    FrameRenderer(const LaneFilter& LANE_FLTR)
    : 
@@ -51,6 +59,9 @@ public:
      mPURVIEW_LINE_ICS(LANE_FLTR.PURVIEW_LINE_ICCS + mO_ICCS_ICS.y),
      mCOUNT_BINS(mBASE_BINS.rows),
      mHORIZON_V(LANE_FLTR.CAMERA.HORIZON_VH(0))
+     #ifdef DISPLAY_GRAPHICS_DCU
+      , mDCU(io::FrameOutputV234Fb(LANE_FLTR.CAMERA.RES_VH(1), LANE_FLTR.CAMERA.RES_VH(0), io::IO_DATA_DEPTH_08, io::IO_DATA_CH3))
+     #endif
    {
 
    }

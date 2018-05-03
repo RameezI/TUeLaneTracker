@@ -175,13 +175,8 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 mProfiler.start("GRADIENT_COMPUTATION");
 #endif 								
 
-	int scale = 1;
-	int delta = 0;
-	int ddepth = CV_16S;
-	
-	Sobel( mFrameGRAY_ROI, mGradX, ddepth, 1, 0, 3, scale, delta, cv::BORDER_REPLICATE | cv::BORDER_ISOLATED);
-	Sobel( mFrameGRAY_ROI, mGradY, ddepth, 0, 1, 3, scale, delta, cv::BORDER_REPLICATE | cv::BORDER_ISOLATED);
-
+	Sobel( mFrameGRAY_ROI, mGradX, CV_16S, 1, 0, 3, 1, 0, cv::BORDER_REPLICATE | cv::BORDER_ISOLATED);
+	Sobel( mFrameGRAY_ROI, mGradY, CV_16S, 0, 1, 3, 1, 0, cv::BORDER_REPLICATE | cv::BORDER_ISOLATED);
 
 	mMask = mGradX> 255;
 	mGradX.setTo(255, mMask);

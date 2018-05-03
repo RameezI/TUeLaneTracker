@@ -43,6 +43,7 @@ class BufferingDAG_generic
 template<typename T>
 
 friend class BufferingState;
+friend class TrackingTest;
 FRIEND_TEST(BufferingTest, GRAY_IMAGE);
 FRIEND_TEST(BufferingTest, PROB_MAP);
 FRIEND_TEST(BufferingTest, GRAD_TAN);

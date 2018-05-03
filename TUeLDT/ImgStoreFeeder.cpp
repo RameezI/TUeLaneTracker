@@ -23,7 +23,7 @@
 ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
 : mMAX_BUFFER_SIZE(2),
   mMAX_RETRY(100), 		// Main thread sleeps for 5ms and then retry to grab.
-  mSLEEP_ms(80),  		// Sleep time for the mAsyncGrabber
+  mSLEEP_ms(1),  		// Sleep time for the mAsyncGrabber
   mFolder(""),
   mSkipFrames(0),
   mFrameCount(0)
@@ -40,11 +40,17 @@ ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
 
 	  if(!Paused.load())
        {
+          #ifdef PROFILER_ENABLED
+	   mProfiler.start("FRAME_READING");
+          #endif
+
+
           cv::UMat lFrame, lFrameGRAY;
 
           lLock.lock(); //protecting mFiles and mFrameCount shared variables.
            lFrame  		= imread(mFiles[mFrameCount]).getUMat(cv::ACCESS_READ);
-           lFrameGRAY  	= imread(mFiles[mFrameCount], cv::IMREAD_GRAYSCALE).getUMat(cv::ACCESS_READ);
+           cv::cvtColor(lFrame, lFrameGRAY, CV_RGB2GRAY);
+           //lFrameGRAY  	        = imread(mFiles[mFrameCount], cv::IMREAD_GRAYSCALE).getUMat(cv::ACCESS_READ);
           lLock.unlock();
 
 	  //Put the frames in the queue for the stateMachine
@@ -64,8 +70,18 @@ ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
 	  {
              mFrameCount ++;
           }
-      }
 
+          #ifdef PROFILER_ENABLED
+          mProfiler.end();
+          LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
+                                          <<"******************************"<<endl
+                                          <<  "Frame Reading Time." <<endl
+                                          <<  "Max Time: " << mProfiler.getMaxTime("FRAME_READING")<<endl
+                                          <<  "Avg Time: " << mProfiler.getAvgTime("FRAME_READING")<<endl
+                                          <<  "Min Time: " << mProfiler.getMinTime("FRAME_READING")<<endl
+                                          <<"******************************"<<endl<<endl;
+                                          #endif
+      }
 
       std::this_thread::sleep_for(std::chrono::milliseconds(mSLEEP_ms));
    }
@@ -132,6 +148,11 @@ void ImgStoreFeeder::enqueue(cv::UMat& frame, vector<cv::UMat>& queue)
 
 cv::UMat ImgStoreFeeder::dequeue()
 {
+
+  #ifdef PROFILER_ENABLED
+  mProfiler.start("FRAME_DEQUEUE");
+  #endif
+
    WriteLock  lLock(mMutex, std::defer_lock);
    size_t lTryGrab = 0;
 
@@ -163,6 +184,18 @@ cv::UMat ImgStoreFeeder::dequeue()
 
    if(lFrame.empty())
     throw "Failed to get the frame from the process queue! [Empty Frame Exception] ";
+
+
+    #ifdef PROFILER_ENABLED
+    mProfiler.end();
+    LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
+                                    <<"******************************"<<endl
+                                    <<  "Frame Dequeue Time." <<endl
+                                    <<  "Max Time: " << mProfiler.getMaxTime("FRAME_DEQUEUE")<<endl
+                                    <<  "Avg Time: " << mProfiler.getAvgTime("FRAME_DEQUEUE")<<endl
+                                    <<  "Min Time: " << mProfiler.getMinTime("FRAME_DEQUEUE")<<endl
+                                    <<"******************************"<<endl<<endl;
+                                    #endif
 
    return lFrame;
 }

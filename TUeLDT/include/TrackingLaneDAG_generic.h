@@ -29,6 +29,7 @@ class TrackingLaneDAG_generic: public BufferingDAG_generic
 
 template<typename T>
 friend class TrackingLaneState;
+FRIEND_TEST(TrackingTest, MAX_POOLING);
 	
 private:
 	int32_t			mMAX_PIXELS_ROI;

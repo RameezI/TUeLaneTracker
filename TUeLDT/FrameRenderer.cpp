@@ -82,6 +82,7 @@ void FrameRenderer::drawLane(const cv::UMat& FRAME, const LaneModel& Lane)
      cv::addWeighted(lYellow, 0.4, lFrameRGB_SPAN, 0.6, 0, lFrameRGB_SPAN);
    }
 */
+
    // Draw Histogram-Bins at the Base
    for (size_t i=0; i < mCOUNT_BINS; i++)
    {
@@ -101,12 +102,12 @@ void FrameRenderer::drawLane(const cv::UMat& FRAME, const LaneModel& Lane)
    }
 
 
-
-   imshow( "Display window", FRAME);
-   waitKey(1);
+   #ifndef DISPLAY_GRAPHICS_DCU
+     imshow( "Display window", FRAME);
+     waitKey(1);
+   #else
+     mDCU.PutFrame(FRAME);
+   #endif
    
-   if ( (char)32 == (char) waitKey(10) )
-   {
-	while ((char)32 != (char)waitKey(1));
-   }
+
 }
