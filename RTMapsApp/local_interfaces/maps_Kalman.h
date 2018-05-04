@@ -24,34 +24,36 @@ private :
 
 		// This member variable will be used for allocating once the output buffers at first time.
 	bool m_firstTime;
+	const int N_STATES = 3;
+	float timestamp_prev = 0;
 
 	// System Model
 		//Process
-		Matrix4f A;
-		//Matrix4f AT;
+		Matrix3f A;
+		//Matrix3f AT;
 		MatrixXf B;
-		Matrix4f Q;
+		Matrix3f Q;
 		//Observer
-		Matrix4f C;
-		//Matrix4f CT;
-		Matrix4f R;
-		Matrix4f R0;
+		Matrix3f C;
+		//Matrix3f CT;
+		Matrix3f R;
+		Matrix3f R0;
 		//States
 		MatrixXf x;
 		MatrixXf x_hat;
 		MatrixXf y;
-		Matrix4f P;
-		Matrix4f P_hat;
+		Matrix3f P;
+		Matrix3f P_hat;
 		//Output
 		MatrixXf u;
 		//Kalman
 		MatrixXf y_tilde;
-		Matrix4f S;
-		Matrix4f K;
+		Matrix3f S;
+		Matrix3f K;
 		//Misc
-		Matrix4f I;
+		Matrix3f I;
 	
-	void Adjust(float vx, float c);
+	void Adjust(float vx, float c, float dt);
 	void Predict();
 	void Update();
 public:

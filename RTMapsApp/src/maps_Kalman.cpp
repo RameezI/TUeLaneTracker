@@ -9,7 +9,6 @@
 #include "../local_interfaces/maps_Kalman.h"	// Includes the header of this component
 #include <iostream>
 
-
 // Use the macros to declare the inputs
 MAPS_BEGIN_INPUTS_DEFINITION(MAPSKalman)
     MAPS_INPUT("Confidence",MAPS::FilterFloat32,MAPS::FifoReader)
@@ -19,7 +18,7 @@ MAPS_END_INPUTS_DEFINITION
 
 // Use the macros to declare the outputs
 MAPS_BEGIN_OUTPUTS_DEFINITION(MAPSKalman)
-    MAPS_OUTPUT("FilteredParams",MAPS::Float32,NULL,NULL,3)
+    MAPS_OUTPUT("FilteredParams",MAPS::Float32,NULL,NULL,4)
 MAPS_END_OUTPUTS_DEFINITION
 
 // Use the macros to declare the properties
@@ -45,36 +44,42 @@ void MAPSKalman::Birth()
 {
     m_firstTime = true;
 
-    A <<    1,     0,      0,     0,         
-            0,     1,     -0,     0,         
-           -0,    -0,      1,     0,     
-            0,    -0,     -0,     1;  
+    A <<    1,     0,      0,            
+            0,     1,     -0,           
+           -0,    -0,      1;
 
     // A <<    1,     0,      0,     0,         
     //         0,     1/2,   -1/2,   1/2,         
     //        -0,    -1/2,    1/2,   1/2,     
     //         0,    -1,     -1,     2;  
 
-    B.resize(4,2);
+    B.resize(N_STATES,2);
     B <<    1,  0,
-            0,  0,
             0,  0,
             0,  0;
 
-    I = Matrix4f::Identity();
+    I = Matrix3f::Identity();
 
     P = I;
-    R0 = I;
-    Q = I;
+    //Q = I;
+    Q <<    1,        -0.01,     0.01,
+            -0.01,      2,      -1,
+            0.01,      -1,       2;
+    //Q = Q * 100;
+    //R0 = Q;
+    R0 <<   1,         0,         0,
+            0,         2,        -1,
+            0,        -1,         2;
+
     C = I;
     //CT = I.transpose();
 
-    x.resize(4,1);
-    x_hat.resize(4,1);
-    y.resize(4,1);
-    y_tilde.resize(4,1);
-    u.resize(4,1);
-    S.resize(4,1);
+    x.resize(N_STATES,1);
+    x_hat.resize(N_STATES,1);
+    y.resize(N_STATES,1);
+    y_tilde.resize(N_STATES,1);
+    u.resize(N_STATES,1);
+    S.resize(N_STATES,1);
 }
 
 void MAPSKalman::Core() 
@@ -117,17 +122,22 @@ void MAPSKalman::Core()
     y(0) = paramsIn->Float32(0);
     y(1) = paramsIn->Float32(1);
     y(2) = paramsIn->Float32(2);
-    y(3) = paramsIn->Float32(1) + paramsIn->Float32(2);
+    //y(3) = paramsIn->Float32(1) + paramsIn->Float32(2);
 
     //std::cout << "y: " << y(0) << "\t"<< y(1) << "\t"<< y(2) << "\t"<< y(3) << endl;
 
     if (m_firstTime)
     {
         m_firstTime = false;
+        //timestamp_prev = paramsIn->Timestamp();
         x = y;
     }
+    
+    float timestamp_cur = paramsIn->Timestamp();
+    float dt = (timestamp_cur-timestamp_prev)/1e6;
+    timestamp_prev = timestamp_cur;
 
-    Adjust(velIn->Float64(0),confIn->Float32(0));
+    Adjust(velIn->Float64(0),confIn->Float32(0),dt);
     Predict();
     Update();
 
@@ -149,11 +159,11 @@ void MAPSKalman::Death()
     ReportInfo("Passing through Death() method");
 }
 
-void MAPSKalman::Adjust(float vx, float c){
-    A(1,0) = vx * 0;
-    A(2,0) = -vx * 0;
-
-    //AT = A.transpose();
+void MAPSKalman::Adjust(float vx, float c, float dt){
+    float alphaToRad = (float)1 / (float)360 * 2 * M_PI; //small angle approximation: sin(alpha) ~= alpha, >1% error at >14deg
+    float horDisp = vx * dt * alphaToRad; // [M]
+    A(1,0) = -horDisp * 100;// [cm] 
+    A(2,0) = horDisp * 100; // [cm] 
 
     R = R0 * (int)GetIntegerProperty("R_Gain") / c;
 }
@@ -171,6 +181,6 @@ void MAPSKalman::Update(){
 
     x = x_hat + K * y_tilde;
 
-    Matrix4f L = I - K * C;
+    Matrix3f L = I - K * C;
     P = L * P_hat * L.transpose() + K * R * K.transpose();
 }

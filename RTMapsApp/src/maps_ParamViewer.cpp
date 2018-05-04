@@ -70,7 +70,7 @@ void MAPSParamViewer::Core()
     dirParams.push_back(paramsIn->Float32(1));
     dirParams.push_back(paramsIn->Float32(2));
 
-    std::cout<<"Params: \t" << dirParams[0] << "\t"<< dirParams[1] << "\t"<< dirParams[2] << endl;
+    //std::cout<<"Params: \t" << dirParams[0] << "\t"<< dirParams[1] << "\t"<< dirParams[2] << endl;
 
     //Top Down View
 		MAPSIOElt* frameOut = StartWriting(Output(0));
@@ -93,7 +93,7 @@ cv::Mat MAPSParamViewer::getLaneFrame(vector<float> dirParams)
 {
   cv::Mat mLaneFrame(ResV,ResH,CV_8UC3,cv::Scalar(0,0,0));
 
-  float widthR = 600;
+  float widthR = 500;
   float cstart, cend;
 
   cstart = ResH / 2;
