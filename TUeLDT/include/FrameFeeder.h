@@ -24,7 +24,7 @@
 
 #include "Config.h"
 #include "LDT_logger.h"
-#include "LDT_Profiler.h"
+#include "LDT_profiler.h"
 #include "opencv2/opencv.hpp"
 #include <iostream>
 #include <thread>
