@@ -206,9 +206,8 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
 #endif
      {
 	//Build Mask for Valid Intersections
-	bitwise_and(mMask, mIntBase    >  mLOWER_LIMIT_BASE,    mMask);
+        mMask =  mIntBase    >  mLOWER_LIMIT_BASE;
 	bitwise_and(mMask, mIntPurview >  mLOWER_LIMIT_PURVIEW, mMask);
-
     	bitwise_and(mMask, mIntBase    <  mUPPER_LIMIT_BASE, 	mMask);
     	bitwise_and(mMask, mIntPurview <  mUPPER_LIMIT_PURVIEW, mMask);
 

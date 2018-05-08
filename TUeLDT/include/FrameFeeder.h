@@ -44,15 +44,19 @@ public:
 	   std::atomic<bool> 	Paused;
 
 protected:
+
    vector<cv::UMat>		mDisplayQueue;
    vector<cv::UMat>		mProcessQueue;
+
 
    FrameFeeder(): Stopped(false),Paused(true){}
 
    virtual  void parseSettings(string& srcStr)  = 0;
    virtual  void enqueue(cv::UMat& frame, vector<cv::UMat>& queue) = 0;
 
+
 public:
+
    virtual cv::UMat dequeue() = 0 ;
    virtual cv::UMat dequeueDisplay() = 0;
    virtual  ~FrameFeeder(){}
@@ -69,12 +73,12 @@ private:
 	const std::size_t		mSLEEP_ms;
 
 
-	string					mFolder;
+	string				mFolder;
 	int 	        		mSkipFrames;
-	uint32_t 				mFrameCount;
-	vector< cv::String> 	mFiles;
-	std::thread				mAsyncGrabber;
-	std::mutex 				mMutex;
+	uint32_t 			mFrameCount;
+	vector< cv::String> 	        mFiles;
+	std::thread			mAsyncGrabber;
+	std::mutex 			mMutex;
 
 	void enqueue(cv::UMat& frame, vector<cv::UMat>& queue) override;
 	void parseSettings(string& srcStr) override;
