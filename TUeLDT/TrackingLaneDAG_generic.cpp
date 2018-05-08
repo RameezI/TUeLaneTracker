@@ -49,26 +49,26 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
 int TrackingLaneDAG_generic::init_DAG(LaneFilter* laneFilter, VanishingPtFilter* vpFilter)
 {
 
-	mLaneFilter		 = laneFilter;
-	mVpFilter		 = vpFilter;
+	mLaneFilter		= laneFilter;
+	mVpFilter		= vpFilter;
 
         mX_ICCS   		= mX_ICS + mCAMERA.O_ICS_ICCS.x;
         mY_ICCS   		= mY_ICS + mCAMERA.O_ICS_ICCS.y;
 
-	const size_t& lCOUNT 	 = mLaneFilter->COUNT_BINS;
+	const size_t& lCOUNT    = mLaneFilter->COUNT_BINS;
 
-	mX_ICCS_SCALED	 	 =  SCALE_INTSEC*mX_ICCS;
-	mBASE_BINS_SCALED  	 =  SCALE_INTSEC*mLaneFilter->BASE_BINS;
-	mPURVIEW_BINS_SCALED	 =  SCALE_INTSEC*mLaneFilter->PURVIEW_BINS;
+	mX_ICCS_SCALED	 	=  SCALE_INTSEC*mX_ICCS;
+	mBASE_BINS_SCALED  	=  SCALE_INTSEC*mLaneFilter->BASE_BINS;
+	mPURVIEW_BINS_SCALED	=  SCALE_INTSEC*mLaneFilter->PURVIEW_BINS;
 
-	mSTEP_BASE_SCALED	 =  SCALE_INTSEC*mLaneFilter->BASE_STEP;
-	mSTEP_PURVIEW_SCALED	 =  SCALE_INTSEC*mLaneFilter->PURVIEW_STEP;
+	mSTEP_BASE_SCALED	=  SCALE_INTSEC*mLaneFilter->BASE_STEP;
+	mSTEP_PURVIEW_SCALED	=  SCALE_INTSEC*mLaneFilter->PURVIEW_STEP;
 
-	mLOWER_LIMIT_BASE	 =  mBASE_BINS_SCALED.at<int32_t>(0,0);
-	mLOWER_LIMIT_PURVIEW  	 =  mPURVIEW_BINS_SCALED.at<int32_t>(0,0);
+	mLOWER_LIMIT_BASE	=  mBASE_BINS_SCALED.at<int32_t>(0,0);
+	mLOWER_LIMIT_PURVIEW  	=  mPURVIEW_BINS_SCALED.at<int32_t>(0,0);
 
-	mUPPER_LIMIT_BASE	 =  mBASE_BINS_SCALED.at<int32_t>(lCOUNT-1,0);
-	mUPPER_LIMIT_PURVIEW  	 =  mPURVIEW_BINS_SCALED.at<int32_t>(lCOUNT-1,0);
+	mUPPER_LIMIT_BASE	=  mBASE_BINS_SCALED.at<int32_t>(lCOUNT-1,0);
+	mUPPER_LIMIT_PURVIEW  	=  mPURVIEW_BINS_SCALED.at<int32_t>(lCOUNT-1,0);
 
 
         mHistBase      		 =  cv::Mat::zeros(lCOUNT,  1 ,  CV_32S);
@@ -139,15 +139,24 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 mProfiler.start("TEMPORAL_FILTERING");
 #endif	
 
-	mProbMapFocussed = mBufferPool->Probability[0];
-	mGradTanFocussed = mBufferPool->GradientTangent[0];
-	
-	for ( std::size_t i=1; i< mBufferPool->Probability.size(); i++ )
-	{	
-	    mMask = mProbMapFocussed < mBufferPool->Probability[i];
-	    mBufferPool->Probability[i].copyTo(mProbMapFocussed, mMask );
-	    mBufferPool->GradientTangent[i].copyTo(mGradTanFocussed, mMask );
-	}
+      #ifdef TEST_APEX_CODE
+        mPROB_FRAME_0           = mBufferPool->Probability[0].clone();          // copy, otherwise overwritten by shift operation.
+        mGRAD_FRAME_0           = mBufferPool->GradientTangent[0].clone();      // copy, otherwise overwritten by shift operation.
+        mProbMapFocussed        = mBufferPool->Probability[0].clone();          // copy otherwise no test point for temporal pooling.
+        mGradTanFocussed        = mBufferPool->GradientTangent[0].clone();      // copy otherwise no test point for temporal pooling.
+
+      #else
+        mProbMapFocussed        = mBufferPool->Probability[0];
+        mGradTanFocussed        = mBufferPool->GradientTangent[0];
+      #endif
+
+
+      for ( std::size_t i=1; i< mBufferPool->Probability.size(); i++ )
+      {
+          mMask = mProbMapFocussed < mBufferPool->Probability[i];
+          mBufferPool->Probability[i].copyTo(mProbMapFocussed, mMask );
+          mBufferPool->GradientTangent[i].copyTo(mGradTanFocussed, mMask );
+      }
 	
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -159,8 +168,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<  "Min Time: " << mProfiler.getMinTime("TEMPORAL_FILTERING")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
-
-
 
 
 
@@ -199,14 +206,11 @@ mProfiler.start("MASK_INVALID_BIN_IDS");
 #endif
      {
 	//Build Mask for Valid Intersections
-	bitwise_and(mProbMapFocussed > 0, mGradTanFocussed !=0, mMask);
-
 	bitwise_and(mMask, mIntBase    >  mLOWER_LIMIT_BASE,    mMask);
 	bitwise_and(mMask, mIntPurview >  mLOWER_LIMIT_PURVIEW, mMask);
 
     	bitwise_and(mMask, mIntBase    <  mUPPER_LIMIT_BASE, 	mMask);
     	bitwise_and(mMask, mIntPurview <  mUPPER_LIMIT_PURVIEW, mMask);
-
 
 	//^TODO: Put on the side thread
         mHistBase      = cv::Mat::zeros(mLaneFilter->COUNT_BINS,  1 ,  CV_32S);
@@ -236,12 +240,12 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 	multiply(mDepthTemplate, mProbMapFocussed, mIntWeights, 1, CV_32S);	
 	{
 	   int32_t* 	lPtrIntBase 	    = mIntBase.ptr<int32_t>(0);
-	   int32_t* 	lPtrIntPurview   	= mIntPurview.ptr<int32_t>(0);
-	   int32_t* 	lPtrWeights   		= mIntWeights.ptr<int32_t>(0);
-	   uint8_t* 	lPtrMask   			= mMask.ptr<uint8_t>(0);
+	   int32_t* 	lPtrIntPurview      = mIntPurview.ptr<int32_t>(0);
+	   int32_t* 	lPtrWeights   	    = mIntWeights.ptr<int32_t>(0);
+	   uint8_t* 	lPtrMask            = mMask.ptr<uint8_t>(0);
 
-	   int32_t* 	lPtrHistBase    	=  mHistBase.ptr<int32_t>(0);
-	   int32_t* 	lPtrHistPurview 	=  mHistPurview.ptr<int32_t>(0);
+	   int32_t* 	lPtrHistBase        =  mHistBase.ptr<int32_t>(0);
+	   int32_t* 	lPtrHistPurview     =  mHistPurview.ptr<int32_t>(0);
 
 	   uint16_t   	lBaseBinIdx;
 	   uint16_t   	lPurviewBinIdx;
@@ -258,8 +262,8 @@ mProfiler.start("COMPUTE_HISTOGRAMS");
 
 		 assert((0<=lBaseBinIdx)&&(lBaseBinIdx<mHistBase.rows ));
 
-		 *(lPtrHistBase       + lBaseBinIdx   )  	 += lWeightBin;
-	         *(lPtrHistPurview    + lPurviewBinIdx)  += lWeightBin;
+		 *(lPtrHistBase       + lBaseBinIdx   )  	+= lWeightBin;
+	         *(lPtrHistPurview    + lPurviewBinIdx)         += lWeightBin;
 	    }	
 	
 	   }
@@ -307,12 +311,12 @@ mProfiler.start("SETUP_ASYNC_BUFFER_SHIFT");
 	{
 	   WriteLock  lLock(_mutex, std::defer_lock);	
 
+	   lLock.lock();
 	   for ( std::size_t i = 0; i< mBufferPool->Probability.size()-1 ; i++ )
 	   {
 	 	mBufferPool->Probability[i+1].copyTo(mBufferPool->Probability[i]);		
 		mBufferPool->GradientTangent[i+1].copyTo(mBufferPool->GradientTangent[i]);
 	   }	
-
 	   lLock.unlock();
 
 	});
@@ -327,7 +331,6 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 				<<  "Min Time: " << mProfiler.getMinTime("SETUP_ASYNC_BUFFER_SHIFT")<<endl
 				<<"******************************"<<endl<<endl;	
 				#endif
-
 
 
 
@@ -600,6 +603,8 @@ LOG_INFO_(LDTLog::TIMING_PROFILE) <<endl
 				<<  "Min Time: " << mProfiler.getMinTime("ASSIGN_LANE_MODEL")<<endl
 		  		<<"******************************"<<endl<<endl;	
 				#endif
+
+
 
 
 #ifdef PROFILER_ENABLED

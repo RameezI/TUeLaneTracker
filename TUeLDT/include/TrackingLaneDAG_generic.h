@@ -29,7 +29,10 @@ class TrackingLaneDAG_generic: public BufferingDAG_generic
 
 template<typename T>
 friend class TrackingLaneState;
+FRIEND_TEST(TrackingTest, BUFFERING);
 FRIEND_TEST(TrackingTest, MAX_POOLING);
+FRIEND_TEST(TrackingTest, INTERSECTIONS);
+FRIEND_TEST(TrackingTest, MASK_INTERSECTIONS);
 	
 private:
 	int32_t			mMAX_PIXELS_ROI;
@@ -68,6 +71,11 @@ private:
 	cv::Mat			mBASE_BINS_SCALED;
 	cv::Mat			mPURVIEW_BINS_SCALED;
 	cv::Mat 		mX_ICCS_SCALED;	
+
+	#ifdef TEST_APEX_CODE
+	cv::Mat                 mPROB_FRAME_0;
+	cv::Mat                 mGRAD_FRAME_0;
+        #endif
 
 	cv::Mat			mProbMapFocussed;
 	cv::Mat 		mGradTanFocussed;

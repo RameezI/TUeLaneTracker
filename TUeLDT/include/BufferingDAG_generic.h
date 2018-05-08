@@ -26,7 +26,7 @@
 #include "State.h"		//implicit include of profiling and logging headers
 #include "Templates.h"
 #include "LaneModel.h"		//implicit include of LaneFilter and VanishingPtFilter
-#include "gmock/gmock.h"	//google-testing framework includes
+#include "gtest/gtest.h"	//google-testing framework includes
 
 #ifdef DISPLAY_GRAPHICS_DCU
 #include "frame_output_v234fb.h"
@@ -47,6 +47,7 @@ friend class TrackingTest;
 FRIEND_TEST(BufferingTest, GRAY_IMAGE);
 FRIEND_TEST(BufferingTest, PROB_MAP);
 FRIEND_TEST(BufferingTest, GRAD_TAN);
+FRIEND_TEST(TrackingTest, MAX_POOLING);
 
 public:
 	BufferingDAG_generic ();
@@ -151,7 +152,7 @@ public:
 	
 	     mBufferPool   		= std::move(bufferingGraph.mBufferPool);
 	     mVanishPt			= std::move(bufferingGraph.mVanishPt);
-	
+
 	     mFrameGRAY_ROI		= std::move(bufferingGraph.mFrameGRAY_ROI);
 
 	     mMask 			= std::move(bufferingGraph.mMask);

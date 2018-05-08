@@ -182,6 +182,8 @@ mProfiler.start("GRADIENT_COMPUTATION");
 	mGradX.setTo(255, mMask);
 	mMask = mGradX <-255;
 	mGradX.setTo(-255, mMask);
+        mMask = mGradX ==0;
+        mGradX.setTo(1, mMask);
 
 	mMask = mGradY> 255;
 	mGradY.setTo(255, mMask);
@@ -280,6 +282,7 @@ mProfiler.start("FOCUS");
 #endif 							
 
 	bitwise_and(mBufferPool->Probability[mBufferPos], mFocusTemplate, mBufferPool->Probability[mBufferPos]);
+
 	if(mBufferPos < ((mBufferPool->Probability.size())-1) )
 	mBufferPos ++;
 				
