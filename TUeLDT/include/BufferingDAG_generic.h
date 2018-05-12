@@ -49,6 +49,8 @@ FRIEND_TEST(BufferingTest, PROB_MAP);
 FRIEND_TEST(BufferingTest, GRAD_TAN);
 FRIEND_TEST(TrackingTest, MAX_POOLING);
 
+
+
 public:
 	BufferingDAG_generic ();
 
