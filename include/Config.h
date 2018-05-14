@@ -28,11 +28,11 @@
 #define CAMERA_NAME "BUMBLEBEE_640x480" /** Target camera and resolution [Loads corresponding calibration file] */
 #define PROFILER_ENABLED 	        /**< If defined, the program logs and profiles its execution*/
 #define DISPLAY_GRAPHICS 	        /**< If defined, the program renders results on to a display */
-//#define DISPLAY_GRAPHICS_DCU          /**< If defined, the graphics are rendered on the s32v23 DCU*/
+#define DISPLAY_GRAPHICS_DCU          /**< If defined, the graphics are rendered on the s32v23 DCU*/
 
 
 //S32V specific definitions
-//#define S32V2XX			/**< If defined, the program runs s32v-hardware accelerated algorithm */
+#define S32V2XX			/**< If defined, the program runs s32v-hardware accelerated algorithm */
 #ifdef S32V2XX
  #include "GraphsConfig.h"
 #endif
