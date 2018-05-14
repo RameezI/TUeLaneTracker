@@ -38,9 +38,7 @@
 #endif
 
 
-
 // Configure FrameFeeder
-
 
 //Configuration for the Algorithm
 #define BASE_LINE_IBCS	 	  0     /**< Describes base line in Image-Bottom-Coordinate-System */

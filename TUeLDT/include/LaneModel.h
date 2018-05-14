@@ -53,10 +53,11 @@ public:
 
 	VanishingPt vanishingPt; 	/*< Selected, according to max-posterior, distance to VanishingPoint in Image-Center-CS [pixel] */
 
-	float 	lookAheadErr_m;		/*< The mid-Line at the purview line in Vehicle-Symmetery-CS [m]*/
+	float 	lookAheadErr_m;		/*< The mid-Line at the purview line in Vehicle-Symmetry-CS [m]*/
 	
 
-	void setModel(const int&  boundaryL, 	const int& boundaryR, const VanishingPt& vanishPt, const float& Err)
+	void setModel(const int&  boundaryL,            const int& boundaryR,
+	              const VanishingPt& vanishPt,      const float& Err)
 	{
 
 	  boundaryLeft  	= boundaryL;
