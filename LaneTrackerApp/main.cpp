@@ -106,14 +106,14 @@ int main(int argc, char* argv[]) /**
 		
 		if(lPreviousState != stateMachine.getCurrentState())
 		{
-		  cout<<endl<<stateMachine.getCurrentState();
-		  std::cout.flush();
+		  //cout<<endl<<stateMachine.getCurrentState();
+		  //std::cout.flush();
 		  lPreviousState = stateMachine.getCurrentState();
 		}
 		else if (lCyclesCount%100==0)
 		{
-		  cout <<endl<<stateMachine.getCurrentState();
-		  cout <<"state cycle-count = " << lCyclesCount;
+		  //cout <<endl<<stateMachine.getCurrentState();
+		  //cout <<"state cycle-count = " << lCyclesCount;
 		}
 	   }// End spinning
 	   

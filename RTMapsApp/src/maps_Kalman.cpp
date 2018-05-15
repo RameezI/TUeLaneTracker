@@ -23,7 +23,8 @@ MAPS_END_OUTPUTS_DEFINITION
 
 // Use the macros to declare the properties
 MAPS_BEGIN_PROPERTIES_DEFINITION(MAPSKalman)
-    MAPS_PROPERTY("R_Gain",10000,false,false)
+    MAPS_PROPERTY("R_Gain",10,false,false)
+    MAPS_PROPERTY("C_ExpGain",2,false,false)
 MAPS_END_PROPERTIES_DEFINITION
 
 // Use the macros to declare the actions
@@ -165,7 +166,8 @@ void MAPSKalman::Adjust(float vx, float c, float dt){
     A(1,0) = -horDisp * 100;// [cm] 
     A(2,0) = horDisp * 100; // [cm] 
 
-    R = R0 * (int)GetIntegerProperty("R_Gain") / c;
+    float c_expgain = (float)GetIntegerProperty("C_ExpGain");
+    R = R0 * (int)GetIntegerProperty("R_Gain") / pow(c,c_expgain) * pow(50,c_expgain);
 }
 
 void MAPSKalman::Predict(){
