@@ -23,7 +23,7 @@
 #include "Config.h"
 #include "ScalingFactors.h"
 
-VanishingPtFilter::VanishingPtFilter()
+VanishingPtFilter::VanishingPtFilter(const int HOR_H, const int HOR_V)
 : 
   STEP((STEP_VP_FILTER > 0) ? STEP_VP_FILTER : throw "VP filter step-size must be a positive integer"),
   
@@ -35,9 +35,9 @@ VanishingPtFilter::VanishingPtFilter()
   
   COUNT_BINS_H(floor((2*RANGE_H)/STEP) +1),
   
-  BINS_V( VectorXi::LinSpaced(COUNT_BINS_V,-RANGE_V, RANGE_V).array()),
+  BINS_V( VectorXi::LinSpaced(COUNT_BINS_V,-RANGE_V + HOR_V, RANGE_V + HOR_V).array()),
   
-  BINS_H( VectorXi::LinSpaced(COUNT_BINS_H,-RANGE_H, RANGE_H).array()),
+  BINS_H( VectorXi::LinSpaced(COUNT_BINS_H,-RANGE_H + HOR_H, RANGE_H + HOR_H).array()),
   
   prior(  cv::Mat::zeros( COUNT_BINS_V, COUNT_BINS_H , CV_32SC1) ),
   

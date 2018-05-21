@@ -72,7 +72,7 @@ unique_ptr<VanishingPtFilter> InitState::createVanishingPtFilter()
 	  LaneProperties   	lLane;
 	  LaneFilter 		lLaneFilter(lLane, lCamera);
 	
-	  lVanishingPtFilter 	= unique_ptr<VanishingPtFilter>(new VanishingPtFilter() ); 
+	  lVanishingPtFilter 	= unique_ptr<VanishingPtFilter>(new VanishingPtFilter(lCamera.HORIZON_VH(1), lCamera.HORIZON_VH(0)) ); 
 	   
 	  mVpFilterCreated 	= true;
 	
@@ -110,7 +110,7 @@ unique_ptr<Templates> InitState::createTemplates()
 	  Camera 		lCamera;
 	  LaneProperties    	lLane;
 	  LaneFilter 		lLaneFilter(lLane, lCamera);
-	  VanishingPtFilter 	lVanishingPtFilter;
+	  VanishingPtFilter 	lVanishingPtFilter(lCamera.HORIZON_VH(1), lCamera.HORIZON_VH(0));
 
 	
 	  lTemplates	 = unique_ptr<Templates>

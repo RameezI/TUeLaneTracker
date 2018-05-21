@@ -40,7 +40,7 @@ private:
 
 public:
 
-		VanishingPtFilter();
+		VanishingPtFilter(const int HOR_H, const int HOR_V);
 
         	const int       STEP;         	/*< Step for VanishinPtFilter [pixels] */
 
