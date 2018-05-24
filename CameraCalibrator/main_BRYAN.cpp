@@ -20,16 +20,16 @@ using namespace std;
 #define CY	-3		//Principal point y-axis in Image-Center-CS [pixels]
 
 
-#define PITCH  			0.0    	// Camera Pitch [degrees].
-#define YAW    			0.0    	// Camera yaw a [degrees].
-#define CAM_HEIGHT    		1.36435	//Camera height from the road [meters].
-#define CAM_LATERAL_OFFSET	0	//Lateral-Offset of the camera from the vehicle symmetry plane[meters].
+#define PITCH  			0   	 // Camera Pitch [degrees].
+#define YAW    			0   	// Camera yaw a [degrees].
+#define CAM_HEIGHT    		1.364	 // Camera height from the road [meters].
+#define CAM_LATERAL_OFFSET	0	 // Lateral-Offset of the camera from the vehicle symmetry plane[meters].
 
 
 
 double toRad(double deg)
 {
-  double radians = deg*(180/M_PI); 
+  double radians = deg*(M_PI/180); 
   return radians;
 }
 

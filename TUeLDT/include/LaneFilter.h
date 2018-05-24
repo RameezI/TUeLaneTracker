@@ -64,6 +64,9 @@ public:	 	//Public Interface
 		const float	BASE_STEP;		/**< Step size for the base bins */
 		const float 	PURVIEW_STEP;		/**< Step size for the purview bins */
 
+		const int	BASE_OFFSET;		/**< Starting Point for Base Bins in Image-Center-CS*/
+		const int 	PURVIEW_OFFSET;		/**< Starting Point for Purview Bins in Image-Cener-CS*/
+
 		const cv::Mat   BASE_BINS;    		/**<Describes the Histogram BINS, in Image-Center-CS, at BASE line [pixels] */
 		const cv::Mat   PURVIEW_BINS; 		/**<Describes the Histogram BINS, in Image-Center-CS, at PURVIEW line [pixels] */
 

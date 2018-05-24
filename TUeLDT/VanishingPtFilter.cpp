@@ -35,7 +35,7 @@ VanishingPtFilter::VanishingPtFilter(const int HOR_H, const int HOR_V)
   
   COUNT_BINS_H(floor((2*RANGE_H)/STEP) +1),
   
-  BINS_V( VectorXi::LinSpaced(COUNT_BINS_V,-RANGE_V + HOR_V, RANGE_V + HOR_V).array()),
+  BINS_V( VectorXi::LinSpaced(COUNT_BINS_V, HOR_V-RANGE_V,  HOR_V +RANGE_V).array()),
   
   BINS_H( VectorXi::LinSpaced(COUNT_BINS_H,-RANGE_H + HOR_H, RANGE_H + HOR_H).array()),
   

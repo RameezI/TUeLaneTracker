@@ -103,6 +103,7 @@ int StateMachine::spin()
 		     << "Booting State Completed"
 		     << "Printing Booting Configuration"<<endl
 		     <<  *(mPtrLaneFilter)<<endl
+		     <<  *(mPtrVanishingPtFilter)<<endl
 		     <<"****************************************"<<endl<<endl;
 		   #endif
 	

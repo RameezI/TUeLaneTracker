@@ -35,6 +35,10 @@ void FrameRenderer::drawLane(const cv::UMat& FRAME, const LaneModel& Lane)
    //Transform VP to Image Coordianate System
    int VP_V =  Lane.vanishingPt.V + mO_ICCS_ICS.y;
    int VP_H =  Lane.vanishingPt.H + mO_ICCS_ICS.x;
+ 
+  //Draw Vanishing-Pt
+   line(FRAME, Point(0, VP_V), Point(FRAME.cols, VP_V), cv::Scalar(0,0,255), 1);
+   line(FRAME, Point(VP_H, 0), Point(VP_H, VP_V), cv::Scalar(0,0,255), 1);
 
    //Lane Bundaries
    lBoundaryPts_L.push_back( Point( Lane.boundaryLeft  + mO_ICCS_ICS.x, mBASE_LINE_ICS) );
@@ -75,7 +79,7 @@ void FrameRenderer::drawLane(const cv::UMat& FRAME, const LaneModel& Lane)
    {
      Rect lROI;	
      int lX = 0;
-     int lY = mO_ICCS_ICS.y + mHORIZON_V;
+     int lY = mO_ICCS_ICS.y + mHORIZON_V - VP_RANGE_VER;
      lROI = Rect(lX,lY, FRAME.cols, FRAME.rows-lY);
      cv::UMat lYellow(FRAME.rows -lY, FRAME.cols, CV_8UC3, Scalar(0,125,125));
      cv::UMat lFrameRGB_SPAN = FRAME(lROI);

@@ -65,7 +65,10 @@ protected:
 
 	size_t 		mBufferPos;		/**< Active Buffer Position */
 
-	int		mHORIZON_ICCS; 		/**< /brief Position of Horizon in the Image-Center-CS [pixels]
+
+	int		mHORIZON_ICCS_H; 	/**< /brief Position of Horizon in the Image-Center-CS [pixels] */
+
+	int		mHORIZON_ICCS_V; 	/**< /brief Position of Horizon in the Image-Center-CS [pixels]
 				 	  	*  /n +ve value implies that the ROI is below the center line.
 					  	*  /n -ve value implies that the ROI is above the center line. */
 
@@ -141,7 +144,9 @@ public:
 	
 	     mBufferPos			= std::move(bufferingGraph.mBufferPos);
 
-	     mHORIZON_ICCS		= std::move(bufferingGraph.mHORIZON_ICCS);
+	     mHORIZON_ICCS_H		= std::move(bufferingGraph.mHORIZON_ICCS_H);
+	     mHORIZON_ICCS_V		= std::move(bufferingGraph.mHORIZON_ICCS_V);
+
 	     mVP_RANGE_V		= std::move(bufferingGraph.mVP_RANGE_V);
 	     mSPAN 			= std::move(bufferingGraph.mSPAN);
 		
