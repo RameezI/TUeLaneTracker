@@ -269,6 +269,11 @@ int StateMachine::spin()
 
 }
 
+LaneModel StateMachine::getLaneModel()
+{
+        return mLaneModel;
+}
+
 
 void StateMachine::quit()
 {

@@ -36,8 +36,8 @@ class StateMachine
 	
 private:
 
-	bool	        mQuitRequest;
-	States 	        mCurrentState;
+	bool	                                mQuitRequest;
+	States 	                                mCurrentState;
 
 	unique_ptr<FrameFeeder>			mPtrFrameFeeder;
 	unique_ptr<FrameRenderer>		mPtrFrameRenderer;
@@ -60,8 +60,9 @@ private:
 
 public:
 
-	States	getCurrentState();
-	void 	quit();
+	States	        getCurrentState();
+	void 	        quit();
+	LaneModel       getLaneModel();
 
 	StateMachine(unique_ptr<FrameFeeder> frameFeeder);
 	int spin();
