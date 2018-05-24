@@ -44,34 +44,28 @@ public:
 	   std::atomic<bool> 	Paused;
 
 protected:
-
-   vector<cv::UMat>		mDisplayQueue;
-   vector<cv::UMat>		mProcessQueue;
-
-
+   ProfilerLDT mProfiler;
    FrameFeeder(): Stopped(false),Paused(true){}
-
    virtual  void parseSettings(string& srcStr)  = 0;
-   virtual  void enqueue(cv::UMat& frame, vector<cv::UMat>& queue) = 0;
-
 
 public:
-
    virtual cv::UMat dequeue() = 0 ;
    virtual cv::UMat dequeueDisplay() = 0;
    virtual  ~FrameFeeder(){}
-
 };
+
 
 class ImgStoreFeeder: public FrameFeeder
 {
 
 private:
-        ProfilerLDT                     mProfiler;
+        vector<cv::UMat>                mDisplayQueue;
+        vector<cv::UMat>                mProcessQueue;
+
+
 	const std::size_t		mMAX_BUFFER_SIZE;
 	const std::size_t		mMAX_RETRY;
 	const std::size_t		mSLEEP_ms;
-
 
 	string				mFolder;
 	int 	        		mSkipFrames;
@@ -80,8 +74,8 @@ private:
 	std::thread			mAsyncGrabber;
 	std::mutex 			mMutex;
 
-	void enqueue(cv::UMat& frame, vector<cv::UMat>& queue) override;
 	void parseSettings(string& srcStr) override;
+	void enqueue(cv::UMat& frame, vector<cv::UMat>& queue);
 
 public:
 	ImgStoreFeeder(string sourceStr);
