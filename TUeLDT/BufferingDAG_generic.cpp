@@ -31,7 +31,8 @@ int BufferingDAG_generic::init_DAG(const Templates & TEMPLATES, const size_t & B
 	const int RES_H 	= mCAMERA.RES_VH(1);
 	mVP_RANGE_V   		= TEMPLATES.VP_RANGE_V;
 	mSPAN			= TEMPLATES.SPAN;
-	mHORIZON_ICCS		= TEMPLATES.HORIZON_ICCS;
+	mHORIZON_ICCS_H		= TEMPLATES.HORIZON_ICCS_H;
+	mHORIZON_ICCS_V		= TEMPLATES.HORIZON_ICCS_V;
 	
 	mBufferPool.reset(new BufferPool(mSPAN, RES_H, BUFFER_SIZE));
 
@@ -40,6 +41,9 @@ int BufferingDAG_generic::init_DAG(const Templates & TEMPLATES, const size_t & B
 	mFOCUS_MASK_ROOT   	= TEMPLATES.FOCUS_MASK_ROOT;
 	mY_ICS	 	  	= TEMPLATES.Y_ICS;
 	mX_ICS    	  	= TEMPLATES.X_ICS;
+
+	mVanishPt.H		= mHORIZON_ICCS_H;
+	mVanishPt.V		= mHORIZON_ICCS_V;
 
 
 	return 0;
@@ -72,7 +76,7 @@ mProfiler.start("SETUP_ASYNC_TEMPLATES");
 
 
 	   //Extract Focus Template
-	   lRowIndex = mVP_RANGE_V	 - mVanishPt.V;
+	   lRowIndex = mVP_RANGE_V - (mVanishPt.V- mHORIZON_ICCS_V);
 	   lROI = cv::Rect(0, lRowIndex, mCAMERA.RES_VH(1), mSPAN);
 
 	   lLock.lock();

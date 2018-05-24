@@ -52,27 +52,25 @@ public:
 
 
 		Camera():
-			 NAME (CAMERA_NAME),
+		 NAME (CAMERA_NAME),
 
-			 MATRIX_INTRINSIC(getMatrix("CAMERA_MATRIX_INTRINSIC")),
+		 MATRIX_INTRINSIC(getMatrix("CAMERA_MATRIX_INTRINSIC")),
 
-			 MATRIX_EXTRINSIC(getMatrix("CAMERA_MATRIX_EXTRINSIC")), 
+		 MATRIX_EXTRINSIC(getMatrix("CAMERA_MATRIX_EXTRINSIC")), 
 
-			 RES_VH(getVector2f("CAMERA_RES").cast<int>()),
+		 RES_VH(getVector2f("CAMERA_RES").cast<int>()),
 
-			 ROT_PY(getVector2f("CAMERA_ROT_PY")),
+		 ROT_PY(getVector2f("CAMERA_ROT_PY")),
 
-			 FOV_VH(Vector2f(2*atan( (RES_VH(0)/2.0) / (MATRIX_INTRINSIC.at<float>(1,1)) )*180/M_PI ,
-					 2*atan( (RES_VH(1)/2.0) / (MATRIX_INTRINSIC.at<float>(0,0)) )*180/M_PI )),
+		 FOV_VH(Vector2f(2*atan( (RES_VH(0)/2.0) / (MATRIX_INTRINSIC.at<float>(1,1)) )*180/M_PI ,
+				 2*atan( (RES_VH(1)/2.0) / (MATRIX_INTRINSIC.at<float>(0,0)) )*180/M_PI )),
 
-			 HORIZON_VH(Vector2i( round((ROT_PY(0)* RES_VH(0)) / FOV_VH(0) ) ,
-			                      round((ROT_PY(1)* RES_VH(1)) / FOV_VH(1) ) )),
+		 HORIZON_VH(Vector2i( round((ROT_PY(0)* RES_VH(0)) / FOV_VH(0) ) ,
+				      round((ROT_PY(1)* RES_VH(1)) / FOV_VH(1) ) )),
 
-			 O_ICCS_ICS( cv::Point( RES_VH[1]/2,  RES_VH[0]/2) ), 
+		 O_ICCS_ICS( cv::Point( RES_VH[1]/2,  RES_VH[0]/2) ), 
 
-			 O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) ){ }
-
-
+		 O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) ){ }
 
 
 
@@ -232,6 +230,7 @@ inline ostream& operator<<(ostream& os, const Camera& lCamera)
   os<<"Resolution[VxH]		: "<<"[ "<<lCamera.RES_VH[0]<<" x "<<lCamera.RES_VH[1]<<" ]"<<endl;
   os<<"Pitch-Yaw[P,Y]		: "<<"[ "<<lCamera.ROT_PY[0]<<" x "<<lCamera.ROT_PY[1]<<" ]"<<endl;
   os<<"Field-of-View [V, H]	: "<<"[ "<<lCamera.FOV_VH[0]<<" , "<<lCamera.FOV_VH[1]<<" ]"<<endl;
+  os<<"Horizon [V, H]	        : "<<"[ "<<lCamera.HORIZON_VH[0]<<" , "<<lCamera.HORIZON_VH[1]<<" ]"<<endl;
   os<<"Origin-ICCS-ICS		: "<<lCamera.O_ICCS_ICS<<endl;
   os<<"Origin-ICS-ICCS		: "<<lCamera.O_ICS_ICCS<<endl;
   os<<"***********************************************"<<endl;

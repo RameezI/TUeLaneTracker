@@ -47,19 +47,49 @@ float  getPixelStep(const float STEP_cm, const Camera& CAM, const int Y_ICCS )
    lWorldPt = lIMG_TO_W * lImgPt;
    lWorldPt = lWorldPt/lWorldPt.at<float>(2);
    
-   lWorldPt.at<float>(0)  = STEP_cm;
+   lWorldPt.at<float>(0)  += STEP_cm;
    lImgPt = lW_TO_IMG * lWorldPt;
 
    return lImgPt.at<float>(0,0)/(lImgPt.at<float>(0,2)*100.0 ) ;
 }
 
-cv::Mat	 getBins(const Ref<const VectorXf>& BINS_cm, const float& STEP_cm, const float& STEP)
+
+int  getBinsOffset(const Camera& CAM, const int Y_ICCS )
+{
+   cv::Mat  lIMG_TO_W;	//Image-Center-CS to Vehicle-Symmetry-CS tranformation, planar homography
+   cv::Mat  lW_TO_IMG;	//Vehicle-Symmetry-CS to Image-Center-CS transformation 
+
+   cv::Mat  lImgPt	= cv::Mat(3,1, CV_32F);
+   cv::Mat  lWorldPt	= cv::Mat(3,1, CV_32F);
+
+   // 3x3 Planar-Homography from the 4x4 Extrinsic Matrix and 3x3 Intrinsic Matrix
+   cv::Mat a = CAM.MATRIX_EXTRINSIC(cv::Range(0,3), cv::Range(0,2));
+   cv::Mat b = CAM.MATRIX_EXTRINSIC(cv::Range(0,3), cv::Range(3,4));
+   cv::hconcat(a, b, lW_TO_IMG);
+   lW_TO_IMG = CAM.MATRIX_INTRINSIC * lW_TO_IMG;
+   lIMG_TO_W = lW_TO_IMG.inv();
+
+   lImgPt.at<float>(0,0) = 0;
+   lImgPt.at<float>(1,0) = (float)Y_ICCS; 
+   lImgPt.at<float>(2,0) = 1;
+
+   lWorldPt = lIMG_TO_W * lImgPt;
+   lWorldPt = lWorldPt/lWorldPt.at<float>(2);
+   
+   lWorldPt.at<float>(0) = 0;
+   lImgPt = lW_TO_IMG * lWorldPt;
+
+   return round(lImgPt.at<float>(0,0)/(lImgPt.at<float>(0,2)*100.0 )) ;
+}
+
+
+cv::Mat	 getBins(const Ref<const VectorXf>& BINS_cm, const float& STEP_cm, const float& STEP, const int OFFSET)
 {	
    cv::Mat lMat(BINS_cm.size(), 1, CV_32S);
 
    for (int i=0; i< BINS_cm.size(); i++)
    {
-     lMat.at<int32_t>(i,0) = round(BINS_cm(i)*(STEP/STEP_cm)) ;
+     lMat.at<int32_t>(i,0) = round(BINS_cm(i)*(STEP/STEP_cm)) + OFFSET;
    }
    return lMat;
 }
@@ -93,9 +123,13 @@ LaneFilter::LaneFilter(const LaneProperties& LAN,  const Camera& CAM)
 
   PURVIEW_STEP(getPixelStep(BINS_STEP_cm, CAMERA, PURVIEW_LINE_ICCS)),
   
-  BASE_BINS(getBins(BINS_cm, BINS_STEP_cm, BASE_STEP)),
+  BASE_OFFSET(getBinsOffset(CAMERA, BASE_LINE_ICCS)),
+  
+  PURVIEW_OFFSET(getBinsOffset(CAMERA, PURVIEW_LINE_ICCS)),
+  
+  BASE_BINS(getBins(BINS_cm, BINS_STEP_cm, BASE_STEP, BASE_OFFSET)),
 
-  PURVIEW_BINS(getBins(BINS_cm, BINS_STEP_cm, PURVIEW_STEP)),
+  PURVIEW_BINS(getBins(BINS_cm, BINS_STEP_cm, PURVIEW_STEP, PURVIEW_OFFSET)),
 
   prior( cv::Mat::zeros( (int)(BINS_MAX_cm/BINS_STEP_cm) +1, (int)(BINS_MAX_cm/BINS_STEP_cm) +1 , CV_32SC1) ),
   

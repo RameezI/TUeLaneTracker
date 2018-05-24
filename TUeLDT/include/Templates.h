@@ -46,14 +46,18 @@ struct Templates
 	
 public:
 
-	const int HORIZON_ICCS;  	/**< /brief Position of Horizon in the Image-Center-CS [pixels]
+        const int HORIZON_ICCS_H;  	/**< /brief Position of Horizon in the Image-Center-CS [pixels] */
+
+
+	const int HORIZON_ICCS_V;  	/**< /brief Position of Horizon in the Image-Center-CS [pixels]
 				 	  *  /n +ve value implies that the ROI is below the center line.
 					  *  /n -ve value implies that the ROI is above the center line. */
+
 
 	const int VP_RANGE_V;   	/**< Vertical range of the vanishing-point in either direction [pixels] */
 
 	const int SPAN;			/**< Vertical size  of the ROI [pixels]
-					/n Automatically calculated from  #HORIZON_ICCS and #VP_RANGE_V */
+					/n Automatically calculated from  #HORIZON_ICCS_V and #VP_RANGE_V */
 
 	cv::Mat FOCUS_MASK_ROOT;  	/**< /brief ROOT-TEMPLATE for extracting mask to compensate vehicle pitch movements.
 					/n The size of /em FOCUS ROOT is [#SPAN + (2x#VP_RANGE_V), #RES_H]
@@ -86,10 +90,11 @@ public:
  	*  /param  FOV_V is an integer argument representing field of view of the camera. [degrees]
  	*  /parame VP_RANGE_ROWS is an integer argument representing vertical range of the vanishing-point. [pixels]
  	*   ****************************************************/
-	Templates(const int RES_V, const int RES_H, const float FOV_V, const int Horizon, const int VP_RANGE_ROWS)
-	: HORIZON_ICCS(Horizon),
+	Templates(const int RES_V, const int RES_H, const float FOV_V, const int HORIZON_H, const int HORIZON_V, const int VP_RANGE_ROWS)
+	: HORIZON_ICCS_H(HORIZON_H),
+	  HORIZON_ICCS_V(HORIZON_V),
 	  VP_RANGE_V(VP_RANGE_ROWS), 
-	  SPAN((RES_V/2)- HORIZON_ICCS + VP_RANGE_ROWS) 
+	  SPAN((RES_V/2)- HORIZON_ICCS_V + VP_RANGE_ROWS) 
 
 	{
 		/* Create Focus Template */

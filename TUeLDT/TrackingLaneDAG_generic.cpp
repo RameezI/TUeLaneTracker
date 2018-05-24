@@ -176,6 +176,10 @@ LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
 #ifdef PROFILER_ENABLED
 mProfiler.start("COMPUTE_INTERSECTIONS");
 #endif	
+	//Note: Gradients are not computed in the Image-center-cs. slope is positive in upward direction.
+	//Therefore invert the mY_ICCS by subtracting the BASE_LINE
+	//Weights of the intersections above the vanishingPt are already set to zero.
+
 	//Base Intersections
 	subtract(mY_ICCS, mLaneFilter->BASE_LINE_ICCS, mIntBase, cv::noArray(), CV_32S);
 	divide(mIntBase, mGradTanFocussed, mIntBase, SCALE_INTSEC_TAN, CV_32S);
@@ -185,6 +189,10 @@ mProfiler.start("COMPUTE_INTERSECTIONS");
 	subtract(mY_ICCS, mLaneFilter->PURVIEW_LINE_ICCS, mIntPurview, cv::noArray(), CV_32S);
 	divide(mIntPurview,mGradTanFocussed, mIntPurview, SCALE_INTSEC_TAN, CV_32S);
 	add(mIntPurview, mX_ICCS_SCALED, mIntPurview);
+
+
+	bitwise_and(mBufferPool->Probability[mBufferPos], mFocusTemplate, mBufferPool->Probability[mBufferPos]);
+
 
 #ifdef PROFILER_ENABLED
 mProfiler.end();
@@ -489,8 +497,9 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		   const int&   lBIN_H 	= mVpFilter->BINS_H(h);
 		   const auto&  lSTEP	= mSTEP_PURVIEW_SCALED;
 		
-		   lIntSecLeft  = SCALE_INTSEC*( ((lBIN_H - lBASE_LB)/(float)(lBIN_V - lBASE_Y))*(lPURV_Y - lBIN_V) +lBIN_H );
-		   lIntSecRight = SCALE_INTSEC*( ((lBIN_H - lBASE_RB)/(float)(lBIN_V - lBASE_Y))*(lPURV_Y - lBIN_V) +lBIN_H );
+		   // x=1/m*y + x0
+		   lIntSecLeft  = SCALE_INTSEC*( ((lBIN_H - lBASE_LB)/(float)(lBIN_V - lBASE_Y))*(lPURV_Y) +lBIN_H );
+		   lIntSecRight = SCALE_INTSEC*( ((lBIN_H - lBASE_RB)/(float)(lBIN_V - lBASE_Y))*(lPURV_Y) +lBIN_H );
 
 		   lIdx_LB 	= ( lIntSecLeft  - mLOWER_LIMIT_PURVIEW + (lSTEP/2) )/lSTEP;
 		   lIdx_RB 	= ( lIntSecRight - mLOWER_LIMIT_PURVIEW + (lSTEP/2) )/lSTEP;

@@ -25,7 +25,10 @@
 #include <Eigen/Dense>
 #include "opencv2/opencv.hpp"
 
+
 using namespace Eigen;
+using namespace std;
+
 typedef Matrix<int, 6, 1> Vector6i;
 
 ///This class represents ad 2D-Filter expressed in Image-Center-Coordiante-System
@@ -35,12 +38,16 @@ typedef Matrix<int, 6, 1> Vector6i;
 class VanishingPtFilter
 {
 
+friend 		ostream& operator<<(ostream& os, const VanishingPtFilter& lVanishingPtFilter);
+
+
 private:
 		void  createPrior();
 
+
 public:
 
-		VanishingPtFilter();
+		VanishingPtFilter(const int HOR_H, const int HOR_V);
 
         	const int       STEP;         	/*< Step for VanishinPtFilter [pixels] */
 
@@ -62,5 +69,25 @@ public:
 		~VanishingPtFilter();
 
 };
+
+
+inline ostream& operator<<(ostream& os, const VanishingPtFilter& vanishingPtFilter)
+{
+  os<<endl<<"[VanishingPtFilter Properties]"<<endl;
+  os<<"***********************************************************************"<<endl;
+
+  os<<"VP step size [pixels]:   "<<vanishingPtFilter.STEP<<endl;
+  os<<"Vertical-Range:          "<<vanishingPtFilter.RANGE_V<<endl;
+  os<<"Horizontal-Range:        "<<vanishingPtFilter.RANGE_H<<endl;
+  os<<"Bins-Count Vertical:     "<<vanishingPtFilter.COUNT_BINS_V<<endl;
+  os<<"Bins-Count Horizontal:   "<<vanishingPtFilter.COUNT_BINS_H<<endl;
+
+  os<<"Vertical   BINS:         "<<endl<<vanishingPtFilter.BINS_V<<endl;
+  os<<"Horizontal BINS:         "<<endl<<vanishingPtFilter.BINS_H<<endl;
+  
+  os<<"************************************************************************"<<endl;
+
+  return os;
+}
 	
 #endif // VANSIHINGPOINFILTER_H
