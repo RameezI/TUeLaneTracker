@@ -47,10 +47,10 @@ float  getPixelStep(const float STEP_cm, const Camera& CAM, const int Y_ICCS )
    lWorldPt = lIMG_TO_W * lImgPt;
    lWorldPt = lWorldPt/lWorldPt.at<float>(2);
    
-   lWorldPt.at<float>(0)  += STEP_cm;
+   lWorldPt.at<float>(0)  += STEP_cm/100.0;
    lImgPt = lW_TO_IMG * lWorldPt;
 
-   return lImgPt.at<float>(0,0)/(lImgPt.at<float>(0,2)*100.0 ) ;
+   return lImgPt.at<float>(0,0)/(lImgPt.at<float>(0,2)) ;
 }
 
 
@@ -142,7 +142,6 @@ LaneFilter::LaneFilter(const LaneProperties& LAN,  const Camera& CAM)
 
 	createPrior();
 	filter = prior.clone(); // Initially the posterior probabilities are equal to the prior estimate.
-
 	
   }
 
@@ -187,7 +186,7 @@ void LaneFilter::createPrior()
 		throw "Select a smaller step-size. Not enough bins for calculating the Histograms";
 	
 	
-	       size_t idxMark 	= floor(lWidthMarking/BINS_STEP_cm) ;
+	       size_t idxMark 	= floor((lWidthMarking/BINS_STEP_cm)/*BASE_STEP*/) ;
 
 	       size_t lNonBoundaryBinsCount_left  = (idxM-idxMark) - (idxL + idxMark) -1;
 	       size_t lNonBoundaryBinsCount_right = (idxR-idxMark) - (idxM + idxMark) -1;
