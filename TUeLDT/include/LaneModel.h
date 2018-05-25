@@ -48,21 +48,35 @@ class  LaneModel
 {
 
 public:
-	int 	boundaryLeft;	  	/*< Selected, according to max-posterior, distance to left boundary in Image-Center-CS [pixel] */
-	int 	boundaryRight;  	/*< Selected, according to max-posterior, distance to left boundary in Image-Center-CS [pixel] */
+	int 	boundaryLeft;	  	/*< Selected,max-poseterior, distance to left boundary at base in Image-Center-CS [pixel] */
+	int 	boundaryRight;  	/*< Selected,max-posterior, distance to left boundary at base in Image-Center-CS [pixel] */
+
+	int	boundaryLeft_Purview; 	/*< Selected,max-poseterior, distance to left boundary at purview in Image-Center-CS [pixel] */
+	int 	boundaryRight_Purview;	/*< Selected,max-poseterior, distance to right boundary at purview in Image-Center-CS [pixel] */
 
 	VanishingPt vanishingPt; 	/*< Selected, according to max-posterior, distance to VanishingPoint in Image-Center-CS [pixel] */
 
-	float 	lookAheadErr_m;		/*< The mid-Line at the purview line in Vehicle-Symmetry-CS [m]*/
+	float 	lookAheadErr_m;		/*< The Look-Ahead error at the purview line in Vehicle-Symmetry-CS [m]*/
+
+
+	float   conf_LB;
+	float   conf_RB;
 	
 
-	void setModel(const int&  boundaryL,            const int& boundaryR,
-	              const VanishingPt& vanishPt,      const float& Err)
+	
+
+	void setModel(const int&  boundaryL,  const int& boundaryR, const int& boundaryL_purview, const int& boundaryR_purview,
+	              const VanishingPt& vanishPt, const float& Err)
 	{
 
 	  boundaryLeft  	= boundaryL;
 	  boundaryRight 	= boundaryR;
+
+	  boundaryLeft_Purview  = boundaryL_purview;
+	  boundaryRight_Purview = boundaryR_purview;
+
 	  vanishingPt	  	= vanishPt;
+
 	  lookAheadErr_m	= Err;
 	}
 
