@@ -26,6 +26,8 @@ using namespace cv;
 void FrameRenderer::drawLane(const cv::UMat& FRAME, const LaneModel& Lane)
 {
 
+ // cout << "LB:	"<<Lane.boundaryLeft_Purview<<"RB:   "<<Lane.boundaryRight_Purview<<endl; 
+
    const float 	lRatioLookAhead 	= 0.35;
 
    vector<Point> lBoundaryPts_L;
@@ -102,13 +104,19 @@ void FrameRenderer::drawLane(const cv::UMat& FRAME, const LaneModel& Lane)
    for (size_t i=0; i < mCOUNT_BINS; i++)
    {
 	int x = mPURVIEW_BINS.at<int32_t>(i,0) + mO_ICCS_ICS.x;
+	if ( (x== Lane.boundaryLeft_Purview + mO_ICCS_ICS.x) |(x== Lane.boundaryRight_Purview + mO_ICCS_ICS.x) )
+	{
+	  line(FRAME, cvPoint(x, mPURVIEW_LINE_ICS), cvPoint(x, mPURVIEW_LINE_ICS - 60), cvScalar(0,0,255), 1);
+	}
+	else
 	line(FRAME, cvPoint(x, mPURVIEW_LINE_ICS), cvPoint(x, mPURVIEW_LINE_ICS - 30), cvScalar(0,0,0), 1);
    }
 
 
    #ifndef DISPLAY_GRAPHICS_DCU
      imshow( "Display window", FRAME);
-     waitKey(1);
+     if( waitKey(200) == 32)
+       while(waitKey(1)!=32);
    #else
      mDCU.PutFrame(FRAME);
    #endif
