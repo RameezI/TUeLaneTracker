@@ -16,14 +16,16 @@ using namespace std;
 // Camera Intrinsic defines
 #define FX	770.35706	//Focal lenght x-axis [pixels]
 #define FY	770.267114  	//Focal lenght y-axis [pixels]
+
+
 #define CX	-12	   	//Principal point x-axis in Image-Center-CS [pixels]
 #define CY	-3		//Principal point y-axis in Image-Center-CS [pixels]
 
 
-#define PITCH  			0   	 // Camera Pitch [degrees].
-#define YAW    			0   	// Camera yaw a [degrees].
-#define CAM_HEIGHT    		1.364	 // Camera height from the road [meters].
-#define CAM_LATERAL_OFFSET	0	 // Lateral-Offset of the camera from the vehicle symmetry plane[meters].
+#define PITCH  			3.2  	// Camera Pitch [degrees].
+#define YAW    			3.19	// Camera yaw a [degrees].
+#define CAM_HEIGHT    		1.364	// Camera height from the road [meters].
+#define CAM_LATERAL_OFFSET	0	// Lateral-Offset of the camera from the vehicle symmetry plane[meters].
 
 
 
@@ -59,19 +61,17 @@ int main( int argc, char** argv )
 						     0,     FY,  CY,
 						     0,     0,    1 );
 
+   // 4x4 Pitch Transformation
+    Mat ROT_P = (Mat_<float>(4,4)<< 1,   0,  				  0,   			            0,
+				    0,	 cos(-(M_PI/2.0) + toRad(PITCH)), sin(-(M_PI/2.0) + toRad(PITCH)),  0,
+				    0,	-sin(-(M_PI/2.0) + toRad(PITCH)), cos(-(M_PI/2.0) + toRad(PITCH)),  0,
+				    0,   0,  				  0,   			       	    1);
 
 
-   // 4x4 Pitch Rotation
-    Mat ROT_P = (Mat_<float>(4,4)<< 1,   0,  				  0,   			           0,
-				    0,	 cos((M_PI/2.0) + toRad(PITCH)), -sin((M_PI/2.0) + toRad(PITCH)),  0,
-				    0,	 sin((M_PI/2.0) + toRad(PITCH)),  cos((M_PI/2.0) + toRad(PITCH)),  0,
-				    0,   0,  				  0,   			       	   1);
-
-
-   // 4x4 Yaw Rotation
-    Mat ROT_Y = (Mat_<float>(4,4)<< cos(toRad(YAW)),   0,  	sin(toRad(YAW)),   0,
+   // 4x4 Yaw Transformation
+    Mat ROT_Y = (Mat_<float>(4,4)<< cos(toRad(YAW)),   0,  	-sin(toRad(YAW)),   0,
 				    0,	 	       1,  	0,		   0,
-				   -sin(toRad(YAW)),   0,  	cos(toRad(YAW)),   0,
+				    sin(toRad(YAW)),   0,  	cos(toRad(YAW)),   0,
 				    0,   	       0,  	0,   		   1);
 
 
