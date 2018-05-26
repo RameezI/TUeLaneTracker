@@ -497,9 +497,9 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		   const int&   lBIN_H 	= mVpFilter->BINS_H(h);
 		   const auto&  lSTEP	= mSTEP_PURVIEW_SCALED;
 		
-		   // x=1/m*y + x0
-		   lIntSecLeft  = SCALE_INTSEC*( ((lBIN_H - lBASE_LB)/(float)(lBIN_V - lBASE_Y))*(lPURV_Y) +lBIN_H );
-		   lIntSecRight = SCALE_INTSEC*( ((lBIN_H - lBASE_RB)/(float)(lBIN_V - lBASE_Y))*(lPURV_Y) +lBIN_H );
+		   // x=1/m*(y-c) + x0
+		   lIntSecLeft  = SCALE_INTSEC*( ((lBIN_H - lBASE_LB)/(float)(lBIN_V - lBASE_Y))*(lPURV_Y - lBIN_V) +lBIN_H );
+		   lIntSecRight = SCALE_INTSEC*( ((lBIN_H - lBASE_RB)/(float)(lBIN_V - lBASE_Y))*(lPURV_Y - lBIN_V) +lBIN_H );
 
 		   lIdx_LB 	= ( lIntSecLeft  - mLOWER_LIMIT_PURVIEW + (lSTEP/2) )/lSTEP;
 		   lIdx_RB 	= ( lIntSecRight - mLOWER_LIMIT_PURVIEW + (lSTEP/2) )/lSTEP;
@@ -548,7 +548,7 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		         mLikelihood_NB   *= exp(-pow( mCorrelationNB/(float)SCALE_FILTER , 2)/mLaneMembership.NEG_BOUNDARY_NOMIN);
 											 				 
 		         //Conditional Probability			 
-		         mConditionalProb  =   mConditionalProb* mLikelihood_NB * mLikelihood_W;		
+		         mConditionalProb  = mConditionalProb* mLikelihood_NB * mLikelihood_W;		
 		         mPosterior 	   = round(mConditionalProb * mTransitVpFilter.at<int32_t>(v ,h));
 			
 		         mVpFilter->filter.at<int32_t>(v, h) = mPosterior;
@@ -560,7 +560,7 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 			    mVanishPt.H 	= lBIN_H;
   			    mIdxPurview_LB  	= lIdx_LB;
   			    mIdxPurview_RB  	= lIdx_RB;
-		          }//end, if posterior is greater than existing Max
+		         }//end, if posterior is greater than existing Max
 
 		      }//end, if Lane Width is in Range
 		   } //end, if Intersections are not in the BIN-Range 
@@ -597,9 +597,13 @@ mProfiler.start("ASSIGN_LANE_MODEL");
 	   const auto& lBINS_cm   = mLaneFilter->BINS_cm;
 	   const auto& lBASE_LB	  = mBaseHistModel.boundary_left;
 	   const auto& lBASE_RB	  = mBaseHistModel.boundary_right;
+
+	   const auto& lPURV_LB	  = mLaneFilter->PURVIEW_BINS.at<int32_t>(mIdxPurview_LB, 0);
+	   const auto& lPURV_RB	  = mLaneFilter->PURVIEW_BINS.at<int32_t>(mIdxPurview_RB, 0);
+
 	   float lLookAheadErr    = (lBINS_cm(mIdxPurview_LB) + lBINS_cm(mIdxPurview_RB))/2.0;
 
-	   mLaneModel.setModel(lBASE_LB, lBASE_RB, mVanishPt, lLookAheadErr/100.0 );
+	   mLaneModel.setModel(lBASE_LB, lBASE_RB, lPURV_LB, lPURV_RB, mVanishPt, lLookAheadErr/100.0 );
 	}
 #ifdef PROFILER_ENABLED
 mProfiler.end();
