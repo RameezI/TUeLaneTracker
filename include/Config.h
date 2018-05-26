@@ -48,7 +48,7 @@
 #define STEP_LANE_FILTER_CM	10    /**< Provide bin-size for the 1D lane filters (At base and purview lines) [cm]*/
 #define STEP_VP_FILTER		10    /**< Provide bin-size for 2D vanishing point filter [pixels]*/
 
-#define VP_RANGE_VER		0   /**< Vertical range of VP on either side of the Horizon Line [pixels] */
+#define VP_RANGE_VER		20   /**< Vertical range of VP on either side of the Horizon Line [pixels] */
 #define VP_RANGE_HOR		300    /**< Horizontal range of VP on either side of center point on the horizon line [pixels] */
 
 #define BUFFER_COUNT		 5    /**<  Provide number of probability frames to buffer for Max-Pooling operations [Temporal Filtering]*/

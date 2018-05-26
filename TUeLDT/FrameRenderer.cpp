@@ -115,7 +115,7 @@ void FrameRenderer::drawLane(const cv::UMat& FRAME, const LaneModel& Lane)
 
    #ifndef DISPLAY_GRAPHICS_DCU
      imshow( "Display window", FRAME);
-     if( waitKey(200) == 32)
+     if( waitKey(1) == 32)
        while(waitKey(1)!=32);
    #else
      mDCU.PutFrame(FRAME);
