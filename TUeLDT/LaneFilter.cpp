@@ -186,7 +186,7 @@ void LaneFilter::createPrior()
 		throw "Select a smaller step-size. Not enough bins for calculating the Histograms";
 	
 	
-	       size_t idxMark 	= floor((lWidthMarking/BINS_STEP_cm)/*BASE_STEP*/) ;
+	       size_t idxMark 	= floor(lWidthMarking/BINS_STEP_cm) ;
 
 	       size_t lNonBoundaryBinsCount_left  = (idxM-idxMark) - (idxL + idxMark) -1;
 	       size_t lNonBoundaryBinsCount_right = (idxR-idxMark) - (idxM + idxMark) -1;
