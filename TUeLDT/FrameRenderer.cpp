@@ -26,8 +26,6 @@ using namespace cv;
 void FrameRenderer::drawLane(const cv::UMat& FRAME, const LaneModel& Lane)
 {
 
- // cout << "LB:	"<<Lane.boundaryLeft_Purview<<"RB:   "<<Lane.boundaryRight_Purview<<endl; 
-
    const float 	lRatioLookAhead 	= 0.35;
 
    vector<Point> lBoundaryPts_L;
@@ -121,5 +119,8 @@ void FrameRenderer::drawLane(const cv::UMat& FRAME, const LaneModel& Lane)
      mDCU.PutFrame(FRAME);
    #endif
    
+   #ifdef WRITE_FRAMES_TO_FILE
+     mOutputVideo << FRAME.getMat(ACCESS_READ);
+   #endif
 
 }

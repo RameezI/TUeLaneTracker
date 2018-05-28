@@ -30,6 +30,7 @@
 #define PROFILER_ENABLED 	        	/**< If defined, the program logs and profiles its execution*/
 #define DISPLAY_GRAPHICS 	        	/**< If defined, the program renders results on to a display */
 //#define DISPLAY_GRAPHICS_DCU          	/**< If defined, the graphics are rendered on the s32v23 DCU*/
+#define WRITE_FRAMES_TO_FILE			/**< If defined, the output is saved to a video file */
 
 
 //S32V specific definitions

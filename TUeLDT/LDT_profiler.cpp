@@ -38,12 +38,16 @@ ProfilerLDT::ProfilerLDT()
 
 void ProfilerLDT::start(string BlkName)
 {
-	mBlockName.push_back(BlkName);
-	mStartTick.push_back(FSL_Ticks()); 
+
+     	LockGuard  lLock(mMutex); //lock gaurd to protect race conditions
+	 mBlockName.push_back(BlkName);
+	 mStartTick.push_back(FSL_Ticks());
 }
 
 void ProfilerLDT::end()
 {
+     	LockGuard  lLock(mMutex); //lock gaurd to protect race conditions
+
 	mEndTick = FSL_Ticks();
 	blockTime_ms(mStartTick.back(), mEndTick);
 	
@@ -55,6 +59,7 @@ void ProfilerLDT::end()
    
 void ProfilerLDT::blockTime_ms(uint64_t t_start, uint64_t t_finish)
 {
+
 	mStartTime	= FSL_TicksToSeconds(t_start);
 	mEndTime	= FSL_TicksToSeconds(t_finish);
 
@@ -96,6 +101,9 @@ void ProfilerLDT::blockTime_ms(uint64_t t_start, uint64_t t_finish)
 
 uint64_t ProfilerLDT::getMultiplicity(std::string block)
 {
+
+   LockGuard  lLock(mMutex); //lock gaurd to protect race conditions
+
    if ( mBlockMultiplicity.find(block) == mBlockMultiplicity.end() ) 
     {// not found     
         return 0;
@@ -110,20 +118,26 @@ uint64_t ProfilerLDT::getMultiplicity(std::string block)
 
 double ProfilerLDT::getAvgTime(std::string block)
 {
-    if ( mBlockAvgTime.find(block) == mBlockAvgTime.end() ) 
-    {// not found
+
+   LockGuard  lLock(mMutex); //lock gaurd to protect race conditions
+
+   if ( mBlockAvgTime.find(block) == mBlockAvgTime.end() ) 
+   {// not found
         return -1;
-    } 
-    else 
-    {// found 
+   } 
+   else 
+   {// found 
         return mBlockAvgTime[block];
-    }
-					
+   }
+
 }
 
 
 double ProfilerLDT::getMinTime(std::string block)
 {
+
+   LockGuard  lLock(mMutex); //lock gaurd to protect race conditions
+
     if ( mBlockMinTime.find(block) == mBlockMinTime.end() ) 
     {// not found
         return -1;
@@ -134,11 +148,15 @@ double ProfilerLDT::getMinTime(std::string block)
     
         return mBlockMinTime[block];
     }
-					
+
 }
 
 double ProfilerLDT::getMaxTime(std::string block)
 {
+
+					
+   LockGuard  lLock(mMutex); //lock gaurd to protect race conditions
+
     if ( mBlockMaxTime.find(block) == mBlockMaxTime.end() ) 
     {// not found    
         return -1;
@@ -148,7 +166,7 @@ double ProfilerLDT::getMaxTime(std::string block)
     {// found
         return mBlockMaxTime[block];
     }
-					
+
 }
 
 void ProfilerLDT::writeTimings()

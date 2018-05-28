@@ -53,6 +53,8 @@ public:
 
 	int	boundaryLeft_Purview; 	/*< Selected,max-poseterior, distance to left boundary at purview in Image-Center-CS [pixel] */
 	int 	boundaryRight_Purview;	/*< Selected,max-poseterior, distance to right boundary at purview in Image-Center-CS [pixel] */
+	
+	float   laneWidth_cm;
 
 	VanishingPt vanishingPt; 	/*< Selected, according to max-posterior, distance to VanishingPoint in Image-Center-CS [pixel] */
 
@@ -66,7 +68,7 @@ public:
 	
 
 	void setModel(const int&  boundaryL,  const int& boundaryR, const int& boundaryL_purview, const int& boundaryR_purview,
-	              const VanishingPt& vanishPt, const float& Err)
+	              const float& laneWidth, const VanishingPt& vanishPt, const float& Err)
 	{
 
 	  boundaryLeft  	= boundaryL;
@@ -75,6 +77,7 @@ public:
 	  boundaryLeft_Purview  = boundaryL_purview;
 	  boundaryRight_Purview = boundaryR_purview;
 
+	  laneWidth_cm		= laneWidth;
 	  vanishingPt	  	= vanishPt;
 
 	  lookAheadErr_m	= Err;

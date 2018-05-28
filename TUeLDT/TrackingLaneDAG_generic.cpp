@@ -673,8 +673,9 @@ mProfiler.start("ASSIGN_LANE_MODEL");
 	   const auto& lPURV_RB	  = mLaneFilter->PURVIEW_BINS.at<int32_t>(mIdxPurview_RB, 0);
 
 	   float lLookAheadErr    = (lBINS_cm(mIdxPurview_LB) + lBINS_cm(mIdxPurview_RB))/2.0;
+	   float lLaneWidth	  = (lBINS_cm(mIdxPurview_RB) - lBINS_cm(mIdxPurview_LB));
 
-	   mLaneModel.setModel(lBASE_LB, lBASE_RB, lPURV_LB, lPURV_RB, mVanishPt, lLookAheadErr/100.0 );
+	   mLaneModel.setModel(lBASE_LB, lBASE_RB, lPURV_LB, lPURV_RB, lLaneWidth, mVanishPt, lLookAheadErr/100.0 );
 	}
 #ifdef PROFILER_ENABLED
 mProfiler.end();

@@ -28,14 +28,17 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <mutex>
 
 using  namespace std;
+using  LockGuard = std::lock_guard<std::mutex>;
 
     class ProfilerLDT
     {
 
 private:
             
+	std::mutex 			mMutex;
 	double mStartTime;
 	double mEndTime;
 

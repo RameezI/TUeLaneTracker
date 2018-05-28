@@ -49,6 +49,10 @@ private:
     io::FrameOutputV234Fb  mDCU;
    #endif
 
+   #ifdef WRITE_FRAMES_TO_FILE
+    cv::VideoWriter  mOutputVideo;
+   #endif
+
 public:
    FrameRenderer(const LaneFilter& LANE_FLTR)
    : 
@@ -59,11 +63,16 @@ public:
      mPURVIEW_LINE_ICS(LANE_FLTR.PURVIEW_LINE_ICCS + mO_ICCS_ICS.y),
      mCOUNT_BINS(mBASE_BINS.rows),
      mHORIZON_V(LANE_FLTR.CAMERA.HORIZON_VH(0))
+
      #ifdef DISPLAY_GRAPHICS_DCU
       , mDCU(io::FrameOutputV234Fb(LANE_FLTR.CAMERA.RES_VH(1), LANE_FLTR.CAMERA.RES_VH(0), io::IO_DATA_DEPTH_08, io::IO_DATA_CH3))
      #endif
-   {
 
+   {
+      Size lSize = cv::Size( LANE_FLTR.CAMERA.RES_VH(1), LANE_FLTR.CAMERA.RES_VH(0));
+      #ifdef WRITE_FRAMES_TO_FILE
+       mOutputVideo.open("TUeLaneTracker.avi", CV_FOURCC('F','M','P','4'), 25,  lSize);
+      #endif
    }
    void drawLane(const cv::UMat& FRAME, const LaneModel& Lane);
 };
