@@ -3,7 +3,7 @@
 .build-debug/
 .codelite/
 .vscode/
-.avi
+*.avi
 TUeLaneTracker
 Log_StateMachine
 Profile_ExecutionTime
