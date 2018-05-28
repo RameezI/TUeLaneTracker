@@ -1,0 +1,14 @@
+# TUeLDT
+.clang/
+.build-debug/
+.codelite/
+.vscode/
+.avi
+TUeLaneTracker
+Log_StateMachine
+Profile_ExecutionTime
+build/
+*~
+*.swp
+*.swo
+TUeLaneTracker.workspace

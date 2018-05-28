@@ -4,7 +4,6 @@
 .codelite/
 .vscode/
 build/
-install/
 *~
 *.swp
 *.swo
