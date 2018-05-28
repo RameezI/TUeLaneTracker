@@ -8,6 +8,7 @@ TUeLaneTracker
 Log_StateMachine
 Profile_ExecutionTime
 build/
+lib/
 *~
 *.swp
 *.swo
