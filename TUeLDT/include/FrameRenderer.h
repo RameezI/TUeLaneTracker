@@ -69,8 +69,8 @@ public:
      #endif
 
    {
-      Size lSize = cv::Size( LANE_FLTR.CAMERA.RES_VH(1), LANE_FLTR.CAMERA.RES_VH(0));
       #ifdef WRITE_FRAMES_TO_FILE
+      Size lSize = cv::Size( LANE_FLTR.CAMERA.RES_VH(1), LANE_FLTR.CAMERA.RES_VH(0));
        mOutputVideo.open("TUeLaneTracker.avi", CV_FOURCC('F','M','P','4'), 25,  lSize);
       #endif
    }
