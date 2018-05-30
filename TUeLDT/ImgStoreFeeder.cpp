@@ -23,7 +23,7 @@
 ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
 : mMAX_BUFFER_SIZE(2),
   mMAX_RETRY(100), 		// Main thread sleeps for 5ms and then retry to grab.
-  mSLEEP_ms(20),  		// Sleep time for the mAsyncGrabber
+  mSLEEP_ms(1),  		// Sleep time for the mAsyncGrabber
   mFolder(""),
   mSkipFrames(0),
   mFrameCount(0)
@@ -37,13 +37,11 @@ ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
 
      while(!Stopped.load())
     {
-
 	  if(!Paused.load())
        {
           #ifdef PROFILER_ENABLED
 	   mProfiler.start("FRAME_READING");
           #endif
-
 
           cv::UMat lFrame, lFrameGRAY;
 
@@ -83,6 +81,7 @@ ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
                                           #endif
       }
 
+      if(mSLEEP_ms >0)
       std::this_thread::sleep_for(std::chrono::milliseconds(mSLEEP_ms));
    }
 

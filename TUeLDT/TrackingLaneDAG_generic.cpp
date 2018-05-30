@@ -41,8 +41,7 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
   mIdxPurview_LB(0),
   mIdxPurview_RB(0)
 {	
-	//Write Images to a video file
-	//mOutputVideo.open("TUeLaneTracker.avi", CV_FOURCC('M','P','4','V'), 30, mFrameRGB.size());
+
 }
 
 
