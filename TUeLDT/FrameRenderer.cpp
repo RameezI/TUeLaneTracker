@@ -79,7 +79,7 @@ void FrameRenderer::drawLane(const cv::UMat& FRAME, const LaneModel& Lane)
    //Draw Purview Line
    line(FRAME, Point(0,mPURVIEW_LINE_ICS), Point(FRAME.cols,mPURVIEW_LINE_ICS),	CvScalar(0,0,0),1);
 
-
+/*
    // Highlight region below Horizon
    {
      Rect lROI;	
@@ -90,6 +90,7 @@ void FrameRenderer::drawLane(const cv::UMat& FRAME, const LaneModel& Lane)
      cv::UMat lFrameRGB_SPAN = FRAME(lROI);
      cv::addWeighted(lYellow, 0.4, lFrameRGB_SPAN, 0.6, 0, lFrameRGB_SPAN);
    }
+*/
 
    // Draw Histogram-Bins at the Base
    for (size_t i=0; i < mCOUNT_BINS; i++)

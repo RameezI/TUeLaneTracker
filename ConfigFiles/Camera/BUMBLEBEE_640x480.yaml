@@ -1,0 +1,24 @@
+%YAML:1.0
+---
+callibrationDate: "Wed Mar 21 17:37:15 2018\n"
+CAMERA_RES: !!opencv-matrix
+   rows: 1
+   cols: 2
+   dt: f
+   data: [ 480., 640. ]
+CAMERA_ROT_PY: !!opencv-matrix
+   rows: 1
+   cols: 2
+   dt: f
+   data: [ 0., 0. ]
+CAMERA_MATRIX_INTRINSIC: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: f
+   data: [ 5.54256287e+02, 0., 0., 0., 5.79411255e+02, 0., 0., 0., 1. ]
+CAMERA_MATRIX_EXTRINSIC: !!opencv-matrix
+   rows: 4
+   cols: 4
+   dt: f
+   data: [ 1., 0., 0., 0., 0., 0., -1., 1.50000000e+00, 0., 1., 0., 0.,
+       0., 0., 0., 1. ]
