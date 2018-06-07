@@ -32,8 +32,6 @@ private :
 		// This member variable will be used for allocating once the output buffers at first time.
 	bool m_firstTime;
 
-	FrameSource 		 lFrameSource;
-	std::string 		 lSourceStr;
 	unique_ptr<FrameFeeder>  lPtrFeeder;
 	StateMachine* lPtrStateMachine;
 	States lPreviousState;

@@ -40,7 +40,6 @@ MAPS_COMPONENT_DEFINITION(MAPSMovingAverage,"MovingAverage","1.0",128,
 //Initialization: Birth() will be called once at diagram execution startup.			  
 void MAPSMovingAverage::Birth()
 {
-    
     m_firstTime = true;
     pSMA = new SMA((int)GetIntegerProperty("NrAveragePoints"));
     average = 0;
@@ -56,7 +55,6 @@ void MAPSMovingAverage::Core()
     }
 
     pSMA->add(confIn->Float32());
-    //average += (confIn->Float32() - average) / (float)GetIntegerProperty("NrAveragePoints") ;
 
     MAPSIOElt* confOut = StartWriting(Output(0));
     confOut->Float32() = pSMA->avg();

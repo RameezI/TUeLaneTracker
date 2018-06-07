@@ -2,8 +2,8 @@
 // RTMaps SDK Component header
 ////////////////////////////////
 
-#ifndef _Maps_Kalman_H
-#define _Maps_Kalman_H
+#ifndef _Maps_MovingAverage_H
+#define _Maps_MovingAverage_H
 
 #include "/opt/rtmaps/sdk/ubuntu1604_x86_64/include/maps.hpp"
 #include "/opt/rtmaps/sdk/ubuntu1604_x86_64/include/maps.h"

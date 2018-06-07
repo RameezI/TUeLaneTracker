@@ -53,8 +53,9 @@ file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_D
 target_include_directories (${PCK} PUBLIC	${Boost_INCLUDE_DIRS})
 
 target_link_libraries 	   (${PCK} TUeLDT 	
+                            aruco
 							${Boost_LIBRARIES} 
-							${OpenCV_LIBS} 
+                            ${OpenCV_LIBS} 
 							${CMAKE_THREAD_LIBS_INIT})
 
 #install(TARGETS  RTMapsApp DESTINATION install-RTMaps)

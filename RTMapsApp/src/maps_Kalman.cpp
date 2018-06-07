@@ -23,8 +23,8 @@ MAPS_END_OUTPUTS_DEFINITION
 
 // Use the macros to declare the properties
 MAPS_BEGIN_PROPERTIES_DEFINITION(MAPSKalman)
-    MAPS_PROPERTY("R_Gain",10,false,false)
-    MAPS_PROPERTY("C_ExpGain",2,false,false)
+    MAPS_PROPERTY("R_Gain",500,false,false)
+    MAPS_PROPERTY("C_ExpGain",2.00,false,false)
 MAPS_END_PROPERTIES_DEFINITION
 
 // Use the macros to declare the actions
@@ -49,11 +49,6 @@ void MAPSKalman::Birth()
             0,     1,     -0,           
            -0,    -0,      1;
 
-    // A <<    1,     0,      0,     0,         
-    //         0,     1/2,   -1/2,   1/2,         
-    //        -0,    -1/2,    1/2,   1/2,     
-    //         0,    -1,     -1,     2;  
-
     B.resize(N_STATES,2);
     B <<    1,  0,
             0,  0,
@@ -62,18 +57,15 @@ void MAPSKalman::Birth()
     I = Matrix3f::Identity();
 
     P = I;
-    //Q = I;
     Q <<    1,        -0.01,     0.01,
             -0.01,      2,      -1,
             0.01,      -1,       2;
-    //Q = Q * 100;
-    //R0 = Q;
+
     R0 <<   1,         0,         0,
             0,         2,        -1,
             0,        -1,         2;
 
     C = I;
-    //CT = I.transpose();
 
     x.resize(N_STATES,1);
     x_hat.resize(N_STATES,1);
@@ -85,15 +77,12 @@ void MAPSKalman::Birth()
 
 void MAPSKalman::Core() 
 {
-   //ReportInfo("Passing through Core() method");
-
    MAPSIOElt* confIn = StartReading(Input(0));
 	if (confIn == NULL)
     {   
         ReportInfo("No confidence input!");
 		return;
     }
-
 
    MAPSIOElt* paramsIn = StartReading(Input(1));
 	if (paramsIn == NULL)
@@ -123,14 +112,10 @@ void MAPSKalman::Core()
     y(0) = paramsIn->Float32(0);
     y(1) = paramsIn->Float32(1);
     y(2) = paramsIn->Float32(2);
-    //y(3) = paramsIn->Float32(1) + paramsIn->Float32(2);
-
-    //std::cout << "y: " << y(0) << "\t"<< y(1) << "\t"<< y(2) << "\t"<< y(3) << endl;
 
     if (m_firstTime)
     {
         m_firstTime = false;
-        //timestamp_prev = paramsIn->Timestamp();
         x = y;
     }
     

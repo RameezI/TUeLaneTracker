@@ -30,12 +30,10 @@ private :
 	// System Model
 		//Process
 		Matrix3f A;
-		//Matrix3f AT;
 		MatrixXf B;
 		Matrix3f Q;
 		//Observer
 		Matrix3f C;
-		//Matrix3f CT;
 		Matrix3f R;
 		Matrix3f R0;
 		//States

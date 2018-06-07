@@ -54,11 +54,8 @@ void MAPSLaneTracker::Birth()
         // Reports this information to the RTMaps console. You can remove this line if you know when Birth() is called in the component lifecycle.
     ReportInfo("Passing through Birth() method");
 
-    	//Alloctation of the _firstTime member variable (see the .h file)
 	m_firstTime = true;
 
-    lFrameSource = RTMAPS;
-    lSourceStr = "";
     nbCycles = 0;
     lReturn = 0;
 
@@ -72,8 +69,6 @@ void MAPSLaneTracker::Birth()
 		std::cout<<"******************************"<<std::endl;
 		std::cout<<" Lane Tracker Started."<<std::endl;
 		std::cout<<"******************************"<<std::endl;
-		
-		//^TODO: Replace by State.h member variable.
 		nbCycles = 0;
 
 		try
