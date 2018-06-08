@@ -104,7 +104,7 @@ mProfiler.start("SETUP_ASYNC_FILTERING");
 
 	    mTransitLaneFilter= mTransitLaneFilter*SCALE_FILTER;
 	    mTransitLaneFilter.convertTo(mTransitLaneFilter, CV_32S, 1.0/lSUM);
-	  //  mTransitLaneFilter = 	mTransitLaneFilter + 0.2*mLaneFilter->prior;
+	    //mTransitLaneFilter = 	mTransitLaneFilter + 0.2*mLaneFilter->prior;
 
 
 	   //Predict VP States
@@ -115,7 +115,8 @@ mProfiler.start("SETUP_ASYNC_FILTERING");
 	    lSUM = sum(mTransitVpFilter)[0];
 	    mTransitVpFilter= mTransitVpFilter*SCALE_FILTER;
 	    mTransitVpFilter.convertTo(mTransitVpFilter, CV_32S, 1.0/lSUM);	
-	   // mTransitVpFilter = mTransitVpFilter + 0.2*mVpFilter->prior;
+	    //mTransitVpFilter = mTransitVpFilter + 0.2*mVpFilter->prior;
+
 	   lLock.unlock();
 
 	});
@@ -670,13 +671,6 @@ mProfiler.start("ASSIGN_LANE_MODEL");
 
 	   const auto& lPURV_LB	  = mLaneFilter->PURVIEW_BINS.at<int32_t>(mIdxPurview_LB, 0);
 	   const auto& lPURV_RB	  = mLaneFilter->PURVIEW_BINS.at<int32_t>(mIdxPurview_RB, 0);
-
-	   const float x 	  = mLaneFilter->filter.at<int32_t>(mBaseHistModel.rowIdxFilter,mBaseHistModel.colIdxFilter)
-				   /((float)sum(mLaneFilter->filter)[0]); 
-
-	   const float confidence = (x / ( 1.0/(mLaneFilter->baseHistogramModels.size()) )) ;
-	   
-	   cout<< confidence<<endl;
 
 	   float lLookAheadErr    = (lBINS_cm(mIdxPurview_LB) + lBINS_cm(mIdxPurview_RB))/2.0;
 	   float lLaneWidth	  = (lBINS_cm(mIdxPurview_RB) - lBINS_cm(mIdxPurview_LB));
