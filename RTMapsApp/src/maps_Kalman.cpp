@@ -151,7 +151,7 @@ void MAPSKalman::Adjust(float vx, float c, float dt){
     A(1,0) = -horDisp * 100;// [cm] 
     A(2,0) = horDisp * 100; // [cm] 
 
-    float c_expgain = (float)GetIntegerProperty("C_ExpGain");
+    float c_expgain = (float)GetFloatProperty("C_ExpGain");
     R = R0 * (int)GetIntegerProperty("R_Gain") / pow(c,c_expgain) * pow(50,c_expgain);
 }
 

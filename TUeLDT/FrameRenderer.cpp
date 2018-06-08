@@ -116,7 +116,9 @@ void FrameRenderer::drawLane(const cv::Mat& FRAME, const LaneModel& Lane)
 }
 
 vector<float> FrameRenderer::getDirectionalParameters(){
-    float a;  //Angle of the road direction compared to car logitudinal direction.
+//This function calculates the directional parametrs
+
+    float a;  //(Heading) Angle of the road direction compared to car logitudinal direction.
     float b1; //Distance to right lane
     float b2; //Distance to left lane
     Camera mCAM;
@@ -137,13 +139,10 @@ vector<float> FrameRenderer::getDirectionalParameters(){
       a = 0;
     }
 
-      //std::cout << "a: " << a << "\tb1: " << b1 << "\tb2: " << b2 << "\tlanew: " << b1 + b2 << endl;
-
     vector<float> directionalParams;
     directionalParams.push_back(a);
     directionalParams.push_back(b1);
     directionalParams.push_back(b2);
-    //directionalParams.push_back(center);
     return directionalParams;
 
 }
@@ -155,6 +154,7 @@ cv::Mat FrameRenderer::getCurrentFrame()
 
 cv::Mat FrameRenderer::getLaneFrame(vector<float> dirParams)
 {
+  //This creates the topdown view of the directional parameters.
   int resH = 960;
   int resV = 600;
   cv::Mat mLaneFrame(resV,resH,CV_8UC3,Scalar(0,0,0));
