@@ -1,5 +1,3 @@
-/** \file */
-
 #include <SigInt.h>
 #include "FrameFeeder.h"
 #include "StateMachine.h"
@@ -96,19 +94,19 @@ int main(int argc, char* argv[]) /**
 
 	  try
 	  {
-	     lPtrStateMachine.reset( new StateMachine(move(lPtrFeeder)) );
+		  lPtrStateMachine.reset( new StateMachine(move(lPtrFeeder)) );
 	  }
 	  catch(const char* msg)
 	  {
-	     cout<<"******************************"<<endl
-	     <<"Failed to create the StateMachine!"<<endl
-	     << msg <<endl
-	     <<"******************************"<<endl<<endl;
-	     lReturn =-1;
+		cout<<"******************************"<<endl
+		<<"Failed to create the StateMachine!"<<endl
+		<< msg <<endl
+		<<"******************************"<<endl<<endl;
+		lReturn =-1;
 	  }
 	  catch(...)
 	  {
-	     lReturn = -1;
+		lReturn = -1;
 	  }
 	}
 
@@ -116,41 +114,52 @@ int main(int argc, char* argv[]) /**
 	States lPreviousState;
 	if (lReturn ==0) //Get current State of the stateMachine
 	{
-	   cout<<lPtrStateMachine->getCurrentState();
-	   lPreviousState = lPtrStateMachine->getCurrentState();
+	  cout<<lPtrStateMachine->getCurrentState();
+	  lPreviousState = lPtrStateMachine->getCurrentState();
 	}
 
 
-        if(lReturn == 0) //spin the stateMachine
-        {
-    	   uint64_t lCyclesCount = 0;
-    	   StateMachine& stateMachine = *lPtrStateMachine.get();
 
-	   while (stateMachine.getCurrentState() != States::DISPOSED)
-	   {
+    if(lReturn == 0) //spin the stateMachine
+    {
+    	uint64_t        lCyclesCount = 0;
+    	ProfilerLDT     lProfiler;
+    	StateMachine&   stateMachine = *lPtrStateMachine.get();
 
-	      if (lPtrSigInt->sStatus == SigStatus::STOP)
-		  stateMachine.quit();
 
-	      lReturn = stateMachine.spin();
-	      lCyclesCount ++;
+		while (stateMachine.getCurrentState() != States::DISPOSED)
+		{
 
-	      if(lPreviousState != stateMachine.getCurrentState())
-	      {
-	         cout<<endl<<stateMachine.getCurrentState();
-	         std::cout.flush();
-	         lPreviousState = stateMachine.getCurrentState();
-	      }
-	      else if (lCyclesCount%100==0)
-	      {
-	         cout <<endl<<stateMachine.getCurrentState();
-	         cout <<"state cycle-count = " << lCyclesCount;
-	      }
 
-	   }// End spinning
-        }
+		  lProfiler.start("StateMachine_Cycle");
+                    if (lPtrSigInt->sStatus == SigStatus::STOP)
+                      stateMachine.quit();
 
-	lPtrStateMachine.reset( nullptr);
+                    lReturn = stateMachine.spin();
+                    lCyclesCount ++;
+
+		  lProfiler.end();
+
+		  if(lPreviousState != stateMachine.getCurrentState())
+		  {
+		    cout<<endl<<stateMachine.getCurrentState();
+		    std::cout.flush();
+		    lPreviousState = stateMachine.getCurrentState();
+		  }
+		  else if (lCyclesCount%100==0)
+		  {
+		      cout <<endl<<stateMachine.getCurrentState();
+		      cout <<"state cycle-count = " << lCyclesCount<<"    Cycle-Time [Min, Avg, Max] : "
+		      <<"[ "<<lProfiler.getMinTime("StateMachine_Cycle")<<" "
+		      <<lProfiler.getAvgTime("StateMachine_Cycle")<<" "
+		      <<lProfiler.getMaxTime("StateMachine_Cycle")<<" "
+		      <<" ]";
+		  }
+
+		}// End spinning
+    }
+
+    lPtrStateMachine.reset( nullptr);
 	cout<<endl<<"The program ended with exit code " <<lReturn<<endl;
 	return(lReturn);
 }
@@ -164,7 +173,18 @@ unique_ptr<FrameFeeder> createFrameFeeder(FrameSource srcMode, string srcString)
 	/** Create Image Feeder */
 	try
 	{
-	   lPtrFeeder=  unique_ptr<FrameFeeder>( new ImgStoreFeeder(srcString) );
+	  switch(srcMode)
+	  {
+            case DIRECTORY:
+               lPtrFeeder=  unique_ptr<FrameFeeder>( new ImgStoreFeeder(srcString) );
+               break;
+            case STREAM:
+              lPtrFeeder=  unique_ptr<FrameFeeder>( new OpenCvFeeder(srcString) );
+              break;
+            case GMSL:
+              throw "NOT IMPLEMENTED";
+              break;
+	  }
 	}
 	catch(const char* msg)
 	{
@@ -182,5 +202,8 @@ unique_ptr<FrameFeeder> createFrameFeeder(FrameSource srcMode, string srcString)
 	    <<"******************************"<<endl<<endl;
 	   lPtrFeeder = nullptr;
 	}
+
 	return lPtrFeeder;
+
 }
+

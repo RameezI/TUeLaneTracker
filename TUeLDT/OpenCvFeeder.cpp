@@ -121,7 +121,8 @@ void OpenCvFeeder::captureThread()
           Stopped = true;
         }
         frameLock.unlock();
-
+	
+	
 #ifdef PROFILER_ENABLED
         mProfiler.end();
         LOG_INFO_(LDTLog::TIMING_PROFILE)<<endl
@@ -133,7 +134,8 @@ void OpenCvFeeder::captureThread()
         <<"******************************"<<endl<<endl;
 #endif
       }
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+      std::this_thread::sleep_for(std::chrono::milliseconds(30));
 
     }
   }
