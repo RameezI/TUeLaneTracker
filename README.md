@@ -15,10 +15,9 @@ What things you need to install the software and how to install them
 
 ```
 * OpenCv-3.1.0
-* Boostv-1.62.0
+* Boost-1.62.0
 ```
 [OpenCV Installation Guide](http://docs.opencv.org/3.1.0/d7/d9f/tutorial_linux_install.html)
-
 [Boost Library Sources](http://www.boost.org/users/history/version_1_62_0.html)
 
    - Boost Installation [Ubuntu 17.10]:   ``` sudo apt-get install libboost-dev-all ```
