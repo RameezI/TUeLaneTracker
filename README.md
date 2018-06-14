@@ -21,18 +21,15 @@ What things you need to install the software and how to install them
 
 [Boost Library Sources](http://www.boost.org/users/history/version_1_62_0.html)
 
-Ubuntu 17.10 Installation:
-```
-sudo apt-get install libboost-dev-all
-```
-[Ubuntu 16.04 Installation Guide](https://askubuntu.com/questions/859333/how-to-install-libboost-version1-59-or-newer-on-ubuntu16-04)
+   - Boost Installation [Ubuntu 17.10]:   ``` sudo apt-get install libboost-dev-all ```
+   - Boost Installation [Ubuntu 16.04]:       [Installation Instructions](https://askubuntu.com/questions/859333/how-to-install-libboost-version1-59-or-newer-on-ubuntu16-04)
 
 
 ### Build, Install and Run the Application
 
 Follow the following steps to run the software application
 
-1. clone this repository 
+1. clone this repository: 
 
 ```
 git clone https://github.com/RameezI/TUeLaneTracker.git
@@ -44,26 +41,23 @@ git clone https://github.com/RameezI/TUeLaneTracker.git
 cd TUeLaneTracker
 ```
 
-3. Create a build subdirectory and invoke cmake
+3. Create a build subdirectory and invoke cmake:
 ```
 mkdir build
 cd build
 cmake ..
 ```
 
-4. Build and Install the executeable
+4. Build and Install the executeable:
 ```
 make install
 ```
 
-5. Run the executeable <sup>*</sup>. 
+5. Run the executeable: 
 ```
 cd ../install/bin
 ./TUeLaneTracker
 ```
-
-* Executeable must be invoked from within the bin directory.       
-
 
 ### Modifying the Frame Source for the Application
 
