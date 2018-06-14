@@ -60,10 +60,10 @@ cd ../install/bin
 
 ### Modifying the Frame Source for the Application
 
-The TUeLaneDetector has three options for recieving the input frames, defined in the header *TUeLDT/include/State.h* :
-1. DIRECTORY [Default]
-2. STREAM
-3. GMSL [IN PROGRESS]
+The TUeLaneDetector has three modes for recieving the input frames :
+1. imgstore  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Images in a directory]
+2. stream    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [NetworkStream, VideoFile, V4LCapture]
+3. gmsl      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [High-Speed LVDS Camera Interface] [In-Progress] 
    
 To update the frame source use the command line arguments, for available command line options use the *--help* switch
 ```
