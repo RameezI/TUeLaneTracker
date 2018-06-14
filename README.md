@@ -60,7 +60,7 @@ cd ../install/bin
 
 ### Modifying the Frame Source for the Application
 
-The TUeLaneDetector has three modes for recieving the input frames :
+The TUeLaneTracker has three modes for recieving the input frames :
 1. imgstore  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Images in a directory]
 2. stream    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [NetworkStream, VideoFile, V4LCapture]
 3. gmsl      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [High-Speed LVDS Camera Interface] [In-Progress] 
