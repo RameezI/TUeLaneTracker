@@ -11,18 +11,17 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+What librariesyou need, in order to buiild and install the TUeLaneTracker and 
 
 ```
 * OpenCv-3.1.0
 * Boost-1.62.0
 ```
+How to install them:
+
 [OpenCV Installation Guide](http://docs.opencv.org/3.1.0/d7/d9f/tutorial_linux_install.html)
-
 [Boost Library Sources](http://www.boost.org/users/history/version_1_62_0.html)
-   - Boost Installation [Ubuntu 17.10]:   ``` sudo apt-get install libboost-dev-all ```
-   - Boost Installation [Ubuntu 16.04]:       [Installation Instructions](https://askubuntu.com/questions/859333/how-to-install-libboost-version1-59-or-newer-on-ubuntu16-04)
-
+  
 
 ### Build, Install and Run the Application
 
