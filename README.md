@@ -11,28 +11,24 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+What librariesyou need, in order to buiild and install the TUeLaneTracker and 
 
 ```
 * OpenCv-3.1.0
-* Boostv-1.62.0
+* Boost-1.62.0
 ```
+How to install them:
+
 [OpenCV Installation Guide](http://docs.opencv.org/3.1.0/d7/d9f/tutorial_linux_install.html)
 
 [Boost Library Sources](http://www.boost.org/users/history/version_1_62_0.html)
-
-Ubuntu 17.10 Installation:
-```
-sudo apt-get install libboost-dev-all
-```
-[Ubuntu 16.04 Installation Guide](https://askubuntu.com/questions/859333/how-to-install-libboost-version1-59-or-newer-on-ubuntu16-04)
-
+  
 
 ### Build, Install and Run the Application
 
 Follow the following steps to run the software application
 
-1. clone this repository 
+1. clone this repository: 
 
 ```
 git clone https://github.com/RameezI/TUeLaneTracker.git
@@ -44,52 +40,48 @@ git clone https://github.com/RameezI/TUeLaneTracker.git
 cd TUeLaneTracker
 ```
 
-3. Create a build subdirectory and invoke cmake
+3. Create a build subdirectory and invoke cmake:
 ```
 mkdir build
 cd build
 cmake ..
 ```
 
-4. Build and Install the executeable
+4. Build and Install the executeable:
 ```
 make install
 ```
 
-5. Run the executeable <sup>*</sup>. 
+5. Run the executeable: 
 ```
 cd ../install/bin
 ./TUeLaneTracker
 ```
 
-* Executeable must be invoked from within the bin directory.       
-
-
 ### Modifying the Frame Source for the Application
 
-The TUeLaneDetector has three options for recieving the input frames, defined in the header *TUeLDT/include/State.h* :
-1. DIRECTORY [Default]
-2. STREAM
-3. GMSL [IN PROGRESS]
+The TUeLaneTracker has three modes for recieving the input frames :
+1. imgstore  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [Images in a directory]
+2. stream    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [NetworkStream, VideoFile, V4LCapture]
+3. gmsl      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [High-Speed LVDS Camera Interface] [In-Progress] 
    
-To update the frame source use the command line arguments, for available command line options use the *--help* switch
+For usage instructions use the *--help* switch
 ```
 ./TUeLanetracker --help
 ```
 
-### Callibrarting TUeLaneTracker
+### Callibrarting Camera for TUeLaneTracker
 
-1. Camera intrinsic and extrinsic parameters can be found in [install/ConfigFiles/Camera](https://github.com/RameezI/TUeLaneTracker/tree/master/install/ConfigFiles/Camera) directory.
+- Camera intrinsic and extrinsic parameters can be found in [install/ConfigFiles/Camera](https://github.com/RameezI/TUeLaneTracker/tree/master/install/ConfigFiles/Camera) directory.
 
-2. To select a specific configuration for the TUeLaneTracker, you only need to update the CAMERA_NAME define in the [Config.h](https://github.com/RameezI/TUeLaneTracker/blob/master/include/Config.h)
+- To select a specific configuration for the TUeLaneTracker, you only need to update the CAMERA_NAME define in the [Config.h](https://github.com/RameezI/TUeLaneTracker/blob/master/include/Config.h)
 
-3. To generate a new camera callibration use [CameraCalibrator](https://github.com/RameezI/TUeLaneTracker/tree/master/CameraCalibrator) cmake project.
+- To generate a new camera callibration use [CameraCalibrator](https://github.com/RameezI/TUeLaneTracker/tree/master/CameraCalibrator) cmake project.
        
        
 ## Youtube Videos
    These videos showcase the functional performance of the algorithm:
    * [Eindhoven](https://youtu.be/7D1vBPrcPk0)
-
 
 
 ## Built With
