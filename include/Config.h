@@ -25,9 +25,9 @@
 
 // General definitions
 
-#define CAMERA_NAME "BUMBLEBEE_DATASET_640x480"         /** Target camera and resolution [Loads corresponding calibration file] */
-//#define CAMERA_NAME "LOGITECH_C920_640x480"   /** Target camera and resolution [Loads corresponding calibration file] */
-//#define CAMERA_NAME "BRYAN_DATASET_640x480" 	/** Target camera and resolution [Loads corresponding calibration file] */
+//#define CAMERA_NAME "BUMBLEBEE_DATASET_640x480"     	/** Target camera and resolution [Loads corresponding calibration file] */
+#define CAMERA_NAME "LOGITECH_C920_640x480"   		/** Target camera and resolution [Loads corresponding calibration file] */
+//#define CAMERA_NAME "BRYAN_DATASET_640x480" 		/** Target camera and resolution [Loads corresponding calibration file] */
 
 #define PROFILER_ENABLED 	        	/**< If defined, the program logs and profiles its execution*/
 #define DISPLAY_GRAPHICS 	        	/**< If defined, the program renders results on to a display */

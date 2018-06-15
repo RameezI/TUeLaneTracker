@@ -64,6 +64,7 @@ class ImgStoreFeeder: public FrameFeeder
 private:
   vector<cv::UMat> mDisplayQueue;
   vector<cv::UMat> mProcessQueue;
+  bool 		   mQueuesSync;
 
   const std::size_t mMAX_BUFFER_SIZE;
   const std::size_t mMAX_RETRY;
@@ -71,6 +72,7 @@ private:
 
   string mFolder;
   int mSkipFrames;
+
   uint32_t mFrameCount;
   vector<cv::String> mFiles;
   std::thread mAsyncGrabber;
@@ -88,25 +90,32 @@ public:
 
 
 
-class OpenCvFeeder: public FrameFeeder
+class StreamFeeder: public FrameFeeder
 {
-public:
-  OpenCvFeeder(string sourceUriStr);
-  cv::UMat dequeue() override;
-  cv::UMat dequeueDisplay() override;
-  ~OpenCvFeeder();
 
-protected:
+private:
+  vector<cv::UMat> mDisplayQueue;
+  vector<cv::UMat> mProcessQueue;
+  bool 		   mQueuesSync;
+
+  const std::size_t mMAX_BUFFER_SIZE;
+  const std::size_t mMAX_RETRY;
+  const std::size_t mSLEEP_ms;
+
+  std::string mUri;
+
+  void enqueue(cv::UMat& frame, vector<cv::UMat>& queue);
   void parseSettings(string& srcStr) override;
   void captureThread();
-private:
-  cv::UMat mLatestFrameRGB;
-  cv::UMat mLatestFrameGray;
-
+  
   std::thread mAsyncGrabber;
   std::mutex mMutex;
 
-  std::string mUri;
+public:
+  StreamFeeder(string sourceUriStr);
+  cv::UMat dequeue() override;
+  cv::UMat dequeueDisplay() override;
+  ~StreamFeeder();
 };
 
 #endif

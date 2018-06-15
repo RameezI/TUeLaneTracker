@@ -104,7 +104,7 @@ mProfiler.start("SETUP_ASYNC_FILTERING");
 
 	    mTransitLaneFilter= mTransitLaneFilter*SCALE_FILTER;
 	    mTransitLaneFilter.convertTo(mTransitLaneFilter, CV_32S, 1.0/lSUM);
-	    //mTransitLaneFilter = 	mTransitLaneFilter + 0.2*mLaneFilter->prior;
+	    mTransitLaneFilter = 	mTransitLaneFilter + 0.2*mLaneFilter->prior;
 
 
 	   //Predict VP States
@@ -115,7 +115,7 @@ mProfiler.start("SETUP_ASYNC_FILTERING");
 	    lSUM = sum(mTransitVpFilter)[0];
 	    mTransitVpFilter= mTransitVpFilter*SCALE_FILTER;
 	    mTransitVpFilter.convertTo(mTransitVpFilter, CV_32S, 1.0/lSUM);	
-	    //mTransitVpFilter = mTransitVpFilter + 0.2*mVpFilter->prior;
+	    mTransitVpFilter = mTransitVpFilter + 0.2*mVpFilter->prior;
 
 	   lLock.unlock();
 

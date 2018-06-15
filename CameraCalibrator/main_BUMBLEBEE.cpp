@@ -53,25 +53,24 @@ int main( int argc, char** argv )
     time_t rawtime; time(&rawtime);
     fs<< "callibrationDate" << asctime(localtime(&rawtime));
 
+
     // 3x3 Intrinsic Parameters
     // This Matrix is for performing calculations in Image-Center-CS
     Mat CameraMatrixIntrinsic = (Mat_<float>(3,3) << FX,    0,   CX,
 						     0,     FY,  CY,
 						     0,     0,    1 );
 
+   // 4x4 Pitch Transformation
+    Mat ROT_P = (Mat_<float>(4,4)<< 1,   0,  				  0,   			            0,
+				    0,	 cos(-(M_PI/2.0) + toRad(PITCH)), sin(-(M_PI/2.0) + toRad(PITCH)),  0,
+				    0,	-sin(-(M_PI/2.0) + toRad(PITCH)), cos(-(M_PI/2.0) + toRad(PITCH)),  0,
+				    0,   0,  				  0,   			       	    1);
 
 
-   // 4x4 Pitch Rotation
-    Mat ROT_P = (Mat_<float>(4,4)<< 1,   0,  				  0,   			           0,
-				    0,	 cos((M_PI/2.0) + toRad(PITCH)), -sin((M_PI/2.0) + toRad(PITCH)),  0,
-				    0,	 sin((M_PI/2.0) + toRad(PITCH)),  cos((M_PI/2.0) + toRad(PITCH)),  0,
-				    0,   0,  				  0,   			       	   1);
-
-
-   // 4x4 Yaw Rotation
-    Mat ROT_Y = (Mat_<float>(4,4)<< cos(toRad(YAW)),   0,  	sin(toRad(YAW)),   0,
+   // 4x4 Yaw Transformation
+    Mat ROT_Y = (Mat_<float>(4,4)<< cos(toRad(YAW)),   0,  	-sin(toRad(YAW)),   0,
 				    0,	 	       1,  	0,		   0,
-				   -sin(toRad(YAW)),   0,  	cos(toRad(YAW)),   0,
+				    sin(toRad(YAW)),   0,  	cos(toRad(YAW)),   0,
 				    0,   	       0,  	0,   		   1);
 
 

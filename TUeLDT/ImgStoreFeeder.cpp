@@ -21,7 +21,8 @@
 #include "FrameFeeder.h"
 
 ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
-: mMAX_BUFFER_SIZE(2),
+: mQueuesSync(true),
+  mMAX_BUFFER_SIZE(2),
   mMAX_RETRY(100), 		// Main thread sleeps for 5ms and then retry to grab.
   mSLEEP_ms(1),  		// Sleep time for the mAsyncGrabber
   mFolder(""),
@@ -47,8 +48,10 @@ ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
 
           lLock.lock(); //protecting mFiles and mFrameCount shared variables.
            lFrame  		= imread(mFiles[mFrameCount]).getUMat(cv::ACCESS_READ);
-           cv::cvtColor(lFrame, lFrameGRAY, CV_RGB2GRAY);
-           //lFrameGRAY  	        = imread(mFiles[mFrameCount], cv::IMREAD_GRAYSCALE).getUMat(cv::ACCESS_READ);
+           if (!lFrame.empty())
+	   {
+             cv::cvtColor(lFrame, lFrameGRAY, CV_RGB2GRAY);
+	   }
           lLock.unlock();
 
 	  //Put the frames in the queue for the stateMachine
@@ -126,23 +129,28 @@ void ImgStoreFeeder::enqueue(cv::UMat& frame, vector<cv::UMat>& queue)
 {
    WriteLock  lLock(mMutex, std::defer_lock);
 
-   lLock.lock(); //Protect queue from race-condition
-
-   queue.push_back(frame);
-
-   if(queue.size() >  mMAX_BUFFER_SIZE)
+   if(!frame.empty())
    {
-      queue.erase(queue.begin());
+      lLock.lock(); //Protect queue from race-condition
 
-      #ifdef PROFILER_ENABLED
-       LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
-       <<"******************************"<<endl
-       <<  "WARNING!! "<<endl
-       <<  "Dropping frames in the queue, cannot keep-up with the frame production rate"<<endl
-       <<"******************************"<<endl<<endl;
-     #endif
-   }
-   lLock.unlock();
+      queue.push_back(frame);
+
+      if(queue.size() >  mMAX_BUFFER_SIZE)
+      {
+         queue.erase(queue.begin());
+
+         #ifdef PROFILER_ENABLED
+          LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+          <<"******************************"<<endl
+          <<  "WARNING!! "<<endl
+          <<  "Dropping frames in the queue, cannot keep-up with the frame production rate"<<endl
+          <<"******************************"<<endl<<endl;
+        #endif
+     }
+
+     lLock.unlock();
+  }
+
 }
 
 cv::UMat ImgStoreFeeder::dequeue()
@@ -160,7 +168,7 @@ cv::UMat ImgStoreFeeder::dequeue()
    {
       lLock.unlock();
       lTryGrab ++ ;
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
       lLock.lock();
    }
 

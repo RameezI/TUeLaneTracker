@@ -205,7 +205,7 @@ int StateMachine::spin()
 		if (mPtrTrackingState->currentStatus == StateStatus::INACTIVE)
 		{
 		   mPtrTrackingState->setupDAG(mPtrLaneFilter.get(), mPtrVanishingPtFilter.get());
-		   mPtrFrameRenderer.reset(new FrameRenderer(*mPtrLaneFilter));
+		   mPtrFrameRenderer.reset(new FrameRenderer(*mPtrLaneFilter, mPtrFrameFeeder.get() ));
 		}
 		if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
 		{

@@ -179,7 +179,7 @@ unique_ptr<FrameFeeder> createFrameFeeder(FrameSource srcMode, string srcString)
                lPtrFeeder=  unique_ptr<FrameFeeder>( new ImgStoreFeeder(srcString) );
                break;
             case STREAM:
-              lPtrFeeder=  unique_ptr<FrameFeeder>( new OpenCvFeeder(srcString) );
+              lPtrFeeder=  unique_ptr<FrameFeeder>( new StreamFeeder(srcString) );
               break;
             case GMSL:
               throw "NOT IMPLEMENTED";
