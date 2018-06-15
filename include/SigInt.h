@@ -11,7 +11,6 @@ public:
 	SigInt();
 	~SigInt();
 	
-private:
 	static void	handler(int);
 };
 
