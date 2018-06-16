@@ -25,19 +25,32 @@
 #include <sys/stat.h>
 #include <Eigen/Dense>
 #include "opencv2/opencv.hpp"
+#include <cmath>
 
 
 using namespace Eigen;
 using namespace std;
+
+
+static double toRad(double deg)
+{
+  double radians = deg*(M_PI/180); 
+  return radians;
+}
+
 
 struct Camera
 {
 
 friend ostream& operator<<(ostream& os, const Camera& lCamera);
 
-public:
 
-		const string	NAME;				/**<  Camera Identifier */
+private:
+
+		const LaneTracker::Config& mConfig;
+
+
+public:
 		const cv::Mat	MATRIX_INTRINSIC;		/**<  Camera Intrinsic Parameters 3x3 */
 		const cv::Mat	MATRIX_EXTRINSIC;		/**<  Camera Extrinsic Parameters 4x4 */
 
@@ -51,172 +64,86 @@ public:
 		const cv::Point O_ICS_ICCS;			/**< Origin of Image-CS in Image-Center-CS [pixels]*/
 
 
-		Camera(const LaneTracker::Config& Config):
-		 NAME (CAMERA_NAME),
+		Camera(const LaneTracker::Config& Config)
+		: mConfig(Config),
 
-		 MATRIX_INTRINSIC(getMatrix("CAMERA_MATRIX_INTRINSIC")),
+		  MATRIX_INTRINSIC(getIntrinsicMatrix()),
 
-		 MATRIX_EXTRINSIC(getMatrix("CAMERA_MATRIX_EXTRINSIC")), 
+		  MATRIX_EXTRINSIC(getExtrinsicMatrix()), 
 
-		 RES_VH(getVector2f("CAMERA_RES").cast<int>()),
+		  RES_VH(Vector2i(Config.cam_res_v, Config.cam_res_h)),
 
-		 ROT_PY(getVector2f("CAMERA_ROT_PY")),
+		  ROT_PY(Vector2f(Config.cam_pitch, Config.cam_yaw)),
 
-		 FOV_VH(Vector2f(2*atan( (RES_VH(0)/2.0) / (MATRIX_INTRINSIC.at<float>(1,1)) )*180/M_PI ,
+		  FOV_VH(Vector2f(2*atan( (RES_VH(0)/2.0) / (MATRIX_INTRINSIC.at<float>(1,1)) )*180/M_PI ,
 				 2*atan( (RES_VH(1)/2.0) / (MATRIX_INTRINSIC.at<float>(0,0)) )*180/M_PI )),
 
-		 HORIZON_VH(Vector2i( round((ROT_PY(0)* RES_VH(0)) / FOV_VH(0) ) ,
+		  HORIZON_VH(Vector2i( round((ROT_PY(0)* RES_VH(0)) / FOV_VH(0) ) ,
 				      round((ROT_PY(1)* RES_VH(1)) / FOV_VH(1) ) )),
 
-		 O_ICCS_ICS( cv::Point( RES_VH[1]/2,  RES_VH[0]/2) ), 
+		  O_ICCS_ICS( cv::Point( RES_VH[1]/2,  RES_VH[0]/2) ), 
 
-		 O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) ){ }
+		  O_ICS_ICCS( cv::Point(-RES_VH[1]/2, -RES_VH[0]/2) ){ }
 
 
 
 
 private:
-	   cv::Mat getMatrix(std::string Mat_name)
-	   {
-		int lSuccess = 0;
 
-		cv::Mat 	lCAMERA_MATRIX;
+	cv::Mat getIntrinsicMatrix()
+	{	   
 
-		stringstream 	lFormattedString;
-		string 		lFile, lPath;
+	  const float& FX =  mConfig.cam_fx;
+	  const float& FY =  mConfig.cam_fy;
+	  const float& CX =  mConfig.cam_cx;
+	  const float& CY =  mConfig.cam_cy;
 
-		// Read location of Binary
-		char lBuff[65536] = {"\0"};
-		ssize_t lLen = ::readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
+    	  // 3x3 Intrinsic Parameters
+    	  // This Matrix is for performing calculations in Image-Center-CS
+    	  cv::Mat matrix = (cv::Mat_<float>(3,3) << FX,    0,   CX,
+						     0,    FY,  CY,
+						     0,    0,    1 );
+	  return matrix;
+	}
 
-		if (lLen!=-1)
-		{
-		  lPath = std::string(lBuff);
-		  std::string::size_type Idx = lPath.find_last_of("/");
-		  lPath = lPath.substr(0,Idx);
-		}
-		else
-		{
-		   #ifdef PROFILER_ENABLED
-		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
-	    	    <<"******************************"<<endl
-		    <<"Unable to find the path to binary"<<endl
-		    <<"[Searching for Camera configuration files]: "<<endl
-	    	    <<"******************************"<<endl<<endl;
-		   #endif
-		   throw "Camera Instantiation Failed" ;
-		}
 
-		lFormattedString<<lPath<<"/ConfigFiles/Camera/"<<NAME<<".yaml";
-		lFile = lFormattedString.str();
+	cv::Mat getExtrinsicMatrix()
+	{	   
 
-		struct 	stat  lBufStat;
-		lSuccess |= stat(lFile.c_str(),&lBufStat);
 
-		if ( lSuccess !=0 )
-		{
-		   #ifdef PROFILER_ENABLED
-		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
-	    	    <<"******************************"<<endl
-		    <<"Unable to load camera configuration: "<<endl
-		    << "File not found: " << lFile.c_str() << endl
-	    	    <<"******************************"<<endl<<endl;
-		   #endif
-		   throw "Camera Instantiation Failed" ;
-		}
-		else
-		{
-		  try
-		  {
-		     cv::FileStorage loadFile( lFile, cv::FileStorage::READ);
-		     loadFile[Mat_name]>> lCAMERA_MATRIX;
-		  }
-		  catch(...)
-		  {
-		     #ifdef PROFILER_ENABLED
-		      LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
-	    	      <<"******************************"<<endl
-		      <<"ERROR while reading camera file: "<<endl
-		      << "cannot load required data from: " << lFile.c_str() << endl
-	    	      <<"******************************"<<endl<<endl;
-		     #endif
-		     throw "Camera Instantiation Failed" ;
-		  }
-		}
+	  const float& PITCH 		 	= mConfig.cam_pitch;
+	  const float& YAW  		 	= mConfig.cam_yaw;
+	  const float& CAM_HEIGHT		= mConfig.cam_height;
+	  const float& CAM_LATERAL_OFFSET	= mConfig.cam_lateral_offset;
+ 
+   	  // 4x4 Pitch Transformation
+    	  cv::Mat ROT_P = (cv::Mat_<float>(4,4)<< 1,   0,  				  0,   			            0,
+				    	  0,   cos(-(M_PI/2.0) + toRad(PITCH)),  sin(-(M_PI/2.0) + toRad(PITCH)),   0,
+				    	  0,   -sin(-(M_PI/2.0) + toRad(PITCH)), cos(-(M_PI/2.0) + toRad(PITCH)),   0,
+				    	  0,   0,  				  0,   			       	    1);
 
-		return lCAMERA_MATRIX;
-	   }
 
-	  Vector2f getVector2f(std::string Mat_name)
-	  {
-	     	int 		lSuccess = 0; 
-	     	cv::Mat		lVec(1,2, CV_32FC1);
+	  // 4x4 Yaw Transformation
+	  cv::Mat ROT_Y = (cv::Mat_<float>(4,4)<< cos(toRad(YAW)),     0,  	-sin(toRad(YAW)),  0,
+					    0,	 	       1,  	0,		   0,
+					    sin(toRad(YAW)),   0,  	cos(toRad(YAW)),   0,
+					    0,   	       0,  	0,   		   1);
 
-		stringstream 	lFormattedString;
-		string 		lFile, lPath;
 
-		// Read location of Binary
-		char lBuff[65536] = {"\0"};
-		ssize_t lLen = ::readlink("/proc/self/exe", lBuff, sizeof(lBuff)-1);
+   	 // 4x4 Translation
+    	 cv::Mat    T  = (cv::Mat_<float>(4,4)<< 1,   0,     0,  CAM_LATERAL_OFFSET,
+				    	 0,   1,     0,  CAM_HEIGHT,
+				    	 0,   0,     1,  0, //longitudnal displacement between world-CS and camera-CS is 0
+				    	 0,   0,     0,  1);
 
-		if (lLen!=-1)
-		{
-		   lPath = std::string(lBuff);
-		   std::string::size_type Idx = lPath.find_last_of("/");
-		   lPath = lPath.substr(0,Idx);
-		}
-		else
-		{
-		   #ifdef PROFILER_ENABLED
-		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
-	    	     <<"******************************"<<endl
-		     <<"Unable to find the path to binary"<<endl
-		     <<"[Searching for Camera configuration files]: "<<endl
-	    	     <<"******************************"<<endl<<endl;
-		   #endif
-		   throw "Camera Instantiation Failed" ;
-		}
 
-		lFormattedString<<lPath<<"/ConfigFiles/Camera/"<<NAME<<".yaml";
-		lFile = lFormattedString.str();
+    	 // 4x4  Extrinsic Parameters [Homogenous Transformation]
+    	 // This Matrix is specific to the world coordinates definition
+    	 // set the value of camera pitch and yaw to calculate this matrix acoordingly
+    	 cv::Mat matrix = T*ROT_Y*ROT_P; 
+	 return matrix;
+	}
 
-	     	struct  stat  lBufStat;
-
-	     	lSuccess |= stat(lFile.c_str(),&lBufStat);
-
-	    	if ( lSuccess != 0 )
-	    	{
-	       	   #ifdef PROFILER_ENABLED
-		    LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
-	    	    <<"******************************"<<endl
-		    <<"Unable to load camera configuration: "<<endl
-		    << "File not found: " << lFile.c_str() << endl
-	    	    <<"******************************"<<endl<<endl;
-	           #endif
-		   throw "Camera Instantiation Failed" ;
-	    	}
-	    	else
-	    	{
-		   try
-		   {
-		      cv::FileStorage loadFile( lFile, cv::FileStorage::READ);
-		      loadFile[Mat_name]>> lVec;
-		   }
-		   catch(...)
-		   {
-		      #ifdef PROFILER_ENABLED
-		       LOG_INFO_(LDTLog::STATE_MACHINE_LOG)<<endl
-	    	       <<"******************************"<<endl
-		       <<"ERROR while reading camera file: "<<endl
-		       << "cannot load required data from: " << lFile.c_str() << endl
-	    	       <<"******************************"<<endl<<endl;
-		      #endif
-		      throw "Camera Instantiation Failed" ;
-		   }
-	    	}
-
-	   	return Vector2f(lVec.at<float>(0,0), lVec.at<float>(0,1));
-	 }
 };
 
 inline ostream& operator<<(ostream& os, const Camera& lCamera)
@@ -224,7 +151,6 @@ inline ostream& operator<<(ostream& os, const Camera& lCamera)
   os<<endl<<"[Camera Properties]"<<endl;
 
   os<<"***********************************************"<<endl;
-  os<<"Name			: "<<lCamera.NAME<<endl;
   os<<"Extrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_EXTRINSIC<<endl<<endl;
   os<<"Intrinsic Camera Matrix	: "<<endl<<lCamera.MATRIX_INTRINSIC<<endl<<endl;
   os<<"Resolution[VxH]		: "<<"[ "<<lCamera.RES_VH[0]<<" x "<<lCamera.RES_VH[1]<<" ]"<<endl;
