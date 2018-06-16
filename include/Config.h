@@ -74,8 +74,10 @@ namespace LaneTracker
 	int 		vp_range_ver	     = 20;   	/**< Vertical range of VP on either side of the Horizon Line [pixels] */
 	int 		vp_range_hor	     = 300;     /**< Horizontal range of VP on either sides of center point [pixels] */
 
-	//^TODO: Check consistency with reset
 	int 		buffer_count	     = 3;    	/**<  Provide number of frames to buffer[Temporal Filtering]*/
+
+
+	bool 		display_graphics     = true;	/**< Renders graphics on to a HDMI display */
 
   };
 

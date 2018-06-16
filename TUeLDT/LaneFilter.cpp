@@ -95,7 +95,7 @@ cv::Mat	 getBins(const Ref<const VectorXf>& BINS_cm, const float& STEP_cm, const
 }
 
 
-LaneFilter::LaneFilter(const LaneProperties& LAN,  const Camera& CAM)
+LaneFilter::LaneFilter(const LaneProperties& LAN,  const Camera& CAM, const LaneTracker::Config& Config)
 
 : LANE(LAN),
 

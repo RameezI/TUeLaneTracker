@@ -44,7 +44,7 @@ public:	 	//Public Interface
 
 
 		/** Constructs LaneFilter from Camera and LaneProperties */
-		LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA);
+		LaneFilter(const LaneProperties& LANE,  const Camera& CAMERA, const LaneTracker::Config& Config);
 	
 		const cv::Point O_ICCS_ICS;		/** Origin of Image-Center-CS in the Image-CS*/
 		const cv::Point O_ICS_ICCS;		/** Origin of Image-CS in the Image-Center-CS*/

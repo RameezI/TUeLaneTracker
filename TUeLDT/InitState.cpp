@@ -23,9 +23,6 @@
 #include "InitState.h"
 
 // Class Implementation
-
-
-
 unique_ptr<LaneFilter> InitState::createLaneFilter()
 {
 	
@@ -34,9 +31,9 @@ unique_ptr<LaneFilter> InitState::createLaneFilter()
 	try
 	{
 	  Camera 			lCamera(mConfig);
-	  LaneProperties		lLane;
+	  LaneProperties		lLane(mConfig);
 
-	  lLaneFilter =	unique_ptr<LaneFilter>(new LaneFilter(lLane, lCamera));
+	  lLaneFilter =	unique_ptr<LaneFilter>(new LaneFilter(lLane, lCamera, mConfig));
 
 	  mLaneFilterCreated 	= true;
 
@@ -69,10 +66,11 @@ unique_ptr<VanishingPtFilter> InitState::createVanishingPtFilter()
 	try
 	{
 	  Camera 		lCamera(mConfig);
-	  LaneProperties   	lLane;
-	  LaneFilter 		lLaneFilter(lLane, lCamera);
+	  LaneProperties   	lLane(mConfig);
+	  LaneFilter 		lLaneFilter(lLane, lCamera, mConfig);
 	
-	  lVanishingPtFilter 	= unique_ptr<VanishingPtFilter>(new VanishingPtFilter(lCamera.HORIZON_VH(1), lCamera.HORIZON_VH(0)) ); 
+	  lVanishingPtFilter = unique_ptr<VanishingPtFilter>
+	  (new VanishingPtFilter(lCamera.HORIZON_VH(1), lCamera.HORIZON_VH(0), mConfig)); 
 	   
 	  mVpFilterCreated 	= true;
 	
@@ -101,21 +99,19 @@ unique_ptr<VanishingPtFilter> InitState::createVanishingPtFilter()
 
 unique_ptr<Templates> InitState::createTemplates()
 {
-
 	unique_ptr<Templates> lTemplates;
-
 
 	try
 	{
 	  Camera 		lCamera(mConfig);
-	  LaneProperties    	lLane;
-	  LaneFilter 		lLaneFilter(lLane, lCamera);
-	  VanishingPtFilter 	lVanishingPtFilter(lCamera.HORIZON_VH(1), lCamera.HORIZON_VH(0));
+	  LaneProperties    	lLane(mConfig);
+	  LaneFilter 		lLaneFilter(lLane, lCamera, mConfig);
+	  VanishingPtFilter 	lVanishingPtFilter(lCamera.HORIZON_VH(1), lCamera.HORIZON_VH(0), mConfig);
 
 	
 	  lTemplates	 = unique_ptr<Templates>
 	  ( new  Templates (lCamera.RES_VH(0), lCamera.RES_VH(1), lCamera.FOV_VH(0),
-			    lCamera.HORIZON_VH(1),lCamera.HORIZON_VH(0), lVanishingPtFilter.RANGE_V) );
+		 lCamera.HORIZON_VH(1), lCamera.HORIZON_VH(0), lVanishingPtFilter.RANGE_V) );
 	
 	   mTemplatesCreated	= true;
 	

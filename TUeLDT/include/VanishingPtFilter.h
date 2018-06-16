@@ -23,6 +23,7 @@
 * ****************************************************************************/ 
 
 #include <Eigen/Dense>
+#include "Config.h"
 #include "opencv2/opencv.hpp"
 
 
@@ -47,7 +48,7 @@ private:
 
 public:
 
-		VanishingPtFilter(const int HOR_H, const int HOR_V);
+		VanishingPtFilter(const int HOR_H, const int HOR_V, const LaneTracker::Config& Config);
 
         	const int       STEP;         	/*< Step for VanishinPtFilter [pixels] */
 

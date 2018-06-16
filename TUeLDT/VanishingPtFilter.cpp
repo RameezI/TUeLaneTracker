@@ -20,10 +20,9 @@
 * ****************************************************************************/ 
 
 #include "VanishingPtFilter.h"
-#include "Config.h"
 #include "ScalingFactors.h"
 
-VanishingPtFilter::VanishingPtFilter(const int HOR_H, const int HOR_V)
+VanishingPtFilter::VanishingPtFilter(const int HOR_H, const int HOR_V, const LaneTracker::Config& Config)
 : 
   STEP((STEP_VP_FILTER > 0) ? STEP_VP_FILTER : throw "VP filter step-size must be a positive integer"),
   

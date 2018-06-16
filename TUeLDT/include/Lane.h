@@ -20,9 +20,9 @@
 * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
-
-
 #include <iostream>
+#include "Config.h"
+
 using namespace std;
 
 /**Describes Lane Properties*/
@@ -38,10 +38,9 @@ public:
 	const float MAX_WIDTH;  	/*< Maximum width of a Lane [cm] */
 	const float AVG_WIDTH_LM;  	/**< Average Width of the Lane Markings on the lane */
 	
-	LaneProperties() //Lane Widths in cm
+	LaneProperties(const LaneTracker::Config& Config) //Lane Widths in cm
 	: AVG_WIDTH(300),STD_WIDTH(50),MIN_WIDTH(250),MAX_WIDTH(500), AVG_WIDTH_LM(30){}
 };
-
 
 
 /**
