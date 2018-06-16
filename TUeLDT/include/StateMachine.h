@@ -37,7 +37,9 @@ class StateMachine
 private:
 
 	bool	                                mQuitRequest;
+	
 	States 	                                mCurrentState;
+	const LaneTracker::Config& 		mConfig;
 
 	unique_ptr<FrameFeeder>			mPtrFrameFeeder;
 	unique_ptr<FrameRenderer>		mPtrFrameRenderer;
@@ -46,7 +48,6 @@ private:
 	unique_ptr<VanishingPtFilter>  		mPtrVanishingPtFilter;
 	unique_ptr<Templates> 			mPtrTemplates;
 	LaneModel				mLaneModel;
-
 
 	#ifdef S32V2XX
 	 unique_ptr<InitState>						mPtrBootingState;
@@ -64,7 +65,7 @@ public:
 	void 	        quit();
 	LaneModel       getLaneModel();
 
-	StateMachine(unique_ptr<FrameFeeder> frameFeeder);
+	StateMachine(unique_ptr<FrameFeeder> frameFeeder, const LaneTracker::Config& Config);
 	int spin();
 	~StateMachine();
 };

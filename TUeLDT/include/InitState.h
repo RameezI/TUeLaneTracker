@@ -34,7 +34,7 @@ class InitState: public State
 {	
 
 private :
-
+		const LaneTracker::Config& mConfig;
 		bool  mLaneFilterCreated;
 		bool  mVpFilterCreated;
 		bool  mTemplatesCreated;
@@ -48,7 +48,8 @@ public	:
 		unique_ptr<VanishingPtFilter> 		createVanishingPtFilter();
 		unique_ptr<Templates> 			createTemplates();
 		
-		InitState():
+		InitState(const LaneTracker::Config& Config):
+			    mConfig(Config),
 			    mLaneFilterCreated(false),
   		  	    mVpFilterCreated  (false),
   		  	    mTemplatesCreated (false)

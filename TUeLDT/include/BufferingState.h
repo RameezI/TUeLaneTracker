@@ -39,7 +39,7 @@ private:
 	size_t       	mBufferSize;
 
 public:
-	BufferingState();
+	BufferingState(const LaneTracker::Config& Config);
 
 	GRAPH 	mGraph;
 	void 	setupDAG(const Templates& TEMPLATES, const size_t & BUFFER_SIZE);
@@ -53,8 +53,9 @@ public:
 //******************************************************************/
 
 template<typename GRAPH>
-BufferingState<GRAPH>::BufferingState()
-: mBufferSize(0){}
+BufferingState<GRAPH>::BufferingState(const LaneTracker::Config& Config)
+: mBufferSize(0), mGraph(Config)
+{}
 
 
 template<typename GRAPH>  

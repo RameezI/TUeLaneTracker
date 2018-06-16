@@ -32,9 +32,10 @@
 #endif
 
 
-StateMachine::StateMachine(unique_ptr<FrameFeeder> frameFeeder)
+StateMachine::StateMachine(unique_ptr<FrameFeeder> frameFeeder, const LaneTracker::Config& Config)
  : mQuitRequest(false),
    mCurrentState(States::BOOTING),
+   mConfig(Config),
    mPtrFrameFeeder(std::move(frameFeeder)),
    mPtrFrameRenderer(nullptr),
    mPtrLaneFilter(nullptr),
@@ -86,7 +87,7 @@ int StateMachine::spin()
 	{
 		if (mPtrBootingState == nullptr)
 	  	{
-		   mPtrBootingState   = unique_ptr<InitState>(new InitState());
+		   mPtrBootingState   = unique_ptr<InitState>(new InitState(mConfig));
 		}
 	   	if (mPtrBootingState->currentStatus  != StateStatus::ERROR)
 		{
@@ -134,7 +135,7 @@ int StateMachine::spin()
 		   #ifdef S32V2XX
 		    mPtrBufferingState.reset(new BufferingState<BufferingDAG_s32v>());
 		   #else
-		    mPtrBufferingState.reset(new BufferingState<BufferingDAG_generic>());
+		    mPtrBufferingState.reset(new BufferingState<BufferingDAG_generic>(mConfig));
 		   #endif
 		   mPtrBootingState = nullptr;
 		}
@@ -251,6 +252,17 @@ int StateMachine::spin()
 		}
 
 	} break; // TRACKING STATE SCOPE ENDS 
+
+
+	/*case States::RESET :
+	{
+
+
+
+
+
+
+	}break; */
 	
 
 	case States::DISPOSED :

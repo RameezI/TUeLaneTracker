@@ -51,7 +51,7 @@ public:
 		const cv::Point O_ICS_ICCS;			/**< Origin of Image-CS in Image-Center-CS [pixels]*/
 
 
-		Camera():
+		Camera(const LaneTracker::Config& Config):
 		 NAME (CAMERA_NAME),
 
 		 MATRIX_INTRINSIC(getMatrix("CAMERA_MATRIX_INTRINSIC")),

@@ -52,7 +52,7 @@ FRIEND_TEST(TrackingTest, MAX_POOLING);
 
 
 public:
-	BufferingDAG_generic ();
+	BufferingDAG_generic (const LaneTracker::Config& Config);
 
 protected:
 	std::mutex 			_mutex;
@@ -137,12 +137,14 @@ public:
 	void execute(cv::UMat& FrameGRAY);  
 	
    	BufferingDAG_generic (BufferingDAG_generic && bufferingGraph)
+	: mCAMERA(bufferingGraph.mCAMERA)
    	{
 	
 	   WriteLock  lLock(_mutex, std::defer_lock);
 	   lLock.lock();
 	
 	     mBufferPos			= std::move(bufferingGraph.mBufferPos);
+	
 
 	     mHORIZON_ICCS_H		= std::move(bufferingGraph.mHORIZON_ICCS_H);
 	     mHORIZON_ICCS_V		= std::move(bufferingGraph.mHORIZON_ICCS_V);

@@ -11,6 +11,7 @@ namespace po = boost::program_options;
 unique_ptr<FrameFeeder> createFrameFeeder(FrameSource srcMode, string srcString);
 
 
+
 int main(int argc, char* argv[]) /**
 	This is the entry point of the application.
 	- Initialises the sigInit handler
@@ -62,6 +63,17 @@ int main(int argc, char* argv[]) /**
 
 
 
+	unique_ptr<LaneTracker::Config> lPtrConfig;
+	if (lReturn == 0) //create Configuration
+	{
+	  lPtrConfig.reset(new LaneTracker::Config);
+	  if(lPtrConfig == nullptr)
+	  {
+	    lReturn = -1;
+	  }
+	}
+
+
 	unique_ptr<FrameFeeder> lPtrFeeder;
 	if (lReturn == 0) //create FrameFeeder
 	{
@@ -94,7 +106,7 @@ int main(int argc, char* argv[]) /**
 
 	  try
 	  {
-		  lPtrStateMachine.reset( new StateMachine(move(lPtrFeeder)) );
+	       lPtrStateMachine.reset( new StateMachine( move(lPtrFeeder), *lPtrConfig.get() ) );
 	  }
 	  catch(const char* msg)
 	  {

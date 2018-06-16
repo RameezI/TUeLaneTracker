@@ -21,7 +21,9 @@
 
 #include "BufferingDAG_generic.h"
 
-BufferingDAG_generic::BufferingDAG_generic() : mBufferPos(0)
+BufferingDAG_generic::BufferingDAG_generic(const LaneTracker::Config& Config) 
+: mBufferPos(0),
+  mCAMERA(Camera(Config))
 {
 	
 }
