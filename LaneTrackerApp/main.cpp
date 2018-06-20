@@ -132,44 +132,44 @@ int main(int argc, char* argv[]) /**
 
 
 
-    if(lReturn == 0) //spin the stateMachine
-    {
-    	uint64_t        lCyclesCount = 0;
-    	ProfilerLDT     lProfiler;
-    	StateMachine&   stateMachine = *lPtrStateMachine.get();
+    	if(lReturn == 0) //spin the stateMachine
+    	{
+    	  uint64_t        lCyclesCount = 0;
+    	  ProfilerLDT     lProfiler;
+    	  StateMachine&   stateMachine = *lPtrStateMachine.get();
 
 
-		while (stateMachine.getCurrentState() != States::DISPOSED)
-		{
+	  while (stateMachine.getCurrentState() != States::DISPOSED)
+	  {
 
 
-		  lProfiler.start("StateMachine_Cycle");
-                    if (lPtrSigInt->sStatus == SigStatus::STOP)
-                      stateMachine.quit();
+	     lProfiler.start("StateMachine_Cycle");
+	     if (lPtrSigInt->sStatus == SigStatus::STOP)
+	      stateMachine.quit();
 
-                    lReturn = stateMachine.spin();
-                    lCyclesCount ++;
+	     lReturn = stateMachine.spin();
+	     lCyclesCount ++;
 
-		  lProfiler.end();
+	     lProfiler.end();
 
-		  if(lPreviousState != stateMachine.getCurrentState())
-		  {
-		    cout<<endl<<stateMachine.getCurrentState();
-		    std::cout.flush();
-		    lPreviousState = stateMachine.getCurrentState();
-		  }
-		  else if (lCyclesCount%100==0)
-		  {
-		      cout <<endl<<stateMachine.getCurrentState();
-		      cout <<"state cycle-count = " << lCyclesCount<<"    Cycle-Time [Min, Avg, Max] : "
-		      <<"[ "<<lProfiler.getMinTime("StateMachine_Cycle")<<" "
-		      <<lProfiler.getAvgTime("StateMachine_Cycle")<<" "
-		      <<lProfiler.getMaxTime("StateMachine_Cycle")<<" "
-		      <<" ]";
-		  }
+	     if(lPreviousState != stateMachine.getCurrentState())
+	     {
+	       cout<<endl<<stateMachine.getCurrentState();
+	       std::cout.flush();
+	       lPreviousState = stateMachine.getCurrentState();
+	     }
+	     else if (lCyclesCount%100==0)
+	     {
+	       cout <<endl<<stateMachine.getCurrentState();
+	       cout <<"state cycle-count = " << lCyclesCount<<"    Cycle-Time [Min, Avg, Max] : "
+	       <<"[ "<<lProfiler.getMinTime("StateMachine_Cycle")<<" "
+	       <<lProfiler.getAvgTime("StateMachine_Cycle")<<" "
+	       <<lProfiler.getMaxTime("StateMachine_Cycle")<<" "
+	       <<" ]";
+	     }
 
-		}// End spinning
-    }
+	   }// End spinning
+    	}
 
     lPtrStateMachine.reset( nullptr);
 	cout<<endl<<"The program ended with exit code " <<lReturn<<endl;

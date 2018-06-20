@@ -34,6 +34,7 @@
 
 StateMachine::StateMachine(unique_ptr<FrameFeeder> frameFeeder, const LaneTracker::Config& Config)
  : mQuitRequest(false),
+   mRebootRequest(false),
    mCurrentState(States::BOOTING),
    mConfig(Config),
    mPtrFrameFeeder(std::move(frameFeeder)),
@@ -80,6 +81,26 @@ int StateMachine::spin()
 	   #endif
 	   mCurrentState = States::DISPOSED;
 	}
+	else
+	if (mRebootRequest)
+	{
+	   #ifdef PROFILER_ENABLED
+	    LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
+	    <<"******************************"<<endl
+	    << "[User Requested to reboot the State-Machine]"<<endl
+	    <<  "Rebooting the State-Machine."<<endl
+	    <<"******************************"<<endl<<endl;
+	   #endif
+
+   	   mPtrBootingState.reset(nullptr);
+   	   mPtrBufferingState.reset(nullptr);
+   	   mPtrTrackingState.reset(nullptr);
+
+	   mPtrFrameFeeder->Paused.store(true);
+	   mCurrentState = States::BOOTING;
+	   mRebootRequest = false;
+	}
+	else
 
 	switch(mCurrentState) {
 
@@ -91,6 +112,10 @@ int StateMachine::spin()
 		}
 	   	if (mPtrBootingState->currentStatus  != StateStatus::ERROR)
 		{
+	   	    mPtrLaneFilter.reset(nullptr);
+	   	    mPtrVanishingPtFilter.reset(nullptr);
+	   	    mPtrTemplates.reset(nullptr);
+
 	   	    mPtrLaneFilter 	        = mPtrBootingState->createLaneFilter();
 	   	    mPtrVanishingPtFilter       = mPtrBootingState->createVanishingPtFilter();
 	   	    mPtrTemplates 	        = mPtrBootingState->createTemplates();
@@ -108,9 +133,8 @@ int StateMachine::spin()
 		     <<"****************************************"<<endl<<endl;
 		   #endif
 	
-		   mCurrentState 	= States::BUFFERING;	   
 		   cout<< "Completed!"<<endl;
-
+		   mCurrentState 	= States::BUFFERING;	   
 		}
 		else
 		{
@@ -141,7 +165,7 @@ int StateMachine::spin()
 		}
 		if (mPtrBufferingState->currentStatus == StateStatus::INACTIVE)
 		{
-		      mPtrBufferingState->setupDAG(std::ref(*mPtrTemplates), BUFFER_COUNT);
+		      mPtrBufferingState->setupDAG(std::ref(*mPtrTemplates), mConfig.buffer_count);
 		      mPtrFrameFeeder->Paused.store(false);
 		}
 		if (mPtrBufferingState->currentStatus == StateStatus::ACTIVE)
@@ -206,7 +230,7 @@ int StateMachine::spin()
 		if (mPtrTrackingState->currentStatus == StateStatus::INACTIVE)
 		{
 		   mPtrTrackingState->setupDAG(mPtrLaneFilter.get(), mPtrVanishingPtFilter.get());
-		   mPtrFrameRenderer.reset(new FrameRenderer(*mPtrLaneFilter, mPtrFrameFeeder.get() ));
+		   mPtrFrameRenderer.reset(new FrameRenderer(*mPtrLaneFilter, *mPtrFrameFeeder.get() ));
 		}
 		if (mPtrTrackingState->currentStatus == StateStatus::ACTIVE)
 		{
@@ -214,9 +238,8 @@ int StateMachine::spin()
 		  {
 		       mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
 
-			#ifdef DISPLAY_GRAPHICS
-		         mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
-			#endif
+		       if(mConfig.display_graphics)
+		        mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
 		  }
 		  catch(const char* msg)
 		  {
@@ -254,17 +277,6 @@ int StateMachine::spin()
 	} break; // TRACKING STATE SCOPE ENDS 
 
 
-	/*case States::RESET :
-	{
-
-
-
-
-
-
-	}break; */
-	
-
 	case States::DISPOSED :
 	{
 	        #ifdef PROFILER_ENABLED
@@ -291,6 +303,13 @@ void StateMachine::quit()
 {
 	mQuitRequest = true;
 }
+
+
+void StateMachine::reboot()
+{
+	mRebootRequest = true;
+}
+
 
 States StateMachine::getCurrentState()
 {

@@ -46,7 +46,7 @@ private:
    const size_t		mCOUNT_BINS;
    const int      	mHORIZON_V;
 
-   FrameFeeder* 	mPtrFrameFeeder;
+   FrameFeeder& 	mFrameFeeder;
 
    #ifdef DISPLAY_GRAPHICS_DCU
     io::FrameOutputV234Fb  mDCU;
@@ -57,7 +57,7 @@ private:
    #endif
 
 public:
-   FrameRenderer(const LaneFilter& LANE_FLTR, FrameFeeder* frameFeeder)
+   FrameRenderer(const LaneFilter& LANE_FLTR, FrameFeeder& FRAME_FEEDER)
    : 
      mBASE_BINS(LANE_FLTR.BASE_BINS),
      mPURVIEW_BINS(LANE_FLTR.PURVIEW_BINS),
@@ -66,7 +66,7 @@ public:
      mPURVIEW_LINE_ICS(LANE_FLTR.PURVIEW_LINE_ICCS + mO_ICCS_ICS.y),
      mCOUNT_BINS(mBASE_BINS.rows),
      mHORIZON_V(LANE_FLTR.CAMERA.HORIZON_VH(0)),
-     mPtrFrameFeeder(frameFeeder)
+     mFrameFeeder(FRAME_FEEDER)
 
      #ifdef DISPLAY_GRAPHICS_DCU
       , mDCU(io::FrameOutputV234Fb(LANE_FLTR.CAMERA.RES_VH(1), LANE_FLTR.CAMERA.RES_VH(0), io::IO_DATA_DEPTH_08, io::IO_DATA_CH3))

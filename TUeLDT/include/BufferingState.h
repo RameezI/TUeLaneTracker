@@ -42,7 +42,7 @@ public:
 	BufferingState(const LaneTracker::Config& Config);
 
 	GRAPH 	mGraph;
-	void 	setupDAG(const Templates& TEMPLATES, const size_t & BUFFER_SIZE);
+	void 	setupDAG(const Templates& TEMPLATES, const size_t& BUFFER_SIZE);
 	void 	run(cv::UMat Frame);
 };
 
@@ -59,7 +59,7 @@ BufferingState<GRAPH>::BufferingState(const LaneTracker::Config& Config)
 
 
 template<typename GRAPH>  
-void BufferingState<GRAPH>::setupDAG(const Templates & TEMPLATES, const size_t & BUFFER_SIZE)
+void BufferingState<GRAPH>::setupDAG(const Templates & TEMPLATES, const size_t& BUFFER_SIZE)
 {
   if(BUFFER_SIZE <= 0)
   {
@@ -67,7 +67,7 @@ void BufferingState<GRAPH>::setupDAG(const Templates & TEMPLATES, const size_t &
   }
   else if ( 0 == mGraph.init_DAG(TEMPLATES, BUFFER_SIZE) )
   {
-   mBufferSize = BUFFER_SIZE;
+    mBufferSize = BUFFER_SIZE;
     currentStatus= StateStatus::ACTIVE;
   }
 }

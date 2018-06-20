@@ -95,9 +95,9 @@ cv::Mat	 getBins(const Ref<const VectorXf>& BINS_cm, const float& STEP_cm, const
 }
 
 
-LaneFilter::LaneFilter(const LaneProperties& LAN,  const Camera& CAM, const LaneTracker::Config& Config)
+LaneFilter::LaneFilter(const LaneProperties& LANE_PROP,  const Camera& CAM, const LaneTracker::Config& Config)
 
-: LANE(LAN),
+: LANE(LANE_PROP),
 
   CAMERA(CAM),
 
@@ -107,11 +107,11 @@ LaneFilter::LaneFilter(const LaneProperties& LAN,  const Camera& CAM, const Lane
 
   O_IBCS_ICS(cv::Point(0, CAMERA.RES_VH(0))),
 
-  BASE_LINE_ICCS(-BASE_LINE_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),  
+  BASE_LINE_ICCS(-Config.base_line_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),  
 
-  PURVIEW_LINE_ICCS(-PURVIEW_LINE_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),
+  PURVIEW_LINE_ICCS(-Config.purview_line_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),
   
-  BINS_STEP_cm(STEP_LANE_FILTER_CM),
+  BINS_STEP_cm(Config.step_lane_filter_cm),
   
   BINS_MAX_cm(round(LANE.MAX_WIDTH/BINS_STEP_cm)*BINS_STEP_cm),
 

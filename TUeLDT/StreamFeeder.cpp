@@ -27,7 +27,7 @@ StreamFeeder::StreamFeeder(string sourceUriStr)
 : mQueuesSync(true),
   mMAX_BUFFER_SIZE(2),
   mMAX_RETRY(100), 	// Main thread sleeps for 1ms and then retry to grab.
-  mSLEEP_ms(1),  	// Sleep time for the mAsyncGrabber
+  mSLEEP_ms(20),  	// Sleep time for the mAsyncGrabber
   mUri("")
 {
   parseSettings (sourceUriStr);

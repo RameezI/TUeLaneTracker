@@ -24,11 +24,11 @@
 
 VanishingPtFilter::VanishingPtFilter(const int HOR_H, const int HOR_V, const LaneTracker::Config& Config)
 : 
-  STEP((STEP_VP_FILTER > 0) ? STEP_VP_FILTER : throw "VP filter step-size must be a positive integer"),
+  STEP((Config.step_vp_filter > 0) ? Config.step_vp_filter : throw "VP filter step-size must be a positive integer"),
   
-  RANGE_V(VP_RANGE_VER), 
+  RANGE_V(Config.vp_range_ver), 
  
-  RANGE_H(VP_RANGE_HOR),
+  RANGE_H(Config.vp_range_hor),
   
   COUNT_BINS_V(floor((2*RANGE_V)/STEP) +1),
   

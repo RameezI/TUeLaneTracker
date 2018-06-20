@@ -14,4 +14,4 @@ target_include_directories (TUeLDT PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 					   )
 
 #Message("Current Souce Dir	:  " ${CMAKE_CURRENT_SOURCE_DIR})
-install(TARGETS TUeLDT DESTINATION install/lib)
+#install(TARGETS TUeLDT DESTINATION install/lib)

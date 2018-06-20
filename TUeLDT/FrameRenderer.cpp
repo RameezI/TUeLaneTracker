@@ -79,18 +79,18 @@ void FrameRenderer::drawLane(const cv::UMat& FRAME, const LaneModel& Lane)
    //Draw Purview Line
    line(FRAME, Point(0,mPURVIEW_LINE_ICS), Point(FRAME.cols,mPURVIEW_LINE_ICS),	CvScalar(0,0,0),1);
 
-
+/*
    // Highlight region below Horizon
    {
      Rect lROI;	
      int lX = 0;
-     int lY = mO_ICCS_ICS.y + mHORIZON_V - VP_RANGE_VER;
+     int lY = mO_ICCS_ICS.y + mHORIZON_V - Config.vp_range_ver;
      lROI = Rect(lX,lY, FRAME.cols, FRAME.rows-lY);
      cv::UMat lYellow(FRAME.rows -lY, FRAME.cols, CV_8UC3, Scalar(0,125,125));
      cv::UMat lFrameRGB_SPAN = FRAME(lROI);
      cv::addWeighted(lYellow, 0.4, lFrameRGB_SPAN, 0.6, 0, lFrameRGB_SPAN);
    }
-
+*/
 
    // Draw Histogram-Bins at the Base
    for (size_t i=0; i < mCOUNT_BINS; i++)
@@ -120,9 +120,9 @@ void FrameRenderer::drawLane(const cv::UMat& FRAME, const LaneModel& Lane)
      imshow( "Display window", FRAME);
      if( waitKey(1) == 32)
      {
-       mPtrFrameFeeder->Paused.store(true);
+       mFrameFeeder.Paused.store(true);
        while(waitKey(1)!=32);
-       mPtrFrameFeeder->Paused.store(false);
+       mFrameFeeder.Paused.store(false);
      }
    #else
      mDCU.PutFrame(FRAME);

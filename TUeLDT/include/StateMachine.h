@@ -37,6 +37,7 @@ class StateMachine
 private:
 
 	bool	                                mQuitRequest;
+	bool	                                mRebootRequest;
 	
 	States 	                                mCurrentState;
 	const LaneTracker::Config& 		mConfig;
@@ -63,6 +64,7 @@ public:
 
 	States	        getCurrentState();
 	void 	        quit();
+	void 	        reboot();
 	LaneModel       getLaneModel();
 
 	StateMachine(unique_ptr<FrameFeeder> frameFeeder, const LaneTracker::Config& Config);

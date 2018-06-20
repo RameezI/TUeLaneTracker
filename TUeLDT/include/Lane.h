@@ -39,7 +39,11 @@ public:
 	const float AVG_WIDTH_LM;  	/**< Average Width of the Lane Markings on the lane */
 	
 	LaneProperties(const LaneTracker::Config& Config) //Lane Widths in cm
-	: AVG_WIDTH(300),STD_WIDTH(50),MIN_WIDTH(250),MAX_WIDTH(500), AVG_WIDTH_LM(30){}
+	: AVG_WIDTH(Config.lane_avg_width),
+	  STD_WIDTH(Config.lane_std_width),
+	  MIN_WIDTH(Config.lane_min_width),
+	  MAX_WIDTH(Config.lane_max_width),
+	  AVG_WIDTH_LM(2*Config.lane_marker_width){}
 };
 
 
