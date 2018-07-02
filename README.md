@@ -12,7 +12,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What librariesyou need, in order to buiild and install the TUeLaneTracker and 
+What libraries do you need, in order to build and install the TUeLaneTracker
 
 ```
 * OpenCv-3.1.0
@@ -73,7 +73,7 @@ For usage instructions use the *--help* switch
 
 ### Callibrarting TUeLaneTracker
 
-- The algorithm is parameterised with a minimal set of parameters. These parameters includes, among others, intrinsic and extrinsic camera specifications. At the boot-time the algorithm takes into account these parameters, whcih are set via [include/Config.h](https://github.com/RameezI/TUeLaneTracker/blob/master/include/Config.h) file. This provides a way to reconfigure the algorithm but only at the compile time. However, in case of the ROS (Robot Operating System) package for the lane tracker it is possible to dynamically reconfigure and reboot the algorithm, with new configuration, at runtime. The ros package for this lane tracker is available under the [tue_lane_tracker](https://github.com/RameezI/tue_lane_tracker) repository. 
+The algorithm is parameterised with a minimal set of parameters. These parameters includes, among others, intrinsic and extrinsic camera specifications. At the boot-time the algorithm takes into account these parameters, whcih are set via [include/Config.h](https://github.com/RameezI/TUeLaneTracker/blob/master/include/Config.h) file. This provides a way to reconfigure the algorithm but only at the compile time. However, in case of the ROS (Robot Operating System) package for the lane tracker it is possible to dynamically reconfigure and reboot the algorithm, with new configuration, at runtime. The ros package for this lane tracker is available under the [tue_lane_tracker](https://github.com/RameezI/tue_lane_tracker) repository. 
        
        
 ## Youtube Videos
