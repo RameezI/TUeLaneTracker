@@ -4,7 +4,8 @@ This is a software application that detects and tracks lane boundaries. The unde
 
 This application provides a loose coupling between the software control flow and the algorithm, making it possible to generate various target specific implementations for the algorithm. Besides this generic implementation, an accelrated version for the NXP-BlueBox (s32v) is also available. The s32v specific implementation makes use of the APEX accelrators to speed-up the vision processing. The APEX architecture blends scalar and vector processing capabilities within the two fully programable cores, achieving an effective 5-10x speed-up of the algorithm. 
 
-
+#### Note: A ROS package for this lane tracker is available under [tue_lane_tracker](https://github.com/RameezI/tue_lane_tracker) repository. 
+       
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
@@ -70,14 +71,11 @@ For usage instructions use the *--help* switch
 ./TUeLanetracker --help
 ```
 
-### Callibrarting Camera for TUeLaneTracker
+### Callibrarting TUeLaneTracker
 
-- Camera intrinsic and extrinsic parameters can be found in [install/ConfigFiles/Camera](https://github.com/RameezI/TUeLaneTracker/tree/master/install/ConfigFiles/Camera) directory.
+- To easily adjust and callibrate the system to a new setup, the algorithm is parameterised with a minimal set of parameters. These parameters includes, among others, intrinsic and extrinsic camera specifications. At the boot-time the algorithm take into account these parameters, whcih can be found in [install/ConfigFiles/Camera](https://github.com/RameezI/TUeLaneTracker/tree/master/install/ConfigFiles/Camera) directory.
 
-- To select a specific configuration for the TUeLaneTracker, you only need to update the CAMERA_NAME define in the [Config.h](https://github.com/RameezI/TUeLaneTracker/blob/master/include/Config.h)
-
-- To generate a new camera callibration use [CameraCalibrator](https://github.com/RameezI/TUeLaneTracker/tree/master/CameraCalibrator) cmake project.
-       
+- To callibrate the TUeLaneTracker, it is recommended to use the TUeLaneTracker in the ROS(Robot Operating System) environment. As this allows to dynamically callibrate the system. The ros package for this lane tracker is provided by the [tue_lane_tracker](https://github.com/RameezI/tue_lane_tracker) repository. 
        
 ## Youtube Videos
    These videos showcase the functional performance of the algorithm:
