@@ -48,7 +48,7 @@ private:
 	unique_ptr<LaneFilter>  		mPtrLaneFilter;
 	unique_ptr<VanishingPtFilter>  		mPtrVanishingPtFilter;
 	unique_ptr<Templates> 			mPtrTemplates;
-	LaneModel				mLaneModel;
+	LaneModel*				mPtrLaneModel;
 
 	#ifdef S32V2XX
 	 unique_ptr<InitState>						mPtrBootingState;
@@ -65,6 +65,7 @@ public:
 	States	        getCurrentState();
 	void 	        quit();
 	void 	        reboot();
+	bool 		laneModel();
 	LaneModel       getLaneModel();
 
 	StateMachine(unique_ptr<FrameFeeder> frameFeeder, const LaneTracker::Config& Config);

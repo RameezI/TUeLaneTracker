@@ -25,7 +25,7 @@
 #include <opencv2/core/eigen.hpp>
 
 ///cm to pixel conversion, for a particular row in the image, of the #BINS_cm [Vehicle-Symmetry-CS <---> Image-Center-CS]
-float  getPixelStep(const float STEP_cm, const Camera& CAM, const int Y_ICCS )
+float  getPixelStep(const float STEP_cm, const Camera& CAM, const int Y_ICCS, float& Y_cm )
 {
    cv::Mat  lIMG_TO_W;	//Image-Center-CS to Vehicle-Symmetry-CS tranformation, planar homography
    cv::Mat  lW_TO_IMG;	//Vehicle-Symmetry-CS to Image-Center-CS transformation 
@@ -46,12 +46,16 @@ float  getPixelStep(const float STEP_cm, const Camera& CAM, const int Y_ICCS )
 
    lWorldPt = lIMG_TO_W * lImgPt;
    lWorldPt = lWorldPt/lWorldPt.at<float>(2);
-   
+  
+   Y_cm = lWorldPt.at<float>(1)*100;
+
    lWorldPt.at<float>(0)  += STEP_cm/100.0;
    lImgPt = lW_TO_IMG * lWorldPt;
 
+
    return lImgPt.at<float>(0,0)/(lImgPt.at<float>(0,2)) ;
 }
+
 
 
 int  getBinsOffset(const Camera& CAM, const int Y_ICCS )
@@ -110,6 +114,10 @@ LaneFilter::LaneFilter(const LaneProperties& LANE_PROP,  const Camera& CAM, cons
   BASE_LINE_ICCS(-Config.base_line_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),  
 
   PURVIEW_LINE_ICCS(-Config.purview_line_IBCS + O_IBCS_ICS.y + O_ICS_ICCS.y ),
+
+  BASE_LINE_cm(-1),  
+
+  PURVIEW_LINE_cm(-1),
   
   BINS_STEP_cm(Config.step_lane_filter_cm),
   
@@ -119,9 +127,9 @@ LaneFilter::LaneFilter(const LaneProperties& LANE_PROP,  const Camera& CAM, cons
 
   BINS_cm( VectorXf::LinSpaced( COUNT_BINS, -BINS_MAX_cm, BINS_MAX_cm) ),
 
-  BASE_STEP(getPixelStep(BINS_STEP_cm, CAMERA, BASE_LINE_ICCS)),
+  BASE_STEP(getPixelStep(BINS_STEP_cm, CAMERA, BASE_LINE_ICCS, BASE_LINE_cm)),
 
-  PURVIEW_STEP(getPixelStep(BINS_STEP_cm, CAMERA, PURVIEW_LINE_ICCS)),
+  PURVIEW_STEP(getPixelStep(BINS_STEP_cm, CAMERA, PURVIEW_LINE_ICCS, PURVIEW_LINE_cm)),
   
   BASE_OFFSET(getBinsOffset(CAMERA, BASE_LINE_ICCS)),
   

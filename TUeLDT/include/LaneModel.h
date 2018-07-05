@@ -24,8 +24,6 @@
 * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/ 
-
-
 	
 /**
 Describes the selected Vanishing Point in Image-Center-CS. 
@@ -48,54 +46,33 @@ class  LaneModel
 {
 
 public:
-	int 	boundaryLeft;	  	/*< Selected,max-poseterior, distance to left boundary at base in Image-Center-CS [pixel] */
-	int 	boundaryRight;  	/*< Selected,max-posterior, distance to left boundary at base in Image-Center-CS [pixel] */
 
-	int	boundaryLeft_Purview; 	/*< Selected,max-poseterior, distance to left boundary at purview in Image-Center-CS [pixel] */
-	int 	boundaryRight_Purview;	/*< Selected,max-poseterior, distance to right boundary at purview in Image-Center-CS [pixel] */
-	
-	float   laneWidth_cm;
+	vector<float> 	lookAheadPts_cm;	/*Look ahead points for the boundary determination [cm] */
 
-	VanishingPt vanishingPt; 	/*< Selected, according to max-posterior, distance to VanishingPoint in Image-Center-CS [pixel] */
+	vector<int> 	boundaryLeft;	  	/*< Selected,max-poseterior, distance to left boundary at base in Image-Center-CS [pixel] */
+	vector<int> 	boundaryRight;  	/*< Selected,max-posterior, distance to left boundary at base in Image-Center-CS [pixel]  */
 
-	float 	lookAheadErr_m;		/*< The Look-Ahead error at the purview line in Vehicle-Symmetry-CS [m]*/
+	vector<float> 	boundaryLeft_cm;	/*< Selected,max-poseterior, distance to left boundary at base in Image-Center-CS [pixel] */
+	vector<float> 	boundaryRight_cm;  	/*< Selected,max-posterior, distance to left boundary at base in Image-Center-CS [pixel]  */
 
 
-	float   conf_LB;
-	float   conf_RB;
-	
+	VanishingPt 	vanishingPt; 		/*< Selected, according to max-posterior, VanishingPoint in Image-Center-CS [pixel] */
 
-	
+	float   	width_cm;
+	float   	confidence;
 
-	void setModel(const int&  boundaryL,  const int& boundaryR, const int& boundaryL_purview, const int& boundaryR_purview,
-	              const float& laneWidth, const VanishingPt& vanishPt, const float& Err)
-	{
-
-	  boundaryLeft  	= boundaryL;
-	  boundaryRight 	= boundaryR;
-
-	  boundaryLeft_Purview  = boundaryL_purview;
-	  boundaryRight_Purview = boundaryR_purview;
-
-	  laneWidth_cm		= laneWidth;
-	  vanishingPt	  	= vanishPt;
-
-	  lookAheadErr_m	= Err;
-	}
-
-	float getLateralError()
-	{
-	  return lookAheadErr_m;
-	}
-
-	LaneModel():
-		   boundaryLeft(-1),
-		   boundaryRight(-1),
-		   lookAheadErr_m(0)
+	LaneModel(){}
+	LaneModel(const vector<float> lookAhead_cm):
+		   lookAheadPts_cm(lookAhead_cm),
+		   boundaryLeft(lookAheadPts_cm.size()),
+		   boundaryRight(lookAheadPts_cm.size()),
+		   boundaryLeft_cm(lookAheadPts_cm.size()),
+		   boundaryRight_cm(lookAheadPts_cm.size()),
+		   width_cm(-1),
+		   confidence(0)
 		   {
 
 		   }
-
 };
 
 #endif

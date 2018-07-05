@@ -42,7 +42,7 @@ private:
 
 public:	
 	GRAPH        mGraph;
-	const LaneModel& run(cv::UMat Frame);
+	LaneModel* run(cv::UMat Frame);
 	void setupDAG(LaneFilter* laneFilters, VanishingPtFilter* vpFilter);
 
 	template<typename GRAPH_BASE>
@@ -74,7 +74,7 @@ void TrackingLaneState<GRAPH>::setupDAG(LaneFilter* laneFilter, VanishingPtFilte
 
 
 template<typename GRAPH>
-const LaneModel& TrackingLaneState<GRAPH>::run(cv::UMat Frame)
+LaneModel* TrackingLaneState<GRAPH>::run(cv::UMat Frame)
 {
 
   #ifdef PROFILER_ENABLED
@@ -100,7 +100,7 @@ const LaneModel& TrackingLaneState<GRAPH>::run(cv::UMat Frame)
                                   <<"******************************"<<endl<<endl;
                                   #endif
 
-   return mGraph.mLaneModel;
+   return mGraph.mPtrLaneModel.get();
 }
 
 #endif // TRACKING_LANE_STATE_H

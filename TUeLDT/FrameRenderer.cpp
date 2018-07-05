@@ -45,8 +45,8 @@ void FrameRenderer::drawLane(const cv::UMat& FRAME, const LaneModel& Lane)
 
 
    //Lane Bundaries
-   lBoundaryPts_L.push_back( Point( Lane.boundaryLeft  + mO_ICCS_ICS.x, mBASE_LINE_ICS) );
-   lBoundaryPts_R.push_back( Point( Lane.boundaryRight + mO_ICCS_ICS.x, mBASE_LINE_ICS) );
+   lBoundaryPts_L.push_back( Point( Lane.boundaryLeft[0]  + mO_ICCS_ICS.x, mBASE_LINE_ICS) );
+   lBoundaryPts_R.push_back( Point( Lane.boundaryRight[0] + mO_ICCS_ICS.x, mBASE_LINE_ICS) );
    lBoundaryPts_M.push_back( (lBoundaryPts_L[0] + lBoundaryPts_R[0])/2.0 );
 
    float lSlopeLeft =  (float)( VP_V - 	mBASE_LINE_ICS ) /(VP_H - lBoundaryPts_L[0].x);
@@ -103,11 +103,13 @@ void FrameRenderer::drawLane(const cv::UMat& FRAME, const LaneModel& Lane)
 	//line(FRAME, cvPoint(x,mBASE_LINE_ICS), cvPoint(x,mBASE_LINE_ICS - 40), cvScalar(0,0,255), 2);
    }
 
+
+
    // Draw Histogram-Bins at the Purview
    for (size_t i=0; i < mCOUNT_BINS; i++)
    {
 	int x = mPURVIEW_BINS.at<int32_t>(i,0) + mO_ICCS_ICS.x;
-	if ( (x== Lane.boundaryLeft_Purview + mO_ICCS_ICS.x) |(x== Lane.boundaryRight_Purview + mO_ICCS_ICS.x) )
+	if ( (x== Lane.boundaryLeft[1] + mO_ICCS_ICS.x) |(x== Lane.boundaryRight[1] + mO_ICCS_ICS.x) )
 	{
 	  line(FRAME, cvPoint(x, mPURVIEW_LINE_ICS), cvPoint(x, mPURVIEW_LINE_ICS - 60), cvScalar(0,0,255), 1);
 	}

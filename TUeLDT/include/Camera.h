@@ -118,16 +118,15 @@ private:
  
    	  // 4x4 Pitch Transformation
     	  cv::Mat ROT_P = (cv::Mat_<float>(4,4)<< 1,   0,  				  0,   			            0,
-				    	  0,   cos(-(M_PI/2.0) + toRad(PITCH)),  sin(-(M_PI/2.0) + toRad(PITCH)),   0,
-				    	  0,   -sin(-(M_PI/2.0) + toRad(PITCH)), cos(-(M_PI/2.0) + toRad(PITCH)),   0,
-				    	  0,   0,  				  0,   			       	    1);
-
+				    	          0,   cos(-(M_PI/2.0) + toRad(PITCH)),  sin(-(M_PI/2.0) + toRad(PITCH)),   0,
+				    	          0,  -sin(-(M_PI/2.0) + toRad(PITCH)),  cos(-(M_PI/2.0) + toRad(PITCH)),   0,
+				    	          0,   0,  				  0,   			       	    1);
 
 	  // 4x4 Yaw Transformation
-	  cv::Mat ROT_Y = (cv::Mat_<float>(4,4)<< cos(toRad(YAW)),     0,  	-sin(toRad(YAW)),  0,
-					    0,	 	       1,  	0,		   0,
-					    sin(toRad(YAW)),   0,  	cos(toRad(YAW)),   0,
-					    0,   	       0,  	0,   		   1);
+	  cv::Mat ROT_Y = (cv::Mat_<float>(4,4)<< cos(toRad(YAW)),      0,  	-sin(toRad(YAW)),  0,
+					    	  0,	 	       	1,      0,	 	   0,
+					       	  sin(toRad(YAW)),   	0,      cos(toRad(YAW)),   0,
+					          0,   	       		0,      0,   		   1);
 
 
    	 // 4x4 Translation

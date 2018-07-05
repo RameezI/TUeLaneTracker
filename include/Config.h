@@ -57,7 +57,7 @@ namespace LaneTracker
 	float  cam_fy  = 526.0339806; 		//Focal lenght y-axis [pixels]
 
 	float  cam_cx	= 0;	   		//Principal point x-axis in Image-Center-CS [pixels]
-	float  cam_cy   =-3;			//Principal point y-axis in Image-Center-CS [pixels]
+	float  cam_cy   = 0;			//Principal point y-axis in Image-Center-CS [pixels]
 
 	// Camera Extrinsic parameters
 	float  cam_pitch   = 0;			//Pitch of the camera		

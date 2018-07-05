@@ -41,7 +41,8 @@ StateMachine::StateMachine(unique_ptr<FrameFeeder> frameFeeder, const LaneTracke
    mPtrFrameRenderer(nullptr),
    mPtrLaneFilter(nullptr),
    mPtrVanishingPtFilter(nullptr),
-   mPtrTemplates(nullptr)
+   mPtrTemplates(nullptr),
+   mPtrLaneModel(nullptr)
 {
 
 	#ifdef S32V2XX
@@ -95,6 +96,7 @@ int StateMachine::spin()
    	   mPtrBootingState.reset(nullptr);
    	   mPtrBufferingState.reset(nullptr);
    	   mPtrTrackingState.reset(nullptr);
+	   mPtrLaneModel = nullptr;
 
 	   mPtrFrameFeeder->Paused.store(true);
 	   mCurrentState = States::BOOTING;
@@ -236,14 +238,13 @@ int StateMachine::spin()
 		{
 		  try
 		  {
-		       mLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
+		       mPtrLaneModel = mPtrTrackingState->run(mPtrFrameFeeder->dequeue());
 
 		       if(mConfig.display_graphics)
-		        mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), mLaneModel);
+		        mPtrFrameRenderer->drawLane(mPtrFrameFeeder->dequeueDisplay(), *mPtrLaneModel);
 		  }
 		  catch(const char* msg)
 		  {
-
 	   	     #ifdef PROFILER_ENABLED
 	              LOG_INFO_(LDTLog::STATE_MACHINE_LOG) <<endl
 	              <<"******************************"<<endl
@@ -290,12 +291,19 @@ int StateMachine::spin()
 	} break; } // END SWITCH
 
 	return lReturn;
+}
 
+bool StateMachine::laneModel()
+{
+   if(mPtrLaneModel == nullptr)
+     return false;
+   else
+     return true;
 }
 
 LaneModel StateMachine::getLaneModel()
 {
-        return mLaneModel;
+    return *mPtrLaneModel;
 }
 
 
@@ -320,6 +328,7 @@ States StateMachine::getCurrentState()
 StateMachine::~StateMachine()
 {
 
+   mPtrLaneModel = nullptr;
    mPtrFrameFeeder.reset(nullptr);
    mPtrBootingState.reset(nullptr);
    mPtrBufferingState.reset(nullptr);

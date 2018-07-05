@@ -54,6 +54,9 @@ public:	 	//Public Interface
   		const int 	BASE_LINE_ICCS;		/**< Base line in Image-Center-CS [pixel-lines] */
   		const int 	PURVIEW_LINE_ICCS;	/**< Base line in Image-Center-CS [pixel-lines] */
 
+  		float 		BASE_LINE_cm;		/**< Look-ahead distance at the base line in Vehicle_Symmetry-CS [cm] */
+  		float  		PURVIEW_LINE_cm;	/**< Look-ahead distance at the purview line in Vehicle_Symmetry-CS [cm] */
+
 		const float	BINS_STEP_cm;  		/**< Step size for the Histogram BINS [cm] */
   		const float	BINS_MAX_cm;		/**< Max value of the #BINS_cm **/
 		const size_t   	COUNT_BINS;   		/**< Number of bins in each Histogram */

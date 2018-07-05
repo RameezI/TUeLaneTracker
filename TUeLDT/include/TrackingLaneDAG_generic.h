@@ -35,6 +35,7 @@ FRIEND_TEST(TrackingTest, INTERSECTIONS);
 FRIEND_TEST(TrackingTest, MASK_INTERSECTIONS);
 FRIEND_TEST(TrackingTest, WEIGHTS);
 FRIEND_TEST(TrackingTest, HISTOGRAMS);
+
 private:
 	int32_t			mMAX_PIXELS_ROI;
 	
@@ -59,8 +60,6 @@ private:
 	
 	size_t			mIdxPurview_LB;
 	size_t			mIdxPurview_RB;
-	
-
 
 	LaneFilter* 		mLaneFilter;
 	VanishingPtFilter*	mVpFilter;
@@ -95,7 +94,7 @@ private:
 	cv::Mat 		mTransitVpFilter;
 
 	BaseHistogramModel	mBaseHistModel;  	/**< Selected Base-Histogram Model */
-	LaneModel   		mLaneModel;		/**< The detected Lane-Model */
+	unique_ptr<LaneModel>   mPtrLaneModel;		/**< The detected Lane-Model */
 
 	// Only Enable in case of Video Recording
 	//cv::VideoWriter mOutputVideo;
