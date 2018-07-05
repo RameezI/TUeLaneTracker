@@ -44,7 +44,7 @@ namespace LaneTracker
 	//Lane Properties
 	float  lane_avg_width    = 300;
 	float  lane_std_width    = 15;
-	float  lane_min_width    = 250;
+	float  lane_min_width    = 200;
 	float  lane_max_width    = 500;
 	float  lane_marker_width = 15;
 	  

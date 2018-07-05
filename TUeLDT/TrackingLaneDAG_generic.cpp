@@ -483,11 +483,12 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 	
 	   int32_t	  lIntSecLeft, lIntSecRight, lWidth_cm;
 	   int32_t	  lIdx_LB, lIdx_RB;
-	   size_t  	  lIdx_Mid, lIdx_NLB, lIdx_NRB, lCount_NLB, lCount_NRB;
+	   int32_t  	  lIdx_Mid, lIdx_NLB, lIdx_NRB, lCount_NLB, lCount_NRB;
 	   
 	   cv::Mat   	  lRange;
 
 	   const size_t   lIDX_MARK = floor(lWIDTH_MARK/lSTEP_cm) ;
+
 
 	   mPosterior	 = 0;	
 	   mMaxPosterior = 0;
@@ -513,8 +514,12 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		   lIdx_LB 	= ( lIntSecLeft  - mLOWER_LIMIT_PURVIEW + (lSTEP/2) )/lSTEP;
 		   lIdx_RB 	= ( lIntSecRight - mLOWER_LIMIT_PURVIEW + (lSTEP/2) )/lSTEP;
 
+	   	   lIdx_Mid    = round((lIdx_LB + lIdx_RB)/2.0 );
+	   	   lCount_NLB  = (lIdx_Mid - lIDX_MARK) - (lIdx_LB  + lIDX_MARK) -1;
+	   	   lCount_NRB  = (lIdx_RB  - lIDX_MARK) - (lIdx_Mid + lIDX_MARK) -1;
+
 					   
-		   if ( (lIdx_LB > 0) &&  (lIdx_RB < (int32_t)(mLaneFilter->COUNT_BINS -1) ) )
+		   if ( (lIdx_LB > 0) &&  (lIdx_RB < (int32_t)(mLaneFilter->COUNT_BINS -1) ) && (lCount_NLB>0) && (lCount_NRB>0) )
 		   {			
 
 		      lWidth_cm= mLaneFilter->BINS_cm(lIdx_RB) - mLaneFilter->BINS_cm(lIdx_LB);
@@ -592,10 +597,6 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 
 		      if(lMIN_WIDTH< lWidth_cm && lWidth_cm < lMAX_WIDTH)
 		      {
-		   	 lIdx_Mid    = round((lIdx_LB + lIdx_RB)/2.0 );
-
-	           	 lCount_NLB  = (lIdx_Mid - lIDX_MARK) - (lIdx_LB  + lIDX_MARK) -1;
-	           	 lCount_NRB  = (lIdx_RB  - lIDX_MARK) - (lIdx_Mid + lIDX_MARK) -1;
 
 		   	 lIdx_NLB    = lIdx_LB   + lIDX_MARK;
 		   	 lIdx_NRB    = lIdx_RB   - lCount_NRB;	

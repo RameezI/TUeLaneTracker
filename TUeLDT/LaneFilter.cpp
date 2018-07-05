@@ -145,14 +145,13 @@ LaneFilter::LaneFilter(const LaneProperties& LANE_PROP,  const Camera& CAM, cons
   
   {
 
-	if(PURVIEW_STEP<1)
-	throw "Step size is too small,the algorithm could run into possible memory errors => Increase step-size or lower the purview line";
+     if(PURVIEW_STEP<1)
+     throw "Step size is too small,the algorithm could run into possible memory errors => Increase step-size or lower the purview line";
 
-	createPrior();
-	filter = prior.clone(); // Initially the posterior probabilities are equal to the prior estimate.
+     createPrior();
+     filter = prior.clone(); // Initially the posterior probabilities are equal to the prior estimate.
 	
-  }
-
+   }
 
 
 void LaneFilter::createPrior()
@@ -187,20 +186,20 @@ void LaneFilter::createPrior()
 	       size_t idxL 	= (lBINS_RHP_cm.size()  -1) - left;
 	       size_t idxR 	= (lBINS_RHP_cm.size()  -1) + right;
 	       size_t idxM 	= round((idxL+idxR)/2.0);
-	 	
-	       //cout << "Left: "<< idxL <<"	Right: "<< idxR << "	Mid: "<< idxM << "	CM_WIDTH:"<< lWidth_cm<<endl;
-	
-	       if(!( (idxM - idxL >=1) && (idxR - idxM >=1) ) )
-		throw "Select a smaller step-size. Not enough bins for calculating the Histograms";
-	
-	
 	       size_t idxMark 	= floor(lWidthMarking/BINS_STEP_cm) ;
 
-	       size_t lNonBoundaryBinsCount_left  = (idxM-idxMark) - (idxL + idxMark) -1;
-	       size_t lNonBoundaryBinsCount_right = (idxR-idxMark) - (idxM + idxMark) -1;
+	       if(!( (idxM - idxL >=1) && (idxR - idxM >=1) ) )
+		throw "Select a smaller step-size. Not enough bins for calculating the Histograms";
 
-	       if( 0 < idxL && idxR < COUNT_BINS-1 )
+	       int lNonBoundaryBinsCount_left  = (idxM-idxMark) - (idxL + idxMark) -1;
+	       int lNonBoundaryBinsCount_right = (idxR-idxMark) - (idxM + idxMark) -1;
+
+	       if( (0 < idxL) && (idxR < COUNT_BINS-1) && (lNonBoundaryBinsCount_left>0) && (lNonBoundaryBinsCount_right>0))
 	       {
+
+	       	  // cout <<endl<<"Left: "<< idxL <<"   Right: "<<idxR<< "   Mid: "<<idxM<<"   CM_WIDTH:"<<lWidth_cm
+		  //	      <<"idxMark: "<<idxMark<<endl;
+
 		   baseHistogramModels.push_back( BaseHistogramModel());
 
 		   baseHistogramModels.back().rowIdxFilter  			= left;
