@@ -47,7 +47,7 @@ private:
 	float 			mConditionalProb;
 	float			mPosterior;
 	float			mMaxPosterior;
-	int32_t			mCorrelationNB;
+	int32_t			mInvCorrelationNB;
 
 	int32_t 		mLOWER_LIMIT_BASE;
 	int32_t 		mLOWER_LIMIT_PURVIEW;
