@@ -28,11 +28,6 @@
 #include "LaneModel.h"		//implicit include of LaneFilter and VanishingPtFilter
 #include "gtest/gtest.h"	//google-testing framework includes
 
-#ifdef DISPLAY_GRAPHICS_DCU
-#include "frame_output_v234fb.h"
-#endif
-
-
 using WriteLock = std::unique_lock<std::mutex>;
 
 struct BufferPool;
@@ -49,8 +44,6 @@ FRIEND_TEST(BufferingTest, PROB_MAP);
 FRIEND_TEST(BufferingTest, GRAD_TAN);
 FRIEND_TEST(TrackingTest, MAX_POOLING);
 
-
-
 public:
 	BufferingDAG_generic (const LaneTracker::Config& Config);
 
@@ -63,7 +56,7 @@ protected:
     	 ProfilerLDT         		mProfiler;
 	#endif
 
-	size_t 		mBufferPos;		/**< Active Buffer Position */
+	size_t          mBufferPos;		/**< Active Buffer Position */
 
 
 	int		mHORIZON_ICCS_H; 	/**< /brief Position of Horizon in the Image-Center-CS [pixels] */

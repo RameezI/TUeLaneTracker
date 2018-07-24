@@ -31,7 +31,7 @@ TrackingLaneDAG_generic::TrackingLaneDAG_generic(BufferingDAG_generic&& bufferin
   mConditionalProb(0),
   mPosterior(0),
   mMaxPosterior(0),
-  mCorrelationNB(0),
+  mInvCorrelationNB(0),
   mLOWER_LIMIT_BASE(0),
   mLOWER_LIMIT_PURVIEW(0),
   mUPPER_LIMIT_BASE(0),
@@ -419,14 +419,14 @@ mProfiler.start("HISTOGRAM_MATCHING");
 
 
 		//TODO:start=> Put this block on the side thread
-		mCorrelationNB	= 0;
+		mInvCorrelationNB	= 0;
 		lRange = mHistBase(cv::Range(lIdx_NLB,  lIdx_NLB  +  lCount_NLB ), cv::Range::all());
-		mCorrelationNB +=sum(lRange)[0];
+		mInvCorrelationNB +=sum(lRange)[0];
 		
 	    	lRange = mHistBase(cv::Range(lIdx_NRB, lIdx_NRB + lCount_NRB), cv::Range::all());
-		mCorrelationNB +=sum(lRange)[0];
+		mInvCorrelationNB +=sum(lRange)[0];
 		
-		float x= (float)mCorrelationNB / SCALE_FILTER ; 
+		float x= (float)mInvCorrelationNB / SCALE_FILTER ;
 		mLikelihood_NB = mLaneMembership.NEG_BOUNDARY_NORMA*exp(-pow(x,2)/mLaneMembership.NEG_BOUNDARY_NOMIN );
 		//(end)
 
@@ -618,15 +618,15 @@ mProfiler.start("VP_HISTOGRAM_MATCHING");
 		     	 mConditionalProb     =  (mLikelihood_LB*mLikelihood_RB) /(float)SCALE_FILTER;
 		
 		      	 //VP Probability over Non-Boundary Region
-		      	 mCorrelationNB   = 0;
+		      	 mInvCorrelationNB   = 0;
 		      	 lRange 	  = mHistPurview(cv::Range(lIdx_NLB, lIdx_NLB + lCount_NLB), cv::Range::all());
-		      	 mCorrelationNB   +=sum(lRange)[0];
+		      	 mInvCorrelationNB   +=sum(lRange)[0];
 			
 		         lRange 	  = mHistPurview(cv::Range(lIdx_NRB, lIdx_NRB + lCount_NRB), cv::Range::all());
-		         mCorrelationNB   +=sum(lRange)[0];
+		         mInvCorrelationNB   +=sum(lRange)[0];
 		
 		         mLikelihood_NB	   = mLaneMembership.NEG_BOUNDARY_NORMA;
-		         mLikelihood_NB   *= exp(-pow( mCorrelationNB/(float)SCALE_FILTER , 2)/mLaneMembership.NEG_BOUNDARY_NOMIN);
+		         mLikelihood_NB   *= exp(-pow( mInvCorrelationNB/(float)SCALE_FILTER , 2)/mLaneMembership.NEG_BOUNDARY_NOMIN);
 											 				 
 		         //Conditional Probability			 
 		         mConditionalProb  = mConditionalProb* mLikelihood_NB * mLikelihood_W;		
