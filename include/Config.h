@@ -44,7 +44,7 @@ namespace LaneTracker
 	//Lane Properties
 	float  lane_avg_width    = 300;
 	float  lane_std_width    = 15;
-	float  lane_min_width    = 200;
+	float  lane_min_width    = 250;
 	float  lane_max_width    = 500;
 	float  lane_marker_width = 15;
 	  
@@ -67,14 +67,14 @@ namespace LaneTracker
 
 
 	//LaneFilter VpFilter Paramters
-     	int    base_line_IBCS	    = 0;     	/**< Describes base line in Image-Bottom-Coordinate-System */
+    int    base_line_IBCS	    = 0;     	/**< Describes base line in Image-Bottom-Coordinate-System */
 	int    purview_line_IBCS    = 160;	/**< Describes purview line in Image-Bottom-Coordinate-System */
 	int    step_lane_filter_cm  = 10; 	/**< Provides bin-size for the 1D lane filters */
 	int    step_vp_filter	    = 10;	/**< Provides bin-size for 2D vanishing-point filter */
-	int    vp_range_ver	    = 20;   	/**< Vertical range of VP on either side of the Horizon Line [pixels] */
-	int    vp_range_hor	    = 300;     /**< Horizontal range of VP on either sides of center point [pixels] */
+	int    vp_range_ver	        = 20;   	/**< Vertical range of VP on either side of the Horizon Line [pixels] */
+	int    vp_range_hor	        = 300;     /**< Horizontal range of VP on either sides of center point [pixels] */
 	
-	int    buffer_count	    = 3;    	/**<  Provide number of frames to buffer[Temporal Filtering]*/
+	int    buffer_count	        = 3;    	/**<  Provide number of frames to buffer[Temporal Filtering]*/
 	bool   display_graphics     = true;	/**< Renders graphics on to a HDMI display */
 
   };
