@@ -27,7 +27,7 @@
 #define DISPLAY_GRAPHICS_DCU  	/**< If defined, the graphics are rendered on the s32v23 DCU*/
 
 
-//#define S32V2XX		/**< If defined, the program runs s32v-hardware accelerated algorithm */
+#define S32V2XX		/**< If defined, the program runs s32v-hardware accelerated algorithm */
 #ifdef S32V2XX
  #include "GraphsConfig.h"
 #endif
@@ -48,8 +48,8 @@ namespace LaneTracker
 	float  lane_marker_width = 15;
 	  
 	//Camera Resolution
-	int    cam_res_v = 480;   				// Vertical   Resolution  [pixels].
-	int    cam_res_h = 640;   				// Horizontal Resolution  [pixels].
+	int    cam_res_v = 480;					// Vertical   Resolution  [pixels].
+	int    cam_res_h = 640;					// Horizontal Resolution  [pixels].
 
 	// Camera Intrinsic parameters
 	float  cam_fx  = 563.9912133;			//Focal length x-axis [pixels]
