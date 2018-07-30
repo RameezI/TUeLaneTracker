@@ -132,16 +132,14 @@ int main(int argc, char* argv[]) /**
 
 
 
-    	if(lReturn == 0) //spin the stateMachine
-    	{
-    	  uint64_t        lCyclesCount = 0;
-    	  ProfilerLDT     lProfiler;
-    	  StateMachine&   stateMachine = *lPtrStateMachine.get();
+    if(lReturn == 0) //spin the stateMachine
+    {
+       uint64_t        lCyclesCount = 0;
+       ProfilerLDT     lProfiler;
+       StateMachine&   stateMachine = *lPtrStateMachine.get();
 
-
-	  while (stateMachine.getCurrentState() != States::DISPOSED)
-	  {
-
+       while (stateMachine.getCurrentState() != States::DISPOSED)
+	   {
 
 	     lProfiler.start("StateMachine_Cycle");
 	     if (lPtrSigInt->sStatus == SigStatus::STOP)
@@ -169,7 +167,7 @@ int main(int argc, char* argv[]) /**
 	     }
 
 	   }// End spinning
-    	}
+    }
 
     lPtrStateMachine.reset( nullptr);
 	cout<<endl<<"The program ended with exit code " <<lReturn<<endl;
