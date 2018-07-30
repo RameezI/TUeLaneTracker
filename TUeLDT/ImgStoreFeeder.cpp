@@ -23,7 +23,7 @@
 ImgStoreFeeder::ImgStoreFeeder(string sourceStr)
 : mQueuesSync(true),
   mMAX_BUFFER_SIZE(2),
-  mMAX_RETRY(100), 		// Main thread sleeps for 5ms and then retry to grab.
+  mMAX_RETRY(100), 		// Main thread sleeps for 1ms and then retry to grab.
   mSLEEP_ms(10),  		// Sleep time for the mAsyncGrabber
   mFolder(""),
   mSkipFrames(0),

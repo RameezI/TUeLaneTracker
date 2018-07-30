@@ -159,7 +159,7 @@ int StateMachine::spin()
 		if (mPtrBufferingState == nullptr)
 		{
 		   #ifdef S32V2XX
-		    mPtrBufferingState.reset(new BufferingState<BufferingDAG_s32v>());
+		    mPtrBufferingState.reset(new BufferingState<BufferingDAG_s32v>(mConfig));
 		   #else
 		    mPtrBufferingState.reset(new BufferingState<BufferingDAG_generic>(mConfig));
 		   #endif
