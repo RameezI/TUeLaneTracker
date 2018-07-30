@@ -24,10 +24,10 @@
 
 #define PROFILER_ENABLED		/**< If defined, the program logs and profiles its execution*/
 #define WRITE_FRAME_TO_FILE		/**< If defined, the output is saved to a video file */
-#define DISPLAY_GRAPHICS_DCU  	/**< If defined, the graphics are rendered on the s32v23 DCU*/
+#define DISPLAY_GRAPHICS_DCU  	        /**< If defined, the graphics are rendered on the s32v23 DCU*/
 
 
-#define S32V2XX		/**< If defined, the program runs s32v-hardware accelerated algorithm */
+#define S32V2XX		                /**< If defined, the program runs s32v-hardware accelerated algorithm */
 #ifdef S32V2XX
  #include "GraphsConfig.h"
 #endif
@@ -52,31 +52,31 @@ namespace LaneTracker
 	int    cam_res_h = 640;					// Horizontal Resolution  [pixels].
 
 	// Camera Intrinsic parameters
-	float  cam_fx  = 563.9912133;			//Focal length x-axis [pixels]
-	float  cam_fy  = 526.0339806; 			//Focal length y-axis [pixels]
+	float  cam_fx  = 563.9912133;			        //Focal length x-axis [pixels]
+	float  cam_fy  = 526.0339806; 			        //Focal length y-axis [pixels]
 
 	float  cam_cx	= 0;	   				//Principal point x-axis in Image-Center-CS [pixels]
 	float  cam_cy   = 0;					//Principal point y-axis in Image-Center-CS [pixels]
 
 	// Camera Extrinsic parameters
-	float  cam_pitch   			= 0;		//Pitch of the camera [degrees].
-	float  cam_yaw     		  	= 0;		//Yaw of the camera [degrees].
-	float  cam_height  		  	= 1.5;		// Camera height from the road [meters].
-	float  cam_lateral_offset 	= 0;		// Lateral-Offset of the camera from the vehicle symmetry plane[meters].
+	float  cam_pitch   		= 0;		        //Pitch of the camera [degrees].
+	float  cam_yaw     		= 0;		        //Yaw of the camera [degrees].
+	float  cam_height  		= 1.5;		        // Camera height from the road [meters].
+	float  cam_lateral_offset 	= 0;		        // Lateral-Offset of the camera from the vehicle symmetry plane[meters].
 
 
 	//LaneFilter VpFilter Paramters
-    int    base_line_IBCS	    = 0;     	/**< Describes base line in Image-Bottom-Coordinate-System */
-	int    purview_line_IBCS    = 160;		/**< Describes purview line in Image-Bottom-Coordinate-System */
-	int    step_lane_filter_cm  = 10; 		/**< Provides bin-size for the 1D lane filters */
-	int    step_vp_filter	    = 10;		/**< Provides bin-size for 2D vanishing-point filter */
+        int    base_line_IBCS	    = 0;     	                /**< Describes base line in Image-Bottom-Coordinate-System */
+	int    purview_line_IBCS    = 160;		        /**< Describes purview line in Image-Bottom-Coordinate-System */
+	int    step_lane_filter_cm  = 10; 		        /**< Provides bin-size for the 1D lane filters */
+	int    step_vp_filter	    = 10;		        /**< Provides bin-size for 2D vanishing-point filter */
 
-	int    vp_range_ver	    	= 20;   	/**< Vertical range of VP on either side of the Horizon Line [pixels] */
-	int    vp_range_hor	    	= 300;      /**< Horizontal range of VP on either sides of center point [pixels] */
+	int    vp_range_ver	    = 20;   	                /**< Vertical range of VP on either side of the Horizon Line [pixels] */
+	int    vp_range_hor	    = 300;                      /**< Horizontal range of VP on either sides of center point [pixels] */
 
 	
-	int    buffer_count	        = 3;    	/**<  Provide number of frames to buffer[Temporal Filtering]*/
-	bool   display_graphics     = true;		/**< Renders graphics on to a HDMI display */
+	int    buffer_count	    = 3;    	                /**<  Provide number of frames to buffer[Temporal Filtering]*/
+	bool   display_graphics     = true;		        /**< Renders graphics on to a HDMI display */
 
   };
 
