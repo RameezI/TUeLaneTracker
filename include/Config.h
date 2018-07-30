@@ -22,12 +22,12 @@
 * THE POSSIBILITY OF SUCH DAMAGE.
 * ****************************************************************************/
 
-#define PROFILER_ENABLED	/**< If defined, the program logs and profiles its execution*/
-#define WRITE_FRAME_TO_FILE	/**< If defined, the output is saved to a video file */
-#define DISPLAY_GRAPHICS_DCU  /**< If defined, the graphics are rendered on the s32v23 DCU*/
+#define PROFILER_ENABLED		/**< If defined, the program logs and profiles its execution*/
+#define WRITE_FRAME_TO_FILE		/**< If defined, the output is saved to a video file */
+#define DISPLAY_GRAPHICS_DCU  	/**< If defined, the graphics are rendered on the s32v23 DCU*/
 
 
-#define S32V2XX		/**< If defined, the program runs s32v-hardware accelerated algorithm */
+//#define S32V2XX		/**< If defined, the program runs s32v-hardware accelerated algorithm */
 #ifdef S32V2XX
  #include "GraphsConfig.h"
 #endif
@@ -71,13 +71,10 @@ namespace LaneTracker
 	int    purview_line_IBCS    = 160;	/**< Describes purview line in Image-Bottom-Coordinate-System */
 	int    step_lane_filter_cm  = 10; 	/**< Provides bin-size for the 1D lane filters */
 	int    step_vp_filter	    = 10;	/**< Provides bin-size for 2D vanishing-point filter */
-<<<<<<< HEAD
+
 	int    vp_range_ver	    = 20;   	/**< Vertical range of VP on either side of the Horizon Line [pixels] */
 	int    vp_range_hor	    = 300;      /**< Horizontal range of VP on either sides of center point [pixels] */
-=======
-	int    vp_range_ver	        = 20;   	/**< Vertical range of VP on either side of the Horizon Line [pixels] */
-	int    vp_range_hor	        = 300;     /**< Horizontal range of VP on either sides of center point [pixels] */
->>>>>>> 34ce7137fe383f7ae03fa94bb887a3db76c94f4f
+
 	
 	int    buffer_count	        = 3;    	/**<  Provide number of frames to buffer[Temporal Filtering]*/
 	bool   display_graphics     = true;	/**< Renders graphics on to a HDMI display */
