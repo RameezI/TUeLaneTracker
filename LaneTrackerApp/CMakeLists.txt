@@ -1,7 +1,7 @@
 # This compiles and links Executable called "TUeLaneTracker"
 cmake_minimum_required (VERSION 2.8.11)
 
-SET(CMAKE_MODULE_PATH 	 ${CMAKE_SOURCE_DIR}/cmake/Modules {CMAKE_MODULE_PATH} )
+SET(CMAKE_MODULE_PATH 	 ${CMAKE_SOURCE_DIR}/cmake/Modules ${CMAKE_MODULE_PATH} )
 
 find_package(OpenCV REQUIRED)
 find_package(Threads REQUIRED)
