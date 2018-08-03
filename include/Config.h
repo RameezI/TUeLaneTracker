@@ -24,7 +24,7 @@
 
 #define PROFILER_ENABLED		/**< If defined, the program logs and profiles its execution*/
 #define WRITE_FRAME_TO_FILE		/**< If defined, the output is saved to a video file */
-#define DISPLAY_GRAPHICS_DCU    /**< If defined, the graphics are rendered on the s32v23 DCU*/
+//#define DISPLAY_GRAPHICS_DCU    /**< If defined, the graphics are rendered on the s32v23 DCU*/
 
 
 
