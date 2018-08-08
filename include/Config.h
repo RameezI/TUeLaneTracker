@@ -23,20 +23,7 @@
 * ****************************************************************************/
 
 #define PROFILER_ENABLED		/**< If defined, the program logs and profiles its execution*/
-<<<<<<< HEAD
-//#define WRITE_FRAMES_TO_FILE		/**< If defined, the output is saved to a video file */
-=======
-#define WRITE_FRAME_TO_FILE		/**< If defined, the output is saved to a video file */
-//#define DISPLAY_GRAPHICS_DCU    /**< If defined, the graphics are rendered on the s32v23 DCU*/
-
-
-
-//#define S32V2XX					/**< If defined, the program runs s32v-hardware accelerated algorithm */
-#ifdef S32V2XX
- #include "GraphsConfig.h"
-#endif
->>>>>>> cac014eb4d9e48f463403d1ac8a26e71b5832dda
-
+//#define WRITE_FRAMES_TO_FILE  /**< If defined, the output is saved to a video file */
 
 namespace LaneTracker
 {
