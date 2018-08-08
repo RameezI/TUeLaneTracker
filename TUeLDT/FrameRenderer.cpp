@@ -34,7 +34,7 @@ void FrameRenderer::drawLane(const cv::UMat& FRAME, const LaneModel& Lane)
    vector<Point> lBoundaryPts_R;
    vector<Point> lBoundaryPts_M;
 
-   //Transform VP to Image Coordianate System
+   //Transform VP to Image Coordinate System
    int VP_V =  Lane.vanishingPt.V + mO_ICCS_ICS.y;
    int VP_H =  Lane.vanishingPt.H + mO_ICCS_ICS.x;
  
