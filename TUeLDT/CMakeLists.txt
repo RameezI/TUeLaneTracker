@@ -3,7 +3,7 @@
 #Place all headers in the include subdirectory inside the TUeLDT directory
 cmake_minimum_required (VERSION 2.8.11)
 find_package(OpenCV REQUIRED)
-find_package(S32VSDK)
+find_package(S32VSDK QUEIT)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -O0 -std=c++11")
 file(GLOB  SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.c )
@@ -21,7 +21,6 @@ IF(S32VSDK_FOUND)
     list(APPEND TUeLDT_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/tue_lane_tracker/LaneTrackerApp/A53_inc)
     list(APPEND TUeLDT_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/tue_lane_tracker/LaneTrackerApp/APU_gen/src)
     list(APPEND TUeLDT_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/tue_lane_tracker/LaneTrackerApp/A53_gen/inc)
-    message("Includes after append: ${TUeLDT_INCLUDE_DIRS}")
     target_compile_definitions(TUeLDT PUBLIC DISPLAY_GRAPHICS_DCU S32V2XX OSDIR=linux)
 ENDIF(S32VSDK_FOUND)
 
