@@ -18,7 +18,11 @@ message("Includes before append: ${TUeLDT_INCLUDE_DIRS}")
 
 IF(S32VSDK_FOUND)
     list(APPEND TUeLDT_INCLUDE_DIRS ${S32VSDK_INCLUDE_DIRS})
+    list(APPEND TUeLDT_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/tue_lane_tracker/LaneTrackerApp/A53_inc)
+    list(APPEND TUeLDT_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/tue_lane_tracker/LaneTrackerApp/APU_gen/src)
+    list(APPEND TUeLDT_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/tue_lane_tracker/LaneTrackerApp/A53_gen/inc)
     message("Includes after append: ${TUeLDT_INCLUDE_DIRS}")
+    target_compile_definitions(TUeLDT PUBLIC DISPLAY_GRAPHICS_DCU S32V2XX OSDIR=linux)
 ENDIF(S32VSDK_FOUND)
 
 target_include_directories (TUeLDT PUBLIC ${TUeLDT_INCLUDE_DIRS})
