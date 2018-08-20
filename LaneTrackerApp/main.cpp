@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) /**
 			"\t selects frame input mode")
 
 	  ("Source,s",
-			po::value<string>(&lSourceStr)->default_value("../DataSet"),
+			po::value<string>(&lSourceStr)->default_value("DataSet"),
 			"\t provides source configuration");
 
 	  po::variables_map vMap;
