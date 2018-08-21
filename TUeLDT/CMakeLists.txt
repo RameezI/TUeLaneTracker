@@ -12,7 +12,8 @@ add_library(TUeLDT STATIC ${SOURCES})
 
 set(TUeLDT_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
              ${CMAKE_CURRENT_SOURCE_DIR}/../include
-             ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyLibs)
+             ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyLibs
+             ${OpenCV_INCLUDE_DIRS})
 
 message("Includes before append: ${TUeLDT_INCLUDE_DIRS}")
 
