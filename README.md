@@ -91,11 +91,6 @@ This provides a way to reconfigure the algorithm but only at the compile time. H
 * [Boost 1.62.0](http://www.boost.org/users/history/version_1_62_0.html) - Provides Program Options
 
 
-## Contributing
-
-Please read [CONTRIBUTING.md](TO BE DEFINED) for details on our code of conduct, and the process for submitting pull requests to us.
-
-
 ## Authors
 * **Rameez Ismail**
 See also the list of [contributors](https://github.com/RameezI/TUeLaneTracker/graphs/contributors) who participated in this project.
